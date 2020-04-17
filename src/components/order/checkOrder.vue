@@ -186,7 +186,7 @@
           </el-select>
           <span style="margin-left:50px;">物流公司：</span>
           <el-input style="width:300px;" :disabled="this.ctm_order.deliveryType == 3 ? false : true"
-            v-model="ctm_order.deliveryNotes" placeholder="物流备注"></el-input>
+            v-model="ctm_order.deliveryNotes" placeholder="物流公司"></el-input>
         </fieldset>
 
         <fieldset>
@@ -1374,6 +1374,7 @@ export default {
     //     });
     // },
     payNew() {
+      if(!this.checkPay()) return;
       var url = "/order/getResidemoney.do";
       var data = {
         cid: Cookies.get("cid"),
@@ -1387,14 +1388,6 @@ export default {
         for (var i = 0; i < getPush3.length; i++) {
           deleteArray[i] = getPush3[i].cartItemId;
         }
-        //地址
-        this.ctm_order.buyUserAddress = this.splitAddress2(this.ctm_order);
-        //附件拼接
-        this.ctm_order.buyUserPicture = "";
-        for (var i = 0; i < this.fileList.length; i++) {
-          this.ctm_order.buyUserPicture +=
-            "/Files/BuyUser/" + this.cid + "/" + this.fileList[i].name + ";";
-        }
         var data2 = {
           product_group_tpye: "E", //产品类别
           promotion_cost: this.totalPrice, //活动价格【】
@@ -1407,49 +1400,10 @@ export default {
           ctm_orders: this.array2,
           cartItemIDs: deleteArray
         };
-        if (
-          this.ctm_order.deliveryNotes == "" &&
-          this.ctm_order.deliveryType == 3
-        ) {
-          this.$alert("请填写指定的物流公司", "提示", {
-            confirmButtonText: "确定",
-            type: "warning"
-          });
-          return;
-        }
         orderSettlement(data2)
           .then(res => {
-            //活动类型"N"或者应付为0不需要判断余额
-            if (
-              this.allSpend == 0 ||
-              this.arrearsFlag == "N" ||
-              this.allSpend <= this.Initial_balance
-            ) {
-              this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
-              this.$root.$emit("refreshBadgeIcon", "curtainCount");
-              this.$alert("提交成功", "提示", {
-                confirmButtonText: "确定",
-                type: "success"
-              });
-            } else {
-              this.$alert(
-                "余额不足，当前订单还需充值" +
-                  (this.allSpend - this.Initial_balance).toFixed(2) +
-                  "元才能提交",
-                "提示",
-                {
-                  confirmButtonText: "确定",
-                  type: "warning"
-                }
-              );
-            }
-          })
-          .then(() => {
-            //deleteCurtain(deleteArray); //删除订单信息（提交一起删除了）
-            this.closeToTab({
-              oldUrl: "order/checkOrder",
-              newUrl: "order/myOrder"
-            });
+            this.afterPay();
+            this.$root.$emit("refreshBadgeIcon", "curtainCount");
           })
           .catch(res => {
             this.$alert("提交失败，请联系管理员", "提示", {
@@ -1461,23 +1415,7 @@ export default {
     },
     //提交结算
     payIt() {
-      if (
-        this.ctm_order.deliveryNotes == "" &&
-        this.ctm_order.deliveryType == 3
-      ) {
-        this.$alert("请填写指定的物流公司", "提示", {
-          confirmButtonText: "确定",
-          type: "warning"
-        });
-        return;
-      }
-      // if (this.packingShow && !this.ctm_order.packingNote) {
-      //   this.$alert("请选择分包提示", "提示", {
-      //     confirmButtonText: "确定",
-      //     type: "warning"
-      //   });
-      //   return;
-      // }
+      if(!this.checkPay()) return;
       var url = "/order/getResidemoney.do";
       var data = {
         cid: Cookies.get("cid"),
@@ -1492,14 +1430,6 @@ export default {
         var getPush3 = JSON.parse(sessionStorage.getItem("shopping"));
         for (var i = 0; i < getPush3.length; i++) {
           deleteArray[i] = getPush3[i].id; //不像窗帘，这里一个cart_item_id可能对应多个
-        }
-        //地址
-        this.ctm_order.buyUserAddress = this.splitAddress2(this.ctm_order);
-        //附件拼接
-        this.ctm_order.buyUserPicture = "";
-        for (var i = 0; i < this.fileList.length; i++) {
-          this.ctm_order.buyUserPicture +=
-            "/Files/BuyUser/" + this.cid + "/" + this.fileList[i].name + ";";
         }
         var data2 = {
           product_group_tpye: this.product_group_tpye, //产品类别，从购物车出获取
@@ -1516,38 +1446,9 @@ export default {
         //submitOrder(url2, data2)
         normalOrderSettlement(data2)
           .then(res => {
-            //活动类型"N"或者应付为0不需要判断余额
-            if (
-              this.allSpend == 0 ||
-              this.arrearsFlag == "N" ||
-              this.allSpend <= this.Initial_balance
-            ) {
-              this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
-              if (this.product_group_tpye == "F")
-                this.$root.$emit("refreshBadgeIcon", "softCount");
-              else this.$root.$emit("refreshBadgeIcon", "wallCount");
-              this.$alert("提交成功", "提示", {
-                confirmButtonText: "确定",
-                type: "success"
-              });
-            } else {
-              this.$alert(
-                "余额不足，当前订单还需充值" +
-                  (this.allSpend - this.Initial_balance).toFixed(2) +
-                  "元才能提交",
-                "提示",
-                {
-                  confirmButtonText: "确定",
-                  type: "warning"
-                }
-              );
-            }
-          })
-          .then(() => {
-            this.closeToTab({
-              oldUrl: "order/checkOrder",
-              newUrl: "order/myOrder"
-            });
+            this.afterPay();
+            this.$root.$emit("refreshBadgeIcon", "wallCount");
+            this.$root.$emit("refreshBadgeIcon", "softCount");
           })
           .catch(res => {
             this.$alert("提交失败，请联系管理员", "提示", {
@@ -1555,6 +1456,89 @@ export default {
               type: "warning"
             });
           });
+      });
+    },
+    checkPay() {
+      if (
+        this.ctm_order.deliveryNotes == "" &&
+        this.ctm_order.deliveryType == 3
+      ) {
+        this.$alert("请填写指定的物流公司", "提示", {
+          confirmButtonText: "确定",
+          type: "warning"
+        });
+        return false;
+      }
+      // if (this.packingShow && !this.ctm_order.packingNote) {
+      //   this.$alert("请选择分包提示", "提示", {
+      //     confirmButtonText: "确定",
+      //     type: "warning"
+      //   });
+      //   return;
+      // }
+      //购买人地址
+      this.ctm_order.buyUserAddress = this.splitAddress2(this.ctm_order);
+      //附件拼接
+      this.ctm_order.buyUserPicture = "";
+      for (var i = 0; i < this.fileList.length; i++) {
+        this.ctm_order.buyUserPicture +=
+          "/Files/BuyUser/" + this.cid + "/" + this.fileList[i].name + ";";
+      }
+      if (this.activityArray.BUYER_FLAG == 1) {
+        //要填写购买人信息
+        if (
+          !this.ctm_order.buyUser ||
+          !this.ctm_order.buyUserPhone ||
+          !this.ctm_order.buyUserArea1 ||
+          !this.ctm_order.buyUserArea2 ||
+          !this.ctm_order.buyUserArea3 ||
+          !this.ctm_order.buyUserPostAddress
+        ) {
+          this.$alert("请填写完整的购买用户信息", "提示", {
+            confirmButtonText: "确定",
+            type: "warning"
+          });
+          return false;
+        }
+        if (!this.ctm_order.buyUserPicture) {
+          this.$alert("请上传购买凭证", "提示", {
+            confirmButtonText: "确定",
+            type: "warning"
+          });
+          return false;
+        }
+      }
+      return true;
+    },
+    afterPay() {
+      //活动类型"N"或者应付为0不需要判断余额
+      if (
+        this.allSpend == 0 ||
+        this.arrearsFlag == "N" ||
+        this.allSpend <= this.Initial_balance
+      ) {
+        this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
+        this.$root.$emit("refreshBadgeIcon", "curtainCount");
+        this.$alert("提交成功", "提示", {
+          confirmButtonText: "确定",
+          type: "success"
+        });
+      } else {
+        this.$alert(
+          "余额不足，当前订单还需充值" +
+            (this.allSpend - this.Initial_balance).toFixed(2) +
+            "元才能提交",
+          "提示",
+          {
+            confirmButtonText: "确定",
+            type: "warning"
+          }
+        );
+      }
+      //跳转到我的订单
+      this.closeToTab({
+        oldUrl: "order/checkOrder",
+        newUrl: "order/myOrder"
       });
     },
     ...mapMutations("navTabs", ["addTab"]),
@@ -1861,7 +1845,7 @@ export default {
 }
 .rightDiv {
   float: right;
-  margin-right: 5%;
+  margin: 10px 50px 10px 0;
 }
 .rightDiv span {
   font-weight: bold;

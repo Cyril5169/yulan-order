@@ -1,37 +1,23 @@
 <template>
   <el-card class="centerCard">
-    <el-dialog
-      title="窗帘详情"
-      :show-close="true"
-      :visible.sync="detailVisible"
-      width="95%"
-      top="5vh"
-    >
+    <el-dialog title="窗帘详情" :visible.sync="detailVisible" width="95%" top="5vh">
       <keep-alive>
-        <detailCurtainTable
-          v-if="detailVisible"
-          v-bind:tableStatus="check_CURTAIN_STATUS_ID != 1 ? 3 : 2"
-          v-bind:headerData="headerData"
-          v-bind:curtainData="curtainData"
-          v-bind:suggestion="ljsuggestion"
-          v-on:visible="closeTheDialog"
-          v-on:deleteArr="getDeleteArr"
-          v-on:finalData="getFinalData"
-        ></detailCurtainTable>
+        <detailCurtainTable v-if="detailVisible" v-bind:tableStatus="check_CURTAIN_STATUS_ID != 1 ? 3 : 2"
+          v-bind:headerData="headerData" v-bind:curtainData="curtainData" v-bind:suggestion="ljsuggestion"
+          v-on:visible="closeTheDialog" v-on:deleteArr="getDeleteArr" v-on:finalData="getFinalData">
+        </detailCurtainTable>
       </keep-alive>
+    </el-dialog>
+    <el-dialog title="查看购买凭证" width="700px" :visible.sync="buyUserPictureVisible">
+      <div style="display: inline-block;margin:5px;cursor:pointer;" v-for="(file,index) in fileList" :key="index">
+        <el-image style="width: 200px; height: 200px" :src="file" fit="fill" @click="handleImgClick(index)" :preview-src-list="fileList2"></el-image>
+      </div>
     </el-dialog>
 
     <div slot="header">
       <span class="headSpan">订单详情</span>
-      <el-button
-        @click="backTowhere()"
-        style="float:right;"
-        size="small"
-        type="success"
-        plain
-        v-if="button_1"
-        >返回</el-button
-      >
+      <el-button @click="backTowhere()" style="float:right;" size="small" type="success" plain v-if="button_1">返回
+      </el-button>
     </div>
     <el-card class="tableCard" shadow="hover" body-style="padding:1px">
       <div slot="header">
@@ -41,21 +27,18 @@
         </span>
         <span class="zoomLeft">
           经办人：
-          <span class="zoomRight"
-            >{{ ruleForm.LINKPERSON }}({{ ruleForm.TELEPHONE }})</span
-          >
+          <span class="zoomRight">{{ ruleForm.LINKPERSON }}({{ ruleForm.TELEPHONE }})</span>
         </span>
         <span class="zoomLeft">
           收货人：
-          <span class="zoomRight"
-            >{{ ruleForm.WL_CONTACTS }}({{ ruleForm.WL_TEL }})</span
-          >
+          <span class="zoomRight">{{ ruleForm.WL_CONTACTS }}({{ ruleForm.WL_TEL }})</span>
         </span>
-         <span class="zoomLeft">
+        <span class="zoomLeft">
           购买人：
-          <span class="zoomRight"
-            >{{ ruleForm.BUYUSER }}({{ ruleForm.BUYUSERPHONE }})</span
-          >
+          <span class="zoomRight">{{ ruleForm.BUYUSER }}({{ ruleForm.BUYUSERPHONE }})</span>
+        </span>
+        <span class="zoomLeft" v-if="ruleForm.BUYUSER_PICTURE">
+          <el-link type="primary" @click="buyUserPictureVisible=true">查看购买凭证</el-link>
         </span>
         <br />
         <span class="zoomLeft">
@@ -80,178 +63,68 @@
           <span class="zoomRight">{{ ruleForm.YULAN_NOTES }}</span>
         </span>
       </div>
-      <el-table
-        border
-        :show-summary="ruleForm.ORDERBODY.length > 1"
-        :summary-method="getSummaries"
-        :data="ruleForm.ORDERBODY"
-        style="width: 100%"
-        :row-class-name="tableRowClassName"
-      >
-        <el-table-column
-          align="center"
-          prop="LINE_NO"
-          label="序号"
-          width="50"
-        ></el-table-column>
-        <el-table-column
-          align="center"
-          prop="ITEM_NO"
-          label="型号"
-          width="140"
-        ></el-table-column>
+      <el-table border :show-summary="ruleForm.ORDERBODY.length > 1" :summary-method="getSummaries"
+        :data="ruleForm.ORDERBODY" style="width: 100%" :row-class-name="tableRowClassName">
+        <el-table-column align="center" prop="LINE_NO" label="序号" width="50"></el-table-column>
+        <el-table-column align="center" prop="ITEM_NO" label="型号" width="140"></el-table-column>
         <el-table-column align="center" label="经销单价" width="80">
           <template slot-scope="scope1">
-            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID != -1"
-              >***</span
-            >
+            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID != -1">***</span>
             <span v-else>{{ scope1.row.UNIT_PRICE | priceFilter }}</span>
           </template>
         </el-table-column>
-        <el-table-column
-          align="center"
-          prop="QTY_REQUIRED"
-          label="数量"
-          width="60"
-        ></el-table-column>
-        <el-table-column
-          prop="PROMOTION"
-          align="center"
-          label="活动"
-          width="110"
-          show-overflow-tooltip
-        ></el-table-column>
-        <el-table-column
-          prop="PART_SEND_ID"
-          align="center"
-          :formatter="formatRole"
-          label="发货说明"
-          width="90"
-        ></el-table-column>
-        <el-table-column
-          prop="PROMOTION_COST"
-          align="center"
-          label="折后金额"
-          width="90"
-        >
+        <el-table-column align="center" prop="QTY_REQUIRED" label="数量" width="60"></el-table-column>
+        <el-table-column prop="PROMOTION" align="center" label="活动" width="110" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="PART_SEND_ID" align="center" :formatter="formatRole" label="发货说明" width="90">
+        </el-table-column>
+        <el-table-column prop="PROMOTION_COST" align="center" label="折后金额" width="90">
           <template slot-scope="scope1">
-            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID != -1"
-              >***</span
-            >
+            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID != -1">***</span>
             <span v-else>{{ scope1.row.PROMOTION_COST }}</span>
           </template>
         </el-table-column>
-        <el-table-column
-          prop="BACK_Y"
-          align="center"
-          label="年返利使用金额"
-          width="90"
-        >
+        <el-table-column prop="BACK_Y" align="center" label="年返利使用金额" width="90">
           <template slot-scope="scope1">
-            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID != -1"
-              >***</span
-            >
+            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID != -1">***</span>
             <span v-else>{{ scope1.row.BACK_Y }}</span>
           </template>
         </el-table-column>
-        <el-table-column
-          prop="BACK_M"
-          align="center"
-          label="月返利使用金额"
-          width="90"
-        >
+        <el-table-column prop="BACK_M" align="center" label="月返利使用金额" width="90">
           <template slot-scope="scope1">
-            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID != -1"
-              >***</span
-            >
+            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID != -1">***</span>
             <span v-else>{{ scope1.row.BACK_M }}</span>
           </template>
         </el-table-column>
-        <el-table-column
-          prop="FINAL_COST"
-          align="center"
-          label="应付金额"
-          width="90"
-        >
+        <el-table-column prop="FINAL_COST" align="center" label="应付金额" width="90">
           <template slot-scope="scope1">
-            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID != -1"
-              >***</span
-            >
+            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID != -1">***</span>
             <span v-else>{{ scope1.row.FINAL_COST }}</span>
           </template>
         </el-table-column>
-        <el-table-column
-          align="center"
-          prop="NOTES"
-          label="备注"
-        ></el-table-column>
-        <el-table-column
-          v-if="isX"
-          prop="LJ_SUGGESTION"
-          align="center"
-          label="兰居备注"
-        ></el-table-column>
+        <el-table-column align="center" prop="NOTES" label="备注"></el-table-column>
+        <el-table-column v-if="isX" prop="LJ_SUGGESTION" align="center" label="兰居备注"></el-table-column>
         <el-table-column v-if="isX" align="center" label="窗帘详情" width="100">
           <template slot-scope="scope">
-            <el-button
-              @click="openDialog(scope.row, scope.$index)"
-              type="primary"
-              size="mini"
-              >查看详情</el-button
-            >
+            <el-button @click="openDialog(scope.row, scope.$index)" type="primary" size="mini">查看详情</el-button>
           </template>
         </el-table-column>
-        <el-table-column
-          v-if="check_CURTAIN_STATUS_ID == 1 && isX"
-          align="center"
-          prop="checkStatus"
-          label="是否修改"
-          width="80"
-        ></el-table-column>
+        <el-table-column v-if="check_CURTAIN_STATUS_ID == 1 && isX" align="center" prop="checkStatus" label="是否修改"
+          width="80"></el-table-column>
       </el-table>
 
       <div style="float:right;margin-top:20px;margin-right:10px;height:80px;">
         <!-- <p>商品总价格：<span style="color:tomato;font-weight:bold;">{{ruleForm.ALL_SPEND}}</span></p><span> -->
-        <el-button
-          v-if="check_CURTAIN_STATUS_ID == 2"
-          @click="_defeat()"
-          size="medium"
-          type="warning"
-          >退回兰居修改</el-button
-        >
-        <el-button
-          v-if="check_CURTAIN_STATUS_ID == 2"
-          @click="_pass()"
-          size="medium"
-          type="success"
-          >确认兰居修改</el-button
-        >
-        <el-button
-          :disabled="exButton"
-          v-if="check_CURTAIN_STATUS_ID == 1"
-          @click="LjExamine()"
-          size="medium"
-          type="success"
-          >确认修改</el-button
-        >
-        <el-button
-          v-if="
+        <el-button v-if="check_CURTAIN_STATUS_ID == 2" @click="_defeat()" size="medium" type="warning">退回兰居修改
+        </el-button>
+        <el-button v-if="check_CURTAIN_STATUS_ID == 2" @click="_pass()" size="medium" type="success">确认兰居修改</el-button>
+        <el-button :disabled="exButton" v-if="check_CURTAIN_STATUS_ID == 1" @click="LjExamine()" size="medium"
+          type="success">确认修改</el-button>
+        <el-button v-if="
             (check_CURTAIN_STATUS_ID == 0 || check_CURTAIN_STATUS_ID == 4) &&
               check_STATUS_ID == 0
-          "
-          @click="summitCurtain"
-          size="medium"
-          type="primary"
-          >提交订单</el-button
-        >
-        <el-button
-          v-if="check_STATUS_ID == 5 || check_STATUS_ID == 6"
-          @click="refreshPay()"
-          size="medium"
-          type="danger"
-          plain
-          >提交订单</el-button
-        >
+          " @click="summitCurtain" size="medium" type="primary">提交订单</el-button>
+        <el-button v-if="check_STATUS_ID == 5 || check_STATUS_ID == 6" @click="refreshPay()" size="medium" type="danger"
+          plain>提交订单</el-button>
       </div>
       <div style="padding:10px;">
         <span class="timeLeft">
@@ -286,25 +159,12 @@
           >订单修改说明：当修改数量不超过200卷时，双方可通过电话在原订单上进行修改，当修改数量超过200卷时，乙方应向甲方提供书面修改说明。</span
         >
         <br /> -->
-        <span style="margin-left:10px;color:red;"
-          >法律效力：本订单是双方合作协议不可分割的一部分，是乙方向甲方订货的凭证，具法力效力。</span
-        >
+        <span style="margin-left:10px;color:red;">法律效力：本订单是双方合作协议不可分割的一部分，是乙方向甲方订货的凭证，具法力效力。</span>
       </div>
-      <div
-        v-if="operationRecords.length > 0"
-        style="width:800px;margin-bottom:20px;"
-      >
+      <div v-if="operationRecords.length > 0" style="width:800px;margin-bottom:20px;">
         <h1 style="margin-left:10px;">处理记录：</h1>
-        <el-steps
-          direction="vertical"
-          :active="operationRecords.length"
-          style="margin-top:10px;margin-left:20px;"
-        >
-          <el-step
-            v-for="item in operationRecords"
-            :key="item.value"
-            style="margin-top:1px;"
-          >
+        <el-steps direction="vertical" :active="operationRecords.length" style="margin-top:10px;margin-left:20px;">
+          <el-step v-for="item in operationRecords" :key="item.value" style="margin-top:1px;">
             <template slot="title">
               <div v-html="item.OPERATION_NOTE"></div>
             </template>
@@ -361,6 +221,10 @@ export default {
       check_STATUS_ID: "",
       orderNum: "",
       detailVisible: false,
+      buyUserPictureVisible: false,
+      fileList: [],
+      fileList2: [],
+      showViewer: false,
       operationRecords: [],
       ruleForm: {
         ORDER_NO: "",
@@ -678,6 +542,15 @@ export default {
           this.ruleForm.PACKING_NOTE = res2.data.PACKING_NOTE; //先这样处理，后台换了后台就不需要了
           this.ruleForm.BUYUSER_ADDRESS = res2.data.BUYUSER_ADDRESS;
           this.ruleForm.BUYUSER_PICTURE = res2.data.BUYUSER_PICTURE;
+          if (this.ruleForm.BUYUSER_PICTURE) {
+            var list = this.ruleForm.BUYUSER_PICTURE.split(";");
+            for (var i = 0; i < list.length - 1; i++) {
+              var index = list[i].lastIndexOf("/");
+              if (index == -1) index = list[i].lastIndexOf("\\");
+              var fileName = list[i].substr(index + 1);
+              this.fileList.push(this.Global.baseUrl + list[i]);
+            }
+          }
           for (let i = 0; i < this.ruleForm.ORDERBODY.length; i++) {
             this.ruleForm.ORDERBODY[i].checkStatus = "未修改";
           }
@@ -817,6 +690,16 @@ export default {
         }
       });
     },
+    handleImgClick(index) {
+      let tempImgList = [...this.fileList];//非地址复制
+      let temp = [];
+      for (let i = 0; i < index; i++) {
+        temp.push(tempImgList.shift());
+      }
+      this.fileList2 = tempImgList.concat(temp);
+      this.showViewer = true;
+    },
+    closeViewer(){},
     //合计行显示
     getSummaries({ columns, data }) {
       var sums = [];

@@ -10,7 +10,8 @@
     </el-dialog>
     <el-dialog title="查看购买凭证" width="700px" :visible.sync="buyUserPictureVisible">
       <div style="display: inline-block;margin:5px;cursor:pointer;" v-for="(file,index) in fileList" :key="index">
-        <el-image style="width: 200px; height: 200px" :src="file" fit="fill" @click="handleImgClick(index)" :preview-src-list="fileList2"></el-image>
+        <el-image style="width: 200px; height: 200px" :src="file" fit="fill" @click="handleImgClick(index)"
+          :preview-src-list="fileList2"></el-image>
       </div>
     </el-dialog>
 
@@ -34,20 +35,21 @@
           <span class="zoomRight">{{ ruleForm.WL_CONTACTS }}({{ ruleForm.WL_TEL }})</span>
         </span>
         <span class="zoomLeft">
-          购买人：
-          <span class="zoomRight">{{ ruleForm.BUYUSER }}({{ ruleForm.BUYUSERPHONE }})</span>
-        </span>
-        <span class="zoomLeft" v-if="ruleForm.BUYUSER_PICTURE">
-          <el-link type="primary" @click="buyUserPictureVisible=true">查看购买凭证</el-link>
-        </span>
-        <br />
-        <span class="zoomLeft">
           收货地址：
           <span class="zoomRight">{{ ruleForm.ALL_ADDRESS }}</span>
+        </span>
+
+        <br />
+        <span class="zoomLeft">
+          购买人：
+          <span class="zoomRight">{{ ruleForm.BUYUSER }}({{ ruleForm.BUYUSERPHONE }})</span>
         </span>
         <span class="zoomLeft">
           购买人地址：
           <span class="zoomRight">{{ ruleForm.BUYUSER_ADDRESS }}</span>
+        </span>
+        <span class="zoomLeft" v-if="ruleForm.BUYUSER_PICTURE">
+          <el-link type="primary" @click="buyUserPictureVisible=true">查看购买凭证</el-link>
         </span>
         <span class="zoomLeft" v-if="ruleForm.PACKING_NOTE">
           分包备注：
@@ -691,7 +693,7 @@ export default {
       });
     },
     handleImgClick(index) {
-      let tempImgList = [...this.fileList];//非地址复制
+      let tempImgList = [...this.fileList];
       let temp = [];
       for (let i = 0; i < index; i++) {
         temp.push(tempImgList.shift());
@@ -699,7 +701,6 @@ export default {
       this.fileList2 = tempImgList.concat(temp);
       this.showViewer = true;
     },
-    closeViewer(){},
     //合计行显示
     getSummaries({ columns, data }) {
       var sums = [];

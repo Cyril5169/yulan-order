@@ -1490,7 +1490,7 @@ export default {
           !this.ctm_order.buyUserPhone ||
           !this.ctm_order.buyUserArea1 ||
           !this.ctm_order.buyUserArea2 ||
-          !this.ctm_order.buyUserArea3 ||
+          //!this.ctm_order.buyUserArea3 ||
           !this.ctm_order.buyUserPostAddress
         ) {
           this.$alert("请填写完整的购买用户信息", "提示", {

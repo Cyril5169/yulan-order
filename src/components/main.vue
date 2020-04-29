@@ -7,29 +7,17 @@
             <div id="aside-logo"></div>
             <span>玉兰B2B</span>
           </div>
-          <el-menu
-            style="margin-bottom:10px;"
-            :default-openeds="['shops', 'design', 'shoppingCar', 'query']"
-            :default-active="url"
-            @select="addTab"
-            :collapse="asideStatus"
-          >
+          <el-menu style="margin-bottom:10px;" :default-openeds="['shops', 'design', 'shoppingCar', 'query']"
+            :default-active="url" @select="addTab" :collapse="asideStatus">
             <!-- 权限树加载 -->
-            <menuTree
-              v-for="item in menuTreeList"
-              :key="item.SystemMenuID"
-              :menuTreeItem="item"
-            />
+            <menuTree v-for="item in menuTreeList" :key="item.SystemMenuID" :menuTreeItem="item" />
           </el-menu>
         </el-scrollbar>
       </el-aside>
       <el-container style="width:85%; min-width:1050px;">
         <el-header height="45px">
           <ul class="l">
-            <li
-              :title="asideStatus == true ? '菜单展开' : '菜单收起'"
-              @click="changeAside"
-            >
+            <li :title="asideStatus == true ? '菜单展开' : '菜单收起'" @click="changeAside">
               <i id="asideControll" class="iconfont">&#xe61e;</i>
               <span class="ml10 mr10">{{
                 asideStatus == true ? "菜单展开" : "菜单收起"
@@ -58,39 +46,19 @@
                   <!-- <el-dropdown-item>历年经销设计书</el-dropdown-item>
                   <el-dropdown-item>修改登录密码</el-dropdown-item>
                   <el-dropdown-item>修改对账密码</el-dropdown-item>-->
-                  <el-dropdown-item v-if="identity != 'SUPLY'"
-                    ><a
-                      style="color:#606266;"
-                      target="_blank"
-                      :href="
+                  <el-dropdown-item v-if="identity != 'SUPLY'"><a style="color:#606266;" target="_blank" :href="
                         'http://14.29.221.109:10250/pc/#/?cid=' +
                           cid +
                           '&password=' +
                           userInfo.password
-                      "
-                      >网络协议签订</a
-                    >
-                    <el-badge
-                      v-if="wangqian > 0"
-                      style="margin-top:5px;"
-                      :value="wangqian"
-                    ></el-badge
-                  ></el-dropdown-item>
-                  <router-link
-                    v-if="isContainAttr('myZone/myCoupon')"
-                    to="/myZone/myCoupon"
-                    tag="li"
-                  >
-                    <el-dropdown-item @click.native="addTab('myZone/myCoupon')"
-                      >我的优惠券</el-dropdown-item
-                    >
+                      ">网络协议签订</a>
+                    <el-badge v-if="wangqian > 0" style="margin-top:5px;" :value="wangqian"></el-badge>
+                  </el-dropdown-item>
+                  <router-link v-if="isContainAttr('myZone/myCoupon')" to="/myZone/myCoupon" tag="li">
+                    <el-dropdown-item @click.native="addTab('myZone/myCoupon')">我的优惠券</el-dropdown-item>
                   </router-link>
-                  <el-dropdown-item @click.native="changePasswordVisible = true"
-                    >修改密码</el-dropdown-item
-                  >
-                  <el-dropdown-item divided @click.native="logout"
-                    >退出登录</el-dropdown-item
-                  >
+                  <el-dropdown-item @click.native="changePasswordVisible = true">修改密码</el-dropdown-item>
+                  <el-dropdown-item divided @click.native="logout">退出登录</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
             </li>
@@ -98,158 +66,136 @@
               <i class="iconfont ml10 mr10">&#xe663;</i>
             </li>
           </ul>
-          <span
-            v-if="isManager !== '1'"
-            style="color:white;line-height:50px;font-size:12px;margin-left:10px;"
-            >{{
+          <span v-if="isManager !== '1'" style="color:white;line-height:50px;font-size:12px;margin-left:10px;">{{
               "账户：" +
                 cid +
                 " " +
                 realName +
                 (identity == "ECWEB" ? " " + "操作员" : " ")
-            }}</span
-          >
-          <span
-            v-else
-            style="color:white;line-height:50px;font-size:12px;margin-left:10px;"
-            >{{
+            }}</span>
+          <span v-else style="color:white;line-height:50px;font-size:12px;margin-left:10px;">{{
               "账户：" +
                 cid +
                 " " +
                 realName +
                 (identity == "ECWEB" ? " " + "管理员" : " ")
-            }}</span
-          >
+            }}</span>
         </el-header>
         <el-main style="margin:0;padding:0;background:#ECF5EF;" class="backTop">
-          <el-tabs
-            class="tabs"
-            v-model="activeTabName"
-            @tab-click="getTab"
-            @tab-remove="closeTab"
-            type="border-card"
-          >
+          <el-tabs class="tabs" v-model="activeTabName" @tab-click="getTab" @tab-remove="closeTab" type="border-card">
             <div id="notice">
-              <i
-                class="el-icon-bell ml10 mr10 f16"
-                style="line-height:30px;color:gold;font-weight:bold;"
-              ></i>
-              <span style="color:red;margin-right:5px;margin-top:5px;"
-                >最新公告：</span
-              >
+              <i class="el-icon-bell ml10 mr10 f16" style="line-height:30px;color:gold;font-weight:bold;"></i>
+              <span style="color:red;margin-right:5px;margin-top:5px;">最新公告：</span>
               <span v-if="newsTextArr.length == 0">{{ adminText }}</span>
               <span v-else style="line-height:30px;">
                 <transition name="slide">
-                  <a
-                    style="cursor:pointer;text-decoration:underline"
-                    :key="newsTextArr[newsIndex].ID"
-                    @click="showNotification(newsTextArr[newsIndex])"
-                    >{{ newsTextArr[newsIndex].TITLE }}</a
-                  >
+                  <a style="cursor:pointer;text-decoration:underline" :key="newsTextArr[newsIndex].ID"
+                    @click="showNotification(newsTextArr[newsIndex])">{{ newsTextArr[newsIndex].TITLE }}</a>
                 </transition>
               </span>
-              <span
-                v-if="identity == 'ECWEB'"
-                class="r f14 mr10"
-                style="line-height:30px;color:red;"
-              >
+              <span v-if="identity == 'ECWEB'" class="r f14 mr10" style="line-height:30px;color:red;">
                 <strong>
                   <i>{{ moneySituation }}</i>
                 </strong>
-                <i
-                  title="刷新余额"
-                  :class="refreshMoneyClass"
-                  style="color:black;cursor:pointer;"
-                  @click="refreshUserMoney"
-                ></i>
+                <i title="刷新余额" :class="refreshMoneyClass" style="color:black;cursor:pointer;"
+                  @click="refreshUserMoney"></i>
               </span>
             </div>
-            <el-tab-pane
-              v-for="item in tabList"
-              :key="item.name"
-              :name="item.name"
-              :label="item.label"
-              :closable="item.closable"
-            ></el-tab-pane>
+            <el-tab-pane v-for="item in tabList" :key="item.name" :name="item.name" :label="item.label"
+              :closable="item.closable"></el-tab-pane>
             <div v-if="activeTabName == 'main'">
-              <el-card
-                v-if="
+              <el-card v-if="
                   identity != 'SUPLY' &&
                     (hotSaleVersion.length > 0 || hotSaleItem.length > 0)
-                "
-              >
-                <div
-                  v-if="hotSaleVersion.length > 0"
-                  style="margin-bottom:20px;"
-                >
+                ">
+                <div v-if="hotSaleVersion.length > 0" style="margin-bottom:20px;">
                   <h2 style="text-align:center;margin:0 0 10px 0;">
                     版本热销榜
                   </h2>
                   <div>
                     <table style="margin:0 auto;">
                       <tr v-for="(item, index) in hotSaleVersion" :key="index">
-                        <td
-                          style="height:30px;min-width:160px;"
-                          v-for="(n, indexx) in 5"
-                          :key="indexx"
-                        >
-                          <span
-                            v-if="item[indexx].ITEM_NO != ''"
-                            class="numIndex hot-index-normal"
-                            :class="{
+                        <td style="height:30px;min-width:160px;" v-for="(n, indexx) in 5" :key="indexx">
+                          <span v-if="item[indexx].ITEM_NO != ''" class="numIndex hot-index-normal" :class="{
                               'hot-index1': index == 0 && indexx == 0,
                               'hot-index2':
                                 index == 0 && (indexx == 1 || indexx == 2),
                               'hot-index3':
                                 index == 0 && (indexx == 3 || indexx == 4)
-                            }"
-                            >{{ index * 5 + indexx + 1 }}</span
-                          >
+                            }">{{ index * 5 + indexx + 1 }}</span>
                           <a>{{ item[indexx].ITEM_NO }}</a>
-                          <img
-                            src="../assets/img/img/search-hot.gif"
-                            v-if="index == 0 && item[indexx].ITEM_NO != ''"
-                          />
+                          <img src="../assets/img/img/search-hot.gif" v-if="index == 0 && item[indexx].ITEM_NO != ''" />
                         </td>
                       </tr>
                     </table>
                   </div>
                 </div>
-                <div v-if="hotSaleItem.length > 0">
+                <div v-if="hotSaleItem.length > 0" style="margin-bottom:20px;">
                   <h2 style="text-align:center;margin:0 0 10px 0;">
                     型号热销榜
                   </h2>
                   <div>
                     <table style="margin:0 auto;">
                       <tr v-for="(item, index) in hotSaleItem" :key="index">
-                        <td
-                          style="height:30px;min-width:160px;"
-                          v-for="(n, indexx) in 5"
-                          :key="indexx"
-                        >
-                          <span
-                            v-if="item[indexx].ITEM_NO != ''"
-                            class="numIndex hot-index-normal"
-                            :class="{
+                        <td style="height:30px;min-width:160px;" v-for="(n, indexx) in 5" :key="indexx">
+                          <span v-if="item[indexx].ITEM_NO != ''" class="numIndex hot-index-normal" :class="{
                               'hot-index1': index == 0,
                               'hot-index2': index == 1,
                               'hot-index3': index == 2
-                            }"
-                            >{{ index * 5 + indexx + 1 }}</span
-                          >
-                          <a
-                            class="hoverAlink"
-                            title="点击前往下单"
-                            @click="selectHot(item[indexx].ITEM_NO)"
-                            >{{ item[indexx].ITEM_NO }}</a
-                          >
-                          <img
-                            src="../assets/img/img/search-hot.gif"
-                            v-if="
+                            }">{{ index * 5 + indexx + 1 }}</span>
+                          <a class="hoverAlink" title="点击前往下单"
+                            @click="selectHot(item[indexx].ITEM_NO)">{{ item[indexx].ITEM_NO }}</a>
+                          <img src="../assets/img/img/search-hot.gif" v-if="
                               (index == 0 || index == 1) &&
                                 item[indexx].ITEM_NO != ''
-                            "
-                          />
+                            " />
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+                <div v-if="hotSaleCurtain.length > 0" style="margin-bottom:20px;">
+                  <h2 style="text-align:center;margin:0 0 10px 0;">
+                    窗帘版本推荐
+                  </h2>
+                  <div>
+                    <table style="margin:0 auto;">
+                      <tr v-for="(item, index) in hotSaleCurtain" :key="index">
+                        <td style="height:30px;min-width:160px;" v-for="(n, indexx) in 5" :key="indexx">
+                          <span v-if="item[indexx].ITEM_NO != ''" class="numIndex hot-index-normal" :class="{
+                              'hot-index1': index == 0,
+                              'hot-index2': index == 1,
+                              'hot-index3': index == 2
+                            }">{{ index * 5 + indexx + 1 }}</span>
+                          <a>{{ item[indexx].ITEM_NO }}</a>
+                          <img src="../assets/img/img/search-hot.gif" v-if="
+                              (index == 0 || index == 1) &&
+                                item[indexx].ITEM_NO != ''
+                            " />
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+                <div v-if="hotSaleSoft.length > 0" style="margin-bottom:20px;">
+                  <h2 style="text-align:center;margin:0 0 10px 0;">
+                    面料热销榜
+                  </h2>
+                  <div>
+                    <table style="margin:0 auto;">
+                      <tr v-for="(item, index) in hotSaleSoft" :key="index">
+                        <td style="height:30px;min-width:160px;" v-for="(n, indexx) in 5" :key="indexx">
+                          <span v-if="item[indexx].ITEM_NO != ''" class="numIndex hot-index-normal" :class="{
+                              'hot-index1': index == 0,
+                              'hot-index2': index == 1,
+                              'hot-index3': index == 2
+                            }">{{ index * 5 + indexx + 1 }}</span>
+                          <a class="hoverAlink" title="点击前往下单"
+                            @click="selectHot(item[indexx].ITEM_NO)">{{ item[indexx].ITEM_NO }}</a>
+                          <img src="../assets/img/img/search-hot.gif" v-if="
+                              (index == 0 || index == 1) &&
+                                item[indexx].ITEM_NO != ''
+                            " />
                         </td>
                       </tr>
                     </table>
@@ -265,94 +211,45 @@
         </el-main>
       </el-container>
     </el-container>
-    <el-backtop target=".backTop" :right="30" :visibility-height="20"
-      ><div
-        style="{height: 100%;width: 100%;background-color: #f2f5f6;box-shadow: 0 0 6px rgba(0,0,0, .12);
-                        text-align: center;line-height: 40px;color: #1989fa;}"
-      >
+    <el-backtop target=".backTop" :right="30" :visibility-height="20">
+      <div style="{height: 100%;width: 100%;background-color: #f2f5f6;box-shadow: 0 0 6px rgba(0,0,0, .12);
+                        text-align: center;line-height: 40px;color: #1989fa;}">
         UP
-      </div></el-backtop
-    >
-    <el-dialog
-      :show-close="true"
-      :visible.sync="notificationVisible"
-      width="1000px"
-      top="5vh"
-      :title="newsTitle"
-      center
-    >
+      </div>
+    </el-backtop>
+    <el-dialog :show-close="true" :visible.sync="notificationVisible" width="1000px" top="5vh" :title="newsTitle"
+      center>
       <div v-html="newsHtmlData"></div>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="notificationVisible = false"
-          >确 定</el-button
-        >
+        <el-button type="primary" @click="notificationVisible = false">确 定</el-button>
       </span>
     </el-dialog>
-    <el-dialog
-      title="请填写完此调查表，才能继续操作！"
-      :show-close="false"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      :visible.sync="studyVisible"
-      width="900px"
-      top="5vh"
-      center
-    >
+    <el-dialog title="请填写完此调查表，才能继续操作！" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false"
+      :visible.sync="studyVisible" width="900px" top="5vh" center>
       <keep-alive>
-        <studyContextDetail
-          ref="studyContextDetail"
-          v-if="studyVisible"
-          :selectData="studySelectData"
-          @refresh="refreshStudy"
-        ></studyContextDetail>
+        <studyContextDetail ref="studyContextDetail" v-if="studyVisible" :selectData="studySelectData"
+          @refresh="refreshStudy"></studyContextDetail>
       </keep-alive>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitStudy">提交调查表</el-button>
       </span>
     </el-dialog>
-    <el-dialog
-      title="修改密码"
-      :close-on-click-modal="false"
-      :visible.sync="changePasswordVisible"
-      width="450px"
-    >
-      <el-form
-        :model="passwordForm"
-        :rules="passwordRules"
-        ref="passwordForm"
-        class="passwordForm"
-      >
+    <el-dialog title="修改密码" :close-on-click-modal="false" :visible.sync="changePasswordVisible" width="450px">
+      <el-form :model="passwordForm" :rules="passwordRules" ref="passwordForm" class="passwordForm">
         <el-form-item label="原密码" prop="pw">
-          <el-input
-            style="width:300px;"
-            type="password"
-            v-model="passwordForm.pw"
-            placeholder="填写原密码"
-            autocomplete="off"
-          ></el-input>
+          <el-input style="width:300px;" type="password" v-model="passwordForm.pw" placeholder="填写原密码"
+            autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="新密码" prop="npw">
-          <el-input
-            style="width:300px;"
-            type="password"
-            v-model="passwordForm.npw"
-            placeholder="填写新密码"
-            autocomplete="off"
-          ></el-input>
+          <el-input style="width:300px;" type="password" v-model="passwordForm.npw" placeholder="填写新密码"
+            autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="确认密码" prop="npw1">
-          <el-input
-            style="width:300px;"
-            type="password"
-            v-model="passwordForm.npw1"
-            placeholder="再次填写新密码"
-            autocomplete="off"
-          ></el-input>
+          <el-input style="width:300px;" type="password" v-model="passwordForm.npw1" placeholder="再次填写新密码"
+            autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item style="text-align:center;">
-          <el-button type="primary" @click="changePassWord('passwordForm')"
-            >确认修改</el-button
-          >
+          <el-button type="primary" @click="changePassWord('passwordForm')">确认修改</el-button>
           <el-button @click="resetForm('passwordForm')">重置</el-button>
         </el-form-item>
       </el-form>
@@ -468,7 +365,9 @@ export default {
       },
       hotSaleData: [],
       hotSaleVersion: [],
-      hotSaleItem: []
+      hotSaleItem: [],
+      hotSaleCurtain: [],
+      hotSaleSoft: []
     };
   },
   methods: {
@@ -945,7 +844,7 @@ export default {
         } else {
           //审核人员
           if (this.userInfo.pos) {
-            let posList = this.userInfo.pos;//获得职位
+            let posList = this.userInfo.pos; //获得职位
             if (posList != null && posList.length > 0) {
               for (var i = 0; i < posList.length; i++) {
                 var pos = posList[i].position;
@@ -1239,7 +1138,11 @@ export default {
                   "<div style='border-bottom:0.2rem solid #ccc;'></div><br />";
               this.notificationVisible = true;
               if (this.newsTextArr[i].POPUPTYPE == "FIRSTOFDAY")
-                InserFlag({ nid: this.newsTextArr[i].ID, cid: this.cid,accept:1 }); //标记为已显示
+                InserFlag({
+                  nid: this.newsTextArr[i].ID,
+                  cid: this.cid,
+                  accept: 1
+                }); //标记为已显示
             }
           }
         }
@@ -1299,12 +1202,17 @@ export default {
       this.hotSaleItem = {};
       GetHotSales().then(res => {
         if (res.data.length > 0) {
-          var versionData = res.data.filter(item => item.TYPE == "B");
-          var itemData = res.data.filter(item => item.TYPE == "A");
+          var itemData = res.data.filter(item => item.TYPE == "A"); //型号热销
+          var versionData = res.data.filter(item => item.TYPE == "B"); //版本热销
+          var curtainData = res.data.filter(item => item.TYPE == "C"); //窗帘版本推荐
+          var softData = res.data.filter(item => item.TYPE == "D"); //面料热销
           var data = [];
           var data2 = [];
+          var data3 = [];
+          var data4 = [];
           var index = 0;
           var indexx = 0;
+          //分成每行5个的数据
           //版本
           for (var i = 0; i < versionData.length; i++) {
             if (i >= 5 * (index + 1)) {
@@ -1349,6 +1257,52 @@ export default {
             }
           }
           this.hotSaleItem = data2;
+          //窗帘
+          index = 0;
+          indexx = 0;
+          for (var i = 0; i < curtainData.length; i++) {
+            if (i >= 5 * (index + 1)) {
+              index++;
+              indexx = 0;
+            }
+            if (i == 5 * index) {
+              data3[index] = new Array();
+            }
+            data3[index][indexx] = curtainData[i];
+            indexx++;
+          }
+          if (data3[index].length < 5) {
+            var len = 5 - data3[index].length;
+            for (var i = 0; i < len; i++) {
+              data3[index].push({
+                ITEM_NO: ""
+              });
+            }
+          }
+          this.hotSaleCurtain = data3;
+          //面料
+          index = 0;
+          indexx = 0;
+          for (var i = 0; i < softData.length; i++) {
+            if (i >= 5 * (index + 1)) {
+              index++;
+              indexx = 0;
+            }
+            if (i == 5 * index) {
+              data4[index] = new Array();
+            }
+            data4[index][indexx] = softData[i];
+            indexx++;
+          }
+          if (data4[index].length < 5) {
+            var len = 5 - data4[index].length;
+            for (var i = 0; i < len; i++) {
+              data4[index].push({
+                ITEM_NO: ""
+              });
+            }
+          }
+          this.hotSaleSoft = data4;
         }
       });
     },

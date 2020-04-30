@@ -496,7 +496,7 @@ export default {
         deliveryType: "1",
         projectNo: "",
         postAddressModified: "0", //新增
-        allSpend: "1000",
+        allSpend: "0",
         deliveryFlag: "0",
         invoiceFlag: "0",
         wlContacts: "",
@@ -576,7 +576,7 @@ export default {
   filters: {
     priceFilter(value) {
       //四舍五入过滤大法
-      let realVal = parseFloat(value).toFixed(2);
+      let realVal = Math.round(parseFloat(value) * 100) / 100;
       //防止出现-0.00；
       if (realVal <= 0) {
         realVal = 0.0;
@@ -673,10 +673,6 @@ export default {
         return "分批发货";
       } else return "--";
     },
-    /* FixIt:function(row,column){
-        let realVal=parseFloat(row.qtyRequired).toFixed(2);
-        return realVal;
-      }, */
     //单选框使用优惠券
     changeCoupon(index, id, type) {
       if (type == "year" && index == true) {
@@ -1234,8 +1230,8 @@ export default {
         this.array[i].item_no = getPush[i].item.itemNo;
         //根据是选择数量还是长*宽
         if (getPush[i].quantity == null || getPush[i].quantity == 0) {
-          this.array[i].num = (getPush[i].height * getPush[i].width).toFixed(2);
-          //this.array[i].prime_cost=(getPush[i].height*getPush[i].width).toFixed(2)*getPush[i].price;
+          this.array[i].num =
+            Math.round(getPush[i].height * getPush[i].width * 100) / 100;
           this.array[i].prime_cost = this.subtotal(
             getPush[i].width,
             getPush[i].height,
@@ -1251,8 +1247,8 @@ export default {
       var allcost = 0;
       activityPrice(url, data).then(res => {
         for (var j = 0; j < res.data.length; j++) {
-          this.array[j].questPrice = res.data[j].promotion_cost;
-          allcost += parseFloat(res.data[j].promotion_cost);
+          this.array[j].questPrice = Math.round(res.data[j].promotion_cost * 100) / 100;
+          allcost += Math.round(parseFloat(res.data[j].promotion_cost) * 100) / 100;
         }
         /* allcost=allcost.toString(); */
         //将allspend赋值活动后总价
@@ -1291,13 +1287,12 @@ export default {
         this.array2[i].itemNoSample = getPush2[i].item.itemNo;
         this.array2[i].lineNo = getPush2[i].lineNo;
         this.array2[i].itemNo = getPush2[i].item.itemNo;
-        this.array2[i].partSendId = getPush2[i].splitShipment; //splicement？？？
+        this.array2[i].partSendId = getPush2[i].splitShipment;
         this.array2[i].productionVersion = getPush2[i].item.itemVersion;
-        //this.array2[i].qtyRequired=getPush2[i].quantity;
         this.array2[i].notes = getPush2[i].note;
         this.array2[i].unitPrice = getPush2[i].price;
         this.array2[i].prime_cost = this.array[i].prime_cost;
-        this.array2[i].promotionCost = this.array[i].questPrice.toFixed(2);
+        this.array2[i].promotionCost = this.array[i].questPrice;
         this.array2[i].promotion = getPush2[i].activityName;
         if (this.array2[i].promotion == undefined) {
           this.array2[i].promotion = "无";
@@ -1313,67 +1308,12 @@ export default {
         if (getPush2[i].onlineSalesAmount !== null) {
           this.array2[i].onlineSalesAmount = getPush2[i].onlineSalesAmount;
         }
-
-        //this.array2[i].qtyRequired = this.array2[i].qtyRequired.toFixed(2);
-        //this.array2[i].finalPrice = (this.array[i].questPrice/this.array2[i].qtyRequired).toFixed(2);
-        this.array2[i].finalPrice = this.array[i].questPrice.toFixed(2);
+        this.array2[i].finalPrice = this.array[i].questPrice;
       }
       this.ORDERBODY = this.array2;
     },
-    // //窗帘提交结算
-    // payCurtain() {
-    //   var url = "/order/curOrderCount.do";
-    //   this.ctm_order.orderNo = this.array2[0].orderNo; //真的是傻逼接口
-    //   this.ctm_order.curtainStatusId = "1";
-    //   console.log(this.ctm_order);
-    //   var data = {
-    //     product_group_tpye: this.product_group_tpye, //产品类别，从购物车出获取
-    //     promotion_cost: this.totalPrice, //活动价格【】
-    //     cid: Cookies.get("cid"), //登录用户账号
-    //     companyId: Cookies.get("companyId"),
-    //     rebateY: this.rebateY, //年优惠券编号，有则传，无则传空串
-    //     rebateM: this.rebateM, //月优惠券编号
-    //     arrearsFlag: this.arrearsFlag,
-    //     ctm_order: this.ctm_order,
-    //     ctm_orders: this.array2
-    //   };
-    //   console.log(data);
-
-    //   if (
-    //     this.ctm_order.deliveryNotes == "" &&
-    //     this.ctm_order.deliveryType == 3
-    //   ) {
-    //     this.$alert("请填写指定的物流公司", "提示", {
-    //       confirmButtonText: "确定",
-    //       type: "warning"
-    //     });
-    //     return;
-    //   }
-    //   curtainPay(url, data)
-    //     .then(res => {
-    //       console.log(res);
-    //       console.log("成功!!!");
-    //       if (this.allSpend > this.Initial_balance && this.arrearsFlag != "N") {
-    //         this.$alert("余额不足，未提交成功，请充值后再提交", "提示", {
-    //           confirmButtonText: "确定",
-    //           type: "success"
-    //         });
-    //       } else {
-    //         this.$alert("提交成功", "提示", {
-    //           confirmButtonText: "确定",
-    //           type: "success"
-    //         });
-    //       }
-    //     })
-    //     .then(() => {
-    //       this.closeToTab({
-    //         oldUrl: "order/checkOrder",
-    //         newUrl: "order/myOrder"
-    //       });
-    //     });
-    // },
     payNew() {
-      if(!this.checkPay()) return;
+      if (!this.checkPay()) return;
       var url = "/order/getResidemoney.do";
       var data = {
         cid: Cookies.get("cid"),
@@ -1414,7 +1354,7 @@ export default {
     },
     //提交结算
     payIt() {
-      if(!this.checkPay()) return;
+      if (!this.checkPay()) return;
       var url = "/order/getResidemoney.do";
       var data = {
         cid: Cookies.get("cid"),
@@ -1525,7 +1465,7 @@ export default {
       } else {
         this.$alert(
           "余额不足，当前订单还需充值" +
-            (this.allSpend - this.Initial_balance).toFixed(2) +
+            Math.round((this.allSpend - this.Initial_balance) * 100) / 100 +
             "元才能提交",
           "提示",
           {

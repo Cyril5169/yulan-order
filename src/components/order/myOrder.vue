@@ -762,6 +762,7 @@ export default {
                         confirmButtonText: "确定",
                         type: "success"
                       });
+                      this.$root.$emit("refreshBadgeIcon", "curtainCount");
                     });
                   })
                   .catch(() => {});
@@ -799,6 +800,7 @@ export default {
               confirmButtonText: "确定",
               type: "success"
             });
+            this.$root.$emit("refreshBadgeIcon", "curtainCount");
           });
         })
         .catch(() => {});

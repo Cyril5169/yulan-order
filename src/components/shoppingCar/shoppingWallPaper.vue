@@ -446,23 +446,29 @@ export default {
         if (_data.quantity) {
           let sub = parseFloat(_data.price * _data.quantity);
           total += sub;
-          totalPrice += _data.salPromotion
-            ? _data.salPromotion.type == 1
-              ? _data.salPromotion.discount * sub
-              : parseFloat(_data.salPromotion.price * _data.quantity)
-            : sub;
+          totalPrice +=
+            Math.round(
+              (_data.salPromotion
+                ? _data.salPromotion.type == 1
+                  ? _data.salPromotion.discount * sub
+                  : parseFloat(_data.salPromotion.price * _data.quantity)
+                : sub) * 100
+            ) / 100;
         } else {
           let sub = this.subtotal(_data.width, _data.height, _data.price);
           total += sub;
-          totalPrice += _data.salPromotion
-            ? _data.salPromotion.type == 1
-              ? _data.salPromotion.discount * sub
-              : this.subtotal(
-                  _data.width,
-                  _data.height,
-                  _data.salPromotion.price
-                )
-            : sub;
+          totalPrice +=
+            Math.round(
+              (_data.salPromotion
+                ? _data.salPromotion.type == 1
+                  ? _data.salPromotion.discount * sub
+                  : this.subtotal(
+                      _data.width,
+                      _data.height,
+                      _data.salPromotion.price
+                    )
+                : sub) * 100
+            ) / 100;
         }
       }
       this.totalMoney = total;

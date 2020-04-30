@@ -227,7 +227,9 @@ export default {
           activity: val
         });
         this.expands.push(val);
-
+        for (let j = 0; j < theData[i].curtainCartItems.length; j++) {
+          theData[i].curtainCartItems[j].index = i; //赋值下标
+        }
         // for (let j = 0; j < theData[i].curtainCartItems.length; j++) {
         //   for (
         //     let k = 0;
@@ -335,14 +337,16 @@ export default {
       let total = 0;
       let totalPrice = 0;
       for (let i = 0; i < val.length; i++) {
-        let index = val[i].unNullNum;
         let sub = val[i].price * val[i].count;
         total += sub;
-        totalPrice += val[i].salPromotion
-          ? val[i].salPromotion.type == 1
-            ? val[i].salPromotion.discount * sub
-            : val[i].salPromotion.price * val[i].count
-          : sub;
+        totalPrice +=
+          Math.round(
+            (val[i].salPromotion
+              ? val[i].salPromotion.type == 1
+                ? val[i].salPromotion.discount * sub
+                : val[i].salPromotion.price * val[i].count
+              : sub) * 100
+          ) / 100;
       }
       this.totalMoney = total;
       this.totalPriceMoney = totalPrice;

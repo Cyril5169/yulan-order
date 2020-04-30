@@ -120,7 +120,7 @@
                 style="width:250px"
                 size="mini"
                 :disabled="isActivity[scope.$index]"
-                v-model="scope.row.activity"
+                v-model="scope.row.activityId"
                 :placeholder="
                   isActivity[scope.$index] === true
                     ? '无可选活动'
@@ -269,13 +269,13 @@ export default {
         });
         return;
       }
-      if (data.activity === "") {
+      if (data.activityId === "") {
         if (this.isActivity[index] === false) {
           this.$alert("请选择活动!!", "提示", {
             confirmButtonText: "好的"
           });
           return;
-        } else data.activity = null;
+        } else data.activityId = null;
       }
       if (data.wbhFlag === "1" && data.isWBH === false && data.WBH !== "") {
         this.$alert("在填写了帘外包宽度的情况下，请勾选前面的按钮!!", "提示", {
@@ -291,11 +291,18 @@ export default {
       }
       let _groupType;
       this.activityGroup.forEach(item => {
-        if (item.pId === data.activity) {
+        if (item.pId === data.activityId) {
           _groupType = item.groupType;
         }
       });
       this.curtainMsg[index].groupType = _groupType;
+      let activeName = "";
+      this.activityOptions[index].forEach(item => {
+        if (item.value === data.activityId) {
+          activeName = item.label;
+        }
+      });
+      this.curtainMsg[index].activeName = activeName;
       Cookies.set("curtainMsg", data);
       this.addTab("shops/shoppingCurtainDetail");
       this.$router.push({
@@ -312,9 +319,7 @@ export default {
       this.totalNumber = 0;
     },
     //获取每页的条数
-    handleSizeChange(val) {
-      //console.log(`每页${val}条`);
-    },
+    handleSizeChange(val) {},
     //当前页改变时的操作
     handleCurrentChange(val) {
       if (this.searchKey === "") {
@@ -397,14 +402,14 @@ export default {
           wbhFlag: data[i].wbhFlag, //1：需要假帘高，0：不需要假帘高
           multiple: "2.2", //褶皱倍数
           location: "", //位置
-          activity: "", //活动
-          groupType: "" //groupType
+          activityId: "", //活动
+          groupType: "", //groupType
+          activeName: ""
         });
         let itemRes = await getItemById(
           { itemNo: data[i].itemNo },
           { loading: false }
         );
-        //await this.getProductActivity(data[i])
         let res = await GetPromotionByItem(
           {
             cid: this.cid,
@@ -416,6 +421,7 @@ export default {
           },
           { loading: false }
         );
+        //没有活动下拉框disable
         if (res.data.length === 0) this.isActivity.push(true);
         else this.isActivity.push(false);
         let _obj = [];
@@ -450,29 +456,9 @@ export default {
         this.activityOptions.push(_obj);
 
         if (defaultSel.pri != 0) {
-          this.curtainMsg[i].activity = defaultSel.id;
+          this.curtainMsg[i].activityId = defaultSel.id;
         }
       }
-    },
-    //获取产品活动
-    getProductActivity(data) {
-      let obj = {
-        CID: this.cid,
-        customerType: this.customerType,
-        itemNo: data.itemNo,
-        itemVersion: data.itemVersion,
-        productType: data.productType,
-        productBrand: data.productBrand
-      };
-      return new Promise((resolve, reject) => {
-        findItemActivity(obj)
-          .then(res => {
-            return resolve(res);
-          })
-          .catch(err => {
-            return reject(err);
-          });
-      });
     },
     //初始化
     init() {
@@ -485,8 +471,6 @@ export default {
     }
   },
   created() {
-    // var selectNo = this.$route.params.selectNo;
-    // if(selectNo) this.searchKey = selectNo;
     this.init();
   },
   activated() {

@@ -105,7 +105,7 @@
         </el-table-column>
         <el-table-column align="center" prop="NOTES" label="备注"></el-table-column>
         <el-table-column v-if="isX" prop="LJ_SUGGESTION" align="center" label="兰居备注"></el-table-column>
-        <el-table-column v-if="isX" align="center" label="窗帘详情" width="100">
+        <el-table-column v-if="isX" align="center" label="窗帘详情" width="105">
           <template slot-scope="scope">
             <el-button @click="openDialog(scope.row, scope.$index)" type="primary" size="mini">查看详情</el-button>
           </template>
@@ -115,7 +115,6 @@
       </el-table>
 
       <div style="float:right;margin-top:20px;margin-right:10px;height:80px;">
-        <!-- <p>商品总价格：<span style="color:tomato;font-weight:bold;">{{ruleForm.ALL_SPEND}}</span></p><span> -->
         <el-button v-if="check_CURTAIN_STATUS_ID == 2" @click="_defeat()" size="medium" type="warning">退回兰居修改
         </el-button>
         <el-button v-if="check_CURTAIN_STATUS_ID == 2" @click="_pass()" size="medium" type="success">确认兰居修改</el-button>

@@ -167,7 +167,7 @@
                 <template slot-scope="scope1">
                   <span>{{
                     (scope1.row.UNIT_PRICE * scope1.row.QTY_REQUIRED)
-                      | priceFilter
+                      | dosageFilter
                   }}</span>
                 </template>
               </el-table-column>
@@ -363,15 +363,6 @@ export default {
           return "已通过";
           break;
       }
-    },
-    priceFilter(value) {
-      //四舍五入过滤大法
-      let realVal = parseFloat(value).toFixed(2);
-      //防止出现-0.00；
-      if (realVal <= 0) {
-        realVal = 0.0;
-      }
-      return realVal;
     }
   },
   methods: {

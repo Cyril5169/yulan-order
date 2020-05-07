@@ -381,13 +381,6 @@
         </p>
         <el-button @click="backToOrder" size="medium" type="success" plain>返回订单</el-button>
         <el-button v-if="curtainStatus == '0'" @click="payIt" size="medium" type="danger" plain>立即提交</el-button>
-        <!-- <el-button
-          v-if="curtainStatus =='1'"
-          @click="payCurtain()"
-          size="medium"
-          type="danger"
-          plain
-        >确认提交</el-button>-->
         <el-button v-if="curtainStatus == '3'" @click="payNew" size="medium" type="danger" plain>确认提交</el-button>
       </div>
     </el-card>
@@ -443,6 +436,7 @@ export default {
       //返利弹窗
       dialogUse: false,
       dialogBack: false,
+      curtainStatus:'',
       buyUserVisible: false,
       addBuyUserVisible: false,
       buyUserInfoData: [],

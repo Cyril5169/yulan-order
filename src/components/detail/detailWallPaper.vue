@@ -207,7 +207,6 @@ export default {
       data: [], //传过来的数据
       remark: "",
       disableFlag: false, //判断是否禁用选择框
-      activityEffective: true, //活动是否过期
       //按钮样式
       customClass: ["qty-btn"],
       decimalNum: 2 //小数位数

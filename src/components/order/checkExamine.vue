@@ -333,7 +333,11 @@ export default {
         transCookies[i].lineNo = item.ORDERBODY[i].LINE_NO;
         transCookies[i].activityId = item.ORDERBODY[i].curtains[0].activityId;
         transCookies[i].quantity = item.ORDERBODY[i].QTY_REQUIRED;
-        transCookies[i].price = item.ORDERBODY[i].UNIT_PRICE;
+        var price = 0;
+        for(let j = 0;j< item.ORDERBODY[i].curtains.length;j++){
+          price += (item.ORDERBODY[i].curtains[j].price.mul(item.ORDERBODY[i].curtains[j].dosage));
+        }
+        transCookies[i].price = price;
         transCookies[i].splitShipment = item.ORDERBODY[i].PART_SEND_ID;
         transCookies[i].activityName = item.ORDERBODY[i].PROMOTION;
         transCookies[i].unit = "米";
@@ -516,6 +520,8 @@ export default {
       this.headerData.cartItemId = "";
       this.headerData.activityGroupType = ""; //
       this.headerData.activity = tab.PROMOTION_TYPE;
+      this.headerData.activityId = tab.curtains[0].activityId;
+      this.headerData.activityName = tab.PROMOTION;
     },
     //保存修改
     saveChange() {
@@ -543,6 +549,10 @@ export default {
           this.ruleForm.PACKING_NOTE = res2.data.PACKING_NOTE; //先这样处理，后台换了后台就不需要了
           this.ruleForm.BUYUSER_ADDRESS = res2.data.BUYUSER_ADDRESS;
           this.ruleForm.BUYUSER_PICTURE = res2.data.BUYUSER_PICTURE;
+          this.ruleForm.BUYUSER_AREA1 = res2.data.BUYUSER_AREA1;
+          this.ruleForm.BUYUSER_AREA2 = res2.data.BUYUSER_AREA2;
+          this.ruleForm.BUYUSER_AREA3 = res2.data.BUYUSER_AREA3;
+          this.ruleForm.BUYUSER_POST_ADDRESS = res2.data.BUYUSER_POST_ADDRESS;
           if (this.ruleForm.BUYUSER_PICTURE) {
             var list = this.ruleForm.BUYUSER_PICTURE.split(";");
             for (var i = 0; i < list.length - 1; i++) {

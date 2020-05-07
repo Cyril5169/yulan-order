@@ -390,7 +390,7 @@
                     (scope.row.UNIT_PRICE * scope.row.QTY_REQUIRED)
                       | dosageFilter
                   }}</span>
-            <span v-if="allTotal(scope.$index) != scope.row.UNIT_PRICE" style="color:red;">({{allTotal(scope.$index)}})</span>
+            <span v-if="allTotal(scope.$index) != scope.row.UNIT_PRICE" style="color:red;">({{allTotal(scope.$index) | dosageFilter}})</span>
           </template>
         </el-table-column>
         <el-table-column align="center" prop="NOTES" label="备注"></el-table-column>
@@ -612,7 +612,7 @@ export default {
         }
       }
       for (var i = 0; i < _data[index].length; i++) {
-        totalMoney += (_data[index][i].price * _data[index][i].dosage)
+        totalMoney += (_data[index][i].price.mul(_data[index][i].dosage))
       }
       return totalMoney;
     },

@@ -57,7 +57,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="名称" header-align="center" width="75">
+        <el-table-column label="名称" header-align="center" width="70">
           <template slot-scope="scope">
             {{ getTypeName(scope.row.itemType) }}
             <el-checkbox @change="changeLink('ls', 1)" v-if="scope.row.itemType === 'ls'" v-model="chooseBig[1]">
@@ -71,7 +71,7 @@
             </el-checkbox>
           </template>
         </el-table-column>
-        <el-table-column label="编码" header-align="center" width="120">
+        <el-table-column label="编码" header-align="center" width="125">
           <template slot-scope="scope">
             <div>
               <span v-if="
@@ -103,7 +103,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="名称" header-align="center" width="100">
+        <el-table-column label="名称" header-align="center" width="110">
           <template slot-scope="scope">
             <div v-if="scope.row.note !== null">{{ scope.row.note }}</div>
             <div v-else>{{ getTypeName(scope.row.itemType) }}</div>
@@ -116,7 +116,7 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column v-if="isManager != '0' && salPromotion.P_ID" label="折后" align="center" width="50">
+        <el-table-column v-if="isManager != '0' && salPromotion.P_ID" label="折后" align="center" width="55">
           <template slot-scope="scope">
             <span>
               {{ salPromotion.TYPE == 1? 
@@ -1353,8 +1353,7 @@ export default {
               : this.salPromotion.PRICE
             : row.price) * 100
         ) /
-          100) *
-        row.dosage
+          100).mul(row.dosage)
       );
     }
   },
@@ -1461,5 +1460,8 @@ export default {
 }
 .curtainTable .el-textarea__inner {
   padding: 5px;
+}
+.curtainTable .el-checkbox__label {
+  padding-left: 2px;
 }
 </style>

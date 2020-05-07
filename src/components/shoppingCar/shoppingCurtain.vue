@@ -43,8 +43,7 @@
             <el-table-column label="活动" align="center" show-overflow-tooltip>
               <template slot-scope="scope1">
                 <span style="color: red;" v-if="
-                    scope1.row.curtainLists[scope1.row.unNullNum]
-                      .curtainCommodities[0].activityEffective === false
+                    scope1.row.activityEffective === false
                   ">(过期活动)</span>
                 {{ scope1.row.activity }}
               </template>
@@ -315,8 +314,7 @@ export default {
     //判断商品是否可选(活动是否有效)
     checkActiviyEffect(row, index) {
       if (
-        row.curtainLists[row.unNullNum].curtainCommodities[0]
-          .activityEffective === false
+        row.activityEffective === false
       ) {
         return false;
       } else {

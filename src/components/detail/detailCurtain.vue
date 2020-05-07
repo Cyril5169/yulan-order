@@ -75,8 +75,7 @@ export default {
             height: _dataCom.height,
             note: _dataCom.note,
             unit: _unit,
-            status: _dataCom,
-            status,
+            status: _dataCom.status,
             curtainItemName: _dataCom.curtainItemName,
             curtainPartName: _dataCom.curtainPartName,
             dosage: _dataCom.dosage,
@@ -96,7 +95,10 @@ export default {
       }
       this.headerData = {
         activity: _data.activity, //活动中文名称
+        activityId: _data.activityId?_data.activityId:null,
+        activityName: _data.activityName,
         activityGroupType: _data.activityGroupType, //活动组别
+        activityEffective: _data.activityEffective,
         cartItemId: _data.cartItemId, //此套窗帘的标识id
         checked: _data.checked,
         drape: _data.drape, //褶皱倍数
@@ -115,6 +117,7 @@ export default {
       //保存数据
       sessionStorage.setItem("curtainDetail", JSON.stringify(_arr));
       Cookies.set("curtainHead", this.headerData);
+      console.log(_data)
     },
     //根据中文名称获取itemType
     getItemType(partName) {

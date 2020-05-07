@@ -1,6 +1,23 @@
 <template>
-  <div>
+  <div class="curtainTable">
     <el-card shadow="never">
+      <div style="margin-bottom:10px;">活动：<el-select v-if="tableStatus === 0" size="small" style="width:250px"
+          :disabled="activityOptions.length == 1" v-model="headerData.activityId" :placeholder="
+                  activityOptions.length == 1
+                    ? '无可选活动'
+                    : '请选择活动'
+                ">
+          <el-option v-for="item in activityOptions" :key="item.P_ID"
+            :label="item.ORDER_TYPE? item.ORDER_TYPE + ' -- ' + item.ORDER_NAME : item.ORDER_NAME" :value="item.P_ID">
+          </el-option>
+        </el-select>
+        <span v-else>{{headerData.activityName}}</span>
+        <span style="color:red;font-size:14px;" v-if="
+                  headerData.activityId === headerData.activityName &&
+                    headerData.activityEffective != null &&
+                    !headerData.activityEffective
+                ">此活动已经过期，请重新选择</span>
+      </div>
       <el-table style="width:100%;" border :data="data" :span-method="cellMerge">
         <el-table-column width="170" header-align="center" label="商品信息">
           <template>
@@ -52,7 +69,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="名称" header-align="center" width="90">
+        <el-table-column label="名称" header-align="center" width="70">
           <template slot-scope="scope">
             {{ getTypeName(scope.row.curtainPartName) }}
             <!-- <br> -->
@@ -69,7 +86,7 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="编码" header-align="center" width="150">
+        <el-table-column label="编码" header-align="center" width="125">
           <template slot-scope="scope">
             <div>
               <span v-if="tableStatus === 3">
@@ -104,7 +121,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="名称" header-align="center" width="140">
+        <el-table-column label="名称" header-align="center" width="110">
           <template slot-scope="scope">
             <div v-if="scope.row.curtainItemName !== null && scope.row.curtainItemName !== ''">
               {{ scope.row.curtainItemName }}
@@ -112,10 +129,22 @@
             <div v-else>{{ getTypeName(scope.row.itemType) }}</div>
           </template>
         </el-table-column>
-        <el-table-column v-if="isManager != '0' ||  (isManager == '0' && check_CURTAIN_STATUS_ID == -1)" label="单价" align="center" width="50">
+        <el-table-column v-if="isManager != '0' ||  (isManager == '0' && check_CURTAIN_STATUS_ID == -1)" label="单价"
+          align="center" width="50">
           <template slot-scope="scope">
             <span>
               {{ scope.row.price }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          v-if="isManager != '0' ||  (isManager == '0' && check_CURTAIN_STATUS_ID == -1) && salPromotion.P_ID"
+          label="折后" align="center" width="55">
+          <template slot-scope="scope">
+            <span>
+              {{ salPromotion.TYPE == 1? 
+                    salPromotion.DISCOUNT * scope.row.price
+                    : salPromotion.PRICE | dosageFilter }}
             </span>
           </template>
         </el-table-column>
@@ -143,7 +172,7 @@
             <div v-else></div>
           </template>
         </el-table-column>
-        <el-table-column label="用量" width="100" header-align="center" align="center">
+        <el-table-column label="用量" width="90" header-align="center" align="center">
           <template slot-scope="scope">
             <span v-if="tableStatus === 3">
               {{ scope.row.dosage | dosageFilter }}
@@ -183,7 +212,15 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="制造说明" width="130" header-align="center" align="center">
+        <el-table-column v-if="isManager != '0' ||  (isManager == '0' && check_CURTAIN_STATUS_ID == -1)" label="总价"
+          align="center" width="60">
+          <template slot-scope="scope">
+            <span>
+              {{ oneTotal(scope.row) }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column label="制造说明" width="110" header-align="center" align="center">
           <template slot-scope="scope">
             <div v-if="tableStatus === 3">
               {{ scope.row.manufacturingInstructions }}
@@ -235,6 +272,9 @@
           </template>
         </el-table-column>
       </el-table>
+      <div v-if="isManager != '0' ||  (isManager == '0' && check_CURTAIN_STATUS_ID == -1)"
+        style="font-size:16px;margin-top:10px;">总计：<span style="color:red;">￥{{allTotal | dosageFilter}}</span></div>
+
       <el-dialog width="65%" :append-to-body="true" :visible.sync="dialogTableVisible" :close-on-click-modal="false"
         :close-on-press-escape="false" :show-close="false">
         <div slot="title">
@@ -330,6 +370,12 @@ import {
   deleteTheGroup
 } from "@/api/curtain";
 import { GetDosageByNo } from "@/api/itemInfoASP";
+import {
+  getItemById,
+  GetPromotionByItem,
+  GetPromotionsById
+} from "@/api/orderListASP";
+import { UpdateCartItem } from "@/api/shopASP";
 import Cookies from "js-cookie";
 import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
@@ -351,6 +397,7 @@ export default {
         location: "123",
         groupType: "" //活动组
       },
+      activityOptions: [],
       chooseBig: [true, true, true, true, true], //是否选择了大类
       spanArr0: [], //商品信息跨行的数据
       spanArr1: [], //名称跨行的数据
@@ -446,6 +493,54 @@ export default {
     "isModified",
     "STATUS_ID"
   ],
+  computed: {
+    salPromotion() {
+      var selectActivity = this.activityOptions.filter(
+        item => item.P_ID == this.headerData.activityId
+      );
+      if (selectActivity.length) {
+        return selectActivity[0];
+      } else {
+        return {};
+      }
+    },
+    allTotal() {
+      //找到勾选的
+      let _curtainData = JSON.parse(JSON.stringify(this.data));
+      for (let i = 0; i < _curtainData.length; i++) {
+        switch (_curtainData[i].itemType) {
+          case "lt":
+            if (this.chooseBig[0] === false) {
+              _curtainData.splice(i--, 1);
+            }
+            break;
+          case "ls":
+            if (this.chooseBig[1] === false) {
+              _curtainData.splice(i--, 1);
+            }
+            break;
+          case "lspb":
+            if (this.chooseBig[2] === false) {
+              _curtainData.splice(i--, 1);
+            }
+            break;
+          case "sha":
+            if (this.chooseBig[3] === false) {
+              _curtainData.splice(i--, 1);
+            }
+            break;
+        }
+      }
+      let totalMoney = 0;
+      for (let i = 0; i < _curtainData.length; i++) {
+        if (_curtainData[i].choose != false) {
+          totalMoney += this.oneTotal(_curtainData[i]);
+        }
+      }
+
+      return totalMoney;
+    }
+  },
   methods: {
     //修改配件包时，对应修改单位以及名称说明
     changePJBUnit(index) {
@@ -516,6 +611,42 @@ export default {
         }
       });
       return arr;
+    },
+    getActivity() {
+      //判断活动是否存在，不存在的话将activityId转为activityName，让选择器显示
+      if (this.headerData.activityEffective === false) {
+        this.headerData.activityId = this.headerData.activityName;
+      }
+      this.activityOptions = [];
+      if (this.customerType == "110") {
+        GetPromotionsById({ PID: this.headerData.activityId }).then(res => {
+          this.activityOptions = res.data;
+        });
+      } else {
+        getItemById(
+          { itemNo: this.headerData.modelNumber },
+          { loading: false }
+        ).then(itemRes => {
+          GetPromotionByItem(
+            {
+              cid: this.cid,
+              customerType: this.customerType,
+              itemNo: itemRes.data.ITEM_NO,
+              itemVersion: itemRes.data.ITEM_VERSION,
+              productType: itemRes.data.PRODUCT_TYPE,
+              productBrand: itemRes.data.PRODUCT_BRAND
+            },
+            { loading: false }
+          ).then(res => {
+            this.activityOptions = res.data;
+            this.activityOptions.push({
+              ORDER_TYPE: "",
+              ORDER_NAME: "不参与活动",
+              P_ID: null
+            });
+          });
+        });
+      }
     },
     //关闭表格
     closeTable() {
@@ -711,6 +842,20 @@ export default {
           this.totalNumber = 0;
         });
     },
+    getPrice(type, item) {
+      var price = 0;
+      if (type == "02" || type == "08" || type == "10") {
+        //经销
+        price = item.priceSale;
+      } else if (type == "05") {
+        price = item.salePrice;
+      } else if (type == "06") {
+        price = item.priceFx;
+      } else if (type == "09") {
+        price = item.priceHome;
+      }
+      return price;
+    },
     //修改编码--影响用量
     chooseItemNo() {
       if (this.itemNo === "") {
@@ -732,8 +877,10 @@ export default {
       let data = this.items.find(v => {
         if (v.itemNo === this.itemNo) return v;
       });
+      var price = this.getPrice(this.customerType, data);
       this.data[this.chooseIndex].curtainItemName = data.note;
       this.data[this.chooseIndex].specification = data.fixGrade / 1000;
+      this.data[this.chooseIndex].price = price;
       let theFixType;
       if (this.data[this.chooseIndex].itemType === "lspb") {
         this.data[this.chooseIndex].certainHeightWidth = null;
@@ -1089,6 +1236,13 @@ export default {
     },
     //添加窗帘入购物车
     addCurtainToShoppingCar() {
+      if (!this.salPromotion.P_ID) {
+        this.$alert("请选择合适的活动", "提示", {
+          type: "warning",
+          confirmButtonText: "确定"
+        });
+        return;
+      }
       let _curtainData = JSON.parse(JSON.stringify(this.data));
       for (let i = 0; i < _curtainData.length; i++) {
         switch (_curtainData[i].itemType) {
@@ -1213,7 +1367,7 @@ export default {
             id: _curtainData[j].id,
             cartItemId: _curtainData[j].cartItemId,
             price: _curtainData[j].price,
-            activityId: _curtainData[j].activityId,
+            activityId: this.salPromotion.P_ID,
             item: {
               itemNo: _curtainData[j].item.itemNo
             },
@@ -1269,11 +1423,15 @@ export default {
       }
       updateCurtain(obj)
         .then(res => {
-          this.$alert("修改成功!", "提示", {
-            confirmButtonText: "好的",
-            type: "warning",
-            showClose: false
-          }).then(res => {
+          UpdateCartItem({
+            CART_ITEM_ID: this.headerData.cartItemId,
+            ACTIVITY_GROUP_TYPE: this.salPromotion.GROUP_TYPE,
+            UpdateColumns: ["ACTIVITY_GROUP_TYPE"]
+          }).then(res2 => {
+            this.$alert("修改成功!", "提示", {
+              confirmButtonText: "好的",
+              type: "success"
+            });
             this.addTab("shoppingCar/shopping?curtain");
             this.closeTab("detail/detailCurtain");
           });
@@ -1398,10 +1556,21 @@ export default {
         }
       }
       return false;
+    },
+    oneTotal(row) {
+      return (
+        Math.round(
+          (this.salPromotion.P_ID
+            ? this.salPromotion.TYPE == 1
+              ? this.salPromotion.DISCOUNT * row.price
+              : this.salPromotion.PRICE
+            : row.price) * 100
+        ) / 100
+      ).mul(row.dosage);
     }
   },
-  computed: {},
   activated: function() {
+    this.getActivity();
     //按规则排序
     this.curtainData.sort(function(a, b) {
       let rule = ["lt", "ls", "lspb", "sha", "pjb"];
@@ -1413,8 +1582,7 @@ export default {
     this.clearArr();
     this.getSpanArr(this.data);
     if (this.suggestion) this.suggestionLJ = this.suggestion.toString();
-  },
-  deactivated: function() {}
+  }
 };
 </script>
 
@@ -1451,5 +1619,28 @@ export default {
   border-radius: 4px;
   color: gray;
   display: inline-block;
+}
+</style>
+
+<style>
+.curtainTable .el-table td,
+.curtainTable .el-table th {
+  padding: 0 !important;
+}
+.curtainTable .el-table .cell {
+  padding: 0 5px !important;
+}
+.curtainTable .el-input__inner {
+  padding: 0 5px;
+  height: 24px;
+}
+.curtainTable .el-input__icon {
+  line-height: 24px;
+}
+.curtainTable .el-textarea__inner {
+  padding: 5px;
+}
+.curtainTable .el-checkbox__label {
+  padding-left: 2px;
 }
 </style>

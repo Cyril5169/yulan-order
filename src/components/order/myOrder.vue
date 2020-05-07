@@ -575,7 +575,11 @@ export default {
         transCookies[i].lineNo = item.ORDERBODY[i].LINE_NO;
         transCookies[i].activityId = item.ORDERBODY[i].curtains[0].activityId;
         transCookies[i].quantity = item.ORDERBODY[i].QTY_REQUIRED;
-        transCookies[i].price = item.ORDERBODY[i].UNIT_PRICE;
+        var price = 0;
+        for(let j = 0;j< item.ORDERBODY[i].curtains.length;j++){
+          price += (item.ORDERBODY[i].curtains[j].price.mul(item.ORDERBODY[i].curtains[j].dosage));
+        }
+        transCookies[i].price = price;
         transCookies[i].splitShipment = item.ORDERBODY[i].PART_SEND_ID;
         transCookies[i].activityName = item.ORDERBODY[i].PROMOTION;
         transCookies[i].unit = "米";

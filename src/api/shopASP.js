@@ -15,3 +15,10 @@ export function GetCartItemCount(data, config = {}) {
         return Promise.reject(err);
     })
 }
+export function UpdateCartItem(data, config = {}) {
+    return post('/CART_ITEM/UpdateCartItem', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}

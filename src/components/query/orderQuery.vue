@@ -133,16 +133,16 @@
               <td style="width:150px">优惠券余额：</td>
               <td v-if="couponData.length">
                 <span v-for="item of couponData" :key="item.index">
-                  {{ item.rebateMoneyOver }}元
+                  {{item.id}}: ￥{{item.rebateMoneyOver}}
                 </span>
               </td>
               <td v-else>
-                <span style="color:red;">当前年度无优惠券</span>
+                <span style="color:red;">当前无生效优惠券</span>
               </td>
             </tr>
             <tr>
               <td>客户余额：</td>
-              <td>{{ moneySituation }}</td>
+              <td>￥{{ moneySituation }}</td>
             </tr>
           </table>
         </div>
@@ -614,7 +614,7 @@ export default {
         cid: this.cid,
         companyId: this.customerInfo.CUSTOMER_CODE
       });
-      this.moneySituation = res.data + "元";
+      this.moneySituation = res.data;
       var url = "/order/findRebate.do";
       var data = {
         cid: Cookies.get("cid"),
@@ -622,9 +622,8 @@ export default {
       };
       var res2 = await manageCoupon(url, data);
       this.couponData = res2.data;
-      var nowYear = new Date().getFullYear();
       this.couponData = this.couponData.filter(
-        item => item.id.indexOf(nowYear) > -1
+        item => item.dateId == 1 && item.rebateMoneyOver > 0 && item.status ==1
       );
       this.dialogVisible = true;
     },

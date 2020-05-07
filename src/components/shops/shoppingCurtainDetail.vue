@@ -1231,7 +1231,7 @@ export default {
           if (_certainHeightWidth === "01") _certainHeightWidth = 1;
           if (_certainHeightWidth === "02") _certainHeightWidth = 0;
           let _obj1 = {
-            activityId: this.message.activityId,
+            activityId: this.salPromotion.P_ID,
             item: {
               itemNo: _curtainData[j].itemNo
             },
@@ -1276,7 +1276,7 @@ export default {
         CID: this.cid,
         customerType: this.customerType,
         price: "",
-        activityGroupType: this.message.groupType,
+        activityGroupType: this.salPromotion.GROUP_TYPE,
         width: this.message.width,
         height: this.message.height,
         drape: this.message.multiple,

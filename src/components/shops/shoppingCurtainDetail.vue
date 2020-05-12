@@ -973,12 +973,6 @@ export default {
       this.currentPage = 1;
       getGY(data)
         .then(res => {
-          // let _items = [];
-          // for(let i = 0; i < res.itemList.length; i++){
-          //     _items.push({
-          //         itemNo: res.itemList[i]
-          //     });
-          // }
           this.items = res.itemList;
           this.totalNumber = res.itemList.length;
         })

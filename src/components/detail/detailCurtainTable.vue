@@ -1236,7 +1236,7 @@ export default {
     },
     //添加窗帘入购物车
     addCurtainToShoppingCar() {
-      if (!this.salPromotion.P_ID) {
+      if (this.headerData.activityId === this.headerData.activityName) {
         this.$alert("请选择合适的活动", "提示", {
           type: "warning",
           confirmButtonText: "确定"

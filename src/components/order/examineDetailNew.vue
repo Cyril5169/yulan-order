@@ -1577,9 +1577,9 @@ export default {
       this.currentPage = 1;
       getGY(data)
         .then(res => {
-          res.itemList.sort(function(a, b) {
-            return a.itemNO > b.itemNO ? 1 : -1;
-          });
+          // res.itemList.sort(function(a, b) {
+          //   return a.itemNO > b.itemNO ? 1 : -1;
+          // });
           this.items = res.itemList;
           this.totalNumber = res.itemList.length;
         })

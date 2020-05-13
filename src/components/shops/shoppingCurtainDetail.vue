@@ -1245,7 +1245,7 @@ export default {
             specification:
               _curtainData[j].fixGrade === null
                 ? null
-                : Math.round(_curtainData[j].fixGrade / 1000 * 100) / 100(),
+                : Math.round(_curtainData[j].fixGrade / 1000 * 100) / 100,
             illustrate: _curtainData[j].tip,
             deleteFlag: _curtainData[j].deleteFlag,
             modifyFlag: _curtainData[j].modifyFlag,

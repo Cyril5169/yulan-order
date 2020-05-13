@@ -791,7 +791,8 @@ export default {
               label: `${item.itemNo}:${item.note}`,
               value: item.itemNo,
               unit: item.unit === "°ü" ? "包" : item.unit,
-              note: item.note
+              note: item.note,
+              item: item
             });
           });
           _arr.sort(function(a, b) {
@@ -801,7 +802,7 @@ export default {
             label: "-未选择配件包-",
             value: null,
             unit: "",
-            note: ""
+            note: "",
           });
           this.part2 = _arr;
         })
@@ -995,6 +996,8 @@ export default {
         if (item.value === _data) {
           this.allCurtaindata[rowIndex][index].unit = item.unit;
           this.allCurtaindata[rowIndex][index].curtainItemName = item.note;
+          var price = this.getPrice(this.cus_customerType, item.item);
+          this.allCurtaindata[rowIndex][index].price = price;
           this.judgeTip(this.allCurtaindata[rowIndex][index], index, rowIndex);
           return;
         }

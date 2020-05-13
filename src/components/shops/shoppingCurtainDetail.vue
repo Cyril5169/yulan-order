@@ -416,6 +416,8 @@ export default {
         if (item.value === _data) {
           this.curtainData[index].unit = item.unit;
           this.curtainData[index].note = item.note;
+          var price = this.getPrice(this.customerType, item.item);
+          this.curtainData[index].price = price;
           this.judgeTip(this.curtainData[index], index);
           return;
         }
@@ -520,7 +522,8 @@ export default {
               label: `${item.itemNo}:${item.note}`,
               value: item.itemNo,
               unit: item.unit === "°ü" ? "包" : item.unit,
-              note: item.note
+              note: item.note,
+              item: item
             });
           });
           _arr.sort(function(a, b) {
@@ -1242,7 +1245,7 @@ export default {
             specification:
               _curtainData[j].fixGrade === null
                 ? null
-                : (_curtainData[j].fixGrade / 1000).toFixed(2),
+                : Math.round(_curtainData[j].fixGrade / 1000 * 100) / 100(),
             illustrate: _curtainData[j].tip,
             deleteFlag: _curtainData[j].deleteFlag,
             modifyFlag: _curtainData[j].modifyFlag,

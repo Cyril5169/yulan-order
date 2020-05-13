@@ -549,6 +549,8 @@ export default {
         if (item.value === _data) {
           this.data[index].unit = item.unit;
           this.data[index].curtainItemName = item.note;
+          var price = this.getPrice(this.customerType, item.item);
+          this.data[index].price = price;
           this.judgeTip(this.data[index], index);
           return;
         }
@@ -1470,7 +1472,8 @@ export default {
               label: `${item.itemNo}:${item.note}`,
               value: item.itemNo,
               unit: item.unit === "°ü" ? "包" : item.unit,
-              note: item.note
+              note: item.note,
+              item: item
             });
           });
           _arr.sort(function(a, b) {

@@ -3,8 +3,9 @@ let numberFilter = data =>{
     return data.toFixed(2);
 }
 let dosageFilter = data =>{
+    console.log(data)
     if(typeof(data) !== 'number')   return '';
-    return Math.round(data * 100) / 100;
+    return Math.round(data.mul(100)) / 100;
 }
 let findSubStr = (s1,s2) =>{ 
     var sstr= "" ,L1=s1.length,L2=s2.length; 

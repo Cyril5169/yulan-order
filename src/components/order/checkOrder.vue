@@ -570,7 +570,7 @@ export default {
   filters: {
     priceFilter(value) {
       //四舍五入过滤大法
-      let realVal = Math.round(parseFloat(value) * 100) / 100;
+      let realVal = Math.round(parseFloat(value).mul(100)) / 100;
       //防止出现-0.00；
       if (realVal <= 0) {
         realVal = 0.0;
@@ -1225,7 +1225,7 @@ export default {
         //根据是选择数量还是长*宽
         if (getPush[i].quantity == null || getPush[i].quantity == 0) {
           this.array[i].num =
-            Math.round(getPush[i].height * getPush[i].width * 100) / 100;
+            Math.round(getPush[i].height * getPush[i].width.mul(100)) / 100;
           this.array[i].prime_cost = this.subtotal(
             getPush[i].width,
             getPush[i].height,
@@ -1241,8 +1241,8 @@ export default {
       var allcost = 0;
       activityPrice(url, data).then(res => {
         for (var j = 0; j < res.data.length; j++) {
-          this.array[j].questPrice = Math.round(res.data[j].promotion_cost * 100) / 100;
-          allcost += Math.round(parseFloat(res.data[j].promotion_cost) * 100) / 100;
+          this.array[j].questPrice = Math.round(res.data[j].promotion_cost.mul(100)) / 100;
+          allcost += Math.round(parseFloat(res.data[j].promotion_cost).mul(100)) / 100;
         }
         /* allcost=allcost.toString(); */
         //将allspend赋值活动后总价
@@ -1294,7 +1294,7 @@ export default {
         this.array2[i].unit = getPush2[i].unit;
         if (getPush2[i].unit == "平方米") {
           this.array2[i].qtyRequired =
-            Math.round(getPush2[i].height.mul(getPush2[i].width) * 100) / 100;
+            Math.round(getPush2[i].height.mul(getPush2[i].width).mul(100)) / 100;
         } else {
           this.array2[i].qtyRequired = getPush2[i].quantity;
         }
@@ -1459,7 +1459,7 @@ export default {
       } else {
         this.$alert(
           "余额不足，当前订单还需充值" +
-            Math.round((this.allSpend - this.Initial_balance) * 100) / 100 +
+            Math.round((this.allSpend - this.Initial_balance).mul(100)) / 100 +
             "元才能提交",
           "提示",
           {
@@ -1500,8 +1500,8 @@ export default {
       let _width = parseFloat(width);
       let _height = parseFloat(height);
       let _price = parseFloat(price);
-      let square = Math.round(_width.mul(_height) * 100) / 100;
-      return Math.round(price.mul(square) * 100) / 100;
+      let square = Math.round(_width.mul(_height).mul(100)) / 100;
+      return Math.round(price.mul(square).mul(100)) / 100;
     },
     getOrderHead() {
       var getPush = JSON.parse(sessionStorage.getItem("shopping"));

@@ -537,7 +537,6 @@ export default {
           totalMoney += this.oneTotal(_curtainData[i]);
         }
       }
-
       return totalMoney;
     }
   },
@@ -933,7 +932,7 @@ export default {
             let _data = this.data[this.chooseIndex];
             let keys;
             if (_data.itemType == "lt")
-              keys = Math.round(res.data[0].dosage * 100) / 100;
+              keys = Math.round(res.data[0].dosage.mul(100)) / 100;
             else keys = Math.round(res.data[0].dosage * 10) / 10;
             //绣花边只需要修改自身，无需修改面料
             if (_data.productType === "XHB") {
@@ -1003,7 +1002,7 @@ export default {
           let _data = this.data[index];
           let keys;
           if (_data.itemType == "lt")
-            keys = Math.round(res.data[0].dosage * 100) / 100;
+            keys = Math.round(res.data[0].dosage.mul(100)) / 100;
           else keys = Math.round(res.data[0].dosage * 10) / 10;
           //绣花边只需要修改自身，无需修改面料
           if (_data.productType === "XHB") {
@@ -1567,7 +1566,7 @@ export default {
             ? this.salPromotion.TYPE == 1
               ? this.salPromotion.DISCOUNT * row.price
               : this.salPromotion.PRICE
-            : row.price) * 100
+            : row.price).mul(100)
         ) / 100
       ).mul(row.dosage);
     }

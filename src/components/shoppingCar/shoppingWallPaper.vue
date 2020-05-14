@@ -452,7 +452,7 @@ export default {
                 ? _data.salPromotion.type == 1
                   ? _data.salPromotion.discount * sub
                   : parseFloat(_data.salPromotion.price * _data.quantity)
-                : sub) * 100
+                : sub).mul(100)
             ) / 100;
         } else {
           let sub = this.subtotal(_data.width, _data.height, _data.price);
@@ -467,7 +467,7 @@ export default {
                       _data.height,
                       _data.salPromotion.price
                     )
-                : sub) * 100
+                : sub).mul(100)
             ) / 100;
         }
       }
@@ -698,8 +698,8 @@ export default {
       let _width = parseFloat(width);
       let _height = parseFloat(height);
       let _price = parseFloat(price);
-      let square = Math.round(_width.mul(_height) * 100) / 100;
-      return Math.round(price.mul(square) * 100) / 100;
+      let square = Math.round(_width.mul(_height).mul(100)) / 100;
+      return Math.round(price.mul(square).mul(100)) / 100;
     }
   },
   created() {

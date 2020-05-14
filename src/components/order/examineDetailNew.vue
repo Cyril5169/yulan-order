@@ -713,7 +713,7 @@ export default {
         if (tab.curtains[i].unit === "°ü") {
           tab.curtains[i].unit = "包";
         }
-        tab.curtains[i].dosage = Math.round(tab.curtains[i].dosage * 100) / 100;
+        tab.curtains[i].dosage = Math.round(tab.curtains[i].dosage.mul(100)) / 100;
       }
       //拿到保存的数据
       this.curtainData = tab.curtains;
@@ -823,7 +823,7 @@ export default {
             data.curtains[cur].unit = "包";
           }
           data.curtains[cur].dosage =
-            Math.round(data.curtains[cur].dosage * 100) / 100;
+            Math.round(data.curtains[cur].dosage.mul(100)) / 100;
         }
         data.curtains.sort(function(a, b) {
           let rule = ["lt", "ls", "lspb", "sha", "pjb"];
@@ -1372,7 +1372,7 @@ export default {
             ];
             let keys;
             if (_data.itemType == "lt")
-              keys = Math.round(res.data[0].dosage * 100) / 100;
+              keys = Math.round(res.data[0].dosage.mul(100)) / 100;
             else keys = Math.round(res.data[0].dosage * 10) / 10;
             //绣花边只需要修改自身，无需修改面料
             if (_data.productType === "XHB") {
@@ -1473,7 +1473,7 @@ export default {
           let _data = this.allCurtaindata[rowIndex][index];
           let keys;
           if (_data.itemType == "lt")
-            keys = Math.round(res.data[0].dosage * 100) / 100;
+            keys = Math.round(res.data[0].dosage.mul(100)) / 100;
           else keys = Math.round(res.data[0].dosage * 10) / 10;
           //绣花边只需要修改自身，无需修改面料
           if (_data.productType === "XHB") {

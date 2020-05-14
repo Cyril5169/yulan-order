@@ -1348,7 +1348,7 @@ export default {
             ? this.salPromotion.TYPE == 1
               ? this.salPromotion.DISCOUNT * row.price
               : this.salPromotion.PRICE
-            : row.price) * 100
+            : row.price).mul(100)
         ) /
           100).mul(row.dosage)
       );

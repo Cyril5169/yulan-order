@@ -343,7 +343,7 @@ export default {
               ? val[i].salPromotion.type == 1
                 ? val[i].salPromotion.discount * sub
                 : val[i].salPromotion.price * val[i].count
-              : sub) * 100
+              : sub).mul(100)
           ) / 100;
       }
       this.totalMoney = total;

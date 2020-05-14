@@ -387,7 +387,7 @@ export default {
         if (tab.curtains[i].unit === "°ü") {
           tab.curtains[i].unit = "包";
         }
-        tab.curtains[i].dosage = Math.round(tab.curtains[i].dosage * 100) / 100;
+        tab.curtains[i].dosage = Math.round(tab.curtains[i].dosage.mul(100)) / 100;
       }
       //拿到保存的数据
       this.curtainData = tab.curtains;

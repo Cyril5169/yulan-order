@@ -553,7 +553,7 @@ export default {
         { value: "特殊见备注" }
       ],
       //帘身、纱制造说明
-      part1: [{ value: "对开" }, { value: "单开" }, { value: "特殊开备注" }],
+      part1: [{ value: "对开" },  { value: "左单开" }, { value: "右单开" }, { value: "特殊开备注" }],
       //帘身配布制造说明
       part3: [
         { value: "一个褶" },

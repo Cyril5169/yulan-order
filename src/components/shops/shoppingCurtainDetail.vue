@@ -355,7 +355,12 @@ export default {
         { value: "特殊见备注" }
       ],
       //帘身、纱制造说明
-      part1: [{ value: "对开" },  { value: "左单开" }, { value: "右单开" }, { value: "特殊开备注" }],
+      part1: [
+        { value: "对开" },
+        { value: "左单开" },
+        { value: "右单开" },
+        { value: "特殊开备注" }
+      ],
       //帘身配布制造说明
       part3: [
         { value: "一个褶" },
@@ -1245,7 +1250,7 @@ export default {
             specification:
               _curtainData[j].fixGrade === null
                 ? null
-                : Math.round(_curtainData[j].fixGrade / 1000 * 100) / 100,
+                : Math.round((_curtainData[j].fixGrade / 1000) * 100) / 100,
             illustrate: _curtainData[j].tip,
             deleteFlag: _curtainData[j].deleteFlag,
             modifyFlag: _curtainData[j].modifyFlag,
@@ -1295,13 +1300,10 @@ export default {
           });
         })
         .catch(err => {
-          console.log(err);
-          if (err.code === 2) {
-            this.$alert("该产品信息正在完善，请等待!", "提示", {
-              confirmButtonText: "好的",
-              type: "warning"
-            });
-          }
+          this.$alert(err.msg, "提示", {
+            confirmButtonText: "好的",
+            type: "warning"
+          });
         });
     },
     ...mapMutations("navTabs", ["addTab"]),
@@ -1343,15 +1345,15 @@ export default {
     },
     oneTotal(row) {
       return (
-        (Math.round(
+        Math.round(
           (this.salPromotion.P_ID
             ? this.salPromotion.TYPE == 1
               ? this.salPromotion.DISCOUNT * row.price
               : this.salPromotion.PRICE
-            : row.price).mul(100)
-        ) /
-          100).mul(row.dosage)
-      );
+            : row.price
+          ).mul(100)
+        ) / 100
+      ).mul(row.dosage);
     }
   },
   computed: {

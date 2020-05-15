@@ -3,7 +3,6 @@ let numberFilter = data =>{
     return data.toFixed(2);
 }
 let dosageFilter = data =>{
-    console.log(data)
     if(typeof(data) !== 'number')   return '';
     return Math.round(data.mul(100)) / 100;
 }

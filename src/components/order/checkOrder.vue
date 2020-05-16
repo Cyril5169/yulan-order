@@ -1242,7 +1242,7 @@ export default {
       activityPrice(url, data).then(res => {
         for (var j = 0; j < res.data.length; j++) {
           this.array[j].questPrice = Math.round(res.data[j].promotion_cost.mul(100)) / 100;
-          allcost += Math.round(parseFloat(res.data[j].promotion_cost).mul(100)) / 100;
+          allcost = allcost.add(Math.round(parseFloat(res.data[j].promotion_cost).mul(100)) / 100);
         }
         /* allcost=allcost.toString(); */
         //将allspend赋值活动后总价

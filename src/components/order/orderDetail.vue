@@ -314,7 +314,6 @@ export default {
         cid: Cookies.get("cid"),
         orderNo: Cookies.get("ORDER_NO")
       };
-      console.log(data);
       if (this.ruleForm.ALL_SPEND > this.Initial_balance && this.status == 5) {
         //欠款可提交的话可以跳过判断
         this.$alert("余额不足，请尽快充值", "提示", {

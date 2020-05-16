@@ -1397,10 +1397,9 @@ export default {
       let totalMoney = 0;
       for (let i = 0; i < _curtainData.length; i++) {
         if (_curtainData[i].choose != false) {
-          totalMoney += this.oneTotal(_curtainData[i]);
+          totalMoney =  totalMoney.add(this.oneTotal(_curtainData[i]));
         }
       }
-
       return totalMoney;
     }
   }

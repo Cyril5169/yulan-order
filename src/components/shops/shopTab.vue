@@ -1,107 +1,82 @@
 <template>
   <div id="shopTabCon">
-    <el-table
-      id="shopTabTable"
-      class="loading-area"
-      :data="tableData"
-      :row-key="getRowKeys"
-      :expand-row-keys="expands"
-      @expand-change="expandChange"
-      style="min-width: 750px; margin: 5px auto;"
-    >
-      <el-table-column label="型号" prop="itemNo" width="150" align="center">
+    <el-table id="shopTabTable" class="loading-area" :data="tableData" :row-key="getRowKeys" :expand-row-keys="expands"
+      @expand-change="expandChange" style="min-width: 750px; margin: 5px auto;">
+      <el-table-column label="型号" prop="ITEM_NO" width="150" align="center">
       </el-table-column>
-      <el-table-column label="名称" prop="note" width="130" align="center">
+      <el-table-column label="名称" prop="NOTE" width="140" align="center">
         <template slot-scope="scope">
-          <span v-if="scope.row.note !== null">{{ scope.row.note }}</span>
+          <span v-if="scope.row.NOTE">{{ scope.row.NOTE }}</span>
           <span v-else>--</span>
         </template>
       </el-table-column>
       <el-table-column label="规格尺寸" width="120" align="center">
         <template slot-scope="scope">
-          <span v-if="scope.row.fixType === '01'">
-            <span v-if="scope.row.rzGrade">
+          <span v-if="scope.row.FIX_TYPE === '01'">
+            <span v-if="scope.row.RZ_GRADE">
               定宽
-              <!-- {{ scope.row.rzGrade }} -->
-              {{scope.row.fixGrade/1000 + (scope.row.unit?scope.row.unit:'米')}}
+              <!-- {{ scope.row.RZ_GRADE }} -->
+              {{scope.row.FIX_GRADE/1000 + (scope.row.UNIT_NAME?scope.row.UNIT_NAME:'米')}}
             </span>
             <span v-else>
               定宽
             </span>
           </span>
-          <span v-else-if="scope.row.fixType === '02'">
-            <span v-if="scope.row.rzGrade">
+          <span v-else-if="scope.row.FIX_TYPE === '02'">
+            <span v-if="scope.row.RZ_GRADE">
               定高
-              <!-- {{ scope.row.rzGrade }} -->
-              {{scope.row.fixGrade/1000 + (scope.row.unit?scope.row.unit:'米')}}
+              <!-- {{ scope.row.RZ_GRADE }} -->
+              {{scope.row.FIX_GRADE/1000 + (scope.row.UNIT_NAME?scope.row.UNIT_NAME:'米')}}
             </span>
             <span v-else>
               定高
             </span>
           </span>
-          <span v-else-if="scope.row.rzGrade">
-            {{ scope.row.rzGrade }}
+          <span v-else-if="scope.row.RZ_GRADE">
+            {{ scope.row.RZ_GRADE }}
           </span>
           <span v-else>--</span>
         </template>
       </el-table-column>
       <!-- <el-table-column
                 label="尺寸"
-                prop="fixGrade">
+                prop="FIX_GRADE">
                 <template slot-scope="scope">
-                    <span v-if="scope.row.fixGrade !== null">
-                        {{scope.row.fixGrade/1000}}
+                    <span v-if="scope.row.FIX_GRADE !== null">
+                        {{scope.row.FIX_GRADE/1000}}
                     </span>
                     <span v-else>--</span>
                 </template>
             </el-table-column> -->
-      <el-table-column
-        v-if="minimumPurchaseShow"
-        label="起购数量"
-        prop="minimumPurchase"
-        width="80"
-        align="center"
-      ></el-table-column>
-      <el-table-column width="100" label="数量" align="center">
+      <el-table-column v-if="minimumPurchaseShow" label="起购数量" prop="MINIMUM_PURCHASE" width="80" align="center">
+      </el-table-column>
+      <el-table-column width="200" label="数量" align="center">
         <template slot-scope="scope">
-          <div v-if="scope.row.unit === '平方米'" align="center">
+          <div v-if="scope.row.UNIT_NAME === '平方米'" align="center">
             <span class="num-font">宽</span>
-            <currency-input
-              :customStyle="'width: 60px;'"
-              v-model.number="numberList[scope.$index].value"
-            >
+            <currency-input :customStyle="'width: 60px;'" v-model.number="numberList[scope.$index].value">
             </currency-input>
             ×
             <span class="num-font">高</span>
-            <currency-input
-              :customStyle="'width: 60px;'"
-              v-model="numberList[scope.$index].value1"
-            >
+            <currency-input :customStyle="'width: 60px;'" v-model="numberList[scope.$index].value1">
             </currency-input>
           </div>
           <div v-else>
-            <currency-input
-              :customStyle="'width: 60px;'"
-              v-model.number="numberList[scope.$index].value"
-            >
+            <currency-input :customStyle="'width: 80px;'" v-model.number="numberList[scope.$index].value">
             </currency-input>
           </div>
         </template>
       </el-table-column>
       <el-table-column label="单位" width="80" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.unit ? scope.row.unit : "米" }}</span>
+          <span>{{ scope.row.UNIT_NAME ? scope.row.UNIT_NAME : "米" }}</span>
         </template>
       </el-table-column>
       <el-table-column width="100px" label="操作" align="center">
         <template slot-scope="scope">
           <a class="mr10" @click="seeStore(scope)">
             查看库存
-            <iframe
-              :src="storeUrl(scope.row.itemNo)"
-              style="display:none;"
-              frameborder="0"
-            ></iframe>
+            <iframe :src="storeUrl(scope.row.ITEM_NO)" style="display:none;" frameborder="0"></iframe>
           </a>
         </template>
       </el-table-column>
@@ -109,77 +84,40 @@
         <template slot-scope="scope">
           <el-form label-position="left" class="loading-area">
             <el-form-item label="活动：">
-              <el-select
-                style="width:300px;"
-                :disabled="disableFlag"
-                v-model="seletedActivity"
-                :placeholder="
+              <el-select style="width:300px;" :disabled="disableFlag" v-model="seletedActivity" :placeholder="
                   disableFlag === false ? '请选择一个活动' : '此产品不参与活动'
-                "
-              >
-                <el-option
-                  v-for="item in activity"
-                  :label="item.label"
-                  :key="item.value"
-                  :value="item.value"
-                >
+                ">
+                <el-option v-for="item in activity" :label="item.label" :key="item.value" :value="item.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="备注：">
               <div class="dib rel" style="width: 55%;">
-                <el-input
-                  resize="none"
-                  type="textarea"
-                  placeholder="请输入您的备注信息（50字内）"
-                  maxlength="50"
-                  :autosize="{ minRows: 3, maxRows: 6 }"
-                  v-model="remark"
-                >
+                <el-input resize="none" type="textarea" placeholder="请输入您的备注信息（50字内）" maxlength="50"
+                  :autosize="{ minRows: 3, maxRows: 6 }" v-model="remark">
                 </el-input>
-                <i
-                  class="el-icon-edit"
-                  style="position:absolute;
-                                        right:10px;bottom:5px;"
-                >
+                <i class="el-icon-edit" style="position:absolute;
+                                        right:10px;bottom:5px;">
                 </i>
               </div>
-              <span style="margin-left:10px;"
-                >{{ remark ? remark.length : 0 }}/50</span
-              >
+              <span style="margin-left:10px;">{{ remark ? remark.length : 0 }}/50</span>
             </el-form-item>
             <el-form-item class="tc">
-              <el-button
-                style="width: 130px;"
-                type="danger"
-                @click="saveToShoppingCar(scope.row, scope.$index)"
-                >加入购物车</el-button
-              >
-              <el-button
-                style="width: 130px;"
-                type="info"
-                @click="expandChange(scope)"
-                >取消</el-button
-              >
+              <el-button style="width: 130px;" type="danger" @click="saveToShoppingCar(scope.row, scope.$index)">加入购物车
+              </el-button>
+              <el-button style="width: 130px;" type="info" @click="expandChange(scope)">取消</el-button>
             </el-form-item>
           </el-form>
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog
-      border
-      title="库存查询"
-      :visible.sync="dialogTableVisible"
-      width="550px"
-    >
+    <el-dialog border title="库存查询" :visible.sync="dialogTableVisible" width="550px">
       <el-table id="storeTable" :data="produceStore" :row-style="rowClass">
         <el-table-column property="header" min-width="30%"></el-table-column>
         <el-table-column property="body" style="width: 70%;"></el-table-column>
       </el-table>
       <div slot="footer">
-        <el-button type="success" plain @click="dialogTableVisible = false"
-          >关 闭</el-button
-        >
+        <el-button type="success" plain @click="dialogTableVisible = false">关 闭</el-button>
       </div>
     </el-dialog>
   </div>
@@ -189,7 +127,7 @@
 import { findItemActivity } from "@/api/findActivity";
 import { checkStore } from "@/api/searchStore";
 import { addShoppingCar } from "@/api/shop";
-import { getItemById, GetPromotionByItem } from "@/api/orderListASP";
+import { GetPromotionByItem } from "@/api/orderListASP";
 import Axios from "axios";
 import Cookies from "js-cookie";
 
@@ -228,14 +166,6 @@ export default {
     };
   },
   props: ["tableData", "numberList"],
-  // tableData:{
-  //     handler:(val,oldval) => {
-  //         console.log(val,oldval);
-  //         this.storeMsg = [];
-  //         // this.footShow = val;
-  //     },
-  //     immediate:true,//关键
-  // },
   filters: {
     calLength(str) {
       var len = 0;
@@ -269,81 +199,72 @@ export default {
     },
     //获取row的key值
     getRowKeys(row) {
-      return row.itemNo;
+      return row.ITEM_NO;
     },
     storeUrl(IID) {
       return `http://www.luxlano.com/ddkc/ecqueryItemStock.asp?IID=${IID}`;
     },
-    //收起展开行
+    //展开行
     expandChange(row) {
       this.clearMsg();
-      if (row.itemNo === undefined) {
+      if (row.ITEM_NO === undefined) {
         this.expands = [];
         return;
       }
-      var itemVersion = row.itemVersion ? row.itemVersion : "";
-      var productType = row.productType ? row.productType : "";
-      var productBrand = row.productBrand ? row.productBrand : "";
-      getItemById({ itemNo: row.itemNo }).then(itemRes => {
-        itemRes.data.MINIMUM_PURCHASE == 0
-          ? (this.minimumPurchaseShow = false)
-          : (this.minimumPurchaseShow = true);
-        row.minimumPurchase =
-          itemRes.data.MINIMUM_PURCHASE == 0
-            ? ""
-            : itemRes.data.MINIMUM_PURCHASE;
-        //findItemActivity({
-        GetPromotionByItem({
-          cid: this.cid,
-          customerType: this.customerType,
-          itemNo: itemRes.data.ITEM_NO,
-          itemVersion: itemRes.data.ITEM_VERSION,
-          productType: itemRes.data.PRODUCT_TYPE,
-          productBrand: itemRes.data.PRODUCT_BRAND
-        })
-          .then(res => {
-            if (res.data.length === 0) {
-              this.disableFlag = true;
-            } else {
-              this.disableFlag = false;
-            }
-            var defaultSel = {
-              pri: 0,
-              id: 0
+      row.MINIMUM_PURCHASE == 0
+        ? (this.minimumPurchaseShow = false)
+        : (this.minimumPurchaseShow = true);
+      //findItemActivity({
+      GetPromotionByItem({
+        cid: this.cid,
+        customerType: this.customerType,
+        itemNo: row.ITEM_NO,
+        itemVersion: row.ITEM_VERSION,
+        productType: row.PRODUCT_TYPE,
+        productBrand: row.PRODUCT_BRAND
+      })
+        .then(res => {
+          if (res.data.length === 0) {
+            this.disableFlag = true;
+          } else {
+            this.disableFlag = false;
+          }
+          var defaultSel = {
+            pri: 0,
+            id: 0
+          };
+          for (var i = 0; i < res.data.length; i++) {
+            var obj = {
+              label: res.data[i].ORDER_TYPE + " -- " + res.data[i].ORDER_NAME,
+              value: res.data[i].P_ID
             };
-            for (var i = 0; i < res.data.length; i++) {
-              var obj = {
-                label: res.data[i].ORDER_TYPE + " -- " + res.data[i].ORDER_NAME,
-                value: res.data[i].P_ID
-              };
-              if (res.data[i].PRIORITY != 0 && defaultSel.pri == 0) {
-                defaultSel.pri = res.data[i].PRIORITY;
-                defaultSel.id = res.data[i].P_ID;
-              } else if (
-                res.data[i].PRIORITY != 0 &&
-                defaultSel.pri > res.data[i].PRIORITY
-              ) {
-                defaultSel.pri = res.data[i].PRIORITY;
-                defaultSel.id = res.data[i].P_ID;
-              }
-              this.activity.push(obj);
+            if (res.data[i].PRIORITY != 0 && defaultSel.pri == 0) {
+              defaultSel.pri = res.data[i].PRIORITY;
+              defaultSel.id = res.data[i].P_ID;
+            } else if (
+              res.data[i].PRIORITY != 0 &&
+              defaultSel.pri > res.data[i].PRIORITY
+            ) {
+              defaultSel.pri = res.data[i].PRIORITY;
+              defaultSel.id = res.data[i].P_ID;
             }
-            if (defaultSel.pri != 0) {
-              this.seletedActivity = defaultSel.id;
-            }
-            this.activity.push({
-              label: "不参与活动",
-              value: null
-            });
-          })
-          .catch(err => {
-            console.log(err);
+            this.activity.push(obj);
+          }
+          if (defaultSel.pri != 0) {
+            this.seletedActivity = defaultSel.id;
+          }
+          this.activity.push({
+            label: "不参与活动",
+            value: null
           });
-      });
+        })
+        .catch(err => {
+          console.log(err);
+        });
       let temp = this.expands;
       this.expands = [];
-      this.expands.push(row.itemNo);
-      if (temp.length === 1 && temp[0] === row.itemNo) {
+      this.expands.push(row.ITEM_NO);
+      if (temp.length === 1 && temp[0] === row.ITEM_NO) {
         // 收起展开行
         this.expands = [];
       }
@@ -352,7 +273,7 @@ export default {
     saveToShoppingCar(row, index) {
       //库存判断,判断成功才可以添加
       let val;
-      if (row.unit === "平方米") {
+      if (row.UNIT_NAME === "平方米") {
         val = this.numberList[index].value * this.numberList[index].value1;
       } else {
         val = this.numberList[index].value;
@@ -365,9 +286,9 @@ export default {
         return;
       }
       //判断起购数量
-      if (row.minimumPurchase != 0 && val < row.minimumPurchase) {
+      if (row.MINIMUM_PURCHASE != 0 && val < row.MINIMUM_PURCHASE) {
         this.$alert(
-          "本产品最小起购数量为" + row.minimumPurchase + row.unit,
+          "本产品最小起购数量为" + row.MINIMUM_PURCHASE + row.UNIT_NAME,
           "提示",
           {
             type: "warning",
@@ -406,12 +327,12 @@ export default {
       addShoppingCar({
         customer_type: this.customerType,
         CID: this.cid,
-        itemNO: row.itemNo,
+        itemNO: row.ITEM_NO,
         commodityType: "soft",
         activityID: this.seletedActivity,
-        quantity: row.unit == "平方米" ? "" : this.numberList[index].value,
-        height: row.unit == "平方米" ? this.numberList[index].value1 : "",
-        width: row.unit == "平方米" ? this.numberList[index].value : "",
+        quantity: row.UNIT_NAME == "平方米" ? "" : this.numberList[index].value,
+        height: row.UNIT_NAME == "平方米" ? this.numberList[index].value1 : "",
+        width: row.UNIT_NAME == "平方米" ? this.numberList[index].value : "",
         note: this.remark,
         splitShipment: storeMessage,
         softType: _type
@@ -456,11 +377,11 @@ export default {
     seeStore(scope) {
       this.dialogTableVisible = true;
       //生成库存表格，依次是类别、编号、尺寸、库存信息
-      this.produceStore[0].body = scope.row.note ? scope.row.note : "暂无数据";
-      this.produceStore[1].body = scope.row.itemNo
-        ? scope.row.itemNo
+      this.produceStore[0].body = scope.row.NOTE ? scope.row.NOTE : "暂无数据";
+      this.produceStore[1].body = scope.row.ITEM_NO
+        ? scope.row.ITEM_NO
         : "暂无数据";
-      this.produceStore[2].body = scope.row.fixGrade / 1000;
+      this.produceStore[2].body = scope.row.FIX_GRADE / 1000;
       this.produceStore[3].body = this.storeMsg[scope.$index]
         ? this.storeMsg[scope.$index]
         : "暂无数据";
@@ -470,16 +391,6 @@ export default {
   },
   created() {},
   computed: {
-    // length(){
-    //     this.numberList = [];
-    //     for(var i=0; i<this.tableData.length; i++){
-    //         this.numberList.push({
-    //             value: '',  //主计量
-    //             value1: ''  //辅助计量
-    //         });
-    //     }
-    //     return this.tableData.length;
-    // }
     msg() {
       return this.tableData;
     }

@@ -4,45 +4,19 @@
       <div id="shopsCon">
         <el-tabs v-model="activeName" @tab-click="handleClick">
           <div id="shopSearchBox" class="mt10">
-            <el-input
-              clearable
-              v-model.trim="searchKey"
-              @clear="_getShopsAllSoftSuitMsg(0)"
-              @keyup.enter.native="searchSoftSuit(0)"
-              placeholder="输入商品型号查找商品"
-              style="width:25%; min-width:280px;"
-            >
-              <div
-                id="searchBtn"
-                slot="append"
-                style="cursor:pointer;"
-                @click="searchSoftSuit(0)"
-              >
+            <el-input clearable v-model.trim="searchKey" @clear="_getShopsAllSoftSuitMsg(0)"
+              @keyup.enter.native="searchSoftSuit(0)" placeholder="输入商品型号查找商品" style="width:25%; min-width:280px;">
+              <div id="searchBtn" slot="append" style="cursor:pointer;" @click="searchSoftSuit(0)">
                 搜索
               </div>
             </el-input>
           </div>
-          <el-tab-pane
-            lazy
-            v-for="item in softList"
-            :key="item.name"
-            :name="item.name"
-            :label="item.label"
-          >
+          <el-tab-pane lazy v-for="item in softList" :key="item.name" :name="item.name" :label="item.label">
           </el-tab-pane>
-          <shopTab
-            v-bind:tableData="tableData"
-            v-bind:numberList="numberList"
-          ></shopTab>
-          <el-pagination
-            style="margin:0 10%;"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :current-page.sync="currentPage"
-            :page-size="pageSize"
-            layout="total, prev, pager, next, jumper"
-            :total="totalNumber"
-          >
+          <shopTab v-bind:tableData="tableData" v-bind:numberList="numberList"></shopTab>
+          <el-pagination style="margin:0 10%;" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+            :current-page.sync="currentPage" :page-size="pageSize" layout="total, prev, pager, next, jumper"
+            :total="totalNumber">
           </el-pagination>
         </el-tabs>
       </div>
@@ -57,6 +31,7 @@ import {
   getShopsSingleSoftSuit,
   getShopsAllSoftSuitMsg
 } from "@/api/shopSearch";
+import { GetSoftByProductType } from "@/api/itemInfoASP";
 
 export default {
   name: "SoftSuit",
@@ -66,110 +41,7 @@ export default {
       searchKey: "", //搜索的关键词
       chooseTab: "", //当前的选择
       //传给组件的数据
-      tableData: [
-        {
-          itemNo: "MLTS200092", //型号
-          note: "note", //名称
-          fixGrade: "2800", //尺寸
-          style: "01", //01:定宽，02:定高
-          number: "", //计量
-          anotherNumber: "", //辅助计量
-          activity: [
-            { value: "活动一" },
-            { value: "活动二" },
-            { value: "活动三" },
-            { value: "活动四" }
-          ], //活动
-          seletedActivity: "", //选择的活动
-          remark: "", //备注
-          status: "0" //状态
-        },
-        {
-          itemNo: "MLTS200092", //型号
-          note: "note", //名称
-          fixGrade: "2800", //尺寸
-          style: "01", //01:定宽，02:定高
-          number: "", //计量
-          anotherNumber: "", //辅助计量
-          activity: [
-            { value: "活动一" },
-            { value: "活动二" },
-            { value: "活动三" },
-            { value: "活动四" }
-          ], //活动
-          seletedActivity: "", //选择的活动
-          remark: "", //备注
-          status: "0" //状态
-        },
-        {
-          itemNo: "MLTS200092", //型号
-          note: "note", //名称
-          fixGrade: "2800", //尺寸
-          style: "01", //01:定宽，02:定高
-          number: "", //计量
-          anotherNumber: "", //辅助计量
-          activity: [
-            { value: "活动一" },
-            { value: "活动二" },
-            { value: "活动三" },
-            { value: "活动四" }
-          ], //活动
-          seletedActivity: "", //选择的活动
-          remark: "", //备注
-          status: "0" //状态
-        },
-        {
-          itemNo: "MLTS200092", //型号
-          note: "note", //名称
-          fixGrade: "2800", //尺寸
-          style: "01", //01:定宽，02:定高
-          number: "", //计量
-          anotherNumber: "", //辅助计量
-          activity: [
-            { value: "活动一" },
-            { value: "活动二" },
-            { value: "活动三" },
-            { value: "活动四" }
-          ], //活动
-          seletedActivity: "", //选择的活动
-          remark: "", //备注
-          status: "0" //状态
-        },
-        {
-          itemNo: "MLTS200092", //型号
-          note: "note", //名称
-          fixGrade: "2800", //尺寸
-          style: "01", //01:定宽，02:定高
-          number: "", //计量
-          anotherNumber: "", //辅助计量
-          activity: [
-            { value: "活动一" },
-            { value: "活动二" },
-            { value: "活动三" },
-            { value: "活动四" }
-          ], //活动
-          seletedActivity: "", //选择的活动
-          remark: "", //备注
-          status: "0" //状态
-        },
-        {
-          itemNo: "MLTS200092", //型号
-          note: "note", //名称
-          fixGrade: 2800, //尺寸
-          fixType: "01", //01:定宽，02:定高
-          number: "", //计量
-          anotherNumber: "", //辅助计量
-          activity: [
-            { value: "活动一" },
-            { value: "活动二" },
-            { value: "活动三" },
-            { value: "活动四" }
-          ], //活动
-          seletedActivity: "", //选择的活动
-          remark: "", //备注
-          status: "0" //状态
-        }
-      ],
+      tableData: [],
       numberList: [],
       //创建一个总的data，这样只需加载一次请求
       allData: [[], [], [], [], [], [], []],
@@ -201,13 +73,17 @@ export default {
           label: "成品帘"
         },
         {
-          name: "other",
+          name: "CP",
+          label: "床品"
+        },
+        {
+          name: "OTHER",
           label: "其它"
         }
       ],
       currentPage: 1, //当前的页数
       pageSize: 10, //每页的个数
-      totalNumber: 0, //总条数
+      totalNumber: 0 //总条数
     };
   },
   components: {
@@ -215,17 +91,15 @@ export default {
   },
   methods: {
     //获取每页的条数
-    handleSizeChange(val) {
-      //console.log(`每页 ${val} 条`);
-    },
+    handleSizeChange(val) {},
     //获取当前页
     handleCurrentChange(val) {
       this.currentPage = val;
-      if (this.searchKey.length === 0) this._getShopsAllSoftSuitMsg(1);
-      else {
-        this.searchSoftSuit(1);
-      }
-      //console.log(`当前页: ${val}`);
+      // if (this.searchKey.length === 0) this._getShopsAllSoftSuitMsg(1);
+      // else {
+      //   this.searchSoftSuit(1);
+      // }
+      this.searchSoftSuit();
     },
     //数组去重
     unique(arr) {
@@ -233,7 +107,7 @@ export default {
       var len = arr.length;
       for (i = 0; i < len; i++) {
         for (j = i + 1; j < len; j++) {
-          if (arr[i].itemNo == arr[j].itemNo) {
+          if (arr[i].ITEM_NO == arr[j].ITEM_NO) {
             arr.splice(j, 1);
             len--;
             j--;
@@ -392,19 +266,25 @@ export default {
       }
     },
     //软装单类产品的模糊搜索
-    searchSoftSuit(flag) {
-      if (flag === 0) this.currentPage = 1;
-      getShopsSingleSoftSuit({
-        itemType: this.chooseTab,
+    searchSoftSuit() {
+      GetSoftByProductType({
+        productType: this.chooseTab,
+        keywords: this.searchKey.toUpperCase(),
         cid: this.cid,
-        itemNo: this.searchKey.toUpperCase(),
-        limit: this.pageSize,
-        page: this.currentPage
+        page: this.currentPage,
+        limit: this.pageSize
       })
+        // getShopsSingleSoftSuit({
+        //   itemType: this.chooseTab,
+        //   cid: this.cid,
+        //   itemNo: this.searchKey.toUpperCase(),
+        //   limit: this.pageSize,
+        //   page: this.currentPage
+        // })
         .then(res => {
           this.tableData = this.unique(res.data);
-          this.tableData = this.changeUnit(this.tableData);
-          this.totalNumber = this.tableData[0].total;
+          //this.tableData = this.changeUnit(this.tableData);
+          this.totalNumber = res.count;
           this.createNumberList(this.tableData.length);
         })
         .catch(err => {
@@ -419,15 +299,16 @@ export default {
       this.searchKey = "";
       this.currentPage = 1;
       Cookies.set("activeNameSoftSuit", tab.name);
-      this._getShopsAllSoftSuitMsg(0);
+      //this._getShopsAllSoftSuitMsg(0);
+      this.init();
     },
     init() {
-      if (this.searchKey === "") {
-        this._getShopsAllSoftSuitMsg(0);
-      } else {
-        this.currentPage = 1;
-        this.searchSoftSuit(1);
-      }
+      // if (this.searchKey === "") {
+      //   this._getShopsAllSoftSuitMsg(0);
+      // } else {
+      this.currentPage = 1;
+      this.searchSoftSuit();
+      //}
     }
   },
   computed: {
@@ -437,7 +318,8 @@ export default {
         if (Cookies.get("activeNameSoftSuit") === undefined) {
           Cookies.set("activeNameSoftSuit", "ML");
           this.chooseTab = Cookies.get("activeNameSoftSuit");
-          this._getShopsAllSoftSuitMsg(0);
+          //this._getShopsAllSoftSuitMsg(0);
+          this.init();
         } else this.chooseTab = Cookies.get("activeNameSoftSuit");
         return Cookies.get("activeNameSoftSuit");
       },
@@ -452,10 +334,10 @@ export default {
       this.init();
     }
   },
-  activated(){
+  activated() {
     var selectNo = this.$route.params.selectNo;
     var selectType = this.$route.params.selectType;
-    if(selectNo && selectType){
+    if (selectNo && selectType) {
       this.searchKey = selectNo;
     }
     if (Cookies.get("activeNameSoftSuit") !== undefined) {

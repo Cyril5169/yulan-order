@@ -48,11 +48,19 @@ export function GetDosageByNo(data, config = {}) {
         return Promise.reject(err);
     })
 }
-//墙纸查询,type='barcode'为条形码查询
-export function GetWallpaperInfo(data, config = {}){
-    return post('/ITEM/GetWallpaperInfo',data, config).then(res=>{
+//软装
+export function GetSoftByProductType(data, config = {}) {
+    return post('/ITEM/GetSoftByProductType', data, config).then(res => {
         return Promise.resolve(res);
-    }).catch(err=>{
+    }).catch(err => {
+        return Promise.reject(err)
+    })
+}
+//墙纸查询,type='barcode'为条形码查询
+export function GetWallpaperInfo(data, config = {}) {
+    return post('/ITEM/GetWallpaperInfo', data, config).then(res => {
+        return Promise.resolve(res);
+    }).catch(err => {
         return Promise.reject(err)
     })
 }

@@ -329,6 +329,11 @@ export default {
     }
   },
   created() {
+    var selectNo = this.$route.params.selectNo;
+    var selectType = this.$route.params.selectType;
+    if (selectNo && selectType) {
+      this.searchKey = selectNo;
+    }
     if (Cookies.get("activeNameSoftSuit") !== undefined) {
       this.chooseTab = Cookies.get("activeNameSoftSuit");
       this.init();

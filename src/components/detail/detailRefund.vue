@@ -343,8 +343,7 @@ export default {
                 this.clearItemMsg();
                 this.itemMsg.ITEM_NO = data.ITEM_NO;
                 this.itemMsg.PRODUCTION_VERSION = data.PRODUCTVERSION_NAME;
-                this.itemMsg.UNIT =
-                  data.UNIT_NAME === "°ü" ? "包" : data.UNIT_NAME;
+                this.itemMsg.UNIT = data.UNIT_NAME;
                 this.dialogFormVisible = true;
               } else {
                 this.$alert(`${value}--未查询到货品信息`, "提示", {

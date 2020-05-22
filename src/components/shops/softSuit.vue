@@ -195,7 +195,7 @@ export default {
             }
             status = 5;
             break;
-          case "other":
+          case "OTHER":
             if (this.allData[6].length !== 0) {
               this.tableData = this.allData[6];
               this.totalNumber = this.tableData[6].total;
@@ -243,7 +243,7 @@ export default {
           case "TC":
             status = 5;
             break;
-          case "other":
+          case "OTHER":
             status = 6;
             break;
         }

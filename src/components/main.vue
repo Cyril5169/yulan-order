@@ -1329,7 +1329,7 @@ export default {
             case "BZ":
             case "GH":
             case "TC":
-            case "other":
+            case "OTHER":
               if (this.isContainAttr("shops/softSuit")) {
                 this.addTab("shops/softSuit");
                 Cookies.set("activeNameSoftSuit", res.data[0].PRODUCT_TYPE);

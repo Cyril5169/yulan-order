@@ -45,8 +45,12 @@
             <td>{{ data.item.oldItemNo }}</td>
           </tr>
           <tr>
-            <td>版本名称：</td>
-            <td>{{ data.item.itemVersion }}</td>
+            <td>版本：</td>
+            <td>{{ data.item.productversionName }}</td>
+          </tr>
+          <tr>
+            <td>类别：</td>
+            <td>{{ data.item.typeName }}</td>
           </tr>
           <tr>
             <td>单位：</td>

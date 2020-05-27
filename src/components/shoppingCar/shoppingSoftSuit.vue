@@ -9,6 +9,7 @@
             <el-table-column type="selection" width="55" :selectable="checkActiviyEffect" align="center">
             </el-table-column>
             <el-table-column prop="item.itemNo" label="型号" min-width="100" align="center"></el-table-column>
+            <el-table-column min-width="80" label="版本" prop="item.productversionName" align="center"></el-table-column>
             <el-table-column label="活动" min-width="140px" show-overflow-tooltip align="center">
               <template slot-scope="scope">
                 <span style="color: red;" v-if="scope.row.activityEffective === false">(过期活动)</span>

@@ -163,6 +163,12 @@
               width="150"
             ></el-table-column>
             <el-table-column
+              prop="PRODUCTVERSION_NAME"
+              label="版本"
+              align="center"
+              width="150"
+            ></el-table-column>
+            <el-table-column
               prop="NOTE"
               label="类型"
               align="center"

@@ -60,7 +60,7 @@
             align="center"
           ></el-table-column>
           <el-table-column
-            label="名称"
+            label="类别"
             prop="version"
             width="110"
             align="center"
@@ -390,7 +390,7 @@ export default {
               anotherNumber: "", //辅助数量
               minimumPurchase: res.data[0].MINIMUM_PURCHASE // 起购数量
             });
-            if (res.data[0].UNIT == "平方米") this.numWidth = 200;
+            if (res.data[0].UNIT == "平方米") this.numWidth = 220;
             else this.numWidth = 100;
             let storage = window.localStorage;
             let arr = [];

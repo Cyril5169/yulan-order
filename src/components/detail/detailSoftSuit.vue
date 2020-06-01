@@ -41,7 +41,7 @@
           </tr>
           <tr>
             <td>品牌：</td>
-            <td>{{ data.item.productBrand }}</td>
+            <td>{{ data.item.brandName }}</td>
           </tr>
           <tr></tr>
           <tr>

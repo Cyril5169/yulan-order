@@ -230,7 +230,7 @@
               <td
                 style="font-size:10px;height:15px;width:8%;"
                 colspan="1"
-                v-if="submit.STATE != 'SUBMITTED'"
+                v-if="submit.STATE == 'CUSTOMERAFFIRM'||submit.STATE == 'APPROVED'||submit.STATE == 'SENDBACK'"
               >
                 处理人：
               </td>
@@ -242,7 +242,7 @@
               <td
                 style="font-size:10px;height:15px;text-align:left;width:19%;"
                 colspan="1"
-                v-if="submit.STATE != 'SUBMITTED'"
+                v-if="submit.STATE == 'CUSTOMERAFFIRM'||submit.STATE == 'APPROVED'||submit.STATE == 'SENDBACK'"
               >
                 {{ submit.DEALMAN_NAME }}
               </td>
@@ -254,7 +254,7 @@
               <td
                 style="font-size:10px;height:15px;width:9%;"
                 colspan="1"
-                v-if="submit.STATE != 'SUBMITTED'"
+                v-if="submit.STATE == 'CUSTOMERAFFIRM'||submit.STATE == 'APPROVED'||submit.STATE == 'SENDBACK'"
               >
                 处理时间：
               </td>
@@ -266,7 +266,7 @@
               <td
                 style="font-size:10px;height:15px;text-align:left;width:17%;"
                 colspan="3"
-                v-if="submit.STATE != 'SUBMITTED'"
+                v-if="submit.STATE == 'CUSTOMERAFFIRM'||submit.STATE == 'APPROVED'||submit.STATE == 'SENDBACK'"
               >
                 {{ submit.DEAL_TS | datatrans }}
               </td>

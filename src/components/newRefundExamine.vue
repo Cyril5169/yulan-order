@@ -123,21 +123,21 @@
                 <td style="font-size:10px;height:15px;text-align:left;width:17%;" colspan="3">
                   {{ submit.CREATE_TS | datatrans }}
                 </td>
-                <td style="font-size:10px;height:15px;width:8%;" colspan="1" v-if="submit.STATE != 'SUBMITTED'">
+                <td style="font-size:10px;height:15px;width:8%;" colspan="1" v-if="submit.STATE == 'CUSTOMERAFFIRM'||submit.STATE == 'APPROVED'||submit.STATE == 'SENDBACK'">
                   处理人：
                 </td>
                 <td style="font-size:10px;height:15px;width:8%;" colspan="1" v-else></td>
                 <td style="font-size:10px;height:15px;text-align:left;width:19%;" colspan="1"
-                  v-if="submit.STATE != 'SUBMITTED'">
+                  v-if="submit.STATE == 'CUSTOMERAFFIRM'||submit.STATE == 'APPROVED'||submit.STATE == 'SENDBACK'">
                   {{ submit.DEALMAN_NAME }}
                 </td>
                 <td style="font-size:10px;height:15px;width:19%;" colspan="1" v-else></td>
-                <td style="font-size:10px;height:15px;width:9%;" colspan="1" v-if="submit.STATE != 'SUBMITTED'">
+                <td style="font-size:10px;height:15px;width:9%;" colspan="1" v-if="submit.STATE == 'CUSTOMERAFFIRM'||submit.STATE == 'APPROVED'||submit.STATE == 'SENDBACK'">
                   处理时间：
                 </td>
                 <td style="font-size:10px;height:15px;width:9%;" colspan="1" v-else></td>
                 <td style="font-size:10px;height:15px;text-align:left;width:17%;" colspan="3"
-                  v-if="submit.STATE != 'SUBMITTED'">
+                  v-if="submit.STATE == 'CUSTOMERAFFIRM'||submit.STATE == 'APPROVED'||submit.STATE == 'SENDBACK'">
                   {{ submit.DEAL_TS | datatrans }}
                 </td>
                 <td style="font-size:10px;height:15px;width:17%;" colspan="1" v-else></td>
@@ -337,9 +337,7 @@
                 <td class="grayTD" style="width:15%;height:15px">处理意见</td>
                 <td class="grayTD" style="width:20%;height:15px">附件</td>
               </tr>
-              <tr v-if="
-                  submit.STATE == 'CUSTOMERAFFIRM' || submit.STATE == 'APPROVED'
-                " v-for="(item, index) of processDetail" :key="index">
+              <tr v-if="submit.STATE == 'CUSTOMERAFFIRM' || submit.STATE == 'APPROVED' " v-for="(item, index) of processDetail" :key="index">
                 <td colspan="1" rowspan="1" style="height:15px">
                   {{ submit.PRODUCTION_VERSION }}
                 </td>
@@ -1650,7 +1648,7 @@ export default {
         if (type == 2) {
           this.submit.STATE = "SENDBACK";
         }
-        // this.submit.DEALMAN_CODE = this.CID;
+        this.submit.DEALMAN_CODE = this.CID;
         // this.submit.DEALMAN_NAME = this.CNAME;
         UpdateFirstAudition({
           head: this.submit,

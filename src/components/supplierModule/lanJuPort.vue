@@ -169,6 +169,15 @@
                               {{ item.tab1[index].cl_size_times }}
                             </div>
                           </div>
+                                             <div>
+                <label>帘头外包盒单边宽:</label>
+                <div v-if=" item.tab1[index].cl_wbh_width>=0 " 
+                  class="messageInput">
+                  {{ item.tab1[index].cl_wbh_width }}
+                </div>
+                <div v-else class="messageInput">无</div>
+                m
+              </div>
                         </div>
                         <!-- <div class="line_noDiv"><span class="line_noSpan">{{item.tab1[index].cl_place_id}}</span></div> -->
                       </template>
@@ -850,6 +859,21 @@
                               {{ item.tab1[index].cl_size_times }}
                             </div>
                           </div>
+                                         <div>
+                <label>帘头外包盒单边宽:</label>
+                <div v-if=" item.tab1[index].cl_wbh_width>=0 " 
+                  class="messageInput">
+                  {{ item.tab1[index].cl_wbh_width }}
+                </div>
+                <div v-else class="messageInput">无</div>
+                m
+              </div>
+                            <!-- <div>
+                            <label>帘头外包盒单边宽度：</label>
+                            <div  class="messageInput1">
+                              {{ item.tab1[index].cl_wbh_width }}
+                            </div>
+                          </div> -->
                         </div>
                         <!-- <div class="line_noDiv"><span class="line_noSpan">{{item.tab1[index].cl_place_id}}</span></div> -->
                       </template>
@@ -2613,6 +2637,7 @@ detailCol:[
               cl_item_no: this.gridData[i].CL_ITEM_NO,
               cl_width: this.gridData[i].CL_WIDTH,
               cl_high: this.gridData[i].CL_HIGH,
+               cl_wbh_width:this.gridData[i].CL_WBH_WIDTH,
               cl_high_jia: this.gridData[i].CL_HIGH_JIA,
               cl_size_times: this.gridData[i].CL_SIZE_TIMES
             };

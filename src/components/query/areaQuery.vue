@@ -1,133 +1,79 @@
 <template>
   <div id="areaQuery">
     <el-card shadow="hover">
-      <el-dialog
-      :visible.sync="showBill"
-      width="60%"
-      style="height:100%">
-        <el-dialog
-        title="提货单详情"
-        :visible.sync="detailVisible"
-        :close-on-click-modal="false"
-        width="65%"
-        style="heitht:100%;"
-        append-to-body
-        >
+      <el-dialog :visible.sync="showBill" width="60%" style="height:100%">
+        <el-dialog title="提货单详情" :visible.sync="detailVisible" :close-on-click-modal="false" width="65%"
+          style="heitht:100%;" append-to-body>
           <div style="width:100% ;margin:0 auto;font-size:13px;margin-top:-12px" class="diagTable">
-          <table style="width:100%;height:160px" class="table_2" border="1">
-            <tr>
-              <td class="td_1">提货单</td>
-              <td class="td_1">{{ tableDetail_1.SALE_NO }}</td>
-              <td class="td_1">开单日期</td>
-              <td class="td_1">{{ tableDetail_1.BILL_DATE | datatrans }}</td>
-              <td class="td_1">状态</td>
-              <td class="td_1">{{ tableDetail_1.STATUS_ID | transStatus }}</td>
-              <!-- <td class="td_1">业务员</td>
+            <table style="width:100%;height:160px" class="table_2" border="1">
+              <tr>
+                <td class="td_1">提货单</td>
+                <td class="td_1">{{ tableDetail_1.SALE_NO }}</td>
+                <td class="td_1">开单日期</td>
+                <td class="td_1">{{ tableDetail_1.BILL_DATE | datatrans }}</td>
+                <td class="td_1">状态</td>
+                <td class="td_1">{{ tableDetail_1.STATUS_ID | transStatus }}</td>
+                <!-- <td class="td_1">业务员</td>
               <td class="td_1" style="width:100px">
                 {{ tableDetail_1.SALE_NAME }}
               </td> -->
-            </tr>
-            <tr>
-              <td class="td_1">合同号</td>
-              <td class="td_1">{{ tableDetail_1.HTBM }}</td>
-              <td class="td_1">金额</td>
-              <td class="td_1">{{ tableDetail_1.MONEY_SUM }}</td>
-              <td class="td_1">提货日期</td>
-              <td class="td_1">
-                {{ tableDetail_1.DATE_OUT_STOCK | datatrans }}
-              </td>
-              <!-- <td class="td_1">部门</td>
+              </tr>
+              <tr>
+                <td class="td_1">合同号</td>
+                <td class="td_1">{{ tableDetail_1.HTBM }}</td>
+                <td class="td_1">金额</td>
+                <td class="td_1">{{ tableDetail_1.MONEY_SUM }}</td>
+                <td class="td_1">提货日期</td>
+                <td class="td_1">
+                  {{ tableDetail_1.DATE_OUT_STOCK | datatrans }}
+                </td>
+                <!-- <td class="td_1">部门</td>
               <td class="td_1"></td> -->
-            </tr>
-            <tr>
-              <td class="td_1">客户</td>
-              <td colspan="5">
-                <span style="margin-left:10px;">
-                  {{ tableDetail_1.CUSTOMER_NAME }}/联系人:{{
+              </tr>
+              <tr>
+                <td class="td_1">客户</td>
+                <td colspan="5">
+                  <span style="margin-left:10px;">
+                    {{ tableDetail_1.CUSTOMER_NAME }}/联系人:{{
                     tableDetail_1.LINKMAN
-                  }}</span
-                >
-              </td>
-              <!-- <td class="td_1">物流</td>
+                  }}</span>
+                </td>
+                <!-- <td class="td_1">物流</td>
               <td class="td_1"></td> -->
-            </tr>
-            <tr>
-              <td class="td_1">备注</td>
-              <td colspan="5">
-                <span style="margin-left:10px;">{{ tableDetail_1.NOTES }}</span>
-              </td>
-            </tr>
-          </table>
-          <br>
-          <el-table
-            max-height="500"
-            :data="tableDetail"
-            border
-            style="width: 100%; margin:10px auto;font-size:13px;"
-          >
-            <el-table-column width="80" label="状态" align="center">
-              <template slot-scope="scope1">
-                <span>{{ scope1.row.STATUS_ID | transStatus }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="ITEM_NO"
-              label="型号"
-              width="110"
-              align="center"
-            >
-            </el-table-column>
-            <el-table-column
-              prop="BATCH_NO"
-              label="批次"
-              width="180"
-              align="center"
-            >
-            </el-table-column>
-            <el-table-column
-              prop="PRODUCTVERSION_NAME"
-              label="版本"
-              width="150"
-              align="center"
-            ></el-table-column>
-            <el-table-column
-              prop="NOTE"
-              label="仓库"
-              align="center"
-            ></el-table-column>
-            <!-- <el-table-column
+              </tr>
+              <tr>
+                <td class="td_1">备注</td>
+                <td colspan="5">
+                  <span style="margin-left:10px;">{{ tableDetail_1.NOTES }}</span>
+                </td>
+              </tr>
+            </table>
+            <br>
+            <el-table max-height="500" :data="tableDetail" border style="width: 100%; margin:10px auto;font-size:13px;">
+              <el-table-column width="80" label="状态" align="center">
+                <template slot-scope="scope1">
+                  <span>{{ scope1.row.STATUS_ID | transStatus }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column prop="ITEM_NO" label="型号" width="110" align="center">
+              </el-table-column>
+              <el-table-column prop="BATCH_NO" label="批次" width="180" align="center">
+              </el-table-column>
+              <el-table-column prop="PRODUCTVERSION_NAME" label="版本" width="150" align="center"></el-table-column>
+              <el-table-column prop="NOTE" label="仓库" align="center"></el-table-column>
+              <!-- <el-table-column
               prop="AREA"
               label="区位"
               width="80"
               align="center"
             ></el-table-column> -->
-            <el-table-column
-              prop="QTY_DELIVER"
-              label="发货数"
-              width="80"
-              align="center"
-            ></el-table-column>
-            <el-table-column
-              prop="TRANS_PRICE"
-              label="物流单价"
-              width="80"
-              align="center"
-            ></el-table-column>
-            <el-table-column
-              prop="SALE_PRICE"
-              label="单价"
-              width="70"
-              align="center"
-            >
-            </el-table-column>
-            <el-table-column
-              prop="MONEY"
-              label="金额"
-              width="90"
-              align="center"
-            ></el-table-column>
-          </el-table>
-        </div>
+              <el-table-column prop="QTY_DELIVER" label="发货数" width="80" align="center"></el-table-column>
+              <el-table-column prop="TRANS_PRICE" label="物流单价" width="80" align="center"></el-table-column>
+              <el-table-column prop="SALE_PRICE" label="单价" width="70" align="center">
+              </el-table-column>
+              <el-table-column prop="MONEY" label="金额" width="90" align="center"></el-table-column>
+            </el-table>
+          </div>
         </el-dialog>
         <div style="font-size:18px">
           <div>客户名称：{{get_CUSTOMER_NAME}}
@@ -136,57 +82,34 @@
         </div>
         <br>
         <div>
-          <el-table
-            :summary-method="getSummaries"
-            show-summary
-            :data="tableData"
-            border
-            highlight-current-row
-            style="width: 100%;font-weight:normal;font-size:12px"
-            class="table_1"
-          >
+          <el-table :summary-method="getSummaries" show-summary :data="tableData" border highlight-current-row
+            style="width: 100%;font-weight:normal;font-size:12px" class="table_1">
             <el-table-column prop="num" label width="58" align="center">
-              <template slot-scope="scope"
-                ><span
-                  >{{ scope.$index + (currentPage - 1) * limit + 1 }}
+              <template slot-scope="scope"><span>{{ scope.$index + (currentPage - 1) * limit + 1 }}
                 </span>
               </template>
             </el-table-column>
             <el-table-column label="提货单号" width="100" align="center">
               <template slot-scope="scope1">
-                <el-button
-                  size="mini"
-                  @click="openDia(scope1.row)"
-                  type="text"
-                  >{{ scope1.row.SALE_NO }}</el-button
-                >
+                <el-button size="mini" @click="openDia(scope1.row)" type="text">{{ scope1.row.SALE_NO }}</el-button>
               </template>
             </el-table-column>
-            <el-table-column label="状态" align="center" >
+            <el-table-column label="状态" align="center">
               <template slot-scope="scope2">
                 {{ scope2.row.STATUS_ID | transStatus }}
               </template>
             </el-table-column>
-            <el-table-column
-              prop="CONTRACT_NO"
-              label="订单号"
-              align="center"
-              
-            ></el-table-column>
+            <el-table-column prop="CONTRACT_NO" label="订单号" align="center"></el-table-column>
             <!-- <el-table-column
               prop="HTBM"
               label="合同号"
               align="center"
               width="130px"
             ></el-table-column> -->
-            <el-table-column
-              label="类型"
-              align="center"
-              prop="BILL_ID"
+            <el-table-column label="类型" align="center" prop="BILL_ID"
               :filters="[{text: '冲减单', value: '0'}, {text: '自动提货单', value: '1'},{text: '手工提货单', value: '2'},{text: '退货单', value: '3'}, ]"
-              :filter-method="filterHandler"
-            >
-            <template slot-scope="scope3">
+              :filter-method="filterHandler">
+              <template slot-scope="scope3">
                 {{ scope3.row.BILL_ID | transType }}
               </template>
             </el-table-column>
@@ -195,11 +118,7 @@
                 {{ scope4.row.BILL_DATE | datatrans }}
               </template>
             </el-table-column> -->
-            <el-table-column
-              prop="DATE_OUT_STOCK"
-              label="提货日期"
-              align="center"
-            >
+            <el-table-column prop="DATE_OUT_STOCK" label="提货日期" align="center">
               <template slot-scope="scope5">
                 {{ scope5.row.DATE_OUT_STOCK | datatrans }}
               </template>
@@ -213,11 +132,7 @@
                 {{ scope3.row.CUSTOMER_NAME }}/联系人:{{ scope3.row.LINKMAN }}
               </template>
             </el-table-column> -->
-            <el-table-column
-              prop="MONEY_SUM"
-              label="金额"
-              align="center"
-            ></el-table-column>
+            <el-table-column prop="MONEY_SUM" label="金额" align="center"></el-table-column>
             <!-- <el-table-column
               prop="NAME"
               label="物流管理员"
@@ -227,13 +142,8 @@
           </el-table>
           <!-- 分页 -->
           <div style="margin:0 35%;" class="block">
-            <el-pagination
-              @current-change="handleCurrentChange"
-              :current-page="currentPage"
-              :page-size="limit"
-              layout="total, prev, pager, next, jumper"
-              :total="count"
-            ></el-pagination>
+            <el-pagination @current-change="handleCurrentChange" :current-page="currentPage" :page-size="limit"
+              layout="total, prev, pager, next, jumper" :total="count"></el-pagination>
           </div>
         </div>
       </el-dialog>
@@ -241,137 +151,64 @@
       <div class="ff">
         <!-- <el-tabs class="tabs_1" v-model="activeName">
           <el-tab-pane label="区域提货单查询" name="first"> -->
-        <form
-          target="TAB_2_CONTENT"
-          action="queryBillList.jsp"
-          method="POST"
-          class="FORM_1"
-          style="height:250px"
-        >
+        <form target="TAB_2_CONTENT" action="queryBillList.jsp" method="POST" class="FORM_1" style="height:250px">
           <div style="width:100%">
             <div style="width:40%;border:none;float:left">
               市场
-              <el-select
-                v-model="AREACODE.AREA_NAME"
-                placeholder="----选择市场----"
-                style="width:210px"
-                @change="areaCode(AREACODE.AREA_NAME)"
-              >
-                <el-option
-                  v-for="item in AREACODE"
-                  :key="item.AREA_CODE"
-                  :label="item.AREA_NAME"
-                  :value="item.AREA_CODE"
-                >
+              <el-select v-model="AREACODE.AREA_NAME" placeholder="----选择市场----" style="width:210px"
+                @change="areaCode(AREACODE.AREA_NAME)">
+                <el-option v-for="item in AREACODE" :key="item.AREA_CODE" :label="item.AREA_NAME"
+                  :value="item.AREA_CODE">
                 </el-option>
               </el-select>
               片区
-              <el-select
-                v-model="AREA_DISTRICT.DISTRICT_NAME"
-                placeholder="----选择片区----"
-                style="width:210px"
-                @change="district_code(AREA_DISTRICT.DISTRICT_NAME)"
-              >
-                <el-option
-                  v-for="item in AREA_DISTRICT"
-                  :key="item.DISTRICT_ID"
-                  :label="item.DISTRICT_NAME"
-                  :value="item.DISTRICT_ID"
-                ></el-option>
+              <el-select v-model="AREA_DISTRICT.DISTRICT_NAME" placeholder="----选择片区----" style="width:210px"
+                @change="district_code(AREA_DISTRICT.DISTRICT_NAME)">
+                <el-option v-for="item in AREA_DISTRICT" :key="item.DISTRICT_ID" :label="item.DISTRICT_NAME"
+                  :value="item.DISTRICT_ID"></el-option>
               </el-select>
 
               <div style="margin-top:15px">
                 开单日期
-                <el-date-picker
-                  type="date"
-                  format="yyyy-MM-dd"
-                  value-format="yyyy-MM-dd"
-                  placeholder="开始日期区间"
-                  v-model="ruleForm_1.dateValue"
-                  @change="getCustomerChangTime"
-                  style="width:178px"
-                ></el-date-picker>
+                <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="开始日期区间"
+                  v-model="ruleForm_1.dateValue" @change="getCustomerChangTime" style="width:178px"></el-date-picker>
                 <span style="margin-left:10px">--</span>
-                <el-date-picker
-                  type="date"
-                  format="yyyy-MM-dd"
-                  value-format="yyyy-MM-dd"
-                  placeholder="结束日期区间"
-                  @change="getCustomerChangTime"
-                  v-model="ruleForm_2.dateValue"
-                  style="width:210px;margin-left:12px"
-                ></el-date-picker>
+                <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="结束日期区间"
+                  @change="getCustomerChangTime" v-model="ruleForm_2.dateValue" style="width:210px;margin-left:12px">
+                </el-date-picker>
               </div>
               <div style="margin-top:15px">
                 客户类型
-                <el-select
-                  v-model="CUSTOMER_TYPE.label"
-                  placeholder="全部"
-                  style="width:178px"
-                  @change="customer_type(CUSTOMER_TYPE.label)"
-                >
-                  <el-option
-                    v-for="item in CUSTOMER_TYPE"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  ></el-option>
+                <el-select v-model="CUSTOMER_TYPE.label" placeholder="全部" style="width:178px"
+                  @change="customer_type(CUSTOMER_TYPE.label)">
+                  <el-option v-for="item in CUSTOMER_TYPE" :key="item.value" :label="item.label" :value="item.value">
+                  </el-option>
                 </el-select>
                 状态
-                <el-select
-                  v-model="STATUS.label"
-                  placeholder="全部"
-                  style="width:210px"
-                  @change="status_id(STATUS.label)"
-                >
-                  <el-option
-                    v-for="item in STATUS"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  ></el-option>
+                <el-select v-model="STATUS.label" placeholder="全部" style="width:210px"
+                  @change="status_id(STATUS.label)">
+                  <el-option v-for="item in STATUS" :key="item.value" :label="item.label" :value="item.value">
+                  </el-option>
                 </el-select>
               </div>
               <div style="margin-top:15px">
                 <div>
-                  <el-button
-                    type="#DCDFE6"
-                    icon="el-icon-s-grid"
-                    class="cx"
-                    @click="reset"
-                    >重置</el-button
-                  >
-                  <el-button
-                    type="#DCDFE6"
-                    icon="el-icon-search"
-                    class="cx"
-                    @click="_queryQuYu_1"
-                    style="margin-left:65px"
-                    >查询</el-button
-                  >
-                  <el-checkbox v-model="checked" style="margin-left:150px">仅有效客户</el-checkbox>
+                  <el-button type="#DCDFE6" icon="el-icon-s-grid" class="cx" @click="reset">重置</el-button>
+                  <el-button type="#DCDFE6" icon="el-icon-search" class="cx" @click="_queryQuYu_1"
+                    style="margin-left:65px">查询</el-button>
+                  <el-checkbox v-model="checked" style="margin-left:150px" @change="_getCustomerByAreaCode_8">仅有效客户
+                  </el-checkbox>
                 </div>
-                
+
               </div>
             </div>
 
-            <div
-              id="right"
-              style="float:right;margin-right:10px;"
-              class="transferP"
-            >
-              <el-transfer
-                :titles="['可选用户', '已选用户']"
-                style="height:240px;width:700px"
-                filterable
-                filter-placeholder="筛选"
-                v-model="value_4"
-                :data="customerData"
-                :props="{
+            <div id="right" style="float:right;margin-right:10px;" class="transferP">
+              <el-transfer :titles="['可选用户', '已选用户']" style="height:240px;width:700px" filterable
+                filter-placeholder="筛选" v-model="value_4" :data="customerData" :props="{
                   key: 'CUSTOMER_CODE',
                   label: 'CUSTOMER_NAME'
-                }"
-              >
+                }">
               </el-transfer>
             </div>
           </div>
@@ -379,45 +216,25 @@
         <hr />
         <div v-if="query_1">
           <div style="float:left;font-size:15px;color:blue;margin:10px">提货单金额汇总：{{moneySum.MONEYSUM}}元</div>
-          <el-table
-          :data="CUSTOMERED"
-          border
-          class="table_1">
+          <el-table :data="CUSTOMERED" border class="table_1">
             <el-table-column prop="num" width="58" align="center" label="序号">
-              <template slot-scope="scope"
-                ><span
-                  >{{ scope.$index + (currentPage - 1) * limit + 1 }}
+              <template slot-scope="scope"><span>{{ scope.$index + (currentPage - 1) * limit + 1 }}
                 </span>
               </template>
             </el-table-column>
-            <el-table-column
-              label="客户代码"
-              align="center"
-            >
-            <template slot-scope="scope1">
-                <el-button
-                  size="mini"
-                  @click="openDetail_1(scope1.row)"
-                  type="text"
-                  >{{ scope1.row.CUSTOMER_CODE }}</el-button
-                >
+            <el-table-column label="客户代码" align="center">
+              <template slot-scope="scope1">
+                <el-button size="mini" @click="openDetail_1(scope1.row)" type="text">{{ scope1.row.CUSTOMER_CODE }}
+                </el-button>
               </template>
             </el-table-column>
-            <el-table-column
-              prop="CUSTOMER_NAME"
-              label="客户名称"
-              align="center"
-            >
+            <el-table-column prop="CUSTOMER_NAME" label="客户名称" align="center">
             </el-table-column>
-            <el-table-column
-              prop="MONEYSUM"
-              label="时间段内订单提货总额"
-              align="center"
-            >
+            <el-table-column prop="MONEYSUM" label="时间段内订单提货总额" align="center">
             </el-table-column>
           </el-table>
         </div>
-        
+
         <!-- </el-tab-pane>
         </el-tabs> -->
       </div>
@@ -437,25 +254,25 @@ import {
   getPackDetailsType,
   getTotalMoneySum,
   getCustomerName,
-  getPackData,
+  getPackData
 } from "@/api/areaInfoASP";
 import Cookies from "js-cookie";
 export default {
   name: "AreaQuery",
   data() {
     return {
-      get_customer_code:"",
-      getMoney:"",
-      showBill:false,
-      get_CUSTOMER_NAME:"",
-      CUSTOMERED:[],//查询的已选用户
-      CUSTOMERED_2:[],
-      CUSTOMERED_1:[],
-      moneySum:[],
-      typeNameFilter:[],
-      typeIdFilter:[],
-      typeFilter:[],
-      checked:true,
+      get_customer_code: "",
+      getMoney: "",
+      showBill: false,
+      get_CUSTOMER_NAME: "",
+      CUSTOMERED: [], //查询的已选用户
+      CUSTOMERED_2: [],
+      CUSTOMERED_1: [],
+      moneySum: [],
+      typeNameFilter: [],
+      typeIdFilter: [],
+      typeFilter: [],
+      checked: true,
       detailVisible: false,
       startDate: "",
       endDate: "",
@@ -464,7 +281,7 @@ export default {
       theBody: {},
       first: "",
       second: "",
-      third:"",
+      third: "",
       activeName: "first",
       query_1: false, //查询显示
       query_2: false,
@@ -481,11 +298,11 @@ export default {
       finishTime_1: "",
       ruleForm_2: { dateValue: "" },
       AREA_DISTRICT: [],
-      AREA_DISTRICT_1:[
+      AREA_DISTRICT_1: [
         {
           DISTRICT_ID: "",
           DISTRICT_NAME: "全部"
-        },
+        }
       ],
       CUSTOMER_TYPE: [
         {
@@ -542,7 +359,7 @@ export default {
           break;
       }
     },
-    transType(value){
+    transType(value) {
       switch (value) {
         case "0":
           return "冲减单";
@@ -583,19 +400,20 @@ export default {
     this.ruleForm_1.dateValue = this.timeDefault_1;
     this.ruleForm_2.dateValue = this.timeDefault_2;
   },
-  computed: {    
-    timeDefault_1() {      
-      var date = new Date();      
+  computed: {
+    timeDefault_1() {
+      var date = new Date();
       var s1 = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + "01";
-      return s1;    
-      },
-    
-    timeDefault_2() {      
-      var date = new Date();      
-      var s1 = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + (date.getDate());      
-      return s1;    
-      }  
+      return s1;
     },
+
+    timeDefault_2() {
+      var date = new Date();
+      var s1 =
+        date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+      return s1;
+    }
+  },
   methods: {
     // _getPackDetailsType(){
     //    getPackDetailsType().then(res => {
@@ -616,8 +434,8 @@ export default {
     // }
     // },
     filterHandler(value, row, column) {
-        const property = column['property'];
-        return row[property] === value;
+      const property = column["property"];
+      return row[property] === value;
     },
     //根据用户查区域市场
     _getAreaCode() {
@@ -628,16 +446,15 @@ export default {
       var data = {
         userid: userInfo.loginName
       };
-      getAreaCode(data)
-        .then(res => {
-          this.AREACODE = res.data;
-          if(this.AREACODE.length == 0){
-              this.$alert("没有区域权限，请联系管理员配置", "提示", {
-              confirmButtonText: "确定",
-              type: "success"
-            });
-          }
-        });
+      getAreaCode(data).then(res => {
+        this.AREACODE = res.data;
+        if (this.AREACODE.length == 0) {
+          this.$alert("没有区域权限，请联系管理员配置", "提示", {
+            confirmButtonText: "确定",
+            type: "success"
+          });
+        }
+      });
     },
     //根据市场区域查片区
     areaCode(val) {
@@ -650,7 +467,7 @@ export default {
       this.first = val;
       getDistrictByAreaCode(data).then(res => {
         this.AREA_DISTRICT = res.data;
-        this.AREA_DISTRICT.push.apply(this.AREA_DISTRICT,this.AREA_DISTRICT_1)
+        this.AREA_DISTRICT.push.apply(this.AREA_DISTRICT, this.AREA_DISTRICT_1);
       });
       this._getCustomerByAreaCode_1(val);
     },
@@ -689,9 +506,9 @@ export default {
       this.customerData = [];
       this.value_4 = [];
       var data = {
-        beginTime:this.ruleForm_1.dateValue,
-        finishTime:this.ruleForm_2.dateValue,
-        isall:this.checked,
+        beginTime: this.ruleForm_1.dateValue,
+        finishTime: this.ruleForm_2.dateValue,
+        isall: this.checked,
         areaCode: val, //市场
         district: this.AREA_DISTRICT, //片区
         customerType: this.customer_type //客户类型
@@ -705,9 +522,9 @@ export default {
       this.tableData = [];
       this.value_4 = [];
       var data = {
-        beginTime:this.ruleForm_1.dateValue,
-        finishTime:this.ruleForm_2.dateValue,
-        isall:this.checked,
+        beginTime: this.ruleForm_1.dateValue,
+        finishTime: this.ruleForm_2.dateValue,
+        isall: this.checked,
         areaCode: val.areaCode, //市场
         district: val.AREA_DISTRICT, //片区
         customerType: this.customer_type //客户类型
@@ -721,9 +538,9 @@ export default {
       this.tableData = [];
       this.value_4 = [];
       var data = {
-        beginTime:this.ruleForm_1.dateValue,
-        finishTime:this.ruleForm_2.dateValue,
-        isall:this.checked,
+        beginTime: this.ruleForm_1.dateValue,
+        finishTime: this.ruleForm_2.dateValue,
+        isall: this.checked,
         areaCode: val.areaCode, //市场
         district: val.district, //片区
         customerType: val.customerType //客户类型
@@ -733,21 +550,35 @@ export default {
       });
     },
     //改变时间查可选用户
-    getCustomerChangTime(){
+    getCustomerChangTime() {
       this.customerData = [];
       this.tableData = [];
       this.value_4 = [];
-      if(this.first == ""){
+      if (this.first == "") {
         this.$alert("未选择市场区域", "提示", {
-            confirmButtonText: "确定",
-            type: "success"
-          });
+          confirmButtonText: "确定",
+          type: "success"
+        });
         return (this.tableData = []);
-      }else{
+      } else {
+        var data = {
+          beginTime: this.ruleForm_1.dateValue,
+          finishTime: this.ruleForm_2.dateValue,
+          isall: this.checked,
+          areaCode: this.first, //市场
+          district: this.second, //片区
+          customerType: this.third //客户类型
+        };
+        getCustomerByAreaCode(data).then(res => {
+          this.customerData = res.data;
+        });
+      }
+    },
+    _getCustomerByAreaCode_8() {
       var data = {
-        beginTime:this.ruleForm_1.dateValue,
-        finishTime:this.ruleForm_2.dateValue,
-        isall:this.checked,
+        beginTime: this.ruleForm_1.dateValue,
+        finishTime: this.ruleForm_2.dateValue,
+        isall: this.checked,
         areaCode: this.first, //市场
         district: this.second, //片区
         customerType: this.third //客户类型
@@ -755,7 +586,6 @@ export default {
       getCustomerByAreaCode(data).then(res => {
         this.customerData = res.data;
       });
-      }
     },
     //提货单查询
     _queryQuYu_1() {
@@ -763,32 +593,30 @@ export default {
       this.queryQuYu_1();
     },
     async queryQuYu_1() {
-      this.query_1 = false,
-      this.moneySum=[],
-      this.typeFilter=[],
-      
-      this.tableData = [];
+      (this.query_1 = false),
+        (this.moneySum = []),
+        (this.typeFilter = []),
+        (this.tableData = []);
       this.CUSTOMERED = [];
       this.CUSTOMERED_1 = [];
       this.CUSTOMERED_2 = [];
       if (this.value_4.length == 0) {
-            this.$alert("未选择用户", "提示", {
-            confirmButtonText: "确定",
-            type: "success"
-          });
+        this.$alert("未选择用户", "提示", {
+          confirmButtonText: "确定",
+          type: "success"
+        });
         return (this.tableData = []);
-      } else if(this.first == ""){
+      } else if (this.first == "") {
         this.$alert("未选择市场", "提示", {
-            confirmButtonText: "确定",
-            type: "success"
-          });
+          confirmButtonText: "确定",
+          type: "success"
+        });
         return (this.tableData = []);
-      } else{
-        
+      } else {
         // for (var i = 0; i < this.value_4.length; i++) {
         //   var res = await  getCustomerName({customer:this.value_4[i]},{ loading: false })
         //   this.get_CUSTOMER_NAME = res.data[0]
-            
+
         //   var data_2 =  {
         //     beginTime: this.ruleForm_1.dateValue, //起始时间
         //     finishTime: this.ruleForm_2.dateValue+" 23:59:59", //结束时间
@@ -806,16 +634,16 @@ export default {
         //     MONEYSUM:this.moneySum.MONEYSUM
         //   }
         // }
-       
-        //this.CUSTOMERED = this.CUSTOMERED_1 
-       var data_2 =  {
-            beginTime: this.ruleForm_1.dateValue, //起始时间
-            finishTime: this.ruleForm_2.dateValue+" 23:59:59", //结束时间
-            status: this.status_info , //状态
-            customers:this.value_4
-          }
+
+        //this.CUSTOMERED = this.CUSTOMERED_1
+        var data_2 = {
+          beginTime: this.ruleForm_1.dateValue, //起始时间
+          finishTime: this.ruleForm_2.dateValue + " 23:59:59", //结束时间
+          status: this.status_info, //状态
+          customers: this.value_4
+        };
         var data = {
-          type:this.typeFilter,//类型筛选
+          type: this.typeFilter, //类型筛选
           costomerCodes: this.value_4, //已选用户
           beginTime: this.ruleForm_1.dateValue, //起始时间
           finishTime: this.ruleForm_2.dateValue, //结束时间
@@ -831,26 +659,26 @@ export default {
         } else {
           data.finishTime = data.finishTime + " 23:59:59";
         }
-       await getPackData(data_2).then(res =>{
-          this.CUSTOMERED_1 = res.data
+        await getPackData(data_2).then(res => {
+          this.CUSTOMERED_1 = res.data;
           for (var i = 0; i < this.CUSTOMERED_1.length; i++) {
             this.CUSTOMERED_2[i] = {
-              CUSTOMER_CODE : this.CUSTOMERED_1[i][0],
-            CUSTOMER_NAME : this.CUSTOMERED_1[i][1],
-            MONEYSUM : this.CUSTOMERED_1[i][2],
-            }
+              CUSTOMER_CODE: this.CUSTOMERED_1[i][0],
+              CUSTOMER_NAME: this.CUSTOMERED_1[i][1],
+              MONEYSUM: this.CUSTOMERED_1[i][2]
+            };
           }
-          this.CUSTOMERED = this.CUSTOMERED_2
-        })
-        if(this.CUSTOMERED.length == 0){
+          this.CUSTOMERED = this.CUSTOMERED_2;
+        });
+        if (this.CUSTOMERED.length == 0) {
           this.$alert("所选客户无提货单信息", "提示", {
             confirmButtonText: "确定",
             type: "success"
           });
-          return this.query_1 = false
+          return (this.query_1 = false);
         }
-        this._getTotalMoneySum(data)
-        
+        this._getTotalMoneySum(data);
+
         // getPackDetails(data).then(res => {
         //   this.count = res.count;
         //   this.tableData = res.data;
@@ -858,20 +686,20 @@ export default {
         //     //this._getPackDetailsType();
         //     this._getTotalMoneySum(data)
         //   }
-          
+
         // });
       }
       // this.$router.push("/QYTable");
     },
     //客户总金额
-    _getTotalMoneySum(val){
-      this.moneySum = []
+    _getTotalMoneySum(val) {
+      this.moneySum = [];
       var data = {
         beginTime: val.beginTime, //起始时间
         finishTime: val.finishTime, //结束时间
         status: val.status, //状态
-        customers:val.costomerCodes
-      }
+        customers: val.costomerCodes
+      };
       getTotalMoneySum(data).then(res => {
         this.moneySum = res.data[0];
         this.query_1 = true;
@@ -918,11 +746,11 @@ export default {
     //重置
     reset() {
       this.query_1 = false;
-      this.CUSTOMERED=[]
-      this.CUSTOMERED_1=[]
-      this.CUSTOMERED_2=[]
-      this.moneySum=[]
-      this.checked=true
+      this.CUSTOMERED = [];
+      this.CUSTOMERED_1 = [];
+      this.CUSTOMERED_2 = [];
+      this.moneySum = [];
+      this.checked = true;
       this.customerData = [];
       this.value_4 = [];
       this.tableData = [];
@@ -972,44 +800,44 @@ export default {
       this.ruleForm_2.dateValue = this.timeDefault_2;
     },
     //点击客户code查看详情
-    openDetail_1(val){
+    openDetail_1(val) {
       this.currentPage = 1;
-      this.get_CUSTOMER_NAME = val.CUSTOMER_NAME
-      this.getMoney = val.MONEYSUM
-      this.get_customer_code = val.CUSTOMER_CODE
-      this.openDetail()
+      this.get_CUSTOMER_NAME = val.CUSTOMER_NAME;
+      this.getMoney = val.MONEYSUM;
+      this.get_customer_code = val.CUSTOMER_CODE;
+      this.openDetail();
     },
-    openDetail(val){
-      this.tableData =[]
+    openDetail(val) {
+      this.tableData = [];
       var data = {
-          type:this.typeFilter,//类型筛选
-          costomerCodes: [this.get_customer_code], //已选用户
-          beginTime: this.ruleForm_1.dateValue, //起始时间
-          finishTime: this.ruleForm_2.dateValue, //结束时间
-          limit: this.limit, //限制数
-          page: this.currentPage, //页数
-          status: this.status_info //状态
-        };
-        if (!data.beginTime) {
-          data.beginTime = "0001/1/1";
-        }
-        if (!data.finishTime) {
-          data.finishTime = "9999/12/31";
-        } else {
-          data.finishTime = data.finishTime + " 23:59:59";
-        }
+        type: this.typeFilter, //类型筛选
+        costomerCodes: [this.get_customer_code], //已选用户
+        beginTime: this.ruleForm_1.dateValue, //起始时间
+        finishTime: this.ruleForm_2.dateValue, //结束时间
+        limit: this.limit, //限制数
+        page: this.currentPage, //页数
+        status: this.status_info //状态
+      };
+      if (!data.beginTime) {
+        data.beginTime = "0001/1/1";
+      }
+      if (!data.finishTime) {
+        data.finishTime = "9999/12/31";
+      } else {
+        data.finishTime = data.finishTime + " 23:59:59";
+      }
       getPackDetails(data).then(res => {
-          this.count = res.count;
-          this.tableData = res.data;
-          if(res.data.length != 0){
-            this.showBill = true
-          }else{
-            this.$alert("暂无数据", "提示", {
+        this.count = res.count;
+        this.tableData = res.data;
+        if (res.data.length != 0) {
+          this.showBill = true;
+        } else {
+          this.$alert("暂无数据", "提示", {
             confirmButtonText: "确定",
             type: "success"
           });
-          }
-        });
+        }
+      });
     },
     //打开弹窗显示详情数据
     openDia(val) {
@@ -1078,7 +906,6 @@ export default {
 .td_1 {
   text-align: center;
   padding: 0;
-  
 }
 .table_2 {
   border-collapse: collapse;

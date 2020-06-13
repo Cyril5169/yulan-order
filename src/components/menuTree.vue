@@ -61,7 +61,7 @@
       <span slot="title">{{ menuTreeItem.MENU_NAME }}</span>
       <el-badge
         v-if="getAllBadge(menuTreeItem.MENU_LINK) > 0"
-        class="mark r"
+        class="iconBadge"
         :value="getAllBadge(menuTreeItem.MENU_LINK)"
       ></el-badge>
     </el-menu-item>
@@ -131,6 +131,10 @@ export default {
 <style scoped>
 .icon-color {
   color: #303133;
+}
+.iconBadge{
+  position: absolute;
+  right: 10px;
 }
 .el-menu i {
   font-size: 18px;

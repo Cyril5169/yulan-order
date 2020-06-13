@@ -416,7 +416,7 @@
           
           <tr>
             <td class="grayTD"  colspan="2" rowspan="1"  style="height:90px" >支付方式</td>
-            <td  colspan="1" rowspan="1"  style="height:90px" >
+            <td  colspan="1" rowspan="1"  style="height:120px" >
                  <div><img src="../../assets/img/payment.png"  alt="付款二维码"  style="width:90%;height:90%;"/></div>
             </td>
             <td  colspan="6" rowspan="1"  style="height:90px" >客户上传附件：户型图或平面布局图（需要表示房间名称，如“男儿童房”“女中学生”“老人房”等）、付款凭证（需要备注楼盘名称且图上有交易时间）（图片应为jpg、dwg、pdf等格式,平面图尺寸要表达清晰，消防位等有阻碍设计的地方要标注清楚）</td>

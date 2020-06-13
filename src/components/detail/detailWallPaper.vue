@@ -374,6 +374,7 @@ export default {
         note: this.data.note,
         splitShipment: storeMessage
       };
+      console.log(updateObj)
       if (this.customerType === "10") {
         updateObj.onlineSalesAmount = this.data.onlineSalesAmount;
       }

@@ -349,7 +349,12 @@ export default {
             });
             this.$root.$emit("refreshBadgeIcon", "softCount");
           } else {
-            this.$alert(res.data.msg, "添加失败", {
+            var msg = res.data.msg;
+            if (msg == "该产品正在上架，暂时不能加入购物车") {
+              msg =
+                "没有维护经销/分销/家装/零售价格，暂时不能加入购物车，请联系玉兰订单部";
+            }
+            this.$alert(msg, "添加失败", {
               confirmButtonText: "确定",
               type: "warning"
             });

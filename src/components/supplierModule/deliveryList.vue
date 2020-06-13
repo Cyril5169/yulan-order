@@ -106,7 +106,7 @@
               <td>{{ DeliverData_1.LOGISTICS_COMPANY }}</td>
               <td>物流单号：</td>
               <td>{{ DeliverData_1.LOGISTICS_NUMBER }}</td>
-              <td>创建人：</td>
+              <td>填写人：</td>
               <td>{{ DeliverData_1.CREATE_PERSON }}</td>
             </tr>
             <tr>
@@ -151,15 +151,15 @@
         <br>
         <table style="width:100%;text-align:center">
           <tr>
-            <td style="width:10%">供应商联系人：</td>
+            <td style="width:10%">供应商联系人<span style="color:red;font-size:15px">*</span>：</td>
             <td>
-              <input v-model="submit.SUPPLY_LINKMAN" placeholder="(由采购单填入)" clearable class="inputStyle" />
+              <input v-model="submit.SUPPLY_LINKMAN" clearable class="inputStyle" />
             </td>
-            <td style="width:12%">供应商联系电话：</td>
+            <td style="width:12%">供应商联系电话<span style="color:red;font-size:15px">*</span>：</td>
             <td>
-              <input v-model="submit.LINKMAN_TEL" placeholder="(由采购单填入)" clearable class="inputStyle" />
+              <input v-model="submit.LINKMAN_TEL" clearable class="inputStyle" />
             </td>
-            <td style="width:10%">创建日期：</td>
+            <td style="width:10%">创建日期<span style="color:red;font-size:15px">*</span>：</td>
             <td style="width:25%">{{ editData.CREATE_DATE | datatrans }}</td>
           </tr>
         </table>
@@ -167,7 +167,7 @@
         <div class="checkTable">
           <table style="width:100%;font-size:12px">
             <tr>
-              <td style="width:12%">送货单号：</td>
+              <td style="width:12%">送货单号<span style="color:red;font-size:15px">*</span>：</td>
               <td>{{ editData.INVOICE_NO }}</td>
               <td>送货日期：</td>
               <td>
@@ -191,38 +191,38 @@
               </td>
             </tr>
             <tr>
-              <td>物流公司：</td>
+              <td>物流公司<span style="color:red;font-size:15px">*</span>：</td>
               <td>
-                <input v-model="submit.LOGISTICS_COMPANY" placeholder="" clearable class="inputStyle" />
+                <input v-model="submit.LOGISTICS_COMPANY" clearable class="inputStyle" />
               </td>
 
               <td>物流单号：</td>
               <td>
-                <input v-model="submit.LOGISTICS_NUMBER" placeholder="" clearable class="inputStyle" />
+                <input v-model="submit.LOGISTICS_NUMBER" clearable class="inputStyle" />
               </td>
-              <td>创建人：</td>
+              <td>填写人：</td>
               <td>{{ editData.CREATE_PERSON }}</td>
             </tr>
             <tr>
               <td>物流联系人：</td>
               <td>
-                <input v-model="submit.LOGISTICS_LINKMAN" placeholder="" clearable class="inputStyle" />
+                <input v-model="submit.LOGISTICS_LINKMAN" clearable class="inputStyle" />
               </td>
 
               <td style="width:12%">物流联系电话：</td>
               <td>
-                <input v-model="submit.LOGISTICS_TEL" placeholder="" clearable class="inputStyle" />
+                <input v-model="submit.LOGISTICS_TEL" clearable class="inputStyle" />
               </td>
 
               <td style="width:12%">送货地址：</td>
               <td style="width:30%">
-                <input v-model="submit.AREA_DISTRICT" placeholder="" clearable class="inputStyle" />
+                <input v-model="submit.AREA_DISTRICT" clearable class="inputStyle" />
               </td>
             </tr>
             <tr>
               <td>备注：</td>
               <td colspan="5">
-                <input v-model="submit.REMARKS" placeholder="" clearable class="inputStyle" />
+                <input v-model="submit.REMARKS" clearable class="inputStyle" />
               </td>
             </tr>
           </table>
@@ -296,16 +296,16 @@
       </div>
       <table style="width:100%;text-align:center">
         <tr>
-          <td style="width:10%">供应商联系人：</td>
+          <td style="width:10%">供应商联系人<span style="color:red;font-size:15px">*</span>：</td>
           <td>
-            <input v-model="submitForm.SUPPLY_LINKMAN" placeholder="(由采购单填入)" clearable class="inputStyle" />
+            <input v-model="submitForm.SUPPLY_LINKMAN" clearable class="inputStyle" />
           </td>
-          <td style="width:10%">供应商联系电话：</td>
+          <td style="width:11%">供应商联系电话<span style="color:red;font-size:15px">*</span>：</td>
           <td>
-            <input v-model="submitForm.LINKMAN_TEL" placeholder="(由采购单填入)" clearable class="inputStyle" />
+            <input v-model="submitForm.LINKMAN_TEL" learable class="inputStyle" />
           </td>
-          <td style="width:10%">创建日期：</td>
-          <td style="width:25%">(系统生成)</td>
+          <td style="width:10%">创建日期<span style="color:red;font-size:15px">*</span>：</td>
+          <td style="width:25%"></td>
         </tr>
       </table>
 
@@ -313,8 +313,8 @@
       <div v-show="isAdd" class="table-c">
         <table style="width:100%">
           <tr>
-            <td>送货单号：</td>
-            <td>(系统生成)</td>
+            <td>送货单号<span style="color:red;font-size:15px">*</span>：</td>
+            <td></td>
             <td>送货日期：</td>
             <td>
               <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="送货日期"
@@ -329,27 +329,27 @@
           <tr>
             <td>物流公司 <span style="color:red;font-size:15px">*</span>：</td>
             <td>
-              <input v-model="submitForm.logistics_company" placeholder="(客户必填)" clearable class="inputStyle" />
+              <input v-model="submitForm.logistics_company" clearable class="inputStyle" />
             </td>
             <td>物流单号 <span style="color:red;font-size:15px">*</span>：</td>
             <td>
-              <input v-model="submitForm.logistics_number" placeholder="(客户必填)" clearable class="inputStyle" />
+              <input v-model="submitForm.logistics_number" clearable class="inputStyle" />
             </td>
-            <td>创建人：</td>
+            <td>填写人：</td>
             <td>
-              <input v-model="submitForm.create_person" placeholder="(客户选填)" clearable class="inputStyle" />
+              <input v-model="submitForm.create_person" clearable class="inputStyle" />
             </td>
           </tr>
           <tr>
             <td>物流联系人<span style="color:red;font-size:15px">*</span>：</td>
             <td>
-              <input v-model="submitForm.LOGISTICS_LINKMAN" placeholder="(客户必填)" clearable class="inputStyle" />
+              <input v-model="submitForm.LOGISTICS_LINKMAN" clearable class="inputStyle" />
             </td>
             <td>
               物流联系电话 <span style="color:red;font-size:15px">*</span>：
             </td>
             <td>
-              <input v-model="submitForm.LOGISTICS_TEL" placeholder="(客户必填)" clearable class="inputStyle" />
+              <input v-model="submitForm.LOGISTICS_TEL" clearable class="inputStyle" />
             </td>
             <td>送货地址：</td>
             <td>
@@ -359,7 +359,7 @@
           <tr>
             <td>备注：</td>
             <td colspan="5">
-              <input v-model="submitForm.remarks" placeholder="(客户选填)" clearable class="inputStyle" />
+              <input v-model="submitForm.remarks" clearable class="inputStyle" />
             </td>
           </tr>
         </table>

@@ -390,7 +390,8 @@
                     (scope.row.UNIT_PRICE * scope.row.QTY_REQUIRED)
                       | dosageFilter
                   }}</span>
-            <span v-if="allTotal(scope.$index) != scope.row.UNIT_PRICE" style="color:red;">({{allTotal(scope.$index) | dosageFilter}})</span>
+            <span v-if="dosageFilter(allTotal(scope.$index)) != scope.row.UNIT_PRICE"
+              style="color:red;">({{allTotal(scope.$index) | dosageFilter}})</span>
           </template>
         </el-table-column>
         <el-table-column align="center" prop="NOTES" label="备注"></el-table-column>
@@ -553,7 +554,12 @@ export default {
         { value: "特殊见备注" }
       ],
       //帘身、纱制造说明
-      part1: [{ value: "对开" },  { value: "左单开" }, { value: "右单开" }, { value: "特殊开备注" }],
+      part1: [
+        { value: "对开" },
+        { value: "左单开" },
+        { value: "右单开" },
+        { value: "特殊开备注" }
+      ],
       //帘身配布制造说明
       part3: [
         { value: "一个褶" },
@@ -612,7 +618,7 @@ export default {
         }
       }
       for (var i = 0; i < _data[index].length; i++) {
-        totalMoney += (_data[index][i].price.mul(_data[index][i].dosage))
+        totalMoney += _data[index][i].price.mul(_data[index][i].dosage);
       }
       return totalMoney;
     },
@@ -713,7 +719,8 @@ export default {
         if (tab.curtains[i].unit === "°ü") {
           tab.curtains[i].unit = "包";
         }
-        tab.curtains[i].dosage = Math.round(tab.curtains[i].dosage.mul(100)) / 100;
+        tab.curtains[i].dosage =
+          Math.round(tab.curtains[i].dosage.mul(100)) / 100;
       }
       //拿到保存的数据
       this.curtainData = tab.curtains;
@@ -802,7 +809,7 @@ export default {
             label: "-未选择配件包-",
             value: null,
             unit: "",
-            note: "",
+            note: ""
           });
           this.part2 = _arr;
         })
@@ -815,7 +822,7 @@ export default {
         var data = this.ruleForm.ORDERBODY[i];
         let smallChoose = [];
         for (let cur = 0; cur < data.curtains.length; cur++) {
-          this.$set(data.curtains[cur],'choose', true);
+          this.$set(data.curtains[cur], "choose", true);
           smallChoose.push(true);
           data.curtains[cur].productType = data.curtains[cur].item.productType;
           data.curtains[cur].itemType = data.curtains[cur].curtainPartName;

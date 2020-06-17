@@ -67,7 +67,8 @@ Vue.config.productionTip = false
 
 
 Object.keys(custom).forEach(key => {
-  Vue.filter(key, custom[key])
+  Vue.filter(key, custom[key]);
+  Vue.prototype[key] = custom[key];
 })
 
 /* eslint-disable no-new */

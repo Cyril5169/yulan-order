@@ -369,7 +369,6 @@ export default {
     //订单详情
     toExamineDetail(val) {
       Cookies.set("ORDER_NO", val);
-      //console.log(Cookies.get("ORDER_NO"));
       this.addTab("order/examineDetailNew");
     },
     toCheckExamine(val) {
@@ -528,11 +527,9 @@ export default {
       }
     }
   },
-  //生命周期
-  created() {
-    this.getorderList();
-    //console.log(Cookies.get("cid"));
-  },
+  // created() {
+  //   this.getorderList();
+  // },
   activated: function() {
     this.getorderList();
   }

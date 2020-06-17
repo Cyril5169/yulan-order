@@ -503,9 +503,6 @@ export default {
     };
   },
   components: { shipment },
-  activated: function() {
-    this.refresh();
-  },
   filters: {
     transStatus(value) {
       switch (value) {
@@ -939,8 +936,10 @@ export default {
       return "";
     }
   },
-  //生命周期
-  created() {
+  // created() {
+  //   this.refresh();
+  // },
+  activated: function() {
     this.refresh();
   }
 };

@@ -82,7 +82,7 @@
                 (identity == "ECWEB" ? " " + "管理员" : " ")
             }}</span>
         </el-header>
-        <el-main style="margin:0;padding:0;background:#ECF5EF;" class="backTop">
+        <el-main style="margin:0;padding:0;background:#ECF5EF;" class="backTop" id="mainBackTop">
           <el-tabs class="tabs" v-model="activeTabName" @tab-click="getTab" @tab-remove="closeTab" type="border-card">
             <div id="notice">
               <i class="el-icon-bell ml10 mr10 f16" style="line-height:30px;color:gold;font-weight:bold;"></i>

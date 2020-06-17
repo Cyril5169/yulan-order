@@ -54,7 +54,7 @@
                   scope.row.INVOICE_STATUS == 0 || scope.row.INVOICE_STATUS == 1 || scope.row.INVOICE_STATUS == 3 || scope.row.INVOICE_STATUS == 2
                 "></el-button>
               <el-button @click="_EditDetail(scope.row)" type="primary" size="mini" icon="el-icon-edit" circle
-                v-if="scope.row.INVOICE_STATUS == 4 "></el-button>
+                v-if="scope.row.INVOICE_STATUS == 4"></el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -68,6 +68,7 @@
     </el-card>
 
     <el-dialog :visible.sync="lanjuDetail" :close-on-click-modal="false" width="70%">
+
       <!-- 查看区 -->
       <div v-show="isCheck">
         <div style="width:100%;text-align:center;font-size:20px">{{DeliverData_1.PUR_NO}} 送货单明细
@@ -78,70 +79,65 @@
         <br>
         <table style="width:100%;text-align:center">
           <tr>
-            <td style="width:10%">供应商联系人：</td>
-            <td>
+            <td style="width:12.5%">供应商联系人：</td>
+            <td style="width:12.5%">
               {{DeliverData_1.SUPPLY_LINKMAN}}
             </td>
-            <td style="width:12%">供应商联系电话：</td>
-            <td>
+            <td style="width:12.5%">供应商联系电话：</td>
+            <td style="width:12.5%">
               {{DeliverData_1.LINKMAN_TEL}}
             </td>
-            <td style="width:10%">创建日期：</td>
-            <td style="width:25%">{{ DeliverData_1.CREATE_DATE | datatrans }}</td>
+            <td style="width:12.5%">填写人：</td>
+            <td style="width:12.5%">{{ DeliverData_1.CREATE_PERSON }}</td>
+            <td style="width:12.5%">创建日期：</td>
+            <td>{{ DeliverData_1.CREATE_DATE | datatrans }}</td>
           </tr>
         </table>
+
         <hr>
         <div class="checkTable">
           <table class="" style="width:100%;font-size:12px">
             <tr>
-              <td>送货单号：</td>
-              <td>{{ DeliverData_1.INVOICE_NO }}</td>
-              <td>送货日期：</td>
-              <td>{{ DeliverData_1.INVOICE_DATE | datatrans }}</td>
-              <td>预计到货日期：</td>
-              <td>{{ DeliverData_1.EXPECT_ARRIVAL_DATE | datatrans }}</td>
+              <td style="width:12.5%">送货单号：</td>
+              <td style="width:12.5%">{{ DeliverData_1.INVOICE_NO }}</td>
+              <td style="width:12.5%">送货日期：</td>
+              <td style="width:12.5%">{{ DeliverData_1.INVOICE_DATE | datatrans }}</td>
+              <td style="width:12.5%">预计到货时间：</td>
+              <td colspan="3">{{ DeliverData_1.EXPECT_ARRIVAL_DATE | datatrans }}</td>
             </tr>
+
             <tr>
-              <td>物流公司：</td>
-              <td>{{ DeliverData_1.LOGISTICS_COMPANY }}</td>
               <td>物流单号：</td>
               <td>{{ DeliverData_1.LOGISTICS_NUMBER }}</td>
-              <td>填写人：</td>
-              <td>{{ DeliverData_1.CREATE_PERSON }}</td>
-            </tr>
-            <tr>
+              <td>物流公司：</td>
+              <td>{{ DeliverData_1.LOGISTICS_COMPANY }}</td>
               <td>物流联系人：</td>
-              <td>{{ DeliverData_1.LOGISTICS_LINKMAN }}</td>
-              <td>物流联系电话：</td>
+              <td style="width:12.5%">{{ DeliverData_1.LOGISTICS_LINKMAN }}</td>
+              <td style="width:12.5%">物流电话：</td>
               <td>{{ DeliverData_1.LOGISTICS_TEL }}</td>
-              <td>送货地址：</td>
-              <td>{{ DeliverData_1.AREA_DISTRICT }}</td>
             </tr>
+
             <tr>
+              <td>送货地址：</td>
+              <td colspan="3">{{ DeliverData_1.AREA_DISTRICT }}</td>
               <td>备注：</td>
-              <td colspan="5">{{ DeliverData_1.REMARKS }}</td>
+              <td colspan="3">{{ DeliverData_1.REMARKS }}</td>
             </tr>
           </table>
         </div>
         <hr />
         <el-table :data="DetailData" border highlight-current-row style="width: 100%;font-weight:normal;font-size:12px"
           class="table_1">
-          <el-table-column prop="ITEM_NO" label="物料编码" align="center" width="180px"></el-table-column>
+          <el-table-column prop="ITEM_NO" label="物料编码" align="center" width="130px"></el-table-column>
           <el-table-column prop="NAMEE" label="物料名称" align="center" width="180px"></el-table-column>
-          <el-table-column prop="INVOICE_QTY" label="送货数量" align="center" width="150px"></el-table-column>
-          <!-- <el-table-column
-            prop="REBACK_QTY"
-            label="退货数量"
-            align="center"
-            width="150px"
-          ></el-table-column> -->
+          <el-table-column prop="INVOICE_QTY" label="送货数量" align="center" width="120px"></el-table-column>
           <el-table-column prop="UNIT1" label="单位" align="center" width="80px"></el-table-column>
           <el-table-column prop="MAT_BRAND" label="品牌" align="center" width="110px"></el-table-column>
           <el-table-column prop="GRADE" label="规格/型号" align="center" width="110px"></el-table-column>
-          <!-- <el-table-column prop="REMARKS" label="赠品" align="center" width="150px"></el-table-column> -->
           <el-table-column prop="NOTE" label="备注" align="center"></el-table-column>
         </el-table>
       </div>
+
       <!-- 编辑区 -->
       <div v-show="isEdit">
         <div style="width:100%;text-align:center;font-size:20px">{{editData.PUR_NO}} 送货单明细
@@ -149,79 +145,71 @@
         <div v-if="editData.INVOICE_STATUS == 3" style="font-size:20px;float:right;">未通过说明：{{editData.REBACK_NOTES}}
         </div>
         <br>
+
         <table style="width:100%;text-align:center">
           <tr>
-            <td style="width:10%">供应商联系人<span style="color:red;font-size:15px">*</span>：</td>
-            <td>
+            <td style="width:12.5%">供应商联系人：</td>
+            <td style="width:12.5%">
               <input v-model="submit.SUPPLY_LINKMAN" clearable class="inputStyle" />
             </td>
-            <td style="width:12%">供应商联系电话<span style="color:red;font-size:15px">*</span>：</td>
-            <td>
+            <td style="width:12.5%">供应商联系电话：</td>
+            <td style="width:12.5%">
               <input v-model="submit.LINKMAN_TEL" clearable class="inputStyle" />
             </td>
-            <td style="width:10%">创建日期<span style="color:red;font-size:15px">*</span>：</td>
-            <td style="width:25%">{{ editData.CREATE_DATE | datatrans }}</td>
+            <td style="width:12.5%">填写人：</td>
+            <td style="width:12.5%">{{ editData.CREATE_PERSON }}</td>
+            <td style="width:12.5%">填写日期：</td>
+            <td>{{ editData.CREATE_DATE | datatrans }}</td>
           </tr>
         </table>
+
         <hr>
         <div class="checkTable">
           <table style="width:100%;font-size:12px">
             <tr>
-              <td style="width:12%">送货单号<span style="color:red;font-size:15px">*</span>：</td>
-              <td>{{ editData.INVOICE_NO }}</td>
-              <td>送货日期：</td>
-              <td>
-                <div style="width:100%">
-                  <span>
-                    <el-date-picker clearable type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
-                      placeholder="修改日期" v-model="ruleForm_1.dateValue" style="width:100%;text-align:right">
-                    </el-date-picker>
-                  </span>
-                </div>
+              <td style="width:12.5%">送货单号：</td>
+              <td style="width:12.5%">{{ editData.INVOICE_NO }}</td>
+              <td style="width:12.5%">送货日期：</td>
+              <td style="width:12.5%">
+                <el-date-picker clearable type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
+                  v-model="ruleForm_1.dateValue" style="width:100%;">
+                </el-date-picker>
               </td>
-              <td>预计到货日期：</td>
-              <td>
-                <div style="width:100%">
-                  <span>
-                    <el-date-picker clearable type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
-                      placeholder="修改日期" v-model="ruleForm_4.dateValue" style="width:100%;text-align:right">
-                    </el-date-picker>
-                  </span>
-                </div>
+              <td style="width:12.5%">预计到货时间：</td>
+              <td colspan="3">
+                <el-date-picker clearable type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
+                  v-model="ruleForm_4.dateValue" style="width:100%;">
+                </el-date-picker>
               </td>
             </tr>
+
             <tr>
+              <td>物流单号<span style="color:red;font-size:15px">*</span>：</td>
+              <td>
+                <input v-model="submit.LOGISTICS_NUMBER" clearable class="inputStyle" />
+              </td>
               <td>物流公司<span style="color:red;font-size:15px">*</span>：</td>
               <td>
                 <input v-model="submit.LOGISTICS_COMPANY" clearable class="inputStyle" />
               </td>
-
-              <td>物流单号：</td>
-              <td>
-                <input v-model="submit.LOGISTICS_NUMBER" clearable class="inputStyle" />
-              </td>
-              <td>填写人：</td>
-              <td>{{ editData.CREATE_PERSON }}</td>
-            </tr>
-            <tr>
-              <td>物流联系人：</td>
-              <td>
+              <td>物流联系人<span style="color:red;font-size:15px">*</span>：</td>
+              <td style="width:12.5%">
                 <input v-model="submit.LOGISTICS_LINKMAN" clearable class="inputStyle" />
               </td>
 
-              <td style="width:12%">物流联系电话：</td>
+              <td style="width:12.5%">物流联系电话<span style="color:red;font-size:15px">*</span>：</td>
               <td>
                 <input v-model="submit.LOGISTICS_TEL" clearable class="inputStyle" />
               </td>
+            </tr>
 
-              <td style="width:12%">送货地址：</td>
-              <td style="width:30%">
+            <tr>
+              <td>送货地址：</td>
+              <td colspan="3">
                 <input v-model="submit.AREA_DISTRICT" clearable class="inputStyle" />
               </td>
-            </tr>
-            <tr>
               <td>备注：</td>
-              <td colspan="5">
+              <td colspan="3">
                 <input v-model="submit.REMARKS" clearable class="inputStyle" />
               </td>
             </tr>
@@ -230,25 +218,20 @@
         <hr />
         <el-table :data="DetailData_1" border highlight-current-row
           style="width: 100%;font-weight:normal;font-size:12px" class="table_1">
-          <el-table-column prop="ITEM_NO" label="物料编码" align="center" width="150px"></el-table-column>
+          <el-table-column prop="ITEM_NO" label="物料编码" align="center" width="130px"></el-table-column>
           <el-table-column prop="NAMEE" label="物料名称" align="center" width="180px"></el-table-column>
-          <el-table-column label="送货数量" align="center" width="155px">
+          <el-table-column label="送货数量" align="center" width="140px">
             <template slot-scope="scope">
               <el-input-number v-model="scope.row.INVOICE_QTY" size="mini" controls-position="right" :min="0"
                 :max="scope.row.max_qty"></el-input-number>
             </template>
           </el-table-column>
-          <el-table-column prop="UNIT1" label="单位" align="center" width="100px"></el-table-column>
-          <el-table-column prop="MAT_BRAND" label="品牌" align="center" width="150px"></el-table-column>
-          <el-table-column prop="GRADE" label="规格/型号" align="center" width="150px"></el-table-column>
-          <!-- <el-table-column label="赠品" align="center" width="150px">
-             <template slot-scope="scope">
-                <el-input v-model="scope.row.REMARKS" clearable></el-input>
-              </template>
-           </el-table-column> -->
+          <el-table-column prop="UNIT1" label="单位" align="center" width="80px"></el-table-column>
+          <el-table-column prop="MAT_BRAND" label="品牌" align="center" width="130px"></el-table-column>
+          <el-table-column prop="GRADE" label="规格/型号" align="center" width="130px"></el-table-column>
           <el-table-column label="备注" align="center">
             <template slot-scope="scope">
-              <el-input v-model="scope.row.NOTE" clearable></el-input>
+              <el-input size="mini" v-model="scope.row.NOTE" clearable></el-input>
             </template>
           </el-table-column>
         </el-table>
@@ -258,6 +241,7 @@
         </div>
       </div>
     </el-dialog>
+
     <el-dialog title="新增送货单" :visible.sync="DeliverDetail" :close-on-click-modal="false" width="80%">
       <el-dialog width="80%" title="采购单明细" :visible.sync="innerVisible" append-to-body>
         <el-table :data="PURData" @selection-change="handleSelectionChange" border highlight-current-row
@@ -287,25 +271,28 @@
           <el-button @click="isTrue" class="trueButton">确认</el-button>
         </div>
       </el-dialog>
-      <!-- 新增 -->
       <div>
         <el-input @keyup.enter.native="searchPUR()" placeholder="请输入采购单号" v-model="find"
-          style="width:280px;float:left;margin-top:-15px;margin-bottom:5px">
+          style="width:280px;float:left;margin-top:-15px;margin-bottom:5px" clearable>
           <el-button @click="searchPUR()" class="button_1" slot="append" icon="el-icon-search">搜索</el-button>
         </el-input>
       </div>
+
+      <!-- 新增 -->
       <table style="width:100%;text-align:center">
         <tr>
-          <td style="width:10%">供应商联系人<span style="color:red;font-size:15px">*</span>：</td>
-          <td>
+          <td style="width:12.5%">供应商联系人：</td>
+          <td style="width:12.5%">
             <input v-model="submitForm.SUPPLY_LINKMAN" clearable class="inputStyle" />
           </td>
-          <td style="width:11%">供应商联系电话<span style="color:red;font-size:15px">*</span>：</td>
-          <td>
-            <input v-model="submitForm.LINKMAN_TEL" learable class="inputStyle" />
+          <td style="width:12.5%">供应商联系电话：</td>
+          <td style="width:12.5%">
+            <input v-model="submitForm.LINKMAN_TEL" clearable class="inputStyle" />
           </td>
-          <td style="width:10%">创建日期<span style="color:red;font-size:15px">*</span>：</td>
-          <td style="width:25%"></td>
+          <td style="width:12.5%">填写人：</td>
+          <td>{{ editData.CREATE_PERSON  }}</td>
+          <td style="width:12.5%">创建日期：</td>
+          <td></td>
         </tr>
       </table>
 
@@ -313,52 +300,48 @@
       <div v-show="isAdd" class="table-c">
         <table style="width:100%">
           <tr>
-            <td>送货单号<span style="color:red;font-size:15px">*</span>：</td>
-            <td></td>
-            <td>送货日期：</td>
+            <td style="width:12.5%">送货单号：</td>
+            <td style="width:12.5%"></td>
+            <td style="width:12.5%">送货日期：</td>
             <td>
-              <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="送货日期"
-                v-model="ruleForm_2.dateValue" style="width:100%"></el-date-picker>
+              <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" v-model="ruleForm_2.dateValue"
+                style="width:100%"></el-date-picker>
             </td>
-            <td>预计到货时间：</td>
-            <td>
-              <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="预计到货时间"
-                v-model="ruleForm_3.dateValue" style="width:100%"></el-date-picker>
+            <td style="width:12.5%">预计到货时间：</td>
+            <td colspan="3">
+              <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" v-model="ruleForm_3.dateValue"
+                style="width:100%"></el-date-picker>
             </td>
           </tr>
+
           <tr>
-            <td>物流公司 <span style="color:red;font-size:15px">*</span>：</td>
-            <td>
-              <input v-model="submitForm.logistics_company" clearable class="inputStyle" />
-            </td>
-            <td>物流单号 <span style="color:red;font-size:15px">*</span>：</td>
+            <td>物流单号<span style="color:red;font-size:15px">*</span>：</td>
             <td>
               <input v-model="submitForm.logistics_number" clearable class="inputStyle" />
             </td>
-            <td>填写人：</td>
+            <td>物流公司<span style="color:red;font-size:15px">*</span>：</td>
             <td>
-              <input v-model="submitForm.create_person" clearable class="inputStyle" />
+              <input v-model="submitForm.logistics_company" clearable class="inputStyle" />
             </td>
-          </tr>
-          <tr>
             <td>物流联系人<span style="color:red;font-size:15px">*</span>：</td>
-            <td>
+            <td style="width:12.5%">
               <input v-model="submitForm.LOGISTICS_LINKMAN" clearable class="inputStyle" />
             </td>
-            <td>
-              物流联系电话 <span style="color:red;font-size:15px">*</span>：
+            <td style="width:12.5%">
+              物流电话<span style="color:red;font-size:15px">*</span>：
             </td>
             <td>
               <input v-model="submitForm.LOGISTICS_TEL" clearable class="inputStyle" />
             </td>
-            <td>送货地址：</td>
-            <td>
-              <input v-model="submitForm.area_district" placeholder="(客户必填)" clearable class="inputStyle" />
-            </td>
           </tr>
+
           <tr>
+            <td>送货地址：</td>
+            <td colspan="3">
+              <input v-model="submitForm.area_district" clearable class="inputStyle" />
+            </td>
             <td>备注：</td>
-            <td colspan="5">
+            <td colspan="3">
               <input v-model="submitForm.remarks" clearable class="inputStyle" />
             </td>
           </tr>
@@ -697,7 +680,6 @@ export default {
           PUR_NO: this.find
         };
         GetPoDetail_1(data).then(res => {
-          console.log(res.data);
           this.PURData = res.data;
           if (res.data.length == 0) {
             this.$alert("采购单未确认", "提示", {
@@ -761,7 +743,8 @@ export default {
       this.isAdd = true;
       this.DeliverDetail = true;
       this.isEdit = false;
-      (this.submitForm = {
+      this.find = "";
+      this.submitForm = {
         create_person: "",
         logistics_company: "",
         logistics_number: "",
@@ -777,8 +760,8 @@ export default {
         LOGISTICS_LINKMAN: "",
         LOGISTICS_TEL: "",
         CONFIRM_STATUS: 2
-      }),
-        (this.multipleSelection = []);
+      };
+      this.multipleSelection = [];
       this.multipleSelection_1 = [];
       this.multipleSelection_2 = [];
     },
@@ -968,93 +951,15 @@ export default {
   text-align: center;
   font-size: 14px;
 }
-.tableCol {
-  background: #f0f9eb;
-}
-.grayTD {
-  background: rgb(241, 242, 243);
-}
-.headerStyle {
-  display: inline-block;
-  width: 100px;
-  font-weight: bold;
-}
-.timeRight {
-  font-size: 14px;
-  line-height: 30px;
-  display: inline-block;
-  margin-right: 20px;
-  font-weight: bold;
-}
-.timeLeft {
-  font-size: 14px;
-  line-height: 30px;
-  display: inline-block;
-}
-.ISimg {
-  width: 100px;
-  height: 100px;
-  cursor: pointer;
-}
-.BIGimg {
-  width: 333px;
-  height: 333px;
-}
-.inputWidth {
-  width: 220px;
-}
 .tbarStyle {
   margin-bottom: 13px;
 }
-.statusCombobox {
-  margin-left: 10px;
-}
-</style>
-
-<style>
-.el-table .success-row {
-  background: #f0f9eb;
-}
-
-.avatar-uploader .el-upload {
-  border: 1px dashed black;
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-.avatar-uploader .el-upload:hover {
-  border-color: #409eff;
-}
-.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 30px;
-  height: 30px;
-  line-height: 30px;
-  text-align: center;
-}
-.avatar {
-  width: 30px;
-  height: 30px;
-  display: block;
-}
 .inputStyle {
-  border: 0;
   height: 100%;
   width: 100%;
   font-size: 16px;
   text-align: center;
-}
-.inputStyleNew {
-  border: 0;
-  height: 100%;
-  width: 54%;
-  font-size: 16px;
-  text-align: center;
-}
-.upload-de .el-upload-dragger {
-  height: 30px;
-  width: 200px;
+  border: 1px solid #dcdfe6;
+  box-sizing: border-box;
 }
 </style>

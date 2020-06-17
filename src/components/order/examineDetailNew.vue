@@ -11,7 +11,7 @@
     </el-dialog>
 
     <el-card class="tableCard" shadow="hover">
-      <div slot="header">
+      <div slot="header" :class="{fixHead:isFixed}">
         <span class="zoomLeft">
           订单号：
           <span class="zoomRight">{{ ruleForm.ORDER_NO }}</span>
@@ -38,6 +38,9 @@
           玉兰处理说明：
           <span class="zoomRight">{{ ruleForm.YULAN_NOTES }}</span>
         </span>
+      </div>
+      <div slot="header" v-if="isFixed">
+        <div style="height:80px;width:100%;"></div>
       </div>
       <el-table border :data="ruleForm.ORDERBODY" style="width: 100%" :row-class-name="tableRowClassName"
         :expand-row-keys="expands" :row-key="getRowKeys">
@@ -384,7 +387,7 @@
         <el-table-column prop="PRODUCTION_VERSION" align="center" label="所属版本" width="120"></el-table-column>
         <el-table-column align="center" prop="QTY_REQUIRED" label="数量" width="90"></el-table-column>
         <el-table-column prop="PROMOTION" align="center" label="活动" show-overflow-tooltip></el-table-column>
-        <el-table-column label="总价" align="center" width="110">
+        <el-table-column label="总价" align="center" width="130">
           <template slot-scope="scope">
             <span>{{
                     (scope.row.UNIT_PRICE * scope.row.QTY_REQUIRED)
@@ -571,15 +574,12 @@ export default {
       ],
       //配件编码
       part2: [],
-      suggestionLJ: []
+      suggestionLJ: [],
+      isFixed: false
     };
   },
   components: {
     DetailCurtainTable
-  },
-  created: function() {
-    this.orderNumber = Cookies.get("ORDER_NO");
-    this.getDetail();
   },
   filters: {
     datatrans(value) {
@@ -2008,7 +2008,28 @@ export default {
       return "success-row";
     },
     ...mapMutations("navTabs", ["addTab"]),
-    ...mapActions("navTabs", ["closeTab", "closeToTab"])
+    ...mapActions("navTabs", ["closeTab", "closeToTab"]),
+    handleScroll() {
+      this.$nextTick(() => {
+        let main = document.getElementById("mainBackTop");
+        let scrollTop = main.scrollTop;
+        if (scrollTop > 110) {
+          this.isFixed = true;
+        } else {
+          this.isFixed = false;
+        }
+      });
+    }
+  },
+  created: function() {
+    this.orderNumber = Cookies.get("ORDER_NO");
+    this.getDetail();
+  },
+  mounted() {
+    window.addEventListener("scroll", this.handleScroll, true);
+  },
+  destroyed() {
+    window.removeEventListener("scroll", this.handleScroll, true);
   }
 };
 </script>
@@ -2069,6 +2090,14 @@ export default {
   color: gray;
   display: inline-block;
   line-height: 18px;
+}
+.fixHead {
+  position: fixed;
+  opacity: 0.85;
+  top: 50px;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.6);
+  width: 100%;
 }
 </style>
 <style>

@@ -252,3 +252,10 @@ export function DeleteBuyUser(data, config = {}) {
         return Promise.reject(err);
     })
 }
+export function DeleteBuyUserList(data, config = {}) {
+    return post('/BUYUSER_INFO/DeleteBuyUserList', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}

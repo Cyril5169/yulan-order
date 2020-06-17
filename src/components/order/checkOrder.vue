@@ -80,11 +80,15 @@
           </el-input>
           <el-button style="margin-left:20px;" size="medium" @click="addBuyUserShow()" type="primary">新增购买用户信息
           </el-button>
+          <el-button type="danger" size="medium" :disabled="userSelect.length==0" @click="deleteBuyUserList">
+            删除选中用户({{userSelect.length}})
+          </el-button>
           <div style="color:darkgrey;">*双击填充到购买人信息</div>
         </div>
         <div>
           <el-table border :data="buyUserInfoData" style="width: 100%" height="400" :row-class-name="tableRowClassName"
-            @row-dblclick="handleRowDBClick">
+            @row-dblclick="handleRowDBClick" @selection-change="handleSelectionChange">
+            <el-table-column type="selection" width="55" align="center"></el-table-column>
             <el-table-column width="130" prop="BUYUSER" label="用户姓名" align="center"></el-table-column>
             <el-table-column width="130" prop="BUYUSER_PHONE" label="用户电话" align="center"></el-table-column>
             <el-table-column label="地址" align="center">
@@ -411,7 +415,8 @@ import {
   GetBuyUserInfo,
   InsertBuyUser,
   UpdateBuyUser,
-  DeleteBuyUser
+  DeleteBuyUser,
+  DeleteBuyUserList
 } from "@/api/orderListASP";
 import { deleteCurtain } from "@/api/curtain";
 import Axios from "axios";
@@ -436,7 +441,7 @@ export default {
       //返利弹窗
       dialogUse: false,
       dialogBack: false,
-      curtainStatus:'',
+      curtainStatus: "",
       buyUserVisible: false,
       addBuyUserVisible: false,
       buyUserInfoData: [],
@@ -564,7 +569,8 @@ export default {
       },
       dialogImageUrl: "",
       dialogImageVisible: false,
-      fileList: []
+      fileList: [],
+      userSelect: []
     };
   },
   filters: {
@@ -1241,8 +1247,11 @@ export default {
       var allcost = 0;
       activityPrice(url, data).then(res => {
         for (var j = 0; j < res.data.length; j++) {
-          this.array[j].questPrice = Math.round(res.data[j].promotion_cost.mul(100)) / 100;
-          allcost = allcost.add(Math.round(parseFloat(res.data[j].promotion_cost).mul(100)) / 100);
+          this.array[j].questPrice =
+            Math.round(res.data[j].promotion_cost.mul(100)) / 100;
+          allcost = allcost.add(
+            Math.round(parseFloat(res.data[j].promotion_cost).mul(100)) / 100
+          );
         }
         /* allcost=allcost.toString(); */
         //将allspend赋值活动后总价
@@ -1294,7 +1303,8 @@ export default {
         this.array2[i].unit = getPush2[i].unit;
         if (getPush2[i].unit == "平方米") {
           this.array2[i].qtyRequired =
-            Math.round(getPush2[i].height.mul(getPush2[i].width).mul(100)) / 100;
+            Math.round(getPush2[i].height.mul(getPush2[i].width).mul(100)) /
+            100;
         } else {
           this.array2[i].qtyRequired = getPush2[i].quantity;
         }
@@ -1640,10 +1650,10 @@ export default {
     onSaveTaskClick() {
       if (
         !this.buyUserModel.PROVINCE_ID ||
-        !this.buyUserModel.CITY_ID ||
-        !this.buyUserModel.COUNTRY_ID
+        !this.buyUserModel.CITY_ID
+        //|| !this.buyUserModel.COUNTRY_ID
       ) {
-        this.$alert("请填写完整地区", "提示", {
+        this.$alert("请填写省市", "提示", {
           confirmButtonText: "确定",
           type: "warning"
         });
@@ -1707,6 +1717,32 @@ export default {
             type: "warning"
           });
         });
+    },
+    deleteBuyUserList() {
+      this.$confirm("删除的数据无法恢复，是否删除？", "提示", {
+        confirmButtonText: "是",
+        cancelButtonText: "否",
+        type: "warning"
+      })
+        .then(() => {
+          DeleteBuyUserList(this.userSelect).then(res => {
+            this.$message({
+              message: "删除成功!",
+              type: "success",
+              duration: 1000
+            });
+            this.searchBuyUser();
+          });
+        })
+        .catch(res => {
+          this.$alert("删除失败", "提示", {
+            confirmButtonText: "确定",
+            type: "warning"
+          });
+        });
+    },
+    handleSelectionChange(val) {
+      this.userSelect = val;
     },
     handleRowDBClick(row, column) {
       this.ctm_order.buyUser = row.BUYUSER;

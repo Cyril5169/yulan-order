@@ -8,127 +8,58 @@
       </div>
 
       <div id="tbar" class="tbarStyle">
-        <el-date-picker
-          type="date"
-          format="yyyy-MM-dd"
-          value-format="yyyy-MM-dd"
-          placeholder="查询开始日期"
-          v-model="beginTime"
-          style="width:14%;"
-        ></el-date-picker> --
-        <el-date-picker
-          type="date"
-          format="yyyy-MM-dd"
-          value-format="yyyy-MM-dd"
-          placeholder="查询截止日期"
-          v-model="finishTime"
-          style="width:14%;"
-        ></el-date-picker>
+        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询开始日期"
+          v-model="beginTime" style="width:14%;"></el-date-picker> --
+        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询截止日期"
+          v-model="finishTime" style="width:14%;"></el-date-picker>
 
         <el-select v-model="SELECT_STATUS" style="margin-left:10px;width:160px;" placeholder="状态">
-          <el-option
-            v-for="item in statusArray"
-            :key="item.label"
-            :label="item.label"
-            :value="item.value"
-          ></el-option>
+          <el-option v-for="item in statusArray" :key="item.label" :label="item.label" :value="item.value"></el-option>
         </el-select>
 
-
-        <el-input
-        @keyup.enter.native="search()"
-        placeholder="请输入方案名称进行查询"
-        v-model="SEARCHKEY"
-        style="width:220px;margin-left:10px"
-         >
-         </el-input>
+        <el-input @keyup.enter.native="search()" placeholder="请输入方案名称进行查询" v-model="SEARCHKEY"
+          style="width:220px;margin-left:10px">
+        </el-input>
 
         <el-button size="medium" type="success" style="margin-left:10px" @click="search()">查询</el-button>
-        <el-button size="medium" type="primary"  style="float:right"  @click="_addRecord()">需求新增</el-button>
+        <el-button size="medium" type="primary" style="float:right" @click="_addRecord()">需求新增</el-button>
         <el-button size="medium" type="warning" style="float:right" @click="_checkServiceDetail()">服务须知</el-button>
-        
+
       </div>
-      
+
       <div style="margin-top:10px">
-        <el-table
-          border
-          :data="lanjuData"
-          style="width: 100%"
-          class="table_1"
-        >
-          <el-table-column
-            prop="ID"
-            label="单据号"
-            align="center"
-            width="150px"
-          ></el-table-column>
-          <el-table-column  label="提交时间" align="center" width="130px">
+        <el-table border :data="lanjuData" style="width: 100%" class="table_1">
+          <el-table-column prop="ID" label="单据号" align="center" width="150px"></el-table-column>
+          <el-table-column label="提交时间" align="center" width="130px">
             <template slot-scope="scope">
               <span>{{ scope.row.SUBMIT_DATE | datatrans }}</span>
             </template>
           </el-table-column>
-          <el-table-column
-            prop="DISTRIBUTOR_NAME"
-            label="经销商"
-            align="center"
-            width="130px"
-          ></el-table-column>
-          <el-table-column
-            prop="CUSTOMER_AGENT"
-            label="联系人"
-            align="center"
-            width="120px"
-          ></el-table-column>
-          <el-table-column
-            prop="MANAGER"
-            label="主管业务经理"
-            align="center"
-            width="120px"
-          ></el-table-column>
-          <el-table-column
-            prop="SOLUTION_NAME"
-            label="方案名称"
-            align="center"
-          ></el-table-column>
+          <el-table-column prop="DISTRIBUTOR_NAME" label="经销商" align="center" width="130px"></el-table-column>
+          <el-table-column prop="CUSTOMER_AGENT" label="联系人" align="center" width="120px"></el-table-column>
+          <el-table-column prop="MANAGER" label="主管业务经理" align="center" width="120px"></el-table-column>
+          <el-table-column prop="SOLUTION_NAME" label="方案名称" align="center"></el-table-column>
           <el-table-column label="状态" align="center" width="150px">
             <template slot-scope="scope">
               <span>{{ scope.row.STATUS | transStatus }}</span>
             </template>
           </el-table-column>
           <el-table-column align="center" label="操作" width="100px">
-            <template slot-scope="scope" >
-              <el-button
-                @click="_EditDetail(scope.row)"
-                type="primary"
-                size="mini"
-                icon="el-icon-edit"
-                circle
-                v-if="scope.row.STATUS==2||scope.row.STATUS==4||scope.row.STATUS==7"
-              ></el-button>
-              <el-button
-                @click="_CheckDetail(scope.row)"
-                type="warning"
-                size="mini"
-                icon="el-icon-search"
-                style="text-align:center"
-                circle
-                v-if="scope.row.STATUS!=2&&scope.row.STATUS!=4&&scope.row.STATUS!=7"
-              ></el-button>
+            <template slot-scope="scope">
+              <el-button @click="_EditDetail(scope.row)" type="primary" size="mini" icon="el-icon-edit" circle
+                v-if="scope.row.STATUS==2||scope.row.STATUS==4||scope.row.STATUS==7"></el-button>
+              <el-button @click="_CheckDetail(scope.row)" type="warning" size="mini" icon="el-icon-search"
+                style="text-align:center" circle v-if="scope.row.STATUS!=2&&scope.row.STATUS!=4&&scope.row.STATUS!=7">
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
       </div>
 
       <div style="margin:0 25%;margin-top:10px" class="block">
-        <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page.sync="currentPage"
-          :page-sizes="[5, 10, 15, 20]"
-          :page-size="limit"
-          layout="total,sizes, prev, pager, next, jumper"
-          :total="count"
-        ></el-pagination>
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+          :current-page.sync="currentPage" :page-sizes="[5, 10, 15, 20]" :page-size="limit"
+          layout="total,sizes, prev, pager, next, jumper" :total="count"></el-pagination>
       </div>
     </el-card>
 
@@ -140,20 +71,20 @@
             <td style="font-size:20px;height:30px;" colspan="9">需求登记表</td>
           </tr>
 
-           <tr>
-            <td class="grayTD"  colspan="1" :rowspan="this.usedRowspan"  style="width:5%;height:15px" >基本情况</td>
-            <td class="grayTD"  colspan="1" rowspan="1" style="width:13%;height:15px">经销商代码</td>
+          <tr>
+            <td class="grayTD" colspan="1" :rowspan="this.usedRowspan" style="width:5%;height:15px">基本情况</td>
+            <td class="grayTD" colspan="1" rowspan="1" style="width:13%;height:15px">经销商代码</td>
             <td colspan="1" rowspan="1" style="width:11%;height:15px">{{submitForm.DISTRIBUTOR_CODE}}</td>
             <td colspan="1" rowspan="1" class="grayTD" style="width:10%;height:15px">经销商名称</td>
             <td colspan="1" rowspan="1" style="width:14%;height:13px">{{submitForm.DISTRIBUTOR_NAME}}</td>
             <td colspan="1" rowspan="1" class="grayTD" style="width:15%;height:15px">联系人</td>
             <td colspan="1" rowspan="1" style="width:8%;height:10px">{{submitForm.CUSTOMER_AGENT}}</td>
             <td colspan="1" rowspan="1" class="grayTD" style="width:10%;height:15px">联系电话</td>
-            <td colspan="1" rowspan="1" style="width:14%;height:15px">{{submitForm.OFFICE_TEL}}</td> 
+            <td colspan="1" rowspan="1" style="width:14%;height:15px">{{submitForm.OFFICE_TEL}}</td>
           </tr>
 
           <tr>
-            <td class="grayTD"  colspan="1" rowspan="1" style="height:15px">主管业务经理</td>
+            <td class="grayTD" colspan="1" rowspan="1" style="height:15px">主管业务经理</td>
             <td colspan="1" rowspan="1" style="height:15px">{{submitForm.MANAGER}}</td>
             <td colspan="1" rowspan="1" class="grayTD" style="height:15px">联系电话</td>
             <td colspan="1" rowspan="1" style="height:15px">{{submitForm.MANAGER_TEL}}</td>
@@ -162,400 +93,336 @@
           </tr>
 
           <tr>
-            <td class="grayTD"  colspan="1" rowspan="1" style="height:15px">方案名称(楼盘)</td>
+            <td class="grayTD" colspan="1" rowspan="1" style="height:15px">方案名称(楼盘)</td>
             <td colspan="3" rowspan="1" style="height:15px">{{submitForm.SOLUTION_NAME}}</td>
             <td colspan="1" rowspan="1" class="grayTD" style="height:15px">楼盘定位</td>
             <td colspan="3" rowspan="1" style="height:15px">{{submitForm.ESTATE_TYPE|houseTrans}}</td>
           </tr>
 
           <tr>
-            <td class="grayTD"  colspan="1" rowspan="1" style="height:15px">户型编号</td>
-            <td class="grayTD"  colspan="1" rowspan="1" style="height:15px">建筑面积</td>
-            <td class="grayTD"  colspan="2" rowspan="1" style="height:15px">风格：如美式、欧式、中式、地中海、田园、日式、简约、复古、混搭等</td>
-            <td class="grayTD"  colspan="2" rowspan="1" style="height:15px">偏好说明</td>
-            <td class="grayTD"  colspan="2" rowspan="1" style="height:15px">附件</td>
+            <td class="grayTD" colspan="1" rowspan="1" style="height:15px">户型编号</td>
+            <td class="grayTD" colspan="1" rowspan="1" style="height:15px">建筑面积</td>
+            <td class="grayTD" colspan="2" rowspan="1" style="height:15px">风格：如美式、欧式、中式、地中海、田园、日式、简约、复古、混搭等</td>
+            <td class="grayTD" colspan="2" rowspan="1" style="height:15px">偏好说明</td>
+            <td class="grayTD" colspan="2" rowspan="1" style="height:15px">附件</td>
           </tr>
-          
+
           <tr v-for="(item,index) of submitDetailForm" :key="index">
             <td colspan="1" rowspan="1" style="height:30px">{{item.HOUSE_CODE}}</td>
             <td colspan="1" rowspan="1" style="height:30px">{{item.HOUSING_AREA}}</td>
             <td colspan="2" rowspan="1" style="height:30px">{{item.STYLE}}</td>
             <td colspan="2" rowspan="1" style="height:30px">{{item.PREFERENCE_NOTE}}</td>
             <td colspan="2" rowspan="1" style="height:30px">
-              <ul  class="el-upload-list el-upload-list--text" >
-              <li 
-                  v-for="(file, i) in item.fileList"
-                  :key="i"
-                  class="el-upload-list__item is-success"
-                  tabindex="0"
-                >
-                  <a class="el-upload-list__item-name" >
-                    <i class="el-icon-document" ></i>{{ file.name }}
+              <ul class="el-upload-list el-upload-list--text">
+                <li v-for="(file, i) in item.fileList" :key="i" class="el-upload-list__item is-success" tabindex="0">
+                  <a class="el-upload-list__item-name">
+                    <i class="el-icon-document"></i>{{ file.name }}
                   </a>
                   <label style="display:block;position:absolute;top:0px;right:30px;">
                     <a style="cursor:pointer;" @click="downLoad(file.url)">下载附件</a>
                   </label>
-              </li>
+                </li>
               </ul>
             </td>
           </tr>
 
           <tr>
-            <td class="grayTD"  colspan="2" rowspan="1"  style="height:90px" >支付方式</td>
-            <td  colspan="1" rowspan="1"  style="height:90px" >
-                 <div><img src="../../assets/img/payment.png"  alt="付款二维码"  style="width:90%;height:90%;"/></div>
+            <td class="grayTD" colspan="2" rowspan="1" style="height:90px">支付方式</td>
+            <td colspan="1" rowspan="1" style="height:90px">
+              <div><img src="../../assets/img/payment.png" alt="付款二维码" style="width:90%;height:90%;cursor:pointer;"
+                  @click="BigPic=true" /></div>
             </td>
-            <td  colspan="6" rowspan="1"  style="height:90px" >客户上传附件：户型图或平面布局图（需要表示房间名称，如“男儿童房”“女中学生”“老人房”等）、付款凭证（需要备注楼盘名称且图上有交易时间）（图片应为jpg、dwg、pdf等格式,平面图尺寸要表达清晰，消防位等有阻碍设计的地方要标注清楚）</td>
+            <td colspan="6" rowspan="1" style="height:90px">
+              客户上传附件：户型图或平面布局图（需要表示房间名称，如“男儿童房”“女中学生”“老人房”等）、付款凭证（需要备注楼盘名称且图上有交易时间）（图片应为jpg、dwg、pdf等格式,平面图尺寸要表达清晰，消防位等有阻碍设计的地方要标注清楚）
+            </td>
           </tr>
 
           <tr>
-            <td class="grayTD"  colspan="2" rowspan="1"  style="height:30px" >备注</td>
-            <td colspan="7" rowspan="1"  style="height:30px" >{{submitForm.MEMO}}</td>
+            <td class="grayTD" colspan="2" rowspan="1" style="height:30px">备注</td>
+            <td colspan="7" rowspan="1" style="height:30px">{{submitForm.MEMO}}</td>
           </tr>
 
           <tr v-if="submitForm.STATUS==5||submitForm.STATUS==6">
-            <td class="grayTD"  colspan="2" rowspan="1"  style="height:30px" >预计出图日期</td>
-            <td colspan="3" rowspan="1"  style="height:30px" >{{submitForm.EXPECTED_DRAW_DATE|datatrans}}</td>
-            <td class="grayTD"  colspan="2" rowspan="1"  style="height:30px" >设计图附件</td>
+            <td class="grayTD" colspan="2" rowspan="1" style="height:30px">预计出图日期</td>
+            <td colspan="3" rowspan="1" style="height:30px">{{submitForm.EXPECTED_DRAW_DATE|datatrans}}</td>
+            <td class="grayTD" colspan="2" rowspan="1" style="height:30px">设计图附件</td>
             <td colspan="2" rowspan="1" style="height:30px">
-              <ul  class="el-upload-list el-upload-list--text" >
-              <li 
-                  v-for="(file, i) in this.fileListGM"
-                  :key="i"
-                  class="el-upload-list__item is-success"
-                  tabindex="0"
-                >
-                  <a class="el-upload-list__item-name" >
-                    <i class="el-icon-document" ></i>{{ file.name }}
+              <ul class="el-upload-list el-upload-list--text">
+                <li v-for="(file, i) in this.fileListGM" :key="i" class="el-upload-list__item is-success" tabindex="0">
+                  <a class="el-upload-list__item-name">
+                    <i class="el-icon-document"></i>{{ file.name }}
                   </a>
                   <label style="display:block;position:absolute;top:0px;right:30px;">
                     <a style="cursor:pointer;" @click="downLoad(file.url)">下载附件</a>
                   </label>
-              </li>
+                </li>
               </ul>
             </td>
           </tr>
 
         </table>
-      </div> 
+      </div>
 
-  
       <!--编辑区 -->
-      <div v-show="isAdd||isEdit" class="table-c" >
-       <div>
-        <table width="100%" border="0" cellspacing="0" cellpadding="0">
-          <tr class="grayTD">
-            <td style="font-size:20px;height:30px;" colspan="9">需求登记表</td>
-          </tr>
+      <div v-show="isAdd||isEdit" class="table-c">
+        <div>
+          <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tr class="grayTD">
+              <td style="font-size:20px;height:30px;" colspan="9">需求登记表</td>
+            </tr>
 
-           <tr>
-            <td class="grayTD"  colspan="1" :rowspan="this.usedRowspan"  style="width:5%;height:15px" >基本情况</td>
-            <td class="grayTD"  colspan="1" rowspan="1" style="width:13%;height:15px">经销商代码</td>
-            <td colspan="1" rowspan="1" style="width:11%;height:15px">{{submitForm.DISTRIBUTOR_CODE}}</td>
-            <td colspan="1" rowspan="1" class="grayTD" style="width:10%;height:15px">经销商名称</td>
-            <td colspan="1" rowspan="1" style="width:14%;height:13px">{{submitForm.DISTRIBUTOR_NAME}}</td>
-            <td colspan="1" rowspan="1" class="grayTD" style="width:15%;height:15px">联系人</td>
-            <td colspan="1" rowspan="1" style="width:8%;height:10px">{{submitForm.CUSTOMER_AGENT}}</td>
-            <td colspan="1" rowspan="1" class="grayTD" style="width:10%;height:15px">联系电话</td>
-            <td colspan="1" rowspan="1" style="width:14%;height:15px">{{submitForm.OFFICE_TEL}}</td> 
-          </tr>
+            <tr>
+              <td class="grayTD" colspan="1" :rowspan="this.usedRowspan" style="width:5%;height:15px">基本情况</td>
+              <td class="grayTD" colspan="1" rowspan="1" style="width:13%;height:15px">经销商代码</td>
+              <td colspan="1" rowspan="1" style="width:11%;height:15px">{{submitForm.DISTRIBUTOR_CODE}}</td>
+              <td colspan="1" rowspan="1" class="grayTD" style="width:10%;height:15px">经销商名称</td>
+              <td colspan="1" rowspan="1" style="width:14%;height:13px">{{submitForm.DISTRIBUTOR_NAME}}</td>
+              <td colspan="1" rowspan="1" class="grayTD" style="width:15%;height:15px">联系人</td>
+              <td colspan="1" rowspan="1" style="width:8%;height:10px">{{submitForm.CUSTOMER_AGENT}}</td>
+              <td colspan="1" rowspan="1" class="grayTD" style="width:10%;height:15px">联系电话</td>
+              <td colspan="1" rowspan="1" style="width:14%;height:15px">{{submitForm.OFFICE_TEL}}</td>
+            </tr>
 
-          <tr>
-            <td class="grayTD"  colspan="1" rowspan="1" style="height:15px">主管业务经理</td>
-            <td colspan="1" rowspan="1" style="height:15px">
-                  <input
-                  v-model="submitForm.MANAGER"
-                  placeholder="(客户必填)"
-                  clearable
+            <tr>
+              <td class="grayTD" colspan="1" rowspan="1" style="height:15px">主管业务经理</td>
+              <td colspan="1" rowspan="1" style="height:15px">
+                <input v-model="submitForm.MANAGER" placeholder="(客户必填)" clearable class="inputStyle">
+              </td>
+              <td colspan="1" rowspan="1" class="grayTD" style="height:15px">联系电话</td>
+              <td colspan="1" rowspan="1" style="height:15px">
+                <input v-model="submitForm.MANAGER_TEL" placeholder="(客户必填)" clearable class="inputStyle">
+              </td>
+              <td colspan="1" rowspan="1" class="grayTD" style="height:15px">接收二维码邮箱</td>
+              <td colspan="3" rowspan="1" style="height:15px">
+                <input v-model="submitForm.EMAIL" placeholder="(客户必填)" clearable class="inputStyle">
+              </td>
+            </tr>
+
+            <tr>
+              <td class="grayTD" colspan="1" rowspan="1" style="height:15px">方案名称(楼盘)</td>
+              <td colspan="3" rowspan="1" style="height:15px">
+                <input v-model="submitForm.SOLUTION_NAME" placeholder="(客户必填)" clearable class="inputStyle">
+              </td>
+              <td colspan="1" rowspan="1" class="grayTD" style="height:15px">楼盘定位</td>
+              <td colspan="3" rowspan="1" style="height:15px">
+                <div class="selectCard">
+                  <el-select style="height:16px;width:100%;padding:0px 0px 0px 0px;" v-model="submitForm.ESTATE_TYPE"
+                    filterable placeholder="选择楼盘类型">
+                    <el-option v-for="item in typeArray" :key="item.value" :label="item.label" :value="item.value">
+                    </el-option>
+                  </el-select>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="grayTD" colspan="1" rowspan="1" style="height:15px">
+                <template>
+                  <el-button type="primary" size="mini" icon="el-icon-plus" @click="_rowPlus()" circle></el-button>
+                </template>
+                户型编号
+              </td>
+              <td class="grayTD" colspan="1" rowspan="1" style="height:15px">建筑面积</td>
+              <td class="grayTD" colspan="2" rowspan="1" style="height:15px">风格：如美式、欧式、中式、地中海、田园、日式、简约、复古、混搭等</td>
+              <td class="grayTD" colspan="2" rowspan="1" style="height:15px">偏好说明</td>
+              <td class="grayTD" colspan="2" rowspan="1" style="height:15px">附件</td>
+            </tr>
+
+            <tr v-for="(item,index) of submitDetailForm" :key="index">
+              <td colspan="1" rowspan="1" style="height:30px">
+                <span>
+                  <el-button type="danger" size="mini" icon="el-icon-minus" @click="_rowSubtract(index)" v-if="index!=0"
+                    circle></el-button>
+                </span>
+                <input v-model="submitDetailForm[index].HOUSE_CODE" placeholder="" v-if="index==0" clearable
                   class="inputStyle">
-            </td>
-            <td colspan="1" rowspan="1" class="grayTD" style="height:15px">联系电话</td>
-            <td colspan="1" rowspan="1" style="height:15px">
-                  <input
-                  v-model="submitForm.MANAGER_TEL"
-                  placeholder="(客户必填)"
-                  clearable
-                  class="inputStyle">
-            </td>
-            <td colspan="1" rowspan="1" class="grayTD" style="height:15px">接收二维码邮箱</td>
-            <td colspan="3" rowspan="1" style="height:15px">
-                  <input
-                  v-model="submitForm.EMAIL"
-                  placeholder="(客户必填)"
-                  clearable
-                  class="inputStyle"> 
-            </td>
-          </tr>
-
-          <tr>
-            <td class="grayTD"  colspan="1" rowspan="1" style="height:15px">方案名称(楼盘)</td>
-            <td colspan="3" rowspan="1" style="height:15px">
-                  <input
-                  v-model="submitForm.SOLUTION_NAME"
-                  placeholder="(客户必填)"
-                  clearable
-                  class="inputStyle">
-            </td>
-            <td colspan="1" rowspan="1" class="grayTD" style="height:15px">楼盘定位</td>
-            <td colspan="3" rowspan="1" style="height:15px">
-              <div class="selectCard">
-               <el-select
-                style="height:16px;width:100%;padding:0px 0px 0px 0px;"
-                v-model="submitForm.ESTATE_TYPE"
-                filterable
-                placeholder="选择楼盘类型"
-              >
-                <el-option
-                  v-for="item in typeArray"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                >
-                </el-option>
-              </el-select>
-              </div>
-            </td>
-          </tr>
-
-          <tr>
-            <td class="grayTD"  colspan="1" rowspan="1" style="height:15px">
-              <template>
-                <el-button 
-                 type="primary" 
-                 size="mini" 
-                 icon="el-icon-plus" 
-                 @click="_rowPlus()"
-                 circle></el-button>
-              </template>
-              户型编号
-            </td>
-            <td class="grayTD"  colspan="1" rowspan="1" style="height:15px">建筑面积</td>
-            <td class="grayTD"  colspan="2" rowspan="1" style="height:15px">风格：如美式、欧式、中式、地中海、田园、日式、简约、复古、混搭等</td>
-            <td class="grayTD"  colspan="2" rowspan="1" style="height:15px">偏好说明</td>
-            <td class="grayTD"  colspan="2" rowspan="1" style="height:15px">附件</td>
-          </tr>
-
-          <tr v-for="(item,index) of submitDetailForm" :key="index">
-            <td colspan="1" rowspan="1" style="height:30px">
-                  <span>
-                    <el-button 
-                     type="danger" 
-                     size="mini" 
-                     icon="el-icon-minus" 
-                     @click="_rowSubtract(index)"
-                     v-if="index!=0"
-                     circle></el-button>
-                  </span>
-                  <input
-                  v-model="submitDetailForm[index].HOUSE_CODE"
-                  placeholder=""
-                  v-if="index==0"
-                  clearable 
-                  class="inputStyle"
-                  >
-                  <input
-                  v-model="submitDetailForm[index].HOUSE_CODE"
-                  placeholder=""
-                  v-if="index!=0"
-                  clearable 
-                  class="inputStyleNew"
-                  >
-            </td>
-            <td colspan="1" rowspan="1" style="height:30px">
-                  <input
-                  v-model="submitDetailForm[index].HOUSING_AREA"
-                  placeholder=""
-                  clearable
-                  class="inputStyle"
+                <input v-model="submitDetailForm[index].HOUSE_CODE" placeholder="" v-if="index!=0" clearable
+                  class="inputStyleNew">
+              </td>
+              <td colspan="1" rowspan="1" style="height:30px">
+                <input v-model="submitDetailForm[index].HOUSING_AREA" placeholder="" clearable class="inputStyle"
                   oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
-                           .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"
-                  >
-            </td>
-            <td colspan="2" rowspan="1" style="height:30px">
-                  <input
-                  v-model="submitDetailForm[index].STYLE"
-                  placeholder="(客户必填)"
-                  clearable
-                  class="inputStyle">
-            </td>
-            <td colspan="2" rowspan="1" style="height:30px">                 
-               <input
-                  v-model="submitDetailForm[index].PREFERENCE_NOTE"
-                  placeholder=""
-                  clearable
-                  class="inputStyle">
-            </td>
-            <td colspan="2" rowspan="1" style="height:30px">
+                           .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)">
+              </td>
+              <td colspan="2" rowspan="1" style="height:30px">
+                <input v-model="submitDetailForm[index].STYLE" placeholder="(客户必填)" clearable class="inputStyle">
+              </td>
+              <td colspan="2" rowspan="1" style="height:30px">
+                <input v-model="submitDetailForm[index].PREFERENCE_NOTE" placeholder="" clearable class="inputStyle">
+              </td>
+              <td colspan="2" rowspan="1" style="height:30px">
                 <div>
-                <el-upload
-                class="upload-de"
-                :action="Global.baseUrl + '/Lanju/UploadFiles'"
-                drag
-                multiple
-                :on-change="function(file,fileList){return  handleChange(file,fileList,index)}"
-                :on-remove="function(file,fileList){return  handleRemove(file,fileList,index)}"
-                :on-success="function(res,file,fileList){return  handleSuccess(res,file,fileList,index)}"
-                ref="upload"
-                :auto-upload="false"
-                :file-list="submitDetailForm[index].fileList"
-                :data="{ CID: CID, dateStamp: dateStamp }"
-              >
-                <i
-                  class="el-icon-upload2"
-                  style="margin-top:8px;"
-                >
-                <span style="font-size:15px;">上传附件</span>
-                </i>
-              </el-upload>
-              </div>
-            </td>
-          </tr>
-          
-          <tr>
-            <td class="grayTD"  colspan="2" rowspan="1"  style="height:90px" >支付方式</td>
-            <td  colspan="1" rowspan="1"  style="height:120px" >
-                 <div><img src="../../assets/img/payment.png"  alt="付款二维码"  style="width:90%;height:90%;"/></div>
-            </td>
-            <td  colspan="6" rowspan="1"  style="height:90px" >客户上传附件：户型图或平面布局图（需要表示房间名称，如“男儿童房”“女中学生”“老人房”等）、付款凭证（需要备注楼盘名称且图上有交易时间）（图片应为jpg、dwg、pdf等格式,平面图尺寸要表达清晰，消防位等有阻碍设计的地方要标注清楚）</td>
-          </tr>
+                  <el-upload class="upload-de" :action="Global.baseUrl + '/Lanju/UploadFiles'" drag multiple
+                    :on-change="function(file,fileList){return  handleChange(file,fileList,index)}"
+                    :on-remove="function(file,fileList){return  handleRemove(file,fileList,index)}"
+                    :on-success="function(res,file,fileList){return  handleSuccess(res,file,fileList,index)}"
+                    ref="upload" :auto-upload="false" :file-list="submitDetailForm[index].fileList"
+                    :data="{ CID: CID, dateStamp: dateStamp }">
+                    <i class="el-icon-upload2" style="margin-top:8px;">
+                      <span style="font-size:15px;">上传附件</span>
+                    </i>
+                  </el-upload>
+                </div>
+              </td>
+            </tr>
 
-          <tr>
-            <td class="grayTD"  colspan="2" rowspan="1"  style="height:30px" >备注</td>
-            <td colspan="7" rowspan="1"  style="height:30px" >
-                  <input
-                  v-model="submitForm.MEMO"
-                  placeholder=""
-                  clearable
-                  class="inputStyle">
-            </td>
-          </tr>
+            <tr>
+              <td class="grayTD" colspan="2" rowspan="1" style="height:90px">支付方式</td>
+              <td colspan="1" rowspan="1" style="height:120px">
+                <div><img src="../../assets/img/payment.png" alt="付款二维码" style="width:90%;height:90%;cursor:pointer;"
+                    @click="BigPic=true" /></div>
+              </td>
+              <td colspan="6" rowspan="1" style="height:90px">
+                客户上传附件：户型图或平面布局图（需要表示房间名称，如“男儿童房”“女中学生”“老人房”等）、付款凭证（需要备注楼盘名称且图上有交易时间）（图片应为jpg、dwg、pdf等格式,平面图尺寸要表达清晰，消防位等有阻碍设计的地方要标注清楚）
+              </td>
+            </tr>
 
-        </table>
-       </div>
+            <tr>
+              <td class="grayTD" colspan="2" rowspan="1" style="height:30px">备注</td>
+              <td colspan="7" rowspan="1" style="height:30px">
+                <input v-model="submitForm.MEMO" placeholder="" clearable class="inputStyle">
+              </td>
+            </tr>
 
-        <div style="text-align:center;margin-top:10px">           
+          </table>
+        </div>
+
+        <div style="text-align:center;margin-top:10px">
           <el-button type="warning" @click="_checkServiceDetail()">服务须知</el-button>
-          <el-button type="success"  v-if="this.submitForm.STATUS==1" @click="_addSubmit()">提 交</el-button>  
-          <el-button type="success"  v-if="this.submitForm.STATUS!=1"  @click="_editSubmit()">确定</el-button>  
-        </div>    
+          <el-button type="success" v-if="this.submitForm.STATUS==1" @click="_addSubmit()">提 交</el-button>
+          <el-button type="success" v-if="this.submitForm.STATUS!=1" @click="_editSubmit()">确定</el-button>
+        </div>
 
       </div>
 
       <div v-show="isCheck" style="margin-top:5px;font-weight:bold;">
         <table width="100%" border="0px" cellspacing="0px" cellpadding="0">
-           <tr >
-             <td style="width:12%">提交时间：</td>
-             <td style="width:20%;">{{ submitForm.SUBMIT_DATE| datatransDetail }}</td>
-             <td style="width:12%">单据状态：</td>
-             <td v-if="submitForm.STATUS==3||submitForm.STATUS==5||submitForm.STATUS==6||submitForm.STATUS==8" style="width:30%;color:green;">{{ submitForm.STATUS| transStatus }}</td>
-             <td v-if="submitForm.STATUS==2||submitForm.STATUS==4||submitForm.STATUS==7" style="width:30%;color:red;">{{ submitForm.STATUS| transStatus  }}</td>
-             <td v-if="submitForm.STATUS==1" style="width:30%;">{{submitForm.STATUS| transStatus }}</td>
-             <td style="width:8%;"></td>
-             <td style="width:8%;"></td>
+          <tr>
+            <td style="width:12%">提交时间：</td>
+            <td style="width:20%;">{{ submitForm.SUBMIT_DATE| datatransDetail }}</td>
+            <td style="width:12%">单据状态：</td>
+            <td v-if="submitForm.STATUS==3||submitForm.STATUS==5||submitForm.STATUS==6||submitForm.STATUS==8"
+              style="width:30%;color:green;">{{ submitForm.STATUS| transStatus }}</td>
+            <td v-if="submitForm.STATUS==2||submitForm.STATUS==4||submitForm.STATUS==7" style="width:30%;color:red;">
+              {{ submitForm.STATUS| transStatus  }}</td>
+            <td v-if="submitForm.STATUS==1" style="width:30%;">{{submitForm.STATUS| transStatus }}</td>
+            <td style="width:8%;"></td>
+            <td style="width:8%;"></td>
           </tr>
-          <tr >
-             <td style="width:12%"  v-if="submitForm.STATUS!=1&&submitForm.STATUS!=2&&submitForm.STATUS!=4&&submitForm.STATUS!=7">市场部审核时间：</td>
-             <td style="width:20%;" v-if="submitForm.STATUS!=1&&submitForm.STATUS!=2&&submitForm.STATUS!=4&&submitForm.STATUS!=7">{{ submitForm.AUDIT_TIME| datatransDetail }}</td>
-             <td style="width:12%"  v-if="submitForm.STATUS==8||submitForm.STATUS==4||submitForm.STATUS==5||submitForm.STATUS==6">财务审核时间：</td>
-             <td style="width:30%;" v-if="submitForm.STATUS==8||submitForm.STATUS==4||submitForm.STATUS==5||submitForm.STATUS==6">{{ submitForm.FINANCE_AUDIT_TIME| datatransDetail}}</td>
-             <td style="width:8%;"></td>
-             <td style="width:8%;"></td>
+          <tr>
+            <td style="width:12%"
+              v-if="submitForm.STATUS!=1&&submitForm.STATUS!=2&&submitForm.STATUS!=4&&submitForm.STATUS!=7">市场部审核时间：
+            </td>
+            <td style="width:20%;"
+              v-if="submitForm.STATUS!=1&&submitForm.STATUS!=2&&submitForm.STATUS!=4&&submitForm.STATUS!=7">
+              {{ submitForm.AUDIT_TIME| datatransDetail }}</td>
+            <td style="width:12%"
+              v-if="submitForm.STATUS==8||submitForm.STATUS==4||submitForm.STATUS==5||submitForm.STATUS==6">财务审核时间：</td>
+            <td style="width:30%;"
+              v-if="submitForm.STATUS==8||submitForm.STATUS==4||submitForm.STATUS==5||submitForm.STATUS==6">
+              {{ submitForm.FINANCE_AUDIT_TIME| datatransDetail}}</td>
+            <td style="width:8%;"></td>
+            <td style="width:8%;"></td>
           </tr>
-          <tr >
-             <td style="width:12%"  v-if="submitForm.STATUS==5||submitForm.STATUS==6">广美审核时间：</td>
-             <td style="width:20%;" v-if="submitForm.STATUS==5||submitForm.STATUS==6">{{ submitForm.CHECK_TIME| datatransDetail}}</td>
-             <td style="width:12%" ></td>
-             <td style="width:30%;"></td>
-             <td style="width:8%;"></td>
-             <td style="width:8%;"></td>
+          <tr>
+            <td style="width:12%" v-if="submitForm.STATUS==5||submitForm.STATUS==6">广美审核时间：</td>
+            <td style="width:20%;" v-if="submitForm.STATUS==5||submitForm.STATUS==6">
+              {{ submitForm.CHECK_TIME| datatransDetail}}</td>
+            <td style="width:12%"></td>
+            <td style="width:30%;"></td>
+            <td style="width:8%;"></td>
+            <td style="width:8%;"></td>
           </tr>
-        </table> 
-      </div>  
+        </table>
+      </div>
     </el-dialog>
 
     <el-dialog title="玉兰墙纸·兰居软装设计服务内容须知" :visible.sync="ServiceDetail" :close-on-click-modal="false" width="72%">
       <div class="table-c">
         <table width="100%" border="0px" cellspacing="0px" cellpadding="0">
-            <tr>
-               <td class="grayTD" style="font-size:20px;height:30px;" colspan="5">服务内容须知</td>
-            </tr>
+          <tr>
+            <td class="grayTD" style="font-size:20px;height:30px;" colspan="5">服务内容须知</td>
+          </tr>
 
-            <tr>
-                <td  class="grayTD" colspan="1" rowspan="1"  style="width:20%;height:190px" >收费标准</td>
-                <td  colspan="4" rowspan="1" style="width:80%;height:190px;font-size:15px;text-align:left">
-                  &nbsp;1.普通户型：<br/>
-                  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; 3室2厅（客餐厅）内 100元/次/风格<br/>
-                  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; 4-5室2厅 200元/次/风格<br/>
-                  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; 每加2房间加收100，如此类推（特殊户型可先询问李工）<br/>
-                  &nbsp;2.复式/别墅/独栋自建房:<br/>
-                  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; 1层：100元/次/风格<br/>
-                  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; 2层：200元/次/风格<br/>
-                  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; 3层：300元/次/风格<br/>
-                  &nbsp;3.注：可免费调整一次，第2次起按50元/次/层收取修改费用；换户型/改风格等请重新申请。
-                </td>
-            </tr>
+          <tr>
+            <td class="grayTD" colspan="1" rowspan="1" style="width:20%;height:190px">收费标准</td>
+            <td colspan="4" rowspan="1" style="width:80%;height:190px;font-size:15px;text-align:left">
+              &nbsp;1.普通户型：<br />
+              &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; 3室2厅（客餐厅）内 100元/次/风格<br />
+              &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; 4-5室2厅 200元/次/风格<br />
+              &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; 每加2房间加收100，如此类推（特殊户型可先询问李工）<br />
+              &nbsp;2.复式/别墅/独栋自建房:<br />
+              &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; 1层：100元/次/风格<br />
+              &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; 2层：200元/次/风格<br />
+              &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; 3层：300元/次/风格<br />
+              &nbsp;3.注：可免费调整一次，第2次起按50元/次/层收取修改费用；换户型/改风格等请重新申请。
+            </td>
+          </tr>
 
-            <tr>
-                <td  class="grayTD" colspan="1" rowspan="1"  style="width:20%;height:32px" >方案有效期</td>
-                <td  colspan="4" rowspan="1" style="width:80%;height:32px;font-size:15px;text-align:left">
-                  &nbsp;方案有效期默认是永久有效，如有特殊需求，请在备注上说明有效期，有效期失效后可免费重新启动一次。<br/>
-                </td>
-            </tr>
+          <tr>
+            <td class="grayTD" colspan="1" rowspan="1" style="width:20%;height:32px">方案有效期</td>
+            <td colspan="4" rowspan="1" style="width:80%;height:32px;font-size:15px;text-align:left">
+              &nbsp;方案有效期默认是永久有效，如有特殊需求，请在备注上说明有效期，有效期失效后可免费重新启动一次。<br />
+            </td>
+          </tr>
 
-            <tr>
-                <td  class="grayTD" colspan="1" rowspan="1"  style="width:20%;height:110px" >出图标准</td>
-                <td  colspan="4" rowspan="1" style="width:80%;height:110px;font-size:15px;text-align:left">
-                   &nbsp;1.以墙纸窗帘搭配效果为主导进行搭配效果出图（不与家装效果相比）;<br/>     
-                   &nbsp;2.单个空间没有使用墙纸或墙纸面积过少的不出图，厨房（含开放式）、卫生间等非墙纸区域不在出图范围 ;<br/>                                                      
-                   &nbsp;3.墙面背景墙等有造型的根据风格搭配（不作精准绘制）； <br/>                                    
-                   &nbsp;4.吊顶按照要求可做大轮廓与风格相符合的简吊（不作精准绘制）；<br/> 
-                   &nbsp;5.全屋漫游高清图：提供二维码扫描（修改后第一次的方案将失效）；<br/> 
-                </td>
-            </tr>
+          <tr>
+            <td class="grayTD" colspan="1" rowspan="1" style="width:20%;height:110px">出图标准</td>
+            <td colspan="4" rowspan="1" style="width:80%;height:110px;font-size:15px;text-align:left">
+              &nbsp;1.以墙纸窗帘搭配效果为主导进行搭配效果出图（不与家装效果相比）;<br />
+              &nbsp;2.单个空间没有使用墙纸或墙纸面积过少的不出图，厨房（含开放式）、卫生间等非墙纸区域不在出图范围 ;<br />
+              &nbsp;3.墙面背景墙等有造型的根据风格搭配（不作精准绘制）； <br />
+              &nbsp;4.吊顶按照要求可做大轮廓与风格相符合的简吊（不作精准绘制）；<br />
+              &nbsp;5.全屋漫游高清图：提供二维码扫描（修改后第一次的方案将失效）；<br />
+            </td>
+          </tr>
 
-            <tr>
-                <td class="grayTD" colspan="1" rowspan="1"  style="width:20%;height:32px" >平面图说明</td>
-                <td colspan="4" rowspan="1" style="width:80%;height:32px;font-size:15px;text-align:left">
-                  &nbsp;酷家乐户型数据库中（有对应户型图的请拍照或截图，无对应户型图的请发平面图或手绘平面图标上尺度）<br/>
-                </td>
-            </tr>
+          <tr>
+            <td class="grayTD" colspan="1" rowspan="1" style="width:20%;height:32px">平面图说明</td>
+            <td colspan="4" rowspan="1" style="width:80%;height:32px;font-size:15px;text-align:left">
+              &nbsp;酷家乐户型数据库中（有对应户型图的请拍照或截图，无对应户型图的请发平面图或手绘平面图标上尺度）<br />
+            </td>
+          </tr>
 
-            <tr>
-                <td class="grayTD" colspan="1" rowspan="1"  style="width:20%;height:32px" >设计周期</td>
-                <td colspan="4" rowspan="1" style="width:80%;height:32px;font-size:15px;text-align:left">
-                  &nbsp;确认收到客户设计款后方可展开设计（5-10个工作日）<br/>
-                </td>
-            </tr>
+          <tr>
+            <td class="grayTD" colspan="1" rowspan="1" style="width:20%;height:32px">设计周期</td>
+            <td colspan="4" rowspan="1" style="width:80%;height:32px;font-size:15px;text-align:left">
+              &nbsp;确认收到客户设计款后方可展开设计（5-10个工作日）<br />
+            </td>
+          </tr>
 
-            <tr>
-                <td class="grayTD" colspan="1" rowspan="1"  style="width:20%;height:50px" >联系方式</td>
-                <td colspan="4" rowspan="1" style="width:80%;height:50px;font-size:15px;text-align:left">
-                  &nbsp;1.兰居联系电话：0769-22677213；传真：0769-22677282。<br/>
-                  &nbsp;2.广美玉兰研究院设计对接人：李工，联系电话：18011989112;020-34263100;QQ：2388946615。<br/>
-                </td>
-            </tr>
+          <tr>
+            <td class="grayTD" colspan="1" rowspan="1" style="width:20%;height:50px">联系方式</td>
+            <td colspan="4" rowspan="1" style="width:80%;height:50px;font-size:15px;text-align:left">
+              &nbsp;1.兰居联系电话：0769-22677213；传真：0769-22677282。<br />
+              &nbsp;2.广美玉兰研究院设计对接人：李工，联系电话：18011989112;020-34263100;QQ：2388946615。<br />
+            </td>
+          </tr>
 
         </table>
-      </div> 
+      </div>
     </el-dialog>
 
+    <el-dialog width="500px" :visible.sync="BigPic">
+      <div>
+        <img style="width:450px;height:450px;" src="../../assets/img/payment.png" />
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { 
+import {
   GetAllData,
   CheckDetailByID,
   addSubmit,
   editByCustomer,
   GetInitialInfo
- } from "@/api/lanju";
-import {
-  UploadFiles,
-} from "@/api/imageStoreASP";
+} from "@/api/lanju";
+import { UploadFiles } from "@/api/imageStoreASP";
 import { downLoadFile } from "@/common/js/downLoadFile";
 import { mapMutations } from "vuex";
 import Cookies from "js-cookie";
@@ -569,8 +436,8 @@ export default {
       dateStamp: "",
       fileChange: false,
       deleteFile: [],
-      subtractDeleteFile:[],//点击减号准备删除明细，预删除的文件集合
-      deleteIndex:[],//删除文件对应的明细的索引
+      subtractDeleteFile: [], //点击减号准备删除明细，预删除的文件集合
+      deleteIndex: [], //删除文件对应的明细的索引
       btnDisable: false,
       companyId: "",
       CID: Cookies.get("cid"), //客户账号
@@ -579,20 +446,20 @@ export default {
       finishTime: "", //查询的结束时间
       SEARCHKEY: "", //搜索栏关键字
       SELECT_STATUS: 2, //存储下拉框的值
-      rowPlus:0,//兰居软装设计需求表中的户型编辑项添加数
+      rowPlus: 0, //兰居软装设计需求表中的户型编辑项添加数
       isAdd: false, //新增记录
       isEdit: false, //编辑记录
       isCheck: false, //查看记录
-      initRowspan:5,//基本信息中的初始行数
-      usedRowspan:5,//基本信息中的行数
-      fileListGM:[],//广美上传的文件集合
-      successCount:0,
-      allCount:0,
-      ServiceDetail:false,
+      initRowspan: 5, //基本信息中的初始行数
+      usedRowspan: 5, //基本信息中的行数
+      fileListGM: [], //广美上传的文件集合
+      successCount: 0,
+      allCount: 0,
+      ServiceDetail: false,
       lanjuDetail: false,
       limit: 10,
       count: 0,
-      detailCount:0,//新增户型记录数
+      detailCount: 0, //新增户型记录数
       currentPage: 1,
       statusArray: [
         {
@@ -622,7 +489,7 @@ export default {
         {
           label: "已完成设计图",
           value: 6
-        },
+        }
       ],
       typeArray: [
         {
@@ -632,11 +499,12 @@ export default {
         {
           label: "豪宅",
           value: 2
-        },
+        }
       ],
       lanjuData: [],
-      submitForm:[],//提交的表头信息
-      submitDetailForm:[], //提交的明细信息
+      submitForm: [], //提交的表头信息
+      submitDetailForm: [], //提交的明细信息
+      BigPic: false
     };
   },
   created: function() {
@@ -723,14 +591,14 @@ export default {
           return "惊喜";
       }
     },
-    houseTrans(value){
+    houseTrans(value) {
       switch (value) {
-        case  1:
+        case 1:
           return "简装";
-        case  2:
+        case 2:
           return "豪宅";
       }
-    },
+    }
   },
   methods: {
     //模糊搜索
@@ -780,68 +648,72 @@ export default {
       this.isEdit = false;
       this.isCheck = false;
       this.lanjuDetail = true;
-      this.successCount=0;
-      this.allCount=0;
+      this.successCount = 0;
+      this.allCount = 0;
       this.submitDetailForm = [];
       this.subtractDeleteFile = [];
       this.submitForm = [];
-      this.fileListGM=[];
+      this.fileListGM = [];
       this.dateStamp = new Date().getTime();
-      this.CID=Cookies.get("cid");
-      this.submitForm = {
-        ID: "", 
-        DISTRIBUTOR_CODE:"",
-        DISTRIBUTOR_NAME: "", 
-        CONTACTS: "", 
-        CONTACTS_TEL: "", 
-        MANAGER: "", 
-        MANAGER_TEL: "", 
-        EMAIL: "", 
-        SOLUTION_NAME:"",
-        ESTATE_TYPE:"",
-        PAY_NOTE:"",
+      this.CID = Cookies.get("cid");
+      (this.submitForm = {
+        ID: "",
+        DISTRIBUTOR_CODE: "",
+        DISTRIBUTOR_NAME: "",
+        CONTACTS: "",
+        CONTACTS_TEL: "",
+        MANAGER: "",
+        MANAGER_TEL: "",
+        EMAIL: "",
+        SOLUTION_NAME: "",
+        ESTATE_TYPE: "",
+        PAY_NOTE: "",
         PAY_DETAIL: "",
-        MEMO:"",
-        EXPECTED_DRAW_DATE:"",
-        SUBMIT_DATE:"",
-        STATUS:1,
-        USER_CODE:"",
-        USER_NAME: "", 
-      },
-      this.submitDetailForm=[{
-        ID: "", 
-        HOUSE_CODE:"",
-        HOUSING_AREA: "", 
-        STYLE: "", 
-        PREFERENCE_NOTE: "", 
-        PREFERENCE_URL: "", 
-        DESIGN_ID: "", 
-        ATTACHMENT_FILE: "",
-        ATTACHMENT_FILE_FOLDER:"",
-        fileList:[],
-        rowNumber:this.initRowspan,
-        }],
-      this.submitForm.USER_CODE = Cookies.get("cid");   
-      this.submitForm.USER_NAME = Cookies.get("realName");   
+        MEMO: "",
+        EXPECTED_DRAW_DATE: "",
+        SUBMIT_DATE: "",
+        STATUS: 1,
+        USER_CODE: "",
+        USER_NAME: ""
+      }),
+        (this.submitDetailForm = [
+          {
+            ID: "",
+            HOUSE_CODE: "",
+            HOUSING_AREA: "",
+            STYLE: "",
+            PREFERENCE_NOTE: "",
+            PREFERENCE_URL: "",
+            DESIGN_ID: "",
+            ATTACHMENT_FILE: "",
+            ATTACHMENT_FILE_FOLDER: "",
+            fileList: [],
+            rowNumber: this.initRowspan
+          }
+        ]),
+        (this.submitForm.USER_CODE = Cookies.get("cid"));
+      this.submitForm.USER_NAME = Cookies.get("realName");
       // this.submitForm.DISTRIBUTOR_CODE = Cookies.get("companyId");   //经销商（公司）的编码和名字不同于账号的编码和名字；
-      this.submitForm.DISTRIBUTOR_CODE = Cookies.get("customerMainId");  
-      this.usedRowspan=this.initRowspan;
-      GetInitialInfo({customerMainId:this.submitForm.DISTRIBUTOR_CODE}).then(res => {
-        if (res.count > 0) {
-          this.submitForm.CUSTOMER_AGENT = res.data[0].CUSTOMER_AGENT;
-          this.submitForm.OFFICE_TEL= res.data[0].OFFICE_TEL;
-          this.submitForm.DISTRIBUTOR_NAME= res.data[0].CUSTOMER_NAME;
+      this.submitForm.DISTRIBUTOR_CODE = Cookies.get("customerMainId");
+      this.usedRowspan = this.initRowspan;
+      GetInitialInfo({ customerMainId: this.submitForm.DISTRIBUTOR_CODE }).then(
+        res => {
+          if (res.count > 0) {
+            this.submitForm.CUSTOMER_AGENT = res.data[0].CUSTOMER_AGENT;
+            this.submitForm.OFFICE_TEL = res.data[0].OFFICE_TEL;
+            this.submitForm.DISTRIBUTOR_NAME = res.data[0].CUSTOMER_NAME;
+          }
         }
-      });
+      );
     },
     //新增记录提交
     _addSubmit() {
       //判断是否填完所有信息
       if (
         this.submitForm.MANAGER == "" ||
-        this.submitForm.MANAGER_TEL == ""||
-        this.submitForm.EMAIL == ""||
-        this.submitForm.SOLUTION_NAME == ""||
+        this.submitForm.MANAGER_TEL == "" ||
+        this.submitForm.EMAIL == "" ||
+        this.submitForm.SOLUTION_NAME == "" ||
         this.submitForm.ESTATE_TYPE == ""
       ) {
         this.$alert("请完善单据信息", "提示", {
@@ -850,53 +722,53 @@ export default {
         });
         return;
       }
-      var flag=0;
+      var flag = 0;
       //判断户型信息是否填写完整
       for (let i = 0; i < this.submitDetailForm.length; i++) {
-          if(this.submitDetailForm[i].STYLE == "")
-          {
-              this.$alert("请完善户型信息（如风格、偏好等信息）", "提示", {
-                 confirmButtonText: "确定",
-                 type: "warning"
-               });
-              return;
-          }
-          if(this.submitDetailForm[i].fileList.length == 0)
-          {
-              flag+=1;
-          }
+        if (this.submitDetailForm[i].STYLE == "") {
+          this.$alert("请完善户型信息（如风格、偏好等信息）", "提示", {
+            confirmButtonText: "确定",
+            type: "warning"
+          });
+          return;
+        }
+        if (this.submitDetailForm[i].fileList.length == 0) {
+          flag += 1;
+        }
       }
-      if(flag==this.submitDetailForm.length)
-      {
-          addSubmit({model:this.submitForm,detailModels:this.submitDetailForm}).then(res => {
-            if (res.code == 0) {
-              this.$alert("提交成功", "提示", {
+      if (flag == this.submitDetailForm.length) {
+        addSubmit({
+          model: this.submitForm,
+          detailModels: this.submitDetailForm
+        }).then(res => {
+          if (res.code == 0) {
+            this.$alert("提交成功", "提示", {
               confirmButtonText: "确定",
               type: "success"
             });
             this.currentPage = 1;
-            this.usedRowspan=5;
+            this.usedRowspan = 5;
             this.refresh();
             this.lanjuDetail = false;
             return;
-            } else {
-              this.$alert("提交失败，请稍后重试", "提示", {
+          } else {
+            this.$alert("提交失败，请稍后重试", "提示", {
               confirmButtonText: "确定",
               type: "warning"
             });
             return;
-            }
-          });
+          }
+        });
       }
       for (let i = 0; i < this.submitDetailForm.length; i++) {
-         this.$refs.upload[i].submit();
+        this.$refs.upload[i].submit();
       }
     },
     //查看列表详情
     _CheckDetail(val) {
       this.submitDetailForm = [];
       this.submitForm = val;
-      this.fileListGM=[];
+      this.fileListGM = [];
       this.usedRowspan = this.initRowspan;
       let data = {
         DESIGN_ID: val.ID
@@ -907,7 +779,7 @@ export default {
           this.submitDetailForm = res.data;
           this.detailCount = res.count;
           this.submitForm.CUSTOMER_AGENT = this.submitDetailForm[0].CUSTOMER_AGENT;
-          this.submitForm.OFFICE_TEL= this.submitDetailForm[0].OFFICE_TEL;
+          this.submitForm.OFFICE_TEL = this.submitDetailForm[0].OFFICE_TEL;
         }
         for (let j = 0; j < this.submitDetailForm.length; j++) {
           var list = this.submitDetailForm[j].ATTACHMENT_FILE.split(";");
@@ -923,12 +795,12 @@ export default {
         }
         var listGM = this.submitForm.GM_FILE.split(";");
         for (var i = 0; i < listGM.length - 1; i++) {
-        var index = listGM[i].lastIndexOf("/");
-        var fileName = listGM[i].substr(index + 1);
-        this.fileListGM.push({
-          name: fileName,
-          url: list[i]
-        });
+          var index = listGM[i].lastIndexOf("/");
+          var fileName = listGM[i].substr(index + 1);
+          this.fileListGM.push({
+            name: fileName,
+            url: list[i]
+          });
         }
         this.usedRowspan = this.initRowspan + this.detailCount - 1;
         console.log(this.usedRowspan);
@@ -945,47 +817,47 @@ export default {
       this.deleteFile = [];
       this.subtractDeleteFile = [];
       this.deleteIndex = [];
-      this.usedRowspan=this.initRowspan;
+      this.usedRowspan = this.initRowspan;
       let data = {
         DESIGN_ID: val.ID
       };
       this.CNAME = Cookies.get("realName");
       CheckDetailByID(data).then(res => {
-          if (res.count > 0) {
-            this.submitDetailForm = res.data;
-            this.detailCount=res.count;
-            this.submitForm.CUSTOMER_AGENT = this.submitDetailForm[0].CUSTOMER_AGENT;
-            this.submitForm.OFFICE_TEL= this.submitDetailForm[0].OFFICE_TEL;
-          }
-          //将数据库里文件路径集合数据拆解，拆分成可以访问的路径
-          for (let j = 0; j < this.submitDetailForm.length; j++) {
-          this.submitDetailForm[j].rowNumber=this.initRowspan+j;
+        if (res.count > 0) {
+          this.submitDetailForm = res.data;
+          this.detailCount = res.count;
+          this.submitForm.CUSTOMER_AGENT = this.submitDetailForm[0].CUSTOMER_AGENT;
+          this.submitForm.OFFICE_TEL = this.submitDetailForm[0].OFFICE_TEL;
+        }
+        //将数据库里文件路径集合数据拆解，拆分成可以访问的路径
+        for (let j = 0; j < this.submitDetailForm.length; j++) {
+          this.submitDetailForm[j].rowNumber = this.initRowspan + j;
           var list = this.submitDetailForm[j].ATTACHMENT_FILE.split(";");
-          this.submitDetailForm[j].fileList=[];
+          this.submitDetailForm[j].fileList = [];
           for (var i = 0; i < list.length - 1; i++) {
-          var index = list[i].lastIndexOf("/");
-          var fileName = list[i].substr(index + 1);
-          this.submitDetailForm[j].fileList.push({
-          name: fileName,
-          url: list[i]
-          });
+            var index = list[i].lastIndexOf("/");
+            var fileName = list[i].substr(index + 1);
+            this.submitDetailForm[j].fileList.push({
+              name: fileName,
+              url: list[i]
+            });
           }
-          }
-         this.usedRowspan=this.initRowspan+this.detailCount-1;
-         this.dateStamp = new Date().getTime();
-         this.isAdd = false;
-         this.isEdit = true;
-         this.isCheck = false;
-         this.lanjuDetail = true;
-         });
+        }
+        this.usedRowspan = this.initRowspan + this.detailCount - 1;
+        this.dateStamp = new Date().getTime();
+        this.isAdd = false;
+        this.isEdit = true;
+        this.isCheck = false;
+        this.lanjuDetail = true;
+      });
     },
     //编辑列表详情修改
     _editSubmit() {
       //判断是否填完所有信息
       if (
         this.submitForm.MANAGER == "" ||
-        this.submitForm.MANAGER_TEL == ""||
-        this.submitForm.EMAIL == ""||
+        this.submitForm.MANAGER_TEL == "" ||
+        this.submitForm.EMAIL == "" ||
         this.submitForm.SOLUTION_NAME == ""
       ) {
         this.$alert("请完善单据信息", "提示", {
@@ -996,32 +868,38 @@ export default {
       }
       //点击提交，将预删除的文件传入要删除的文件的数组中
       for (let i = 0; i < this.subtractDeleteFile.length; i++) {
-            this.deleteFile.push(this.subtractDeleteFile[i]);
+        this.deleteFile.push(this.subtractDeleteFile[i]);
       }
       if (this.fileChange) {
         //文件发生改变，重新上传一次(仅选中修改后的文件，而不是所有文件效率会更高)
         for (let i = 0; i < this.submitDetailForm.length; i++) {
-            this.$refs.upload[i].submit();
-            this.submitDetailForm[i].ATTACHMENT_FILE = "";
-            for (let j = 0; j < this.submitDetailForm[i].fileList.length; j++) {
-               this.submitDetailForm[i].ATTACHMENT_FILE +=
-                "/Files/LANJU_STORE/" +
-               this.CID +
-               "/" +
-               this.dateStamp +
-                "/" +
-               this.submitDetailForm[i].fileList[j].name +
-                ";"; 
-              }
+          this.$refs.upload[i].submit();
+          this.submitDetailForm[i].ATTACHMENT_FILE = "";
+          for (let j = 0; j < this.submitDetailForm[i].fileList.length; j++) {
+            this.submitDetailForm[i].ATTACHMENT_FILE +=
+              "/Files/LANJU_STORE/" +
+              this.CID +
+              "/" +
+              this.dateStamp +
+              "/" +
+              this.submitDetailForm[i].fileList[j].name +
+              ";";
+          }
           this.submitDetailForm[i].ATTACHMENT_FILE_FOLDER =
-        "/Files/LANJU_STORE/" + this.CID + "/" + this.dateStamp;
+            "/Files/LANJU_STORE/" + this.CID + "/" + this.dateStamp;
         }
       } else {
         if (this.deleteFile.length > 0) {
           for (let i = 0; i < this.deleteFile.length; i++) {
-            this.submitDetailForm[this.deleteIndex[i]].ATTACHMENT_FILE="";
-            for (var j = 0; j < this.submitDetailForm[this.deleteIndex[i]].fileList.length; j++) {
-                this.submitDetailForm[this.deleteIndex[i]].ATTACHMENT_FILE += this.submitDetailForm[this.deleteIndex[i]].fileList[j].url + ";";
+            this.submitDetailForm[this.deleteIndex[i]].ATTACHMENT_FILE = "";
+            for (
+              var j = 0;
+              j < this.submitDetailForm[this.deleteIndex[i]].fileList.length;
+              j++
+            ) {
+              this.submitDetailForm[this.deleteIndex[i]].ATTACHMENT_FILE +=
+                this.submitDetailForm[this.deleteIndex[i]].fileList[j].url +
+                ";";
             }
           }
         }
@@ -1029,90 +907,90 @@ export default {
       }
     },
     //添加基本信息中的户型编辑项数目
-    _rowPlus(){
-        if(this.usedRowspan>=11)
-        {
+    _rowPlus() {
+      if (this.usedRowspan >= 11) {
         this.$alert("已经达到编辑项的上限", "提示", {
           confirmButtonText: "确定",
           type: "warning"
         });
         return;
-        }
-        else{
+      } else {
         this.submitDetailForm.push({
-        ID: "", 
-        HOUSE_CODE:"",
-        HOUSING_AREA: "", 
-        STYLE: "", 
-        PREFERENCE_NOTE: "", 
-        PREFERENCE_URL: "", 
-        DESIGN_ID: "", 
-        ATTACHMENT_FILE: "",
-        ATTACHMENT_FILE_FOLDER:"",
-        fileList:[],
-        rowNumber:this.usedRowspan+1,
+          ID: "",
+          HOUSE_CODE: "",
+          HOUSING_AREA: "",
+          STYLE: "",
+          PREFERENCE_NOTE: "",
+          PREFERENCE_URL: "",
+          DESIGN_ID: "",
+          ATTACHMENT_FILE: "",
+          ATTACHMENT_FILE_FOLDER: "",
+          fileList: [],
+          rowNumber: this.usedRowspan + 1
         }),
-         this.usedRowspan+=1;
-        }
+          (this.usedRowspan += 1);
+      }
     },
-    _rowSubtract(index){
-        if(this.usedRowspan==5)
-        {
+    _rowSubtract(index) {
+      if (this.usedRowspan == 5) {
         this.$alert("必须至少有一项该类信息", "提示", {
           confirmButtonText: "确定",
           type: "warning"
         });
         return;
-        }
-        else{
-          var flag=false;
-          for (let i = 0; i < this.submitDetailForm.length; i++) {
-            if(this.submitDetailForm[i].rowNumber-5==index)
-            {
-              this.submitDetailForm.splice(index,1);
-              this.usedRowspan-=1;
-              flag=true;
-              //将删除的明细的文件存进预删除数组中
-              for (let j = 0; j < this.submitDetailForm[i].fileList.length; j++) {
-                   this.subtractDeleteFile.push(this.submitDetailForm[i].fileList[j].url);
-              }    
-            }   
-            if(flag)
-            {
-                for (let j = i; j < this.submitDetailForm.length; j++) {
-                  this.submitDetailForm[j].rowNumber-=1;
-                }
-                break;
+      } else {
+        var flag = false;
+        for (let i = 0; i < this.submitDetailForm.length; i++) {
+          if (this.submitDetailForm[i].rowNumber - 5 == index) {
+            this.submitDetailForm.splice(index, 1);
+            this.usedRowspan -= 1;
+            flag = true;
+            //将删除的明细的文件存进预删除数组中
+            for (let j = 0; j < this.submitDetailForm[i].fileList.length; j++) {
+              this.subtractDeleteFile.push(
+                this.submitDetailForm[i].fileList[j].url
+              );
             }
           }
+          if (flag) {
+            for (let j = i; j < this.submitDetailForm.length; j++) {
+              this.submitDetailForm[j].rowNumber -= 1;
+            }
+            break;
+          }
         }
+      }
     },
-    _checkServiceDetail()
-    {
-        this.ServiceDetail=true;
+    _checkServiceDetail() {
+      this.ServiceDetail = true;
     },
-    handleChange(file, fileList,index) {
+    handleChange(file, fileList, index) {
       console.log(index);
       this.submitDetailForm[index].fileList = fileList;
       this.fileChange = true;
     },
-    handleRemove(file, fileList,index) {
+    handleRemove(file, fileList, index) {
       this.submitDetailForm[index].fileList = fileList;
       if ((file.status = "success")) {
         this.deleteFile.push(file.url);
-        this.deleteIndex.push(index)
+        this.deleteIndex.push(index);
       }
     },
-    handleSuccess(res, file, fileList,index) {
-      var flag=true;
+    handleSuccess(res, file, fileList, index) {
+      var flag = true;
       for (let i = 0; i < this.submitDetailForm.length; i++) {
-         if(this.submitDetailForm[i].fileList.filter(item=>item.status == "uploading").length == 0 && this.submitDetailForm[i].fileList.filter(item=>item.status == "success").length == this.submitDetailForm[i].fileList.length)
-         {
-         }   
-         else{
-           flag=false;
-           break;
-         }
+        if (
+          this.submitDetailForm[i].fileList.filter(
+            item => item.status == "uploading"
+          ).length == 0 &&
+          this.submitDetailForm[i].fileList.filter(
+            item => item.status == "success"
+          ).length == this.submitDetailForm[i].fileList.length
+        ) {
+        } else {
+          flag = false;
+          break;
+        }
       }
       if (flag) {
         if (this.isEdit) {
@@ -1124,16 +1002,21 @@ export default {
     },
     submitEDITANSYC() {
       //相当于同步，等提交成功后再执行
-      editByCustomer({model:this.submitForm,detailModels:this.submitDetailForm, attchmentChange: this.fileChange,deleteFile: this.deleteFile}).then(res => {
+      editByCustomer({
+        model: this.submitForm,
+        detailModels: this.submitDetailForm,
+        attchmentChange: this.fileChange,
+        deleteFile: this.deleteFile
+      }).then(res => {
         if (res.code == 0) {
           this.$alert("修改成功", "提示", {
             confirmButtonText: "确定",
             type: "success"
           });
           this.currentPage = 1;
-          this.releaseBadge("lanju1");//刷新角标
+          this.releaseBadge("lanju1"); //刷新角标
           this.refresh();
-          this.usedRowspan=5;
+          this.usedRowspan = 5;
           this.lanjuDetail = false;
           return;
         } else {
@@ -1149,27 +1032,30 @@ export default {
       //相当于同步，等提交成功后再执行
       //附件拼接
       for (let i = 0; i < this.submitDetailForm.length; i++) {
-          for (let j = 0; j < this.submitDetailForm[i].fileList.length; j++) {
-               this.submitDetailForm[i].ATTACHMENT_FILE +=
-                "/Files/LANJU_STORE/" +
-               this.CID +
-               "/" +
-               this.dateStamp +
-                "/" +
-               this.submitDetailForm[i].fileList[j].name +
-                ";"; 
-              }
-          this.submitDetailForm[i].ATTACHMENT_FILE_FOLDER =
-        "/Files/LANJU_STORE/" + this.CID + "/" + this.dateStamp;
+        for (let j = 0; j < this.submitDetailForm[i].fileList.length; j++) {
+          this.submitDetailForm[i].ATTACHMENT_FILE +=
+            "/Files/LANJU_STORE/" +
+            this.CID +
+            "/" +
+            this.dateStamp +
+            "/" +
+            this.submitDetailForm[i].fileList[j].name +
+            ";";
+        }
+        this.submitDetailForm[i].ATTACHMENT_FILE_FOLDER =
+          "/Files/LANJU_STORE/" + this.CID + "/" + this.dateStamp;
       }
-      addSubmit({model:this.submitForm,detailModels:this.submitDetailForm}).then(res => {
+      addSubmit({
+        model: this.submitForm,
+        detailModels: this.submitDetailForm
+      }).then(res => {
         if (res.code == 0) {
           this.$alert("提交成功", "提示", {
             confirmButtonText: "确定",
             type: "success"
           });
           this.currentPage = 1;
-          this.usedRowspan=5;
+          this.usedRowspan = 5;
           this.refresh();
           this.lanjuDetail = false;
         } else {
@@ -1195,9 +1081,9 @@ export default {
         this.Global.baseUrl + `DownLoadAPI/DownloadFile?path=${path}&`
       );
     },
-    ...mapMutations("badge", ["addBadge", "releaseBadge"]),
-  },
-}
+    ...mapMutations("badge", ["addBadge", "releaseBadge"])
+  }
+};
 </script>
 
 <style>
@@ -1207,9 +1093,9 @@ export default {
 </style>
 
  <style scoped>
- .centerCard h4{
-   margin: 0;
- }
+.centerCard h4 {
+  margin: 0;
+}
 .table-c table {
   border-right: 1px solid black;
   border-bottom: 1px solid black;
@@ -1308,20 +1194,20 @@ export default {
 }
 .upload-de .el-upload-dragger {
   height: 30px;
-  width:200px;
+  width: 200px;
 }
 .selectCard .el-input__inner {
-    height: 21px;
-    width:100%;
-    font-size: 16px;
-    box-shadow: none;
-    border: 1px solid #e9e9e9;
-    text-align: center;
+  height: 21px;
+  width: 100%;
+  font-size: 16px;
+  box-shadow: none;
+  border: 1px solid #e9e9e9;
+  text-align: center;
 }
 .selectCard .el-input__icon {
-    height: 100%;
-    width: 22px;
-    text-align: center;
-    line-height: 22px;
+  height: 100%;
+  width: 22px;
+  text-align: center;
+  line-height: 22px;
 }
 </style>

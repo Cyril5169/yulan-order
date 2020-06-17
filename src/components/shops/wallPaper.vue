@@ -3,20 +3,9 @@
     <el-card shadow="hover">
       <div id="shopsCon">
         <div id="searchBoxW" class="tl">
-          <el-input
-            clearable
-            v-model.trim="searchKey"
-            @clear="tableData = []"
-            @keyup.enter.native="_getShopsWallPaperMsg"
-            placeholder="输入商品型号查找商品"
-            style="width:25%; min-width:280px;"
-          >
-            <div
-              id="searchBtn"
-              slot="append"
-              style="cursor:pointer;"
-              @click="_getShopsWallPaperMsg"
-            >
+          <el-input clearable v-model.trim="searchKey" @clear="tableData = []"
+            @keyup.enter.native="_getShopsWallPaperMsg" placeholder="输入商品型号查找商品" style="width:25%; min-width:280px;">
+            <div id="searchBtn" slot="append" style="cursor:pointer;" @click="_getShopsWallPaperMsg">
               搜索
             </div>
           </el-input>
@@ -33,201 +22,82 @@
             </ul>
           </div>
         </div>
-        <el-table
-          class="loading-area"
-          :data="tableData"
-          :row-key="getRowKeys"
-          :expand-row-keys="expands"
-          @expand-change="expandChange"
-          style="margin: 0px auto 20px auto;"
-        >
-          <el-table-column
-            label="型号"
-            prop="type"
-            width="120"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            label="样本型号"
-            prop="sample"
-            width="120"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            label="版本"
-            prop="versionNumber"
-            width="130"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            label="类别"
-            prop="version"
-            width="110"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            label="品牌"
-            prop="brand"
-            width="80"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            v-if="minimumPurchaseShow"
-            label="起购数量"
-            prop="minimumPurchase"
-            width="80"
-            align="center"
-          ></el-table-column>
+        <el-table class="loading-area" :data="tableData" :row-key="getRowKeys" :expand-row-keys="expands"
+          @expand-change="expandChange" style="margin: 0px auto 20px auto;">
+          <el-table-column label="型号" prop="type" width="120" align="center"></el-table-column>
+          <el-table-column label="样本型号" prop="sample" width="120" align="center"></el-table-column>
+          <el-table-column label="版本" prop="versionNumber" width="130" align="center"></el-table-column>
+          <el-table-column label="类别" prop="version" width="110" align="center"></el-table-column>
+          <el-table-column label="品牌" prop="brand" width="80" align="center"></el-table-column>
+          <el-table-column v-if="minimumPurchaseShow" label="起购数量" prop="minimumPurchase" width="80" align="center">
+          </el-table-column>
           <el-table-column :width="numWidth" label="数量" align="center">
             <template slot-scope="scope">
               <div v-if="scope.row.unit === '平方米'">
                 <span class="num-font">宽</span>
-                <currency-input
-                  :customStyle="'width: 60px;'"
-                  :decimalNum="decimalNum"
-                  v-model="scope.row.number"
-                ></currency-input
-                >&nbsp;×
+                <currency-input :customStyle="'width: 60px;'" :decimalNum="decimalNum" v-model="scope.row.number">
+                </currency-input>&nbsp;×
                 <span class="num-font">高</span>
-                <currency-input
-                  :customStyle="'width: 60px;'"
-                  :decimalNum="decimalNum"
-                  v-model="scope.row.anotherNumber"
-                ></currency-input>
+                <currency-input :customStyle="'width: 60px;'" :decimalNum="decimalNum"
+                  v-model="scope.row.anotherNumber"></currency-input>
               </div>
               <div v-else>
-                <currency-input
-                  :customStyle="'width: 60px;'"
-                  :decimalNum="decimalNum"
-                  v-model="scope.row.number"
-                ></currency-input>
+                <currency-input :customStyle="'width: 60px;'" :decimalNum="decimalNum" v-model="scope.row.number">
+                </currency-input>
               </div>
             </template>
           </el-table-column>
-          <el-table-column
-            label="单位"
-            prop="unit"
-            width="80"
-            align="center"
-          ></el-table-column>
+          <el-table-column label="单位" prop="unit" width="80" align="center"></el-table-column>
           <el-table-column width="100px" label="操作" align="center">
             <template slot-scope="scope">
-              <a
-                v-if="scope.row.noteType != 'I_S_H'"
-                class="mr10"
-                @click="seeStore(scope)"
-                >查看库存</a
-              >
+              <a v-if="scope.row.noteType != 'I_S_H'" class="mr10" @click="seeStore(scope)">查看库存</a>
               <span v-else style="color:red;">库存异常</span>
-              <el-dialog
-                title="库存查询"
-                :visible.sync="dialogTableVisible"
-                width="520px"
-              >
-                <el-table
-                  border
-                  :data="produceStore"
-                  style="width:500px;"
-                  :row-style="rowClass"
-                >
-                  <el-table-column
-                    property="STOCK_NO"
-                    label="库房"
-                    align="center"
-                  ></el-table-column>
-                  <el-table-column
-                    property="BATCH_NO"
-                    label="批号"
-                    width="200"
-                    show-overflow-tooltip
-                    align="center"
-                  ></el-table-column>
-                  <el-table-column
-                    property="QTY"
-                    label="库存"
-                    align="center"
-                  ></el-table-column>
+              <el-dialog title="库存查询" :visible.sync="dialogTableVisible" width="520px">
+                <el-table border :data="produceStore" style="width:500px;" :row-style="rowClass">
+                  <el-table-column property="STOCK_NO" label="库房" align="center"></el-table-column>
+                  <el-table-column property="BATCH_NO" label="批号" width="200" show-overflow-tooltip align="center">
+                  </el-table-column>
+                  <el-table-column property="QTY" label="库存" align="center"></el-table-column>
                 </el-table>
                 <div slot="footer">
                   <p class="f14 tc border-b mb10">
                     <b>以上数值仅供参考，以实际订单处理为准</b>
                   </p>
-                  <el-button
-                    type="success"
-                    plain
-                    @click="dialogTableVisible = false"
-                    >关 闭</el-button
-                  >
+                  <el-button type="success" plain @click="dialogTableVisible = false">关 闭</el-button>
                 </div>
               </el-dialog>
             </template>
           </el-table-column>
           <el-table-column width="20px;" type="expand">
             <template slot-scope="scope">
-              <div
-                v-if="scope.row.noteTypeName"
-                style="color:red;font-size:15px;font-weight:bold;margin:10px 20px;"
-              >
+              <div v-if="scope.row.noteTypeName" style="color:red;font-size:15px;font-weight:bold;margin:10px 20px;">
                 {{ scope.row.noteTypeName }}
               </div>
-              <div
-                v-if="baobei"
-                style="color:red;font-size:15px;font-weight:bold;margin:10px 20px;"
-              >
+              <div v-if="baobei" style="color:red;font-size:15px;font-weight:bold;margin:10px 20px;">
                 此型号已报备，如果直接下单，有可能不被处理，请先与工厂订单部联系
               </div>
               <el-form label-position="left" class="loading-area">
                 <el-form-item label="活动：">
-                  <el-select
-                    style="width:300px;"
-                    :disabled="disableFlag"
-                    v-model="seletedActivity"
-                    :placeholder="
+                  <el-select style="width:300px;" :disabled="disableFlag" v-model="seletedActivity" :placeholder="
                       disableFlag === false
                         ? '请选择一个活动'
                         : '此产品不参与活动'
-                    "
-                  >
-                    <el-option
-                      v-for="item in activity"
-                      :label="item.label"
-                      :key="item.value"
-                      :value="item.value"
-                    ></el-option>
+                    ">
+                    <el-option v-for="item in activity" :label="item.label" :key="item.value" :value="item.value">
+                    </el-option>
                   </el-select>
                 </el-form-item>
                 <el-form-item label="备注：">
                   <div class="dib rel" style="width: 55%;">
-                    <el-input
-                      resize="none"
-                      type="textarea"
-                      placeholder="请输入您的备注信息（50字内）"
-                      maxlength="50"
-                      :autosize="{ minRows: 3, maxRows: 6 }"
-                      v-model="remark"
-                    ></el-input>
-                    <i
-                      class="el-icon-edit"
-                      style="position:absolute;right:10px;bottom:5px;"
-                    ></i>
+                    <el-input resize="none" type="textarea" placeholder="请输入您的备注信息（50字内）" maxlength="50"
+                      :autosize="{ minRows: 3, maxRows: 6 }" v-model="remark"></el-input>
+                    <i class="el-icon-edit" style="position:absolute;right:10px;bottom:5px;"></i>
                   </div>
-                  <span style="margin-left:10px;"
-                    >{{ remark ? remark.length : 0 }}/50</span
-                  >
+                  <span style="margin-left:10px;">{{ remark ? remark.length : 0 }}/50</span>
                 </el-form-item>
                 <el-form-item class="tc">
-                  <el-button
-                    style="width: 130px;"
-                    type="danger"
-                    @click="saveToShoppingCar(scope.row)"
-                    >加入购物车</el-button
-                  >
-                  <el-button
-                    style="width: 130px;"
-                    type="info"
-                    @click="closeExpand"
-                    >取消</el-button
-                  >
+                  <el-button style="width: 130px;" type="danger" @click="saveToShoppingCar(scope.row)">加入购物车</el-button>
+                  <el-button style="width: 130px;" type="info" @click="closeExpand">取消</el-button>
                 </el-form-item>
               </el-form>
             </template>
@@ -246,7 +116,11 @@ import { addShoppingCar } from "@/api/shop";
 import { getItemById, GetPromotionByItem } from "@/api/orderListASP";
 import Vue from "vue";
 import Cookies from "js-cookie";
-import { GetWallpaperInfo, GetSalPutonRecord, GetItemStock } from "@/api/itemInfoASP";
+import {
+  GetWallpaperInfo,
+  GetSalPutonRecord,
+  GetItemStock
+} from "@/api/itemInfoASP";
 
 export default {
   name: "WallPaper",
@@ -593,7 +467,12 @@ export default {
             this.clearMsg();
             this.$root.$emit("refreshBadgeIcon", "wallCount");
           } else {
-            this.$alert(res.data.msg, "添加失败", {
+            var msg = res.data.msg;
+            if (msg == "该产品正在上架，暂时不能加入购物车") {
+              msg =
+                "没有维护经销/分销/家装/零售价格，暂时不能加入购物车，请联系玉兰订单部";
+            }
+            this.$alert(msg, "添加失败", {
               confirmButtonText: "确定",
               type: "warning"
             });

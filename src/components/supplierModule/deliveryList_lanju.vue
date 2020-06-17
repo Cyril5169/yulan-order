@@ -7,50 +7,19 @@
       </div>
 
       <div id="tbar" class="tbarStyle">
-        <el-date-picker
-          type="date"
-          format="yyyy-MM-dd"
-          value-format="yyyy-MM-dd"
-          placeholder="查询开始日期"
-          v-model="beginTime"
-          style="width:14%;"
-        ></el-date-picker>
+        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询开始日期"
+          v-model="beginTime" style="width:14%;"></el-date-picker>
         --
-        <el-date-picker
-          type="date"
-          format="yyyy-MM-dd"
-          value-format="yyyy-MM-dd"
-          placeholder="查询截止日期"
-          v-model="finishTime"
-          style="width:14%;"
-        ></el-date-picker>
+        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询截止日期"
+          v-model="finishTime" style="width:14%;"></el-date-picker>
 
-        <el-select
-          v-model="confirm_status"
-          style="margin-left:10px;width:160px;"
-          placeholder="状态"
-        >
-          <el-option
-            v-for="item in statusArray"
-            :key="item.label"
-            :label="item.label"
-            :value="item.value"
-          ></el-option>
+        <el-select v-model="confirm_status" style="margin-left:10px;width:160px;" placeholder="状态">
+          <el-option v-for="item in statusArray" :key="item.label" :label="item.label" :value="item.value"></el-option>
         </el-select>
-        <el-input
-          @keyup.enter.native="search()"
-          placeholder="请输入送货单号进行查询"
-          v-model="SEARCHKEY"
-          style="width:220px;margin-left:10px"
-        >
+        <el-input @keyup.enter.native="search()" placeholder="请输入送货单号进行查询" v-model="SEARCHKEY"
+          style="width:220px;margin-left:10px">
         </el-input>
-        <el-button
-          size="medium"
-          type="success"
-          style="margin-left:10px"
-          @click="search()"
-          >查询</el-button
-        >
+        <el-button size="medium" type="success" style="margin-left:10px" @click="search()">查询</el-button>
         <!-- <el-button
           size="medium"
           type="primary"
@@ -61,23 +30,13 @@
       </div>
 
       <div style="margin-top:10px">
-        <el-table
-          border
-          :data="DeliverData"
-          style="width: 100%;font-size:12px"
-          class="table_1"
-        >
+        <el-table border :data="DeliverData" style="width: 100%;font-size:12px" class="table_1">
           <!-- <el-table-column label="状态" align="center" width="65px">
             <template slot-scope="scope">
               {{ scope.row.INVOICE_STATUS | transStatus }}
             </template>
           </el-table-column> -->
-          <el-table-column
-            prop="INVOICE_NO"
-            label="送货单号"
-            align="center"
-            width="100px"
-          >
+          <el-table-column prop="INVOICE_NO" label="送货单号" align="center" width="100px">
           </el-table-column>
           <el-table-column label="状态" align="center" width="65px">
             <template slot-scope="scope">
@@ -100,429 +59,207 @@
             align="center"
             width="70px"
           ></el-table-column> -->
-          <el-table-column
-            prop="LOGISTICS_COMPANY"
-            label="物流公司"
-            align="center"
-            width="100px"
-          ></el-table-column>
-          <el-table-column
-            prop="LOGISTICS_NUMBER"
-            label="物流单号"
-            align="center"
-            width="100px"
-          ></el-table-column>
+          <el-table-column prop="LOGISTICS_COMPANY" label="物流公司" align="center" width="100px"></el-table-column>
+          <el-table-column prop="LOGISTICS_NUMBER" label="物流单号" align="center" width="100px"></el-table-column>
           <el-table-column prop="AREA_DISTRICT" label="送货地址" align="center">
           </el-table-column>
-          <el-table-column
-            prop="PUR_NO"
-            label="采购单号"
-            align="center"
-            width="110px"
-          >
+          <el-table-column prop="PUR_NO" label="采购单号" align="center" width="110px">
           </el-table-column>
-          <el-table-column
-            prop="INVOICE_DATE"
-            label="发货日期"
-            align="center"
-            width="90px"
-          >
+          <el-table-column prop="INVOICE_DATE" label="发货日期" align="center" width="90px">
             <template slot-scope="scope2">
               {{ scope2.row.INVOICE_DATE | datatrans }}
             </template>
           </el-table-column>
-          <el-table-column
-            prop="SUPPLY_LINKMAN"
-            label="供应商联系人"
-            align="center"
-            width="100px"
-          >
+          <el-table-column prop="SUPPLY_LINKMAN" label="供应商联系人" align="center" width="100px">
           </el-table-column>
-          <el-table-column
-            prop="LINKMAN_TEL"
-            label="电话"
-            align="center"
-            width="100px"
-          >
+          <el-table-column prop="LINKMAN_TEL" label="电话" align="center" width="100px">
           </el-table-column>
-          <el-table-column
-            prop="REMARKS"
-            label="备注"
-            align="center"
-            width="100px"
-          >
+          <el-table-column prop="REMARKS" label="备注" align="center" width="100px">
           </el-table-column>
           <el-table-column align="center" label="操作" width="60px">
             <template slot-scope="scope">
-              <el-button
-                @click="_CheckDetail(scope.row)"
-                type="warning"
-                size="mini"
-                icon="el-icon-search"
-                circle
-                v-if="
+              <el-button @click="_CheckDetail(scope.row)" type="warning" size="mini" icon="el-icon-search" circle v-if="
                  (scope.row.INVOICE_STATUS == 1 || scope.row.CONFIRM_STATUS == 3)  && (scope.row.CONFIRM_STATUS == 0 || scope.row.CONFIRM_STATUS == 1 || scope.row.CONFIRM_STATUS == 3 )
-                "
-              ></el-button>
-              <el-button
-                @click="_EditDetail(scope.row)"
-                type="primary"
-                size="mini"
-                icon="el-icon-edit"
-                circle
-                v-if="scope.row.INVOICE_STATUS == 2 && (scope.row.CONFIRM_STATUS == 2 || scope.row.CONFIRM_STATUS == 3)"
-              ></el-button>
+                "></el-button>
+              <el-button @click="_EditDetail(scope.row)" type="primary" size="mini" icon="el-icon-edit" circle
+                v-if="scope.row.INVOICE_STATUS == 2 && (scope.row.CONFIRM_STATUS == 2 || scope.row.CONFIRM_STATUS == 3)">
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
       </div>
 
       <div style="margin:0 25%;margin-top:10px" class="block">
-        <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page.sync="currentPage"
-          :page-sizes="[5, 10, 15, 20]"
-          :page-size="limit"
-          layout="total,sizes, prev, pager, next, jumper"
-          :total="count"
-        ></el-pagination>
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+          :current-page.sync="currentPage" :page-sizes="[5, 10, 15, 20]" :page-size="limit"
+          layout="total,sizes, prev, pager, next, jumper" :total="count"></el-pagination>
       </div>
     </el-card>
 
-    <el-dialog
-      :visible.sync="lanjuDetail"
-      :close-on-click-modal="false"
-      width="70%"
-    >
-        <el-dialog
-        width="30%"
-        :visible.sync="rebackVisible"
-        append-to-body
-        >
-            <div style="width:100%;text-align:center;font-size:20px">{{editData.PUR_NO}} 未通过说明</div>
-            <div style="margin-top:10px">
-                <el-input
-                v-model="reback_notes_1"
-                placeholder="请输入未通过说明:"
-                tyle="width:30%;height:150PX"
-                clearable>
-                </el-input>
-            </div>
-            <el-button 
-            style="margin-left:40%;margin-top:10px"
-            class="trueButton"
-            @click="rebackTure">确认</el-button>
-        </el-dialog>
+    <el-dialog :visible.sync="lanjuDetail" :close-on-click-modal="false" width="70%">
+      <el-dialog width="30%" :visible.sync="rebackVisible" append-to-body>
+        <div style="width:100%;text-align:center;font-size:20px">{{editData.PUR_NO}} 未通过说明</div>
+        <div style="margin-top:10px">
+          <el-input v-model="reback_notes_1" placeholder="请输入未通过说明:" tyle="width:30%;height:150PX" clearable>
+          </el-input>
+        </div>
+        <el-button style="margin-left:40%;margin-top:10px" class="trueButton" @click="rebackTure">确认</el-button>
+      </el-dialog>
       <!-- 查看区 -->
       <div v-show="isCheck">
-        <div style="width:100%;text-align:center;font-size:20px">{{DeliverData_1.PUR_NO}} 送货单明细 ({{DeliverData_1.CONFIRM_STATUS | transStatus}})</div>
-        <div v-if="DeliverData_1.CONFIRM_STATUS == 3" style="font-size:20px;float:right;">未通过说明：{{DeliverData_1.REBACK_NOTES}}</div>
+        <div style="width:100%;text-align:center;font-size:20px">{{DeliverData_1.PUR_NO}} 送货单明细
+          ({{DeliverData_1.CONFIRM_STATUS | transStatus}})</div>
+        <div v-if="DeliverData_1.CONFIRM_STATUS == 3" style="font-size:20px;float:right;">
+          未通过说明：{{DeliverData_1.REBACK_NOTES}}</div>
         <br>
         <table style="width:100%;text-align:center">
-        <tr>
-          <td style="width:10%">供应商联系人：</td>
-          <td>
+          <tr>
+            <td style="width:12.5%">供应商联系人：</td>
+            <td style="width:12.5%">
               {{DeliverData_1.SUPPLY_LINKMAN}}
-          </td>
-          <td style="width:12%">供应商联系电话：</td>
-          <td>
-            {{DeliverData_1.LINKMAN_TEL}}
-          </td>
-          <td style="width:10%">创建日期：</td>
-          <td style="width:25%">{{ DeliverData_1.CREATE_DATE | datatrans }}</td>
-        </tr>
+            </td>
+            <td style="width:12.5%">供应商联系电话：</td>
+            <td style="width:12.5%">
+              {{DeliverData_1.LINKMAN_TEL}}
+            </td>
+            <td style="width:12.5%">填写人：</td>
+            <td style="width:12.5%">{{ DeliverData_1.CREATE_PERSON }}</td>
+            <td style="width:12.5%">创建日期：</td>
+            <td>{{ DeliverData_1.CREATE_DATE | datatrans }}</td>
+          </tr>
         </table>
+
         <hr>
         <div class="checkTable">
-        <table class="" style="width:100%;font-size:12px">
-          <tr>
-            <td>发货单号：</td>
-            <td>{{ DeliverData_1.INVOICE_NO }}</td>
-            <td>发货日期：</td>
-            <td>{{ DeliverData_1.INVOICE_DATE | datatrans }}</td>
-            <td>预计到货日期：</td>
-            <td>{{ DeliverData_1.EXPECT_ARRIVAL_DATE | datatrans }}</td>
-          </tr>
-          <tr>
-            <td>物流公司：</td>
-            <td>{{ DeliverData_1.LOGISTICS_COMPANY }}</td>
-            <td>物流单号：</td>
-            <td>{{ DeliverData_1.LOGISTICS_NUMBER }}</td>
-            <td>创建人：</td>
-            <td>{{ DeliverData_1.CREATE_PERSON }}</td>
-          </tr>
-          <tr>
-            <td>物流联系人：</td>
-            <td>{{ DeliverData_1.LOGISTICS_LINKMAN }}</td>
-            <td>物流联系电话：</td>
-            <td>{{ DeliverData_1.LOGISTICS_TEL }}</td>
-            <td>送货地址：</td>
-            <td>{{ DeliverData_1.AREA_DISTRICT }}</td>
-          </tr>
-          <tr>
-            <td>备注：</td>
-            <td colspan="5">{{ DeliverData_1.REMARKS }}</td>
-          </tr>
-        </table>
+          <table class="" style="width:100%;font-size:12px">
+            <tr>
+              <td style="width:12.5%">发货单号：</td>
+              <td style="width:12.5%">{{ DeliverData_1.INVOICE_NO }}</td>
+              <td style="width:12.5%">发货日期：</td>
+              <td style="width:12.5%">{{ DeliverData_1.INVOICE_DATE | datatrans }}</td>
+              <td style="width:12.5%">预计到货时间：</td>
+              <td colspan="3">{{ DeliverData_1.EXPECT_ARRIVAL_DATE | datatrans }}</td>
+            </tr>
+
+            <tr>
+              <td>物流单号：</td>
+              <td>{{ DeliverData_1.LOGISTICS_NUMBER }}</td>
+              <td>物流公司：</td>
+              <td>{{ DeliverData_1.LOGISTICS_COMPANY }}</td>
+              <td>物流联系人：</td>
+              <td style="width:12.5%">{{ DeliverData_1.LOGISTICS_LINKMAN }}</td>
+              <td style="width:12.5%">物流电话：</td>
+              <td>{{ DeliverData_1.LOGISTICS_TEL }}</td>
+            </tr>
+
+            <tr>
+              <td>送货地址：</td>
+              <td colspan="3">{{ DeliverData_1.AREA_DISTRICT }}</td>
+              <td>备注：</td>
+              <td colspan="3">{{ DeliverData_1.REMARKS }}</td>
+            </tr>
+          </table>
         </div>
         <hr />
-        <el-table
-          :data="DetailData"
-          border
-          highlight-current-row
-          style="width: 100%;font-weight:normal;font-size:12px"
-          class="table_1"
-        >
-          <el-table-column
-            prop="ITEM_NO"
-            label="物料编码"
-            align="center"
-            width="180px"
-          ></el-table-column>
-          <el-table-column
-            prop="NAMEE"
-            label="物料名称"
-            align="center"
-            width="180px"
-          ></el-table-column>
-          <el-table-column
-            prop="INVOICE_QTY"
-            label="发货数量"
-            align="center"
-            width="150px"
-          ></el-table-column>
-          <!-- <el-table-column
-            prop="REBACK_QTY"
-            label="退货数量"
-            align="center"
-            width="150px"
-          ></el-table-column> -->
-          <el-table-column
-            prop="UNIT1"
-            label="单位"
-            align="center"
-            width="80px"
-          ></el-table-column>
-          <el-table-column
-            prop="MAT_BRAND"
-            label="品牌"
-            align="center"
-            width="110px"
-          ></el-table-column>
-          <el-table-column
-            prop="GRADE"
-            label="规格/型号"
-            align="center"
-            width="110px"
-          ></el-table-column>
-          <!-- <el-table-column prop="REMARKS" label="赠品" align="center" width="150px"></el-table-column> -->
-          <el-table-column
-            prop="NOTE"
-            label="备注"
-            align="center"
-          ></el-table-column>
+        <el-table :data="DetailData" border highlight-current-row style="width: 100%;font-weight:normal;font-size:12px"
+          class="table_1">
+          <el-table-column prop="ITEM_NO" label="物料编码" align="center" width="180px"></el-table-column>
+          <el-table-column prop="NAMEE" label="物料名称" align="center" width="180px"></el-table-column>
+          <el-table-column prop="INVOICE_QTY" label="发货数量" align="center" width="150px"></el-table-column>
+          <el-table-column prop="UNIT1" label="单位" align="center" width="80px"></el-table-column>
+          <el-table-column prop="MAT_BRAND" label="品牌" align="center" width="110px"></el-table-column>
+          <el-table-column prop="GRADE" label="规格/型号" align="center" width="110px"></el-table-column>
+          <el-table-column prop="NOTE" label="备注" align="center"></el-table-column>
         </el-table>
       </div>
       <!-- 编辑区 -->
       <div v-show="isEdit">
-        <div style="width:100%;text-align:center;font-size:20px">{{editData.PUR_NO}} 送货单明细 ({{editData.CONFIRM_STATUS | transStatus}})</div>
+        <div style="width:100%;text-align:center;font-size:20px">{{editData.PUR_NO}} 送货单明细
+          ({{editData.CONFIRM_STATUS | transStatus}})</div>
         <br>
         <table style="width:100%;text-align:center">
-        <tr>
-          <td style="width:10%">供应商联系人：</td>
-          <td>
-            <input
-              v-model="submit.SUPPLY_LINKMAN"
-              placeholder="(由采购单填入)"
-              clearable
-              class="inputStyle"
-            />
-          </td>
-          <td style="width:12%">供应商联系电话：</td>
-          <td>
-            <input
-              v-model="submit.LINKMAN_TEL"
-              placeholder="(由采购单填入)"
-              clearable
-              class="inputStyle"
-            />
-          </td>
-          <td style="width:10%">创建日期：</td>
-          <td style="width:25%">{{ editData.CREATE_DATE | datatrans }}</td>
-        </tr>
+          <tr>
+            <td style="width:12.5%">供应商联系人：</td>
+            <td style="width:12.5%">
+              <input v-model="submit.SUPPLY_LINKMAN" clearable class="inputStyle" />
+            </td>
+            <td style="width:12.5%">供应商联系电话：</td>
+            <td style="width:12.5%">
+              <input v-model="submit.LINKMAN_TEL" clearable class="inputStyle" />
+            </td>
+            <td style="width:12.5%">填写人：</td>
+            <td style="width:12.5%">{{ editData.CREATE_PERSON }}</td>
+            <td style="width:12.5%">填写时间：</td>
+            <td>{{ editData.CREATE_DATE | datatrans }}</td>
+          </tr>
         </table>
+
         <hr>
         <div class="checkTable">
           <table style="width:100%;font-size:12px">
             <tr>
-              <td style="width:12%">发货单号：</td>
-              <td>{{ editData.INVOICE_NO }}</td>
-              <td>发货日期：</td>
-              <td>
-                <div style="width:100%">
-                  <span
-                    ><el-date-picker
-                      clearable
-                      type="date"
-                      format="yyyy-MM-dd"
-                      value-format="yyyy-MM-dd"
-                      placeholder="修改日期"
-                      v-model="ruleForm_1.dateValue"
-                      style="width:100%;text-align:right"
-                    ></el-date-picker
-                  ></span>
-                </div>
+              <td style="width:12.5%">发货单号：</td>
+              <td style="width:12.5%">{{ editData.INVOICE_NO }}</td>
+              <td style="width:12.5%">发货日期：</td>
+              <td style="width:12.5%">
+                <el-date-picker clearable type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
+                  v-model="ruleForm_1.dateValue" style="width:100%;">
+                </el-date-picker>
               </td>
-              <td>预计到货日期：</td>
-              <td>
-                <div style="width:100%">
-                  <span
-                    ><el-date-picker
-                      clearable
-                      type="date"
-                      format="yyyy-MM-dd"
-                      value-format="yyyy-MM-dd"
-                      placeholder="修改日期"
-                      v-model="ruleForm_4.dateValue"
-                      style="width:100%;text-align:right"
-                    ></el-date-picker
-                  ></span>
-                </div>
+              <td style="width:12.5%">预计到货时间：</td>
+              <td colspan="3">
+                <el-date-picker clearable type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
+                  v-model="ruleForm_4.dateValue" style="width:100%;">
+                </el-date-picker>
               </td>
             </tr>
+
             <tr>
-              <td>物流公司：</td>
+              <td>物流单号<span style="color:red;font-size:15px">*</span>：</td>
               <td>
-                <input
-                  v-model="submit.LOGISTICS_COMPANY"
-                  placeholder=""
-                  clearable
-                  class="inputStyle"
-                />
+                <input v-model="submit.LOGISTICS_NUMBER" clearable class="inputStyle" />
+              </td>
+              <td>物流公司<span style="color:red;font-size:15px">*</span>：</td>
+              <td>
+                <input v-model="submit.LOGISTICS_COMPANY" clearable class="inputStyle" />
+              </td>
+              <td>物流联系人<span style="color:red;font-size:15px">*</span>：</td>
+              <td style="width:12.5%">
+                <input v-model="submit.LOGISTICS_LINKMAN" clearable class="inputStyle" />
               </td>
 
-              <td>物流单号：</td>
+              <td style="width:12.5%">物流联系电话<span style="color:red;font-size:15px">*</span>：</td>
               <td>
-                <input
-                  v-model="submit.LOGISTICS_NUMBER"
-                  placeholder=""
-                  clearable
-                  class="inputStyle"
-                />
-              </td>
-              <td>创建人：</td>
-              <td>{{ editData.CREATE_PERSON }}</td>
-            </tr>
-            <tr>
-              <td>物流联系人：</td>
-              <td>
-                <input
-                  v-model="submit.LOGISTICS_LINKMAN"
-                  placeholder=""
-                  clearable
-                  class="inputStyle"
-                />
-              </td>
-
-              <td style="width:12%">物流联系电话：</td>
-              <td>
-                <input
-                  v-model="submit.LOGISTICS_TEL"
-                  placeholder=""
-                  clearable
-                  class="inputStyle"
-                />
-              </td>
-
-              <td style="width:12%">送货地址：</td>
-              <td style="width:30%">
-                <input
-                  v-model="submit.AREA_DISTRICT"
-                  placeholder=""
-                  clearable
-                  class="inputStyle"
-                />
+                <input v-model="submit.LOGISTICS_TEL" clearable class="inputStyle" />
               </td>
             </tr>
+
             <tr>
+              <td>送货地址：</td>
+              <td colspan="3">
+                <input v-model="submit.AREA_DISTRICT" clearable class="inputStyle" />
+              </td>
               <td>备注：</td>
-              <td colspan="5">
-                <input
-                  v-model="submit.REMARKS"
-                  placeholder=""
-                  clearable
-                  class="inputStyle"
-                />
+              <td colspan="3">
+                <input v-model="submit.REMARKS" clearable class="inputStyle" />
               </td>
             </tr>
           </table>
         </div>
         <hr />
-        <el-table
-          :data="DetailData_1"
-          border
-          highlight-current-row
-          style="width: 100%;font-weight:normal;font-size:12px"
-          class="table_1"
-        >
-          <el-table-column
-            prop="ITEM_NO"
-            label="物料编码"
-            align="center"
-            width="150px"
-          ></el-table-column>
-          <el-table-column
-            prop="NAMEE"
-            label="物料名称"
-            align="center"
-            width="180px"
-          ></el-table-column>
+        <el-table :data="DetailData_1" border highlight-current-row
+          style="width: 100%;font-weight:normal;font-size:12px" class="table_1">
+          <el-table-column prop="ITEM_NO" label="物料编码" align="center" width="150px"></el-table-column>
+          <el-table-column prop="NAMEE" label="物料名称" align="center" width="180px"></el-table-column>
           <el-table-column prop="INVOICE_QTY" label="发货数量" align="center" width="155px">
             <template slot-scope="scope">
-              <el-input-number
-                v-model="scope.row.INVOICE_QTY"
-                size="mini"
-                controls-position="right"
-                :min="0"
-                :max="scope.row.max_qty"
-              ></el-input-number>
+              <el-input-number v-model="scope.row.INVOICE_QTY" size="mini" controls-position="right" :min="0"
+                :max="scope.row.max_qty"></el-input-number>
             </template>
           </el-table-column>
-          <!-- <el-table-column label="退货数量" align="center" width="155px">
-            <template slot-scope="scope">
-              <el-input-number
-                v-model="scope.row.REBACK_QTY"
-                size="mini"
-                controls-position="right"
-                :min="0"
-                :max="scope.row.max_qty"
-              ></el-input-number>
-            </template>
-          </el-table-column> -->
-          <el-table-column
-            prop="UNIT1"
-            label="单位"
-            align="center"
-            width="80px"
-          ></el-table-column>
-          <el-table-column
-            prop="MAT_BRAND"
-            label="品牌"
-            align="center"
-            width="150px"
-          ></el-table-column>
-          <el-table-column
-            prop="GRADE"
-            label="规格/型号"
-            align="center"
-            width="150px"
-          ></el-table-column>
-          <!-- <el-table-column label="赠品" align="center" width="150px">
-             <template slot-scope="scope">
-                <el-input v-model="scope.row.REMARKS" clearable></el-input>
-              </template>
-           </el-table-column> -->
+          <el-table-column prop="UNIT1" label="单位" align="center" width="80px"></el-table-column>
+          <el-table-column prop="MAT_BRAND" label="品牌" align="center" width="150px"></el-table-column>
+          <el-table-column prop="GRADE" label="规格/型号" align="center" width="150px"></el-table-column>
           <el-table-column label="备注" align="center">
             <template slot-scope="scope">
               <el-input v-model="scope.row.NOTE" clearable></el-input>
@@ -530,95 +267,25 @@
           </el-table-column>
         </el-table>
         <div>
-        <el-button
-          style="margin-left:40%;margin-top:10px;"
-          class="trueButton_1"
-          @click="reback_show"
-          >不通过</el-button
-        >
-        <el-button class="trueButton" @click="isTrueEdit">通过</el-button>
+          <el-button style="margin-left:40%;margin-top:10px;" class="trueButton_1" @click="reback_show">不通过</el-button>
+          <el-button class="trueButton" @click="isTrueEdit">通过</el-button>
         </div>
       </div>
     </el-dialog>
-    <el-dialog
-      title="新增送货单"
-      :visible.sync="DeliverDetail"
-      :close-on-click-modal="false"
-      width="80%"
-    >
-      <el-dialog
-        width="80%"
-        title="采购单明细"
-        :visible.sync="innerVisible"
-        append-to-body
-      >
-        <el-table
-          :data="PURData"
-          @selection-change="handleSelectionChange"
-          border
-          highlight-current-row
-          style="width: 100%;font-weight:normal;font-size:12px"
-          class="table_1"
-        >
-          <el-table-column
-            type="selection"
-            width="40"
-            class="text-align:center"
-          ></el-table-column>
-          <el-table-column
-            prop="ITEM_NO"
-            label="编码"
-            align="center"
-            width="110px"
-          ></el-table-column>
-          <el-table-column
-            prop="MNAME"
-            label="名称"
-            align="center"
-            width="200px"
-          ></el-table-column>
-          <el-table-column
-            prop="GRADE"
-            label="规格"
-            align="center"
-            width="80px"
-          ></el-table-column>
-          <el-table-column
-            prop="QTY_PUR"
-            label="送货数量"
-            align="center"
-            width="85px"
-          ></el-table-column>
-          <el-table-column
-            prop="PRICE_TAXIN"
-            label="含税单价"
-            align="center"
-            width="80px"
-          ></el-table-column>
-          <el-table-column
-            prop="TOTAL_MONEY"
-            label="金额"
-            align="center"
-            width="80px"
-          ></el-table-column>
-          <el-table-column
-            prop="PRODUCT_NOTE"
-            label="制作说明"
-            align="center"
-            width="100px"
-          ></el-table-column>
-          <el-table-column
-            prop="NOTES"
-            label="备注"
-            align="center"
-            min-width="300px"
-          ></el-table-column>
-          <el-table-column
-            prop="QTY"
-            label="已发货数量"
-            align="center"
-            width="100px"
-          ></el-table-column>
+    <el-dialog title="新增送货单" :visible.sync="DeliverDetail" :close-on-click-modal="false" width="80%">
+      <el-dialog width="80%" title="采购单明细" :visible.sync="innerVisible" append-to-body>
+        <el-table :data="PURData" @selection-change="handleSelectionChange" border highlight-current-row
+          style="width: 100%;font-weight:normal;font-size:12px" class="table_1">
+          <el-table-column type="selection" width="40" class="text-align:center"></el-table-column>
+          <el-table-column prop="ITEM_NO" label="编码" align="center" width="110px"></el-table-column>
+          <el-table-column prop="MNAME" label="名称" align="center" width="200px"></el-table-column>
+          <el-table-column prop="GRADE" label="规格" align="center" width="80px"></el-table-column>
+          <el-table-column prop="QTY_PUR" label="送货数量" align="center" width="85px"></el-table-column>
+          <el-table-column prop="PRICE_TAXIN" label="含税单价" align="center" width="80px"></el-table-column>
+          <el-table-column prop="TOTAL_MONEY" label="金额" align="center" width="80px"></el-table-column>
+          <el-table-column prop="PRODUCT_NOTE" label="制作说明" align="center" width="100px"></el-table-column>
+          <el-table-column prop="NOTES" label="备注" align="center" min-width="300px"></el-table-column>
+          <el-table-column prop="QTY" label="已发货数量" align="center" width="100px"></el-table-column>
           <el-table-column label="约定日期" align="center" width="90px">
             <template slot-scope="scope1">
               {{ scope1.row.DATE_REG | datatrans }}
@@ -634,45 +301,28 @@
           <el-button @click="isTrue" class="trueButton">确认</el-button>
         </div>
       </el-dialog>
-      <!-- 新增 -->
       <div>
-        <el-input
-          @keyup.enter.native="searchPUR()"
-          placeholder="请输入采购单号"
-          v-model="find"
-          style="width:280px;float:left;margin-top:-15px;margin-bottom:5px"
-        >
-          <el-button
-            @click="searchPUR()"
-            class="button_1"
-            slot="append"
-            icon="el-icon-search"
-            >搜索</el-button
-          >
+        <el-input @keyup.enter.native="searchPUR()" placeholder="请输入采购单号" v-model="find"
+          style="width:280px;float:left;margin-top:-15px;margin-bottom:5px">
+          <el-button @click="searchPUR()" class="button_1" slot="append" icon="el-icon-search">搜索</el-button>
         </el-input>
       </div>
+
+      <!-- 新增 -->
       <table style="width:100%;text-align:center">
         <tr>
-          <td style="width:10%">供应商联系人：</td>
-          <td>
-            <input
-              v-model="submitForm.SUPPLY_LINKMAN"
-              placeholder="(由采购单填入)"
-              clearable
-              class="inputStyle"
-            />
+          <td style="width:12.5%">供应商联系人：</td>
+          <td style="width:12.5%">
+            <input v-model="submitForm.SUPPLY_LINKMAN" clearable class="inputStyle" />
           </td>
-          <td style="width:10%">供应商联系电话：</td>
-          <td>
-            <input
-              v-model="submitForm.LINKMAN_TEL"
-              placeholder="(由采购单填入)"
-              clearable
-              class="inputStyle"
-            />
+          <td style="width:12.5%">供应商联系电话：</td>
+          <td style="width:12.5%">
+            <input v-model="submitForm.LINKMAN_TEL" clearable class="inputStyle" />
           </td>
-          <td style="width:10%">创建日期：</td>
-          <td style="width:25%">(系统生成)</td>
+          <td style="width:12.5%">填写人：</td>
+          <td>{{ editData.CREATE_PERSON  }}</td>
+          <td style="width:12.5%">创建日期：</td>
+          <td></td>
         </tr>
       </table>
 
@@ -680,171 +330,75 @@
       <div v-show="isAdd" class="table-c">
         <table style="width:100%">
           <tr>
-            <td>发货单号：</td>
-            <td>(系统生成)</td>
-            <td>发货日期：</td>
+            <td style="width:12.5%">发货单号：</td>
+            <td style="width:12.5%"></td>
+            <td style="width:12.5%">发货日期：</td>
             <td>
-              <el-date-picker
-                type="date"
-                format="yyyy-MM-dd"
-                value-format="yyyy-MM-dd"
-                placeholder="发货日期"
-                v-model="ruleForm_2.dateValue"
-                style="width:100%;height:100%"
-              ></el-date-picker>
+              <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" v-model="ruleForm_2.dateValue"
+                style="width:100%"></el-date-picker>
             </td>
-            <td>预计到货时间：</td>
-            <td>
-              <el-date-picker
-                type="date"
-                format="yyyy-MM-dd"
-                value-format="yyyy-MM-dd"
-                placeholder="预计到货时间"
-                v-model="ruleForm_3.dateValue"
-                style="width:100%;height:100%"
-              ></el-date-picker>
+            <td style="width:12.5%">预计到货时间：</td>
+            <td colspan="3">
+              <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" v-model="ruleForm_3.dateValue"
+                style="width:100%"></el-date-picker>
             </td>
           </tr>
+
           <tr>
-            <td>物流公司 <span style="color:red;font-size:15px">*</span>：</td>
+            <td>物流单号<span style="color:red;font-size:15px">*</span>：</td>
             <td>
-              <input
-                v-model="submitForm.logistics_company"
-                placeholder="(客户必填)"
-                clearable
-                class="inputStyle"
-              />
+              <input v-model="submitForm.logistics_number" clearable class="inputStyle" />
             </td>
-            <td>物流单号 <span style="color:red;font-size:15px">*</span>：</td>
+            <td>物流公司<span style="color:red;font-size:15px">*</span>：</td>
             <td>
-              <input
-                v-model="submitForm.logistics_number"
-                placeholder="(客户必填)"
-                clearable
-                class="inputStyle"
-              />
+              <input v-model="submitForm.logistics_company" clearable class="inputStyle" />
             </td>
-            <td>创建人：</td>
-            <td>
-              <input
-                v-model="submitForm.create_person"
-                placeholder="(客户选填)"
-                clearable
-                class="inputStyle"
-              />
-            </td>
-          </tr>
-          <tr>
             <td>物流联系人<span style="color:red;font-size:15px">*</span>：</td>
-            <td>
-              <input
-                v-model="submitForm.LOGISTICS_LINKMAN"
-                placeholder="(客户必填))"
-                clearable
-                class="inputStyle"
-              />
+            <td style="width:12.5%">
+              <input v-model="submitForm.LOGISTICS_LINKMAN" clearable class="inputStyle" />
+            </td>
+            <td style="width:12.5%">
+              物流电话<span style="color:red;font-size:15px">*</span>：
             </td>
             <td>
-              物流联系电话 <span style="color:red;font-size:15px">*</span>：
-            </td>
-            <td>
-              <input
-                v-model="submitForm.LOGISTICS_TEL"
-                placeholder="(客户必填)"
-                clearable
-                class="inputStyle"
-              />
-            </td>
-            <td>送货地址：</td>
-            <td>
-              <input
-                v-model="submitForm.area_district"
-                placeholder="(客户必填)"
-                clearable
-                class="inputStyle"
-              />
+              <input v-model="submitForm.LOGISTICS_TEL" clearable class="inputStyle" />
             </td>
           </tr>
+
           <tr>
+            <td>送货地址：</td>
+            <td colspan="3">
+              <input v-model="submitForm.area_district" clearable class="inputStyle" />
+            </td>
             <td>备注：</td>
-            <td colspan="5">
-              <input
-                v-model="submitForm.remarks"
-                placeholder="(客户选填)"
-                clearable
-                class="inputStyle"
-              />
+            <td colspan="3">
+              <input v-model="submitForm.remarks" clearable class="inputStyle" />
             </td>
           </tr>
         </table>
 
         <hr />
-        <el-table
-          :data="multipleSelection_2"
-          border
-          highlight-current-row
-          style="width: 100%;font-weight:normal;font-size:12px"
-          class="table_1"
-        >
-          <el-table-column
-            type="index"
-            width="45px"
-            label="序号"
-            align="center"
-          >
+        <el-table :data="multipleSelection_2" border highlight-current-row
+          style="width: 100%;font-weight:normal;font-size:12px" class="table_1">
+          <el-table-column type="index" width="45px" label="序号" align="center">
           </el-table-column>
-          <el-table-column
-            prop="PUR_NO"
-            label="采购单号"
-            align="center"
-            width="100px"
-          ></el-table-column>
-          <el-table-column
-            prop="ITEM_NO"
-            label="编码"
-            align="center"
-            width="110px"
-          ></el-table-column>
-          <el-table-column
-            prop="NAMEE"
-            label="名称"
-            align="center"
-            width="180px"
-          ></el-table-column>
-          <el-table-column
-            prop="GRADE"
-            label="规格"
-            align="center"
-            width="90px"
-          ></el-table-column>
+          <el-table-column prop="PUR_NO" label="采购单号" align="center" width="100px"></el-table-column>
+          <el-table-column prop="ITEM_NO" label="编码" align="center" width="110px"></el-table-column>
+          <el-table-column prop="NAMEE" label="名称" align="center" width="180px"></el-table-column>
+          <el-table-column prop="GRADE" label="规格" align="center" width="90px"></el-table-column>
           <el-table-column label="待送货数量" align="center" width="155px">
             <template slot-scope="scope">
-              <el-input-number
-                v-model="scope.row.INVOICE_QTY"
-                size="mini"
-                controls-position="right"
-                :min="0"
-                :max="scope.row.max_qty"
-              ></el-input-number>
+              <el-input-number v-model="scope.row.INVOICE_QTY" size="mini" controls-position="right" :min="0"
+                :max="scope.row.max_qty"></el-input-number>
             </template>
           </el-table-column>
-          <el-table-column
-            prop="PRODUCT_NOTE"
-            label="制作说明"
-            align="center"
-            width="120px"
-          ></el-table-column>
+          <el-table-column prop="PRODUCT_NOTE" label="制作说明" align="center" width="120px"></el-table-column>
           <el-table-column label="备注" align="center" min-width="300px">
             <template slot-scope="scope">
               <el-input v-model="scope.row.NOTE" clearable></el-input>
             </template>
           </el-table-column>
-          <el-table-column
-            prop="QTY"
-            label="已发货数量"
-            align="center"
-            width="100px"
-          ></el-table-column>
+          <el-table-column prop="QTY" label="已发货数量" align="center" width="100px"></el-table-column>
           <el-table-column label="约定日期" align="center" width="100px">
             <template slot-scope="scope1">
               {{ scope1.row.DATE_REG | datatrans }}
@@ -888,12 +442,12 @@ export default {
   name: "DeliveryList",
   data() {
     return {
-        reback_notes_1:"",
+      reback_notes_1: "",
       max_qty: [],
       editData: [],
       submit: {
         INVOICE_STATUS: "",
-        CONFIRM_STATUS:"",
+        CONFIRM_STATUS: "",
         INVOICE_DATE: "",
         CREATE_DATE: "",
         CREATE_PERSON: "",
@@ -903,9 +457,9 @@ export default {
         REMARKS: "",
         SUPPLY_LINKMAN: "",
         LINKMAN_TEL: "",
-        EXPECT_ARRIVAL_DATE:"",
-        LOGISTICS_LINKMAN:"",
-        LOGISTICS_TEL:"",
+        EXPECT_ARRIVAL_DATE: "",
+        LOGISTICS_LINKMAN: "",
+        LOGISTICS_TEL: ""
       },
       newStatus: 2,
       editStatus: 1,
@@ -918,7 +472,7 @@ export default {
       ruleForm_4: { dateValue: "" },
       multipleSelection: [],
       innerVisible: false,
-      rebackVisible:false,
+      rebackVisible: false,
       PURData: [],
       find: "",
       DeliverData_2: [],
@@ -941,7 +495,7 @@ export default {
       finishTime: "", //查询的结束时间
       SEARCHKEY: "", //搜索栏关键字
       SELECT_STATUS: "", //存储下拉框的值
-      confirm_status:"",
+      confirm_status: "",
       rowPlus: 0, //兰居软装设计需求表中的户型编辑项添加数
       isAdd: false, //新增记录
       isEdit: false, //编辑记录
@@ -973,7 +527,7 @@ export default {
         {
           label: "未通过",
           value: "3"
-        },
+        }
       ],
       lanjuData: [],
       submitForm: [], //提交的表头信息
@@ -1101,13 +655,13 @@ export default {
       });
     },
     //确认退回
-    rebackTure(){
-        this.rebackVisible = false;
-        this.reback();
+    rebackTure() {
+      this.rebackVisible = false;
+      this.reback();
     },
     //退回弹窗
-    reback_show(){
-        this.rebackVisible = true;
+    reback_show() {
+      this.rebackVisible = true;
     },
     //确认采购单
     isTrue() {
@@ -1193,7 +747,7 @@ export default {
         finishTime: this.finishTime,
         status: this.SELECT_STATUS,
         find: this.SEARCHKEY,
-        confirm_status:this.confirm_status,
+        confirm_status: this.confirm_status
       };
       if (!data.beginTime) {
         data.beginTime = "0001/1/1";
@@ -1254,9 +808,8 @@ export default {
         EXPECT_ARRIVAL_DATE: val.EXPECT_ARRIVAL_DATE, //预计到货时间
         LOGISTICS_LINKMAN: val.LOGISTICS_LINKMAN, //物流联系人
         LOGISTICS_TEL: val.LOGISTICS_TEL, //物流联系电话
-        CONFIRM_STATUS:val.CONFIRM_STATUS,
-        REBACK_NOTES:val.REBACK_NOTES,
-
+        CONFIRM_STATUS: val.CONFIRM_STATUS,
+        REBACK_NOTES: val.REBACK_NOTES
       };
       this.DeliverData_1 = data;
       var data_1 = {
@@ -1296,8 +849,8 @@ export default {
         val.EXPECT_ARRIVAL_DATE
       );
       this.submit.LOGISTICS_LINKMAN = val.LOGISTICS_LINKMAN;
-      this.submit.LOGISTICS_TEL = val.LOGISTICS_TEL
-      
+      this.submit.LOGISTICS_TEL = val.LOGISTICS_TEL;
+
       let data = {
         INVOICE_NO: val.INVOICE_NO, //发货单号
         INVOICE_DATE: val.INVOICE_DATE, //发货日期
@@ -1309,10 +862,10 @@ export default {
         REMARKS: val.REMARKS, //备注
         SUPPLY_LINKMAN: val.SUPPLY_LINKMAN, //供应商联系人
         LINKMAN_TEL: val.LINKMAN_TEL, //供应商联系人电话
-        PUR_NO:val.PUR_NO,//采购单号
-        PUR_ID:val.PUR_ID,
-        CONFIRM_STATUS:val.CONFIRM_STATUS,
-        REBACK_NOTES:val.REBACK_NOTES,
+        PUR_NO: val.PUR_NO, //采购单号
+        PUR_ID: val.PUR_ID,
+        CONFIRM_STATUS: val.CONFIRM_STATUS,
+        REBACK_NOTES: val.REBACK_NOTES
       };
       this.editData = data;
       var data_1 = {
@@ -1338,8 +891,8 @@ export default {
             PRODUCT_NOTE: this.DetailData[i].PRODUCT_NOTE,
             QTY: this.DetailData[i].QTY,
             DATE_REG: this.DetailData[i].DATE_REG,
-            DATE_DELIVER: this.DetailData[i].DATE_DELIVER,
-           // REBACK_QTY:this.DetailData[i].REBACK_QTY,
+            DATE_DELIVER: this.DetailData[i].DATE_DELIVER
+            // REBACK_QTY:this.DetailData[i].REBACK_QTY,
           };
           this.$set(this.DetailData_1, i, this.DetailData_1[i]);
         }
@@ -1347,38 +900,37 @@ export default {
     },
     //退回
     reback() {
-        if (this.reback_notes_1.length == "") {
+      if (this.reback_notes_1.length == "") {
         this.$alert("请输入不通过说明", "提示", {
           confirmButtonText: "确定",
           type: "warning"
         });
       } else {
         this.lanjuDetail = false;
-      this.submit.CONFIRM_STATUS = 3;
-      this.submit.INVOICE_STATUS = 3;
-      this.submit.REBACK_NOTES = this.reback_notes_1;
-      
-      if (this.ruleForm_1.dateValue !== this.submit.INVOICE_DATE) {
-        this.submit.INVOICE_DATE = this.ruleForm_1.dateValue;
-      }
-      if (this.ruleForm_4.dateValue !== this.submit.EXPECT_ARRIVAL_DATE) {
-        this.submit.EXPECT_ARRIVAL_DATE = this.ruleForm_4.dateValue;
-      }
-      UpdateDelivery({
-        headForm: this.submit,
-        gridData: this.DetailData_1,
-        cid: Cookies.get("companyId")
-      }).then(res => {
-        if (res.code == "0") {
-          this.$alert("保存成功", "提示", {
-            confirmButtonText: "确定",
-            type: "success"
-          });
-          this.search();
+        this.submit.CONFIRM_STATUS = 3;
+        this.submit.INVOICE_STATUS = 3;
+        this.submit.REBACK_NOTES = this.reback_notes_1;
+
+        if (this.ruleForm_1.dateValue !== this.submit.INVOICE_DATE) {
+          this.submit.INVOICE_DATE = this.ruleForm_1.dateValue;
         }
-      });
+        if (this.ruleForm_4.dateValue !== this.submit.EXPECT_ARRIVAL_DATE) {
+          this.submit.EXPECT_ARRIVAL_DATE = this.ruleForm_4.dateValue;
+        }
+        UpdateDelivery({
+          headForm: this.submit,
+          gridData: this.DetailData_1,
+          cid: Cookies.get("companyId")
+        }).then(res => {
+          if (res.code == "0") {
+            this.$alert("保存成功", "提示", {
+              confirmButtonText: "确定",
+              type: "success"
+            });
+            this.search();
+          }
+        });
       }
-      
     },
     //编辑
     isTrueEdit() {
@@ -1404,7 +956,7 @@ export default {
           this.search();
         }
       });
-    },
+    }
   }
 };
 </script>
@@ -1450,93 +1002,15 @@ export default {
   text-align: center;
   font-size: 14px;
 }
-.tableCol {
-  background: #f0f9eb;
-}
-.grayTD {
-  background: rgb(241, 242, 243);
-}
-.headerStyle {
-  display: inline-block;
-  width: 100px;
-  font-weight: bold;
-}
-.timeRight {
-  font-size: 14px;
-  line-height: 30px;
-  display: inline-block;
-  margin-right: 20px;
-  font-weight: bold;
-}
-.timeLeft {
-  font-size: 14px;
-  line-height: 30px;
-  display: inline-block;
-}
-.ISimg {
-  width: 100px;
-  height: 100px;
-  cursor: pointer;
-}
-.BIGimg {
-  width: 333px;
-  height: 333px;
-}
-.inputWidth {
-  width: 220px;
-}
 .tbarStyle {
   margin-bottom: 13px;
 }
-.statusCombobox {
-  margin-left: 10px;
-}
-</style>
-
-<style>
-.el-table .success-row {
-  background: #f0f9eb;
-}
-
-.avatar-uploader .el-upload {
-  border: 1px dashed black;
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-.avatar-uploader .el-upload:hover {
-  border-color: #409eff;
-}
-.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 30px;
-  height: 30px;
-  line-height: 30px;
-  text-align: center;
-}
-.avatar {
-  width: 30px;
-  height: 30px;
-  display: block;
-}
 .inputStyle {
-  border: 0;
   height: 100%;
   width: 100%;
   font-size: 16px;
   text-align: center;
-}
-.inputStyleNew {
-  border: 0;
-  height: 100%;
-  width: 54%;
-  font-size: 16px;
-  text-align: center;
-}
-.upload-de .el-upload-dragger {
-  height: 30px;
-  width: 200px;
+  border: 1px solid #dcdfe6;
+  box-sizing: border-box;
 }
 </style>

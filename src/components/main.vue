@@ -1,10 +1,10 @@
 <template>
   <div class="center" @click="lastClick">
     <el-container class="page">
-      <el-aside :width="asideWidth" style="overflow:hidden;background:white;">
+      <el-aside :width="asideStatus?'60px':'200px'" style="overflow:hidden;background:white;">
         <el-scrollbar style="height:100%;">
           <div id="aside-header">
-            <div id="aside-logo"></div>
+            <div id="aside-logo" :style="{display:asideStatus?'none':'block'}"></div>
             <span>玉兰B2B</span>
           </div>
           <el-menu style="margin-bottom:10px;" :default-openeds="['shops', 'design', 'shoppingCar', 'query']"
@@ -17,10 +17,11 @@
       <el-container style="width:85%; min-width:1050px;">
         <el-header height="45px">
           <ul class="l">
-            <li :title="asideStatus == true ? '菜单展开' : '菜单收起'" @click="changeAside">
-              <i id="asideControll" class="iconfont">&#xe61e;</i>
+            <li :title="asideStatus? '菜单展开' : '菜单收起'" @click="changeAside">
+              <i id="asideControll" class="iconfont" v-if="asideStatus">&#xe61e;</i>
+              <i id="asideControll" class="iconfont" v-else>&#xe65f;</i>
               <span class="ml10 mr10">{{
-                asideStatus == true ? "菜单展开" : "菜单收起"
+                asideStatus? "菜单展开" : "菜单收起"
               }}</span>
             </li>
             <!-- <li title="主页" @click="dialogFormVisible = true">
@@ -310,8 +311,9 @@ export default {
       notificationVisible: false,
       studySelectData: [],
       studyVisible: false,
-      asideStatus: false, //false:菜单栏处于展开状态； true：菜单栏处于收起状态
-      asideWidth: "200px",
+      asideStatus:
+        window.localStorage.getItem("asideStatus") &&
+        window.localStorage.getItem("asideStatus") == "true", //false:菜单栏处于展开状态； true：菜单栏处于收起状态
       defaultUrl: "",
       isFullscreen: false,
       adminText: "无新公告发布!",
@@ -1012,15 +1014,7 @@ export default {
     //按钮样式--菜单展开收起
     changeAside() {
       this.asideStatus = !this.asideStatus;
-      if (this.asideStatus == false) {
-        this.asideWidth = "200px";
-        document.getElementById("aside-logo").style.display = "block";
-        document.getElementById("asideControll").innerHTML = "&#xe61e;";
-      } else {
-        this.asideWidth = "60px";
-        document.getElementById("aside-logo").style.display = "none";
-        document.getElementById("asideControll").innerHTML = "&#xe65f;";
-      }
+      window.localStorage.setItem("asideStatus", this.asideStatus);
     },
     //全屏事件
     screenfull() {

@@ -312,27 +312,27 @@
                 </el-table-column>
                 <el-table-column label="备注" header-align="center">
                   <template slot-scope="scope1">
-                    <el-input :autosize="{ maxRows: 6 }" :disabled="tableStatus === 3" type="textarea"
-                      v-model="scope1.row.note" clearable>
+                    <el-input resize="none" :autosize="{minRows:1, maxRows: 3 }" :disabled="tableStatus === 3"
+                      type="textarea" v-model="scope1.row.note" clearable>
                     </el-input>
                     {{ getRemark(scope1.row, scope.$index) }}
                   </template>
                 </el-table-column>
                 <el-table-column label="兰居意见" header-align="center" v-if="tableStatus !== 0">
                   <template slot-scope="scope1">
-                    <el-input v-if="tableStatus === 1" type="textarea" :autosize="{ maxRows: 6 }"
-                      v-model="scope1.row.suggestion" clearable>
+                    <el-input v-if="tableStatus === 1" resize="none" type="textarea"
+                      :autosize="{ minRows:1, maxRows: 3 }" v-model="scope1.row.suggestion" clearable>
                     </el-input>
-                    <el-input v-else-if="tableStatus === 2 || tableStatus === 3" size="mini" disabled type="textarea"
-                      :autosize="{ maxRows: 6 }" v-model="scope1.row.suggestion" clearable>
+                    <el-input v-else-if="tableStatus === 2 || tableStatus === 3" disabled resize="none" type="textarea"
+                      :autosize="{ minRows:1, maxRows: 3 }" v-model="scope1.row.suggestion">
                     </el-input>
                   </template>
                 </el-table-column>
               </el-table>
               <div style="text-align: center;" v-if="tableStatus === 1">
-                <el-input resize="none" type="textarea" :rows="3" :placeholder="
+                <el-input resize="none" :autosize="{ minRows:1, maxRows: 3 }" type="textarea" :placeholder="
                     '请输入第' + scope.row.LINE_NO + '副窗帘审核意见'
-                  " v-model="scope.row.LJ_SUGGESTION">
+                  " v-model="scope.row.LJ_SUGGESTION" clearable>
                 </el-input>
               </div>
             </div>
@@ -2058,17 +2058,17 @@ export default {
   font-weight: bold;
 }
 .messageBox > div {
-  padding: 5px 0;
+  padding: 2px 0;
 }
 .messageInput {
   border: 1px solid #c3c3c3;
-  margin-right: 3px;
-  padding: 0 2px;
+  margin-right: 2px;
+  padding: 0 1px;
   min-width: 40px;
   border-radius: 4px;
   color: gray;
   display: inline-block;
-  line-height: 20px;
+  line-height: 18px;
 }
 </style>
 <style>
@@ -2080,7 +2080,7 @@ export default {
 }
 .curtainTable .el-table td,
 .curtainTable .el-table th {
-  padding: 0 !important;
+  padding: 1px !important;
 }
 .curtainTable .el-table .cell {
   padding: 0 5px;

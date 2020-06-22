@@ -2093,10 +2093,9 @@ export default {
 }
 .fixHead {
   position: fixed;
-  opacity: 0.85;
   top: 50px;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.6);
+  background: white;
   width: 100%;
 }
 </style>

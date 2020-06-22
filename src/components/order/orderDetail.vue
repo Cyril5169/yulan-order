@@ -292,7 +292,6 @@ export default {
       };
       queryCash(url, data).then(res => {
         this.Initial_balance = res.data;
-        console.log(this.Initial_balance);
       });
     },
     //[新]订单获取

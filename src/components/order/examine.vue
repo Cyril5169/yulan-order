@@ -1,75 +1,34 @@
 <template>
   <el-card class="centerCard">
     <div>
-      <el-tabs
-        style="display:inline-block;width:900px;"
-        v-model="activeName"
-        @tab-click="handleClick"
-      >
+      <el-tabs style="display:inline-block;width:900px;" v-model="activeName" @tab-click="handleClick">
         <el-tab-pane label="待处理的订单" name="unCheck"></el-tab-pane>
         <el-tab-pane label="待客户处理的订单" name="customCheck"></el-tab-pane>
         <el-tab-pane label="审核过的订单" name="checked"></el-tab-pane>
         <el-tab-pane label="全部订单" name="allOrder"></el-tab-pane>
       </el-tabs>
-      <a
-        target="_blank"
-        style="float:right;"
-        href="http://www.luxlano.com/ddkc/"
-        >玉兰·兰居尚品->订单及库存查询</a
-      >
+      <a target="_blank" style="float:right;" href="http://www.luxlano.com/ddkc/">玉兰·兰居尚品->订单及库存查询</a>
     </div>
     <div>
-      <el-date-picker
-        type="date"
-        format="yyyy-MM-dd"
-        value-format="yyyy-MM-dd"
-        placeholder="日期区间"
-        v-model="date1"
-        style="width:14%;"
-      ></el-date-picker
-      >&nbsp;--
-      <el-date-picker
-        type="date"
-        format="yyyy-MM-dd"
-        value-format="yyyy-MM-dd"
-        placeholder="日期区间"
-        v-model="date2"
-        style="width:14%;"
-      ></el-date-picker>
+      <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="日期区间" v-model="date1"
+        style="width:14%;"></el-date-picker>&nbsp;--
+      <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="日期区间" v-model="date2"
+        style="width:14%;"></el-date-picker>
       <el-select v-model="orderType" placeholder="请选择审核状态">
-        <el-option
-          v-for="item in options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        ></el-option>
+        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
       </el-select>
-      <el-input
-        @keyup.enter.native="search()"
-        placeholder="请输入订单号或客户名称"
-        v-model="find"
-        style="width:300px;"
-      >
-        <el-button @click="search()" slot="append" icon="el-icon-search"
-          >搜索</el-button
-        >
+      <el-input @keyup.enter.native="search()" placeholder="请输入订单号或客户名称" v-model="find" style="width:300px;">
+        <el-button @click="search()" slot="append" icon="el-icon-search">搜索</el-button>
       </el-input>
     </div>
     <div id="outDiv">
-      <el-card
-        style="position:relative;"
-        v-for="(item, index) of data"
-        :key="index"
-      >
+      <el-card style="position:relative;" v-for="(item, index) of data" :key="index">
         <div slot="header">
-          <i
-            style="float: right;color:#20a0ff;line-height: 35px;cursor: pointer;"
-            class="el-icon-caret-bottom"
-            @click="collapseClick($event, item.ORDER_NO)"
-          ></i>
+          <i style="float: right;color:#20a0ff;line-height: 35px;cursor: pointer;"
+            :class="[item.collapse?'el-icon-caret-bottom':'el-icon-caret-top']"
+            @click="item.collapse=!item.collapse"></i>
 
-          <a
-            v-if="
+          <a v-if="
               (item.STATUS_ID == 1 &&
                 (item.CURTAIN_STATUS_ID == '' ||
                   item.CURTAIN_STATUS_ID == 4)) ||
@@ -77,36 +36,20 @@
                 item.STATUS_ID == 4 ||
                 item.STATUS_ID == 7 ||
                 item.STATUS_ID == 12
-            "
-            target="_blank"
-            style="float:right;cursor: pointer;font-size:13px;line-height: 35px;margin-right:10px;"
+            " target="_blank" style="float:right;cursor: pointer;font-size:13px;line-height: 35px;margin-right:10px;"
             :href="
               'http://www.luxlano.com/ddkc/DDrs2.asp?DDid=' + item.ORDER_NO
-            "
-            >兰居订单查询</a
-          >
-          <el-button
-            :id="'cardBtnDetail' + item.ORDER_NO"
-            style="float: right;margin-right:20px;"
-            @click="toCheckExamine(item.ORDER_NO)"
-            size="mini"
-            type="primary"
-            plain
-            >订单详情</el-button
-          >
-          <el-button
-            :id="'cardBtnCheck' + item.ORDER_NO"
-            style="float: right;margin-right:10px;"
-            v-if="
+            ">兰居订单查询</a>
+          <el-button style="float: right;margin-right:20px;" v-if="item.collapse" @click="toCheckExamine(item.ORDER_NO)"
+            size="mini" type="primary" plain>订单详情</el-button>
+          <el-button style="float: right;margin-right:10px;" v-if=" item.collapse &&
               (item.CURTAIN_STATUS_ID == '0' && item.STATUS_ID == '1') ||
                 item.CURTAIN_STATUS_ID == '3'
-            "
-            @click="toExamineDetail(item.ORDER_NO)"
-            size="mini"
-            type="success"
-            plain
-            >审核订单</el-button
-          >
+            " @click="toExamineDetail(item.ORDER_NO)" size="mini" type="success" plain>审核订单</el-button>
+          <el-button style="float: right;margin-right:10px;" v-if=" item.collapse &&
+              (item.CURTAIN_STATUS_ID == '0' && item.STATUS_ID == '1') ||
+                item.CURTAIN_STATUS_ID == '3'
+            " @click="_back(item)" size="mini" type="warning" plain>直接退回</el-button>
           <span class="zoomLeft">时间：</span>
           <span class="zoomRight">{{ item.DATE_CRE }}</span>
           <span class="zoomLeft">订单号：</span>
@@ -129,24 +72,12 @@
           <span class="zoomLeft">地址：</span>
           <span class="zoomRight">{{ item.ALL_ADDRESS }}</span>
         </div>
-        <div :id="'cardBody' + item.ORDER_NO" class="collapseHive">
+        <div v-if="!item.collapse">
           <div class="outDiv" style="float:left;width:90%">
-            <el-table
-              border
-              :data="data[index].ORDERBODY"
-              style="width: 100%;margin-bottom:5px;"
-              :row-class-name="tableRowClassName"
-            >
-              <el-table-column
-                prop="ITEM_NO"
-                label="型号"
-                align="center"
-              ></el-table-column>
-              <el-table-column
-                prop="BRAND_NAME"
-                label="品牌"
-                align="center"
-              ></el-table-column>
+            <el-table border :data="item.ORDERBODY" style="width: 100%;margin-bottom:5px;"
+              :row-class-name="tableRowClassName">
+              <el-table-column prop="ITEM_NO" label="型号" align="center"></el-table-column>
+              <el-table-column prop="BRAND_NAME" label="品牌" align="center"></el-table-column>
               <el-table-column prop="NOTE" label="类型" align="center">
                 <template slot-scope="scope1">
                   <span v-if="scope1.row.NOTE == '帘头'">定制窗帘</span>
@@ -174,32 +105,24 @@
             </el-table>
           </div>
           <div class="buttonDiv">
-            <p
-              style="width:100px; font-size:18px; color:tomato; text-align:center;"
-            >
+            <p style="width:100px; font-size:18px; color:tomato; text-align:center;">
               {{ item.status }}
             </p>
             <p>
-              <el-button
-                v-if="
+              <el-button v-if=" !item.collapse &&
                   (item.CURTAIN_STATUS_ID == '0' && item.STATUS_ID == '1') ||
                     item.CURTAIN_STATUS_ID == '3'
-                "
-                @click="toExamineDetail(item.ORDER_NO)"
-                size="medium"
-                type="success"
-                plain
-                >审核订单</el-button
-              >
+                " @click="toExamineDetail(item.ORDER_NO)" size="medium" type="success" plain>审核订单</el-button>
             </p>
             <p>
-              <el-button
-                @click="toCheckExamine(item.ORDER_NO)"
-                size="medium"
-                type="primary"
-                plain
-                >订单详情</el-button
-              >
+              <el-button v-if="!item.collapse" @click="toCheckExamine(item.ORDER_NO)" size="medium" type="primary"
+                plain>订单详情</el-button>
+            </p>
+            <p>
+              <el-button v-if=" !item.collapse &&
+                  (item.CURTAIN_STATUS_ID == '0' && item.STATUS_ID == '1') ||
+                    item.CURTAIN_STATUS_ID == '3'
+                " @click="_back(item)" size="medium" type="warning" plain>直接退回</el-button>
             </p>
           </div>
         </div>
@@ -208,15 +131,9 @@
         {{ waitText }}
       </div> -->
       <div style="margin:0 25%;" class="block">
-        <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page.sync="currentPage"
-          :page-sizes="[20, 50, 100, 1000]"
-          :page-size="limit"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="count"
-        ></el-pagination>
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+          :current-page.sync="currentPage" :page-sizes="[20, 50, 100, 1000]" :page-size="limit"
+          layout="total, sizes, prev, pager, next, jumper" :total="count"></el-pagination>
       </div>
     </div>
   </el-card>
@@ -224,7 +141,7 @@
 
 <script>
 import { getOrderlist, getExamineOrder } from "@/api/orderList";
-import { getCurtainOrders } from "@/api/orderListASP";
+import { getCurtainOrders, updateCurtainOrder } from "@/api/orderListASP";
 import { cancelOrder } from "@/api/orderList";
 import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
@@ -246,7 +163,7 @@ export default {
       currentPage: 1,
       buttonShow: true,
       isAll: false,
-      orderBy:'',
+      orderBy: "",
       canOptionValue: ["0", "3"],
       options: [
         {
@@ -377,6 +294,55 @@ export default {
       Cookies.set("status_ID", -2);
       this.addTab("order/checkExamine");
     },
+    _back(item) {
+      this.$confirm("确定直接退回客户吗？", "提示", {
+        confirmButtonText: "确定",
+        type: "warning"
+      })
+        .then(() => {
+          var ctmOrderDetails = [];
+          for (var i = 0; i < item.ORDERBODY.length; i++) {
+            var one = item.ORDERBODY[i];
+            let transData = {};
+            transData.lineNo = one.LINE_NO;
+            transData.orderNo = one.ORDER_NO;
+            transData.ljSuggestion = "客户要求退回修改";
+            ctmOrderDetails.push(transData);
+          }
+          let data = {
+            cid: Cookies.get("cid"),
+            orderNo: item.ORDER_NO,
+            curtainStatusId: "1",
+            allCurtains: [],
+            ctmOrderDetails: ctmOrderDetails
+          };
+          updateCurtainOrder(data)
+            .then(res => {
+              if (res.code == 0) {
+                this.$alert("操作成功,已将该订单退回给客户", "提示", {
+                  confirmButtonText: "确定",
+                  type: "success"
+                });
+                this.getorderList();
+              } else {
+                this.$alert("操作失败，请稍后重试", "提示", {
+                  confirmButtonText: "确定",
+                  type: "warning"
+                });
+              }
+            })
+            .catch(res => {
+              this.$alert("操作失败:" + res.msg, "提示", {
+                confirmButtonText: "确定",
+                type: "warning"
+              });
+              console.log(res);
+            });
+        })
+        .catch(() => {
+          return;
+        });
+    },
     //[新]获取审核订单
     // getorderList() {
     //   let url = "/order/gatAllCurOrders.do";
@@ -426,7 +392,7 @@ export default {
         finishTime: this.date2,
         curtainStatusId: this.orderType || this.canOptionValue,
         isAll: this.isAll,
-        orderBy : this.orderBy
+        orderBy: this.orderBy
       };
       if (!data.beginTime) {
         data.beginTime = "0001/1/1";
@@ -454,26 +420,26 @@ export default {
           this.options = this.options1;
           this.canOptionValue = ["0", "3"];
           this.isAll = false;
-          this.orderBy = '';
+          this.orderBy = "";
           break;
         case "customCheck":
           this.options = this.options2;
           this.canOptionValue = ["1", "2", "8"];
           this.isAll = false;
-          this.orderBy = ' DESC';
+          this.orderBy = " DESC";
           break;
         case "checked":
           this.options = this.options3;
           this.canOptionValue = ["4"];
           this.isAll = false;
-          this.orderBy = ' DESC';
+          this.orderBy = " DESC";
           break;
         case "allOrder":
           this.options = this.options4;
           //this.canOptionValue = ["0","1", "2", "3","4"];
           this.canOptionValue = [];
           this.isAll = true;
-          this.orderBy = ' DESC';
+          this.orderBy = " DESC";
           break;
       }
       this.getorderList();
@@ -502,29 +468,6 @@ export default {
         return "success-row";
       }
       return "";
-    },
-    collapseClick: function(event, data) {
-      if (event.target.className == "el-icon-caret-top")
-        event.target.setAttribute("class", "el-icon-caret-bottom");
-      else event.target.setAttribute("class", "el-icon-caret-top");
-
-      let div = document.getElementById("cardBody" + data);
-      if (div.className == "collapseHive") div.removeAttribute("class");
-      else div.setAttribute("class", "collapseHive");
-
-      let btnDetail = document.getElementById("cardBtnDetail" + data);
-      if (btnDetail) {
-        if (btnDetail.className.indexOf("collapseHive") > -1)
-          btnDetail.classList.remove("collapseHive");
-        else btnDetail.classList.add("collapseHive");
-      }
-
-      let btnCheck = document.getElementById("cardBtnCheck" + data);
-      if (btnCheck) {
-        if (btnCheck.className.indexOf("collapseHive") > -1)
-          btnCheck.classList.remove("collapseHive");
-        else btnCheck.classList.add("collapseHive");
-      }
     }
   },
   // created() {

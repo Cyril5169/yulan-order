@@ -105,7 +105,7 @@
                 <a class="uline" @click="getNewItemNo(scope.row, scope.$index)">
                   {{ scope.row.item.itemNo }}
                 </a>
-                <el-checkbox class="ml5" v-if="scope.row.deleteFlag === 'Y'" v-model="scope.row.choose"
+                <el-checkbox v-if="scope.row.deleteFlag === 'Y'" v-model="scope.row.choose"
                   @change="changeLinkReverse(scope.row)">
                 </el-checkbox>
               </span>

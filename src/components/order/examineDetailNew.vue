@@ -1,5 +1,5 @@
 <template>
-  <el-card class="centerCard">
+  <div class="centerCard">
     <el-dialog title="窗帘详情" :show-close="false" :visible.sync="detailVisible" :close-on-click-modal="false" width="95%"
       top="5vh">
       <keep-alive>
@@ -139,7 +139,7 @@
                     </span>
                   </template>
                 </el-table-column>
-                <el-table-column label="编码" header-align="center" width="125">
+                <el-table-column label="编码" header-align="center" width="110">
                   <template slot-scope="scope1">
                     <div>
                       <span v-if="tableStatus === 3">
@@ -165,7 +165,7 @@
                           ">
                           {{ scope1.row.item.itemNo }}
                         </a>
-                        <el-checkbox class="ml5" v-if="scope1.row.deleteFlag === 'Y'"
+                        <el-checkbox v-if="scope1.row.deleteFlag === 'Y'"
                           v-model="chooseSamll[scope.$index][scope1.$index]" @change="
                             changeLinkReverse(
                               scope1.row,
@@ -177,7 +177,7 @@
                       </span>
                       <span v-else>
                         {{ scope1.row.item.itemNo }}
-                        <el-checkbox class="ml5" v-if="scope1.row.deleteFlag === 'Y'"
+                        <el-checkbox v-if="scope1.row.deleteFlag === 'Y'"
                           v-model="chooseSamll[scope.$index][scope1.$index]" @change="
                             changeLinkReverse(
                               scope1.row,
@@ -313,9 +313,9 @@
                     </span>
                   </template>
                 </el-table-column>
-                <el-table-column label="备注" header-align="center">
+                <el-table-column label="客户备注" header-align="center">
                   <template slot-scope="scope1">
-                    <el-input resize="none" :autosize="{minRows:1, maxRows: 3 }" :disabled="tableStatus === 3"
+                    <el-input resize="none" :autosize="{minRows:1, maxRows: 3 }" :disabled="tableStatus === 3 || true"
                       type="textarea" v-model="scope1.row.note" clearable>
                     </el-input>
                     {{ getRemark(scope1.row, scope.$index) }}
@@ -331,10 +331,17 @@
                     </el-input>
                   </template>
                 </el-table-column>
+                <el-table-column label="生产备注" header-align="center" v-if="tableStatus !== 0">
+                  <template slot-scope="scope1">
+                    <el-input resize="none" type="textarea" :autosize="{ minRows:1, maxRows: 3 }"
+                      v-model="scope1.row.productNote" clearable>
+                    </el-input>
+                  </template>
+                </el-table-column>
               </el-table>
               <div style="text-align: center;" v-if="tableStatus === 1">
                 <el-input resize="none" :autosize="{ minRows:1, maxRows: 3 }" type="textarea" :placeholder="
-                    '请输入第' + scope.row.LINE_NO + '副窗帘审核意见'
+                    '请输入第' + scope.row.LINE_NO + '副窗帘退回原因'
                   " v-model="scope.row.LJ_SUGGESTION" clearable>
                 </el-input>
               </div>
@@ -451,7 +458,7 @@
         </el-steps>
       </div>
     </el-card>
-  </el-card>
+  </div>
 </template>
 
 <script>
@@ -756,7 +763,7 @@ export default {
         cid: this.ruleForm.CUSTOMER_CODE,
         companyId: this.ruleForm.CUSTOMER_CODE
       };
-      getCustomerInfo(data).then(res => {
+      getCustomerInfo(data, { loading: false }).then(res => {
         this.cus_customerType = res.data.CUSTOMER_TYPE;
       });
     },
@@ -790,7 +797,7 @@ export default {
         page: 1,
         itemNO: "PJB"
       };
-      changeItem(_obj)
+      changeItem(_obj, { loading: false })
         .then(res => {
           let _arr = [];
           res.data.forEach(item => {
@@ -1100,12 +1107,14 @@ export default {
           }
           if (item.note === null) item.note = "";
           if (item.suggestion === null) item.suggestion = "";
+          if (item.productNote === null) item.productNote = "";
           _data_temp.push(JSON.parse(JSON.stringify(item)));
         });
         //把不需要比对的备注和意见拿出来
         _data_temp.forEach(item => {
           item.note = "";
           item.suggestion = "";
+          item.productNote = "";
         });
         var oldData_temp = [];
         this.oldData.forEach(item => {
@@ -1716,6 +1725,7 @@ export default {
           }
           if (item.note === null) item.note = "";
           if (item.suggestion === null) item.suggestion = "";
+          if (item.productNote === null) item.productNote = "";
           if (item.illustrate === null) item.illustrate = "";
           _data_temp.push(JSON.parse(JSON.stringify(item)));
         });
@@ -1724,6 +1734,7 @@ export default {
       _data_temp.forEach(item => {
         item.note = "";
         item.suggestion = "";
+        item.productNote = "";
       });
       var oldData_temp = [];
       _old_data.forEach(oneItem => {
@@ -1734,6 +1745,7 @@ export default {
           }
           if (item.note === null) item.note = "";
           if (item.suggestion === null) item.suggestion = "";
+          if (item.productNote === null) item.productNote = "";
           if (item.illustrate === null) item.illustrate = "";
           oldData_temp.push(JSON.parse(JSON.stringify(item)));
         });
@@ -1742,6 +1754,7 @@ export default {
       oldData_temp.forEach(item => {
         item.note = "";
         item.suggestion = "";
+        item.productNote = "";
       });
       return JSON.stringify(oldData_temp) == JSON.stringify(_data_temp);
     },
@@ -1783,7 +1796,7 @@ export default {
         deleteIds: this.deleteIds
       };
       if (this.contrastData()) {
-        this.$confirm("所有窗帘未修改，依然兰居修改吗？", "提示", {
+        this.$confirm("所有窗帘未修改，依然修改吗？", "提示", {
           confirmButtonText: "确定",
           type: "warning"
         })
@@ -1794,7 +1807,7 @@ export default {
             return;
           });
       } else {
-        this.$confirm("确认兰居修改吗？", "提示", {
+        this.$confirm("确认修改吗？", "提示", {
           confirmButtonText: "确定",
           type: "warning"
         })
@@ -1811,7 +1824,7 @@ export default {
       updateCurtainOrder(data)
         .then(res => {
           if (res.code == 0) {
-            this.$alert("操作成功,已将该订单退回给用户进行确认", "提示", {
+            this.$alert("操作成功,已将该订单退回给客户进行确认", "提示", {
               confirmButtonText: "确定",
               type: "success"
             });
@@ -1851,6 +1864,7 @@ export default {
         for (let i = 0; i < this.allCurtains[j].length; i++) {
           array[i] = new Object();
           array[i].suggestion = this.allCurtains[j][i].suggestion;
+          array[i].productNote = this.allCurtains[j][i].productNote;
           array[i].lineNo = this.allCurtains[j][i].lineNo;
           array[i].orderItemNumber = this.allCurtains[j][i].orderItemNumber;
           array[i].orderNo = this.orderNumber;
@@ -1886,7 +1900,7 @@ export default {
       updateCurtainOrder(data)
         .then(res => {
           if (res.code == 0) {
-            this.$alert("操作成功,已将该订单退回给用户进行确认", "提示", {
+            this.$alert("操作成功,已将该订单退回给客户进行确认", "提示", {
               confirmButtonText: "确定",
               type: "success"
             });
@@ -1927,6 +1941,7 @@ export default {
           array[i] = new Object();
           array[i].note = this.allCurtains[j][i].note;
           array[i].suggestion = this.allCurtains[j][i].suggestion;
+          array[i].productNote = this.allCurtains[j][i].productNote;
           array[i].lineNo = this.allCurtains[j][i].lineNo;
           array[i].orderItemNumber = this.allCurtains[j][i].orderItemNumber;
           array[i].orderNo = this.orderNumber;
@@ -2093,7 +2108,7 @@ export default {
 }
 .fixHead {
   position: fixed;
-  top: 50px;
+  top: 46px;
   z-index: 100;
   background: white;
   width: 100%;
@@ -2109,9 +2124,6 @@ export default {
 .curtainTable .el-table td,
 .curtainTable .el-table th {
   padding: 1px !important;
-}
-.curtainTable .el-table .cell {
-  padding: 0 5px;
 }
 .curtainTable .el-input__inner {
   padding: 0 5px;

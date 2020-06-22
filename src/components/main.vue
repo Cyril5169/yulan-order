@@ -1725,6 +1725,9 @@ export default {
 .el-table th {
   padding: 4px 0 !important;
 }
+.el-table .cell {
+  padding: 0 5px !important;
+}
 .el-badge__content {
   border: none !important;
 }

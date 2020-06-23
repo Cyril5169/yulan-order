@@ -315,7 +315,7 @@
                 </el-table-column>
                 <el-table-column label="客户备注" header-align="center">
                   <template slot-scope="scope1">
-                    <el-input resize="none" :autosize="{minRows:1, maxRows: 3 }" :disabled="tableStatus === 3 || true"
+                    <el-input resize="none" :autosize="{minRows:1, maxRows: 3 }" :disabled="tableStatus === 3"
                       type="textarea" v-model="scope1.row.note" clearable>
                     </el-input>
                     {{ getRemark(scope1.row, scope.$index) }}
@@ -333,7 +333,7 @@
                 </el-table-column>
                 <el-table-column label="生产备注" header-align="center" v-if="tableStatus !== 0">
                   <template slot-scope="scope1">
-                    <el-input resize="none" type="textarea" :autosize="{ minRows:1, maxRows: 3 }"
+                    <el-input resize="none" type="textarea" :autosize="{ minRows:1, maxRows: 1 }" placeholder="专门给生产人员查看"
                       v-model="scope1.row.productNote" clearable>
                     </el-input>
                   </template>

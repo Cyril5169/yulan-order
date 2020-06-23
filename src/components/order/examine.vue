@@ -46,7 +46,7 @@
               (item.CURTAIN_STATUS_ID == '0' && item.STATUS_ID == '1') ||
                 item.CURTAIN_STATUS_ID == '3'
             " @click="toExamineDetail(item.ORDER_NO)" size="mini" type="success" plain>审核订单</el-button>
-          <el-button style="float: right;margin-right:10px;" v-if=" item.collapse &&
+          <el-button style="float: right;" v-if=" item.collapse &&
               (item.CURTAIN_STATUS_ID == '0' && item.STATUS_ID == '1') ||
                 item.CURTAIN_STATUS_ID == '3'
             " @click="_back(item)" size="mini" type="warning" plain>直接退回</el-button>

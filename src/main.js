@@ -57,7 +57,10 @@ Axios.interceptors.request.use(config => {
 
 //响应拦截
 Axios.interceptors.response.use(res => {
-  tryHideFullScreenLoading()
+  if (res.config.loading != undefined && res.config.loading == false) { }
+  else {
+    tryHideFullScreenLoading();
+  }
   return Promise.resolve(res);
 }, err => {
   tryHideFullScreenLoading();

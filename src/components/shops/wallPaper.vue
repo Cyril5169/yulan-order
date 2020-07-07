@@ -470,7 +470,9 @@ export default {
             var msg = res.data.msg;
             if (msg == "该产品正在上架，暂时不能加入购物车") {
               msg =
-                "没有维护经销/分销/家装/零售价格，暂时不能加入购物车，请联系玉兰订单部";
+                "没有维护" +
+                this.getPriceTip() +
+                "价格，暂时不能加入购物车，请联系玉兰订单部";
             }
             this.$alert(msg, "添加失败", {
               confirmButtonText: "确定",
@@ -496,6 +498,22 @@ export default {
           this.expands = [];
           this.clearMsg();
         });
+    },
+    getPriceTip() {
+      switch (this.customerType) {
+        case "02":
+        case "08":
+        case "10":
+          return "经销";
+        case "05":
+          return "零售";
+        case "06":
+          return "分销";
+        case "09":
+          return "家装";
+        default:
+          return "";
+      }
     },
     //保存到购物车
     saveToShoppingCar(row) {

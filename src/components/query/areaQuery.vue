@@ -9,14 +9,10 @@
               <tr>
                 <td class="td_1">提货单</td>
                 <td class="td_1">{{ tableDetail_1.SALE_NO }}</td>
-                <td class="td_1">开单日期</td>
+                <td class="td_1">发货日期</td>
                 <td class="td_1">{{ tableDetail_1.BILL_DATE | datatrans }}</td>
                 <td class="td_1">状态</td>
                 <td class="td_1">{{ tableDetail_1.STATUS_ID | transStatus }}</td>
-                <!-- <td class="td_1">业务员</td>
-              <td class="td_1" style="width:100px">
-                {{ tableDetail_1.SALE_NAME }}
-              </td> -->
               </tr>
               <tr>
                 <td class="td_1">合同号</td>
@@ -27,8 +23,6 @@
                 <td class="td_1">
                   {{ tableDetail_1.DATE_OUT_STOCK | datatrans }}
                 </td>
-                <!-- <td class="td_1">部门</td>
-              <td class="td_1"></td> -->
               </tr>
               <tr>
                 <td class="td_1">客户</td>
@@ -38,8 +32,6 @@
                     tableDetail_1.LINKMAN
                   }}</span>
                 </td>
-                <!-- <td class="td_1">物流</td>
-              <td class="td_1"></td> -->
               </tr>
               <tr>
                 <td class="td_1">备注</td>
@@ -61,12 +53,6 @@
               </el-table-column>
               <el-table-column prop="PRODUCTVERSION_NAME" label="版本" width="150" align="center"></el-table-column>
               <el-table-column prop="NOTE" label="仓库" align="center"></el-table-column>
-              <!-- <el-table-column
-              prop="AREA"
-              label="区位"
-              width="80"
-              align="center"
-            ></el-table-column> -->
               <el-table-column prop="QTY_DELIVER" label="发货数" width="80" align="center"></el-table-column>
               <el-table-column prop="TRANS_PRICE" label="物流单价" width="80" align="center"></el-table-column>
               <el-table-column prop="SALE_PRICE" label="单价" width="70" align="center">
@@ -100,12 +86,6 @@
               </template>
             </el-table-column>
             <el-table-column prop="CONTRACT_NO" label="订单号" align="center"></el-table-column>
-            <!-- <el-table-column
-              prop="HTBM"
-              label="合同号"
-              align="center"
-              width="130px"
-            ></el-table-column> -->
             <el-table-column label="类型" align="center" prop="BILL_ID"
               :filters="[{text: '冲减单', value: '0'}, {text: '自动提货单', value: '1'},{text: '手工提货单', value: '2'},{text: '退货单', value: '3'}, ]"
               :filter-method="filterHandler">
@@ -113,32 +93,12 @@
                 {{ scope3.row.BILL_ID | transType }}
               </template>
             </el-table-column>
-            <!-- <el-table-column label="开单日期" width="100" align="center">
-              <template slot-scope="scope4">
-                {{ scope4.row.BILL_DATE | datatrans }}
-              </template>
-            </el-table-column> -->
             <el-table-column prop="DATE_OUT_STOCK" label="提货日期" align="center">
               <template slot-scope="scope5">
                 {{ scope5.row.DATE_OUT_STOCK | datatrans }}
               </template>
             </el-table-column>
-            <!-- <el-table-column
-              prop="CUSTOMER_NAME"
-              label="客户名称"
-              align="center"
-            >
-              <template slot-scope="scope3">
-                {{ scope3.row.CUSTOMER_NAME }}/联系人:{{ scope3.row.LINKMAN }}
-              </template>
-            </el-table-column> -->
             <el-table-column prop="MONEY_SUM" label="金额" align="center"></el-table-column>
-            <!-- <el-table-column
-              prop="NAME"
-              label="物流管理员"
-              align="center"
-              width="100"
-            ></el-table-column> -->
           </el-table>
           <!-- 分页 -->
           <div style="margin:0 35%;" class="block">
@@ -149,8 +109,6 @@
       </el-dialog>
 
       <div class="ff">
-        <!-- <el-tabs class="tabs_1" v-model="activeName">
-          <el-tab-pane label="区域提货单查询" name="first"> -->
         <form target="TAB_2_CONTENT" action="queryBillList.jsp" method="POST" class="FORM_1" style="height:250px">
           <div style="width:100%">
             <div style="width:40%;border:none;float:left">
@@ -169,7 +127,7 @@
               </el-select>
 
               <div style="margin-top:15px">
-                开单日期
+                发货日期
                 <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="开始日期区间"
                   v-model="ruleForm_1.dateValue" @change="getCustomerChangTime" style="width:178px"></el-date-picker>
                 <span style="margin-left:10px">--</span>

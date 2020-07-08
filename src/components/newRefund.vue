@@ -1118,7 +1118,6 @@ export default {
       QtyLimit: "", //出货数量上限
       FormRight: false,
       dateStamp: "",
-      uploadSuccessNum: 0, //上传成功的文件数
       fileChange: false,
       inputSaleNo: false, //是否处于输入提货单号状态
       inputItemNo: false, //是否处于输入产品型号状态
@@ -1287,8 +1286,7 @@ export default {
     },
     //查看详情
     _CheckDetail(val, type) {
-      this.FormRight = false;
-      this.uploadSuccessNum = 0;
+      this.FormRight = false;      
       this.submit = [];
       this.fileList = [];
       this.files = [];
@@ -1421,13 +1419,13 @@ export default {
           });
           return;
         }
-        // if (this.submit.QTY > this.QtyLimit) {
-        //   this.$alert("填写数量不能超过实际发货数量", "提示", {
-        //     confirmButtonText: "确定",
-        //     type: "warning"
-        //   });
-        //   return;
-        // }
+        if (this.submit.QTY > this.QtyLimit) {
+          this.$alert("填写数量不能超过实际发货数量", "提示", {
+            confirmButtonText: "确定",
+            type: "warning"
+          });
+          return;
+        }
         //判断是否上传附件
         if (this.files.length == 0) {
           this.$alert("请上传相关附件", "提示", {
@@ -1635,8 +1633,7 @@ export default {
       this.files = [];
       this.dateStamp = new Date().getTime();
       this.fileNumber = 0;
-      this.FormRight = true;
-      this.uploadSuccessNum = 0;
+      this.FormRight = true;      
       this.fileNameList = [];
       this.submitHead = {
         ID: "",
@@ -1738,13 +1735,13 @@ export default {
         });
         return;
       }
-      // if (this.submit.QTY > this.QtyLimit) {
-      //   this.$alert("填写数量不能超过实际发货数量", "提示", {
-      //     confirmButtonText: "确定",
-      //     type: "warning"
-      //   });
-      //   return;
-      // }
+      if (this.submit.QTY > this.QtyLimit) {
+        this.$alert("填写数量不能超过实际发货数量", "提示", {
+          confirmButtonText: "确定",
+          type: "warning"
+        });
+        return;
+      }
       //判断是否上传附件
       if (this.files.length == 0) {
         this.$alert("请上传相关附件", "提示", {
@@ -1998,9 +1995,9 @@ export default {
       })
         .then(res => {
           if (res.code == 0) {
-            this.fileList.push(res.data);
-            this.uploadSuccessNum += 1;
-            if (this.uploadSuccessNum == this.files.length) {
+            this.fileList.push(res.data);   
+            //上传成功的文件数=上传的文件数         
+            if (this.fileList.length == this.files.length) {
               if (this.isRefundAdd) {
                 this.sumbitNEWANSYC();
               } else {

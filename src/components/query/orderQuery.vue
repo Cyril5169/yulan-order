@@ -31,27 +31,6 @@
                 {{ scope4.row.DATE_CRE | datatrans }}
               </template>
             </el-table-column>
-            <!-- <el-table-column label="客户" align="center" width="350px">
-              <template slot-scope="scope3">
-                <el-button
-                  size="mini"
-                  @click="customer_info(scope3.row)"
-                  type="text"
-                  >{{ scope3.row.CUSTOMER_NAME }}</el-button
-                >
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="LINKPERSON"
-              label="联系人"
-              align="center"
-              width="150px"
-            ></el-table-column>
-            <el-table-column
-              prop="TELEPHONE"
-              label="联系电话"
-              align="center"
-            ></el-table-column> -->
             <el-table-column prop="ALL_SPEND" label="订单金额" align="center"></el-table-column>
           </el-table>
 
@@ -107,8 +86,6 @@
       </el-dialog>
 
       <div class="ff">
-        <!-- <el-tabs class="tabs_1"  v-model="activeName" style="width:1340px">
-          <el-tab-pane label="区域订单查询" name="first_1"> -->
         <form target="TAB_2_CONTENT" action="queryBillList.jsp" method="POST" class="FORM_1" style="height:250px">
           <div style="width:100%">
             <div style="width:40%;border:none;float:left">
@@ -127,9 +104,9 @@
               </el-select>
 
               <div style="margin-top:15px">
-                日期
+                提交日期
                 <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="开始日期区间"
-                  v-model="date1" @change="getCustomerChangTime" style="width:210px"></el-date-picker>
+                  v-model="date1" @change="getCustomerChangTime" style="width:178px"></el-date-picker>
                 <span style="margin-left:10px">--</span>
                 <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="结束日期区间"
                   v-model="date2" @change="getCustomerChangTime" style="width:210px;margin-left:12px"></el-date-picker>

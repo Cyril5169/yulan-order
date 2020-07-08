@@ -246,7 +246,8 @@
       <el-dialog width="80%" title="采购单明细" :visible.sync="innerVisible" append-to-body>
         <el-table :data="PURData" @selection-change="handleSelectionChange" border highlight-current-row
           style="width: 100%;font-weight:normal;font-size:12px" class="table_1">
-          <el-table-column type="selection" width="40" class="text-align:center"></el-table-column>
+          <el-table-column type="selection" width="40" class="text-align:center" :selectable="checkActiviyEffect">
+          </el-table-column>
           <el-table-column prop="ITEM_NO" label="编码" align="center" width="110px"></el-table-column>
           <el-table-column prop="MNAME" label="名称" align="center" width="150px"></el-table-column>
           <el-table-column prop="GRADE" label="规格" align="center" width="80px"></el-table-column>
@@ -258,7 +259,7 @@
           <el-table-column prop="QTY" label="已送货数量" align="center" width="100px"></el-table-column>
           <el-table-column label="约定日期" align="center" width="90px">
             <template slot-scope="scope1">
-              {{ scope1.row.DATE_REG | datatrans }}
+              {{ scope1.row.DATE_REQ | datatrans }}
             </template>
           </el-table-column>
           <el-table-column label="送货日期" align="center" width="90px">
@@ -371,7 +372,7 @@
           <el-table-column prop="QTY" label="已送货数量" align="center" width="100px"></el-table-column>
           <el-table-column label="约定日期" align="center" width="100px">
             <template slot-scope="scope1">
-              {{ scope1.row.DATE_REG | datatrans }}
+              {{ scope1.row.DATE_REQ | datatrans }}
             </template>
           </el-table-column>
           <el-table-column label="送货日期" align="center" width="120px">
@@ -586,6 +587,9 @@ export default {
     }
   },
   methods: {
+    checkActiviyEffect(row, index) {
+      return row.QTY_PUR > 0;
+    },
     //确认新增
     isAddTrue() {
       //判断是否填完所有信息
@@ -688,10 +692,25 @@ export default {
             });
             return;
           } else {
-            this.innerVisible = true;
-            this.PURData = res.data;
-            this.submitForm.SUPPLY_LINKMAN = res.data[0].G_LINK;
-            this.submitForm.LINKMAN_TEL = res.data[0].HANDSET;
+            var show = false;
+            for (var i = 0; i < res.data.length; i++) {
+              if (res.data[i].QTY_PUR > 0) {
+                show = true;
+                break;
+              }
+            }
+            if (show) {
+              this.innerVisible = true;
+              this.PURData = res.data;
+              this.submitForm.SUPPLY_LINKMAN = res.data[0].G_LINK;
+              this.submitForm.LINKMAN_TEL = res.data[0].HANDSET;
+            } else {
+              this.$alert("该单已发货完成", "提示", {
+                confirmButtonText: "确定",
+                type: "warning"
+              });
+              return;
+            }
           }
         });
       }

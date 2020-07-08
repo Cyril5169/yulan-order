@@ -288,7 +288,7 @@
           <el-table-column prop="QTY" label="已发货数量" align="center" width="100px"></el-table-column>
           <el-table-column label="约定日期" align="center" width="90px">
             <template slot-scope="scope1">
-              {{ scope1.row.DATE_REG | datatrans }}
+              {{ scope1.row.DATE_REQ | datatrans }}
             </template>
           </el-table-column>
           <el-table-column label="送货日期" align="center" width="90px">
@@ -401,7 +401,7 @@
           <el-table-column prop="QTY" label="已发货数量" align="center" width="100px"></el-table-column>
           <el-table-column label="约定日期" align="center" width="100px">
             <template slot-scope="scope1">
-              {{ scope1.row.DATE_REG | datatrans }}
+              {{ scope1.row.DATE_REQ | datatrans }}
             </template>
           </el-table-column>
           <el-table-column label="送货日期" align="center" width="120px">

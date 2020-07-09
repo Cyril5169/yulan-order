@@ -198,8 +198,7 @@
               <td colspan="1" style="height:21px">{{ submit.QTY }}</td>
               <td colspan="3" style="height:21px">
                 <ul class="el-upload-list el-upload-list--text">
-                  <li v-for="(file, index) in fileList" :key="index" class="el-upload-list__item is-success"
-                    tabindex="0">
+                  <li v-for="(file, index) in files" :key="index" class="el-upload-list__item is-success" tabindex="0">
                     <a class="el-upload-list__item-name">
                       <el-link type="primary" size="mini" @click="showImage(file.url)"
                         @mouseenter.native="showMiniImage($event, file.url)" @mouseout.native="MiniPic = false">
@@ -389,29 +388,29 @@
             </tr>
             <tr style="height:40px">
               <td colspan="4" border="0px" style="font-size:13px;color:gray;text-align:center;">
-               <div style="margin:4px 0px 4px 4px" v-if="submit.STATE != 'SUBMITTED'&&submit.STATE != 'APPROVED'">
-                    广东玉兰集团股份有限公司<br />
-                    市场部<br />
-                    {{ new Date(submit.DEAL_TS).getFullYear() }}年
-                    {{
+                <div style="margin:4px 0px 4px 4px" v-if="submit.STATE != 'SUBMITTED'&&submit.STATE != 'APPROVED'">
+                  广东玉兰集团股份有限公司<br />
+                  市场部<br />
+                  {{ new Date(submit.DEAL_TS).getFullYear() }}年
+                  {{
                       addZeroIfNeed(new Date(submit.DEAL_TS).getMonth() + 1)
                     }}月
-                    {{ addZeroIfNeed(new Date(submit.DEAL_TS).getDate()) }}日
-                  </div>
-                  <div style="margin:4px 0px 4px 4px" v-if="submit.STATE == 'APPROVED'">
-                    广东玉兰集团股份有限公司<br />
-                    市场部<br />
-                    {{ new Date(submit.REASSURE_TS).getFullYear() }}年
-                    {{
+                  {{ addZeroIfNeed(new Date(submit.DEAL_TS).getDate()) }}日
+                </div>
+                <div style="margin:4px 0px 4px 4px" v-if="submit.STATE == 'APPROVED'">
+                  广东玉兰集团股份有限公司<br />
+                  市场部<br />
+                  {{ new Date(submit.REASSURE_TS).getFullYear() }}年
+                  {{
                       addZeroIfNeed(new Date(submit.REASSURE_TS).getMonth() + 1)
                     }}月
-                    {{ addZeroIfNeed(new Date(submit.REASSURE_TS).getDate()) }}日
-                  </div>
-                  <div style="margin:4px 0px 4px 4px" v-if="submit.STATE == 'SUBMITTED'">
-                    广东玉兰集团股份有限公司<br />
-                    市场部<br />
-                    <span > 年 月 日</span>
-                  </div>
+                  {{ addZeroIfNeed(new Date(submit.REASSURE_TS).getDate()) }}日
+                </div>
+                <div style="margin:4px 0px 4px 4px" v-if="submit.STATE == 'SUBMITTED'">
+                  广东玉兰集团股份有限公司<br />
+                  市场部<br />
+                  <span> 年 月 日</span>
+                </div>
               </td>
               <td colspan="4" border="0px" style="font-size:13px;color:gray;text-align:center;">
                 <div>
@@ -546,8 +545,7 @@
               </td>
               <td colspan="3" style="height:21px" v-if="submit.STATE != 'SENDBACK'">
                 <ul class="el-upload-list el-upload-list--text">
-                  <li v-for="(file, index) in fileList" :key="index" class="el-upload-list__item is-success"
-                    tabindex="0">
+                  <li v-for="(file, index) in files" :key="index" class="el-upload-list__item is-success" tabindex="0">
                     <a class="el-upload-list__item-name">
                       <el-link type="primary" size="mini" @click="showImage(file.url)"
                         @mouseenter.native="showMiniImage($event, file.url)" @mouseout.native="MiniPic = false">
@@ -562,24 +560,13 @@
               </td>
               <td colspan="3" style="height:21px" v-else>
                 <div>
-                  <el-upload class="upload-de" :action="
-                      Global.baseUrl +
-                        '/RETURNCOMPENSATIONBILL/UploadFilesForCustomer'
-                    " drag multiple :on-change="function(file, fileList) {
+                  <el-upload class="upload-de" action="#" drag multiple :on-change="function(file, fileList) {
                         return handleChange(file, fileList);
                       }
                     " :on-remove="function(file, fileList) {
                         return handleRemove(file, fileList);
                       }
-                    " :on-success="function(res, file, fileList) {
-                        return handleSuccess(res, file, fileList);
-                      }
-                    " ref="upload2" :auto-upload="false" :file-list="fileList" :data="{
-                      CID: companyId,
-                      dateStamp: dateStamp,
-                      dateString: dateString,
-                      fileNameList: fileNameList
-                    }">
+                    " ref="upload2" :auto-upload="false" :file-list="files">
                     <i class="el-icon-upload2" style="margin-top:5px;">
                       <span style="font-size:15px;">上传附件</span>
                     </i>
@@ -760,24 +747,24 @@
             </tr>
             <tr style="height:40px">
               <td colspan="4" border="0px" style="font-size:13px;color:gray;text-align:center;">
-               <div style="margin:4px 0px 4px 4px" v-if="submit.STATE != 'SUBMITTED'&&submit.STATE != 'APPROVED'">
-                    广东玉兰集团股份有限公司<br />
-                    市场部<br />
-                    {{ new Date(submit.DEAL_TS).getFullYear() }}年
-                    {{
+                <div style="margin:4px 0px 4px 4px" v-if="submit.STATE != 'SUBMITTED'&&submit.STATE != 'APPROVED'">
+                  广东玉兰集团股份有限公司<br />
+                  市场部<br />
+                  {{ new Date(submit.DEAL_TS).getFullYear() }}年
+                  {{
                       addZeroIfNeed(new Date(submit.DEAL_TS).getMonth() + 1)
                     }}月
-                    {{ addZeroIfNeed(new Date(submit.DEAL_TS).getDate()) }}日
-                  </div>
-                  <div style="margin:4px 0px 4px 4px" v-else>
-                    广东玉兰集团股份有限公司<br />
-                    市场部<br />
-                    {{ new Date().getFullYear() }}年
-                    {{
+                  {{ addZeroIfNeed(new Date(submit.DEAL_TS).getDate()) }}日
+                </div>
+                <div style="margin:4px 0px 4px 4px" v-else>
+                  广东玉兰集团股份有限公司<br />
+                  市场部<br />
+                  {{ new Date().getFullYear() }}年
+                  {{
                       addZeroIfNeed(new Date().getMonth() + 1)
                     }}月
-                    {{ addZeroIfNeed(new Date().getDate()) }}日
-                  </div>
+                  {{ addZeroIfNeed(new Date().getDate()) }}日
+                </div>
               </td>
               <td colspan="4" border="0px" style="font-size:13px;color:gray;text-align:center;">
                 <div>
@@ -915,24 +902,13 @@
               </td>
               <td colspan="2" style="height:21px">
                 <div>
-                  <el-upload class="upload-de" :action="
-                      Global.baseUrl +
-                        '/RETURNCOMPENSATIONBILL/UploadFilesForCustomer'
-                    " drag multiple :on-change="function(file, fileList) {
+                  <el-upload class="upload-de" action="#" drag multiple :on-change="function(file, fileList) {
                         return handleChange(file, fileList);
                       }
                     " :on-remove="function(file, fileList) {
                         return handleRemove(file, fileList);
                       }
-                    " :on-success="function(res, file, fileList) {
-                        return handleSuccess(res, file, fileList);
-                      }
-                    " ref="upload" :auto-upload="false" :file-list="fileList" :data="{
-                      CID: companyId,
-                      dateStamp: dateStamp,
-                      dateString: dateString,
-                      fileNameList: fileNameList
-                    }">
+                    " :http-request="uploadFiles" ref="upload" :auto-upload="false" :file-list="files">
                     <i class="el-icon-upload2" style="margin-top:5px;">
                       <span style="font-size:15px;">上传附件</span>
                     </i>
@@ -964,7 +940,7 @@
               <td colspan="3" border="0px" style="font-size:13px;color:gray;text-align:center;">
                 <div>
                   经销商
-                  <span>:{{}}</span><br />
+                  <span></span><br />
                   <span> 年 月 日</span>
                 </div>
               </td>
@@ -1007,7 +983,7 @@
             </tr>
           </table>
 
-          <div style="text-align:center;margin-top:5px">
+          <div style="text-align:center;margin-top:20px">
             <el-button type="success" size="mini" @click="_AddRefundForSaleNoAndItemNo()">确定</el-button>
             <el-button type="info" size="mini" @click="
                 getItemFromSaleNo = false;
@@ -1038,7 +1014,7 @@
             </tr>
           </table>
 
-          <div style="text-align:center;margin-top:5px">
+          <div style="text-align:center;margin-top:20px">
             <el-button type="success" size="mini" @click="_GetItemArray()">确定</el-button>
             <el-button type="info" size="mini" @click="
                 getItemFromSaleNo = false;
@@ -1085,7 +1061,8 @@ import {
   UpdateState,
   SendBackUpdate,
   UpdateFirstAudition,
-  GetItemArray
+  GetItemArray,
+  NewUploadFiles
 } from "@/api/paymentASP";
 import { downLoadFile } from "@/common/js/downLoadFile";
 import { mapMutations } from "vuex";
@@ -1106,9 +1083,10 @@ export default {
       submit: [],
       returnInfo: [],
       processDetail: [], //玉兰处理结果表明细
-      fileList: [], //存储客户意见的附件
+      files: [], //按添加顺序排列的待上传附件（用于handlechange及判断）
+      fileList: [], //按实际上传到服务器中的存储客户意见的附件
       fileListForAudition: [], //存储初审意见附件
-      // fileListForProcess:[],//存储处理结果附件
+      fileListForProcess: [], //存储处理结果附件
       submitHead: [], //存储表头数据
       deleteFile: [], //删除的上传文件
       complaintDetail: false,
@@ -1140,7 +1118,6 @@ export default {
       QtyLimit: "", //出货数量上限
       FormRight: false,
       dateStamp: "",
-      uploadSuccess: false, //是否上传成功
       fileChange: false,
       inputSaleNo: false, //是否处于输入提货单号状态
       inputItemNo: false, //是否处于输入产品型号状态
@@ -1309,10 +1286,10 @@ export default {
     },
     //查看详情
     _CheckDetail(val, type) {
-      this.FormRight = false;
-      this.uploadSuccess = false;
+      this.FormRight = false;      
       this.submit = [];
       this.fileList = [];
+      this.files = [];
       this.fileListForAudition = [];
       this.fileListForProcess = [];
       this.processDetail = [];
@@ -1342,7 +1319,7 @@ export default {
               SALE_NO: this.submit.SALE_NO,
               ITEM_NO: this.submit.ITEM_NO
             }).then(res => {
-              if (res.code == 0) {
+              if (res.code == 0 && res.data.length > 0) {
                 this.QtyLimit = res.data[0].QTY_DELIVER;
               }
             });
@@ -1353,7 +1330,7 @@ export default {
         for (var i = 0; i < list.length - 1; i++) {
           var index = list[i].lastIndexOf("/");
           var fileName = list[i].substr(index + 1);
-          this.fileList.push({
+          this.files.push({
             name: fileName,
             url: list[i]
           });
@@ -1450,7 +1427,7 @@ export default {
           return;
         }
         //判断是否上传附件
-        if (this.fileList.length == 0) {
+        if (this.files.length == 0) {
           this.$alert("请上传相关附件", "提示", {
             confirmButtonText: "确定",
             type: "warning"
@@ -1468,30 +1445,40 @@ export default {
         if (this.fileChange) {
           //文件发生改变，重新上传一次(仅选中修改后的文件，而不是所有文件效率会更高)
           this.$refs.upload2.submit();
-          //附件拼接
-          this.submit.ATTACHMENT_FILE = "";
-          for (let j = 0; j < this.fileList.length; j++) {
-            this.submit.ATTACHMENT_FILE +=
-              "/Files/RTCB_ITEM/" +
-              this.companyId +
-              "/" +
-              this.dateStamp +
-              "/" +
-              this.fileList[j].name +
-              ";";
-          }
-          this.submit.ATTACHMENT_FILE_FOLDER =
-            "/Files/RTCB_ITEM/" + this.companyId + "/" + this.dateStamp;
         } else {
+          //仅删除文件
           if (this.deleteFile.length > 0) {
             for (let i = 0; i < this.deleteFile.length; i++) {
               this.submit.ATTACHMENT_FILE = "";
-              for (var j = 0; j < this.fileList.length; j++) {
-                this.submit.ATTACHMENT_FILE += this.fileList[j].url + ";";
+              for (var j = 0; j < this.files.length; j++) {
+                this.submit.ATTACHMENT_FILE += this.files[j].url + ";";
               }
             }
           }
-          this.submitEDITANSYC();
+          SendBackUpdate({
+            updateState: "SUBMITTED",
+            detail: this.submit,
+            attchmentChange: this.fileChange,
+            deleteFile: this.deleteFile
+          }).then(res => {
+            if (res.code == 0) {
+              this.$alert("重新提交成功", "提示", {
+                confirmButtonText: "确定",
+                type: "success"
+              });
+              this.currentPage = 1;
+              this.releaseBadge("newRefund1"); //刷新角标
+              this.refresh();
+              this.RefundDetail = false;
+              return;
+            } else {
+              this.$alert("提交失败，请稍后重试", "提示", {
+                confirmButtonText: "确定",
+                type: "warning"
+              });
+              return;
+            }
+          });
         }
       } else if (val == 3) {
         //判断是否填完所有信息
@@ -1643,10 +1630,10 @@ export default {
     addRefund() {
       this.FormRight = false;
       this.fileList = [];
+      this.files = [];
       this.dateStamp = new Date().getTime();
       this.fileNumber = 0;
-      this.FormRight = true;
-      this.uploadSuccess = false;
+      this.FormRight = true;      
       this.fileNameList = [];
       this.submitHead = {
         ID: "",
@@ -1697,7 +1684,7 @@ export default {
         SALE_NO: this.SALE_NO,
         ITEM_NO: this.ITEM_NO
       }).then(res => {
-        if (res.code == 0) {
+        if (res.code == 0 && res.data.length > 0) {
           this.QtyLimit = res.data[0].QTY_DELIVER;
         }
       });
@@ -1756,7 +1743,7 @@ export default {
         return;
       }
       //判断是否上传附件
-      if (this.fileList.length == 0) {
+      if (this.files.length == 0) {
         this.$alert("请上传相关附件", "提示", {
           confirmButtonText: "确定",
           type: "warning"
@@ -1798,21 +1785,12 @@ export default {
         list9.length > 1 ||
         list10.length > 1
       ) {
-        if (this.uploadSuccess) {
-        } else {
-          var number = this.fileNumber + 1;
-          this.fileNumber = this.fileNumber + 1;
-          var prefix = this.CID + "-" + this.dateString + "-" + number;
-          var fileName = prefix + suffix;
-          file.name = fileName;
-          this.fileNameList.push(fileName);
-        }
         this.FormRight = true;
-        this.fileList = fileList;
+        this.files = fileList;
         this.fileChange = true;
       } else {
         this.FormRight = false;
-        this.fileList = [];
+        this.files = [];
         this.$alert("请上传图片或视频，否则无法成功提交", "提示", {
           confirmButtonText: "确定",
           type: "warning"
@@ -1821,25 +1799,13 @@ export default {
       }
     },
     handleRemove(file, fileList) {
-      this.fileList = fileList;
+      this.files = fileList;
       if ((file.status = "success")) {
         this.deleteFile.push(file.url);
         this.fileNameList.splice(this.fileNameList.length - 1, 1);
       }
     },
-    handleSuccess(res, file, fileList) {
-      this.fileList = fileList;
-      this.uploadSuccess = true;
-      var successCount = this.fileList.filter(item => item.status == "success")
-        .length;
-      if (successCount == fileList.length) {
-        if (this.isRefundAdd) {
-          this.sumbitNEWANSYC();
-        } else {
-          this.submitEDITANSYC();
-        }
-      }
-    },
+    //新增
     sumbitNEWANSYC() {
       //相当于同步，等提交成功后再执行
       //附件拼接
@@ -1850,7 +1816,7 @@ export default {
           "/" +
           this.dateStamp +
           "/" +
-          this.fileList[j].name +
+          this.fileList[j] +
           ";";
       }
 
@@ -1897,6 +1863,19 @@ export default {
     submitEDITANSYC() {
       //附件拼接
       //相当于同步，等提交成功后再执行
+      this.submit.ATTACHMENT_FILE = "";
+      for (let j = 0; j < this.fileList.length; j++) {
+        this.submit.ATTACHMENT_FILE +=
+          "/Files/RTCB_ITEM/" +
+          this.companyId +
+          "/" +
+          this.dateStamp +
+          "/" +
+          this.fileList[j] +
+          ";";
+      }
+      this.submit.ATTACHMENT_FILE_FOLDER =
+        "/Files/RTCB_ITEM/" + this.companyId + "/" + this.dateStamp;
       SendBackUpdate({
         updateState: "SUBMITTED",
         detail: this.submit,
@@ -1904,7 +1883,7 @@ export default {
         deleteFile: this.deleteFile
       }).then(res => {
         if (res.code == 0) {
-          this.$alert("重新提交成功", "提示", {
+          this.$alert("提交成功", "提示", {
             confirmButtonText: "确定",
             type: "success"
           });
@@ -2001,6 +1980,34 @@ export default {
       }
       var dateTime = year + "-" + month + "-" + day;
       this.dateString = dateTime;
+    },
+    //批量且重命名上传文档
+    uploadFiles(param) {
+      const formData = new FormData();
+      formData.append("file", param.file);
+      NewUploadFiles(formData, {
+        params: {
+          CID: this.companyId,
+          dateStamp: this.dateStamp,
+          dateString: this.dateString,
+          type:"customer",
+        }
+      })
+        .then(res => {
+          if (res.code == 0) {
+            this.fileList.push(res.data);   
+            //上传成功的文件数=上传的文件数         
+            if (this.fileList.length == this.files.length) {
+              if (this.isRefundAdd) {
+                this.sumbitNEWANSYC();
+              } else {
+                this.submitEDITANSYC();
+              }
+            }
+          }
+        })
+        .then(() => {})
+        .catch(() => {});
     },
 
     ...mapMutations("badge", ["addBadge", "releaseBadge"])

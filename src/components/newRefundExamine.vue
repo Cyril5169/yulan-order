@@ -636,23 +636,13 @@
                 <td class="grayTD" style="height:15px" colspan="1">附件</td>
                 <td style="height:15px" colspan="7">
                   <div>
-                    <el-upload class="upload-de" :action="
-                        Global.baseUrl + '/RETURNCOMPENSATIONBILL/UploadFiles'
-                      " drag multiple :on-change="function(file, fileList) {
+                    <el-upload class="upload-de" action="#" drag multiple :on-change="function(file, fileList) {
                           return handleChange(file, fileList);
                         }
                       " :on-remove="function(file, fileList) {
                           return handleRemove(file, fileList);
                         }
-                      " :on-success="function(res, file, fileList) {
-                          return handleSuccess(res, file, fileList);
-                        }
-                      " ref="upload" :auto-upload="false" :file-list="fileListForAudition" :data="{
-                        CID: CID,
-                        dateStamp: dateStamp,
-                        dateString: dateString,
-                        fileNameList: fileNameList
-                      }">
+                      " ref="upload" :http-request="uploadFiles" :auto-upload="false" :file-list="fileListForAudition">
                       <i class="el-icon-upload2" style="margin-top:5px;">
                         <span style="font-size:15px;">上传附件</span>
                       </i>
@@ -777,7 +767,6 @@
                   </div>
                 </td>
               </tr>
-
               <tr style="height:90px">
                 <td colspan="8" border="0px" style="font-size:13px;color:gray;text-align:left;">
                   <div style="margin:4px 0px 4px 4px">
@@ -792,7 +781,7 @@
               </tr>
               <tr style="height:40px">
                 <td colspan="4" border="0px" style="font-size:13px;color:gray;text-align:center;">
-                    <div style="margin:4px 0px 4px 4px" v-if="submit.STATE != 'SUBMITTED'&&submit.STATE != 'APPROVED'">
+                  <div style="margin:4px 0px 4px 4px" v-if="submit.STATE != 'SUBMITTED'&&submit.STATE != 'APPROVED'">
                     广东玉兰集团股份有限公司<br />
                     市场部<br />
                     {{ new Date(submit.DEAL_TS).getFullYear() }}年
@@ -880,7 +869,8 @@ import {
   GetNoPrinted2,
   UpdateFirstAudition,
   UpdateProcess,
-  UpdatePrintedById
+  UpdatePrintedById,
+  NewUploadFiles
 } from "@/api/paymentASP";
 import { downLoadFile } from "@/common/js/downLoadFile";
 import { mapMutations } from "vuex";
@@ -889,6 +879,8 @@ export default {
   name: "refundExamine",
   data() {
     return {
+      iniAuditionFileNum: 0, //编辑时初始状态下初审意见文件的个数
+      filesSubmit: [], //按实际上传到服务器中的存储客户意见的附件
       picX: "0",
       picY: "0",
       MiniPic: false,
@@ -917,7 +909,7 @@ export default {
       SELECT_STATUS: null, //存储下拉框的值
       beginTime: "", //查询的开始时间
       finishTime: "", //查询的结束时间
-      companyId: Cookies.get("companyId"),
+      companyId: Cookies.get("customerMainId"),
       CID: Cookies.get("cid"),
       CNAME: Cookies.get("realName"),
       selectItemNo: "", //搜索栏产品型号
@@ -929,7 +921,6 @@ export default {
       kuaididanhao: "",
       kind: "", //编辑的种类
       dateString: "",
-      uploadSuccess: false,
       fileNumber: 0,
       fileNameList: [],
       fileNameListForProcess: [],
@@ -1112,7 +1103,8 @@ export default {
       this.submit = [];
       this.fileList = [];
       this.fileListForAudition = [];
-      this.uploadSuccess = false;
+      this.filesSubmit = [];
+      this.iniAuditionFileNum = 0;
       this.fileNumber = 0;
       this.fileNameList = [];
       this.fileNameListForProcess = [];
@@ -1158,6 +1150,7 @@ export default {
             url: list2[i]
           });
         }
+        this.iniAuditionFileNum = this.fileListForAudition.length;
         //查询附件名称的末尾最大编号
         if (list2.length >= 2) {
           var findIndex = list2[list2.length - 2].lastIndexOf("-");
@@ -1367,51 +1360,32 @@ export default {
               return;
             }
           }
-        }
-        //第一次添加文件
-        if (
-          this.fileListForAudition.length == 0 &&
-          this.deleteFileForAudition.length == 0
-        ) {
-          this.submitEDITANSYC(this.kind);
-          return;
-        }
-        //判断上传附件的形式为图片或视频
-        if (this.fileListForAudition.length != 0 && this.FormRight == false) {
-          this.$alert("提交失败，附件仅能上传图片或视频", "提示", {
-            confirmButtonText: "确定",
-            type: "warning"
-          });
-          return;
-        }
-        if (this.fileChangeForAudition || this.firstAddAudition) {
-          //文件发生改变，重新上传一次(仅选中修改后的文件，而不是所有文件效率会更高)
-          this.$refs.upload.submit();
-          //附件拼接
-          this.submit.FIRST_AUDITION_FILE = "";
-          for (let j = 0; j < this.fileListForAudition.length; j++) {
-            this.submit.FIRST_AUDITION_FILE +=
-              "/Files/RETURNCOMPENSATIONBILL/" +
-              this.CID +
-              "/" +
-              this.dateStamp +
-              "/" +
-              this.fileListForAudition[j].name +
-              ";";
+          //判断上传附件的形式为图片或视频
+          if (this.fileListForAudition.length != 0 && this.FormRight == false) {
+            this.$alert("提交失败，附件仅能上传图片或视频", "提示", {
+              confirmButtonText: "确定",
+              type: "warning"
+            });
+            return;
           }
-          this.submit.FIRST_AUDITION_FILE_FOLDER =
-            "/Files/RETURNCOMPENSATIONBILL/" + this.CID + "/" + this.dateStamp;
-        } else {
-          if (this.deleteFileForAudition.length > 0) {
-            for (let i = 0; i < this.deleteFileForAudition.length; i++) {
-              this.submit.FIRST_AUDITION_FILE = "";
-              for (var j = 0; j < this.fileListForAudition.length; j++) {
-                this.submit.FIRST_AUDITION_FILE +=
-                  this.fileListForAudition[j].url + ";";
+          //第一次添加
+          if (this.firstAddAudition && this.fileChangeForAudition) {
+            this.$refs.upload.submit();
+          } else if (!this.firstAddAudition && this.fileChangeForAudition) {
+            //修改
+            this.$refs.upload.submit();
+          } else {
+            if (this.deleteFileForAudition.length > 0) {
+              for (let i = 0; i < this.deleteFileForAudition.length; i++) {
+                this.submit.FIRST_AUDITION_FILE = "";
+                for (var j = 0; j < this.fileListForAudition.length; j++) {
+                  this.submit.FIRST_AUDITION_FILE +=
+                    this.fileListForAudition[j].url + ";";
+                }
               }
             }
+            this.submitAudition(this.kind);
           }
-          this.submitEDITANSYC(this.kind);
         }
       }
     },
@@ -1599,16 +1573,6 @@ export default {
         list9.length > 1 ||
         list10.length > 1
       ) {
-        if (this.uploadSuccess) {
-        } else {
-          //第一次新增附件时，修改并保存前端输入的附件名
-          var number = this.fileNumber + 1;
-          this.fileNumber = this.fileNumber + 1;
-          var prefix = this.CID + "-" + this.dateString + "-" + number;
-          var fileName = prefix + suffix;
-          file.name = fileName;
-          this.fileNameList.push(fileName);
-        }
         this.FormRight = true;
         this.fileListForAudition = fileList;
         this.fileChangeForAudition = true;
@@ -1629,21 +1593,6 @@ export default {
         this.fileNameList.splice(this.fileNameList.length - 1, 1);
       }
     },
-    handleSuccess(res, file, fileList) {
-      this.fileListForAudition = fileList;
-      this.uploadSuccess = true;
-      var successCount = this.fileListForAudition.filter(
-        item => item.status == "success"
-      ).length;
-      if (successCount == fileList.length) {
-        if (this.firstAddAudition) {
-          //如果第一次提交附件
-          this.sumbitNEWANSYC(this.kind);
-        } else {
-          this.submitEDITANSYC(this.kind);
-        }
-      }
-    },
     handleError(err, file, fileList) {
       this.$refs.upload.clearFiles();
       this.fileListForAudition = [];
@@ -1653,33 +1602,62 @@ export default {
         type: "success"
       });
     },
-    sumbitNEWANSYC(type) {
-      //相当于同步，等提交成功后再执行
+    //新增或修改初审意见的字段拼接
+    submitAuditionFile(type) {
+      //修改初审意见上传文件时，把文件列表中剩下的添加到filesSubmit中
+      if (!this.firstAddAudition && this.fileChangeForAudition) {
+        for (let i = 0; i < this.filesSubmit.length; i++) {
+          for (let j = 0; j < this.fileListForAudition.length; j++) {
+            if (
+              this.fileListForAudition[j].name == this.filesSubmit[i].origin
+            ) {
+              //问题：返回的是后台修改的
+              this.fileListForAudition.splice(j, 1); //去除文件列表中和上传文件相同的文件
+            }
+          }
+        }
+        for (let j = 0; j < this.fileListForAudition.length; j++) {
+          //剩下的文件的字段并没有改变（因为没有上传，只是转移）
+          var point = this.fileListForAudition[j].name.lastIndexOf(".");
+          var suffix = this.fileListForAudition[j].name.substr(point);
+          var finalFileName = this.filesSubmit[this.filesSubmit.length - 1].now;
+          var num = this.filesSubmit.length + 1; //可能后台转移的顺序不一定和我这里重编号的顺序一样
+          point = finalFileName.lastIndexOf("-");
+          var prefix = finalFileName.substr(0, point + 1);
+          var name = prefix + num + suffix;
+          var model = {
+            origin: this.fileListForAudition[j].name,
+            now: name
+          };
+          this.filesSubmit.push(model);
+        }
+      }
       //附件拼接
       this.submit.FIRST_AUDITION_FILE = "";
-      for (let j = 0; j < this.fileListForAudition.length; j++) {
+      for (let j = 0; j < this.filesSubmit.length; j++) {
         this.submit.FIRST_AUDITION_FILE +=
           "/Files/RETURNCOMPENSATIONBILL/" +
-          this.CID +
+          this.companyId +
           "/" +
           this.dateStamp +
           "/" +
-          this.fileListForAudition[j].name +
+          this.filesSubmit[j].now +
           ";";
       }
       this.submit.FIRST_AUDITION_FILE_FOLDER =
-        "/Files/RETURNCOMPENSATIONBILL/" + this.CID + "/" + this.dateStamp;
-      this.submitEDITANSYC(type);
+        "/Files/RETURNCOMPENSATIONBILL/" +
+        this.companyId +
+        "/" +
+        this.dateStamp;
+      this.submitAudition(type);
     },
-    //待修改
-    submitEDITANSYC(type) {
-      //相当于同步，等提交成功后再执行
+    //提交初审意见（最终）
+    submitAudition(type) {
       if (type == 2 || type == 5) {
         if (type == 2) {
           this.submit.STATE = "SENDBACK";
         }
         this.submit.DEALMAN_CODE = this.CID;
-        // this.submit.DEALMAN_NAME = this.CNAME;
         UpdateFirstAudition({
           head: this.submit,
           type: type,
@@ -1716,7 +1694,6 @@ export default {
           this.submit.STATE = "RECEIVE";
         }
         this.submit.DEALMAN_CODE = this.CID;
-        // this.submit.DEALMAN_NAME = this.CNAME;
         UpdateFirstAudition({
           head: this.submit,
           type: type,
@@ -1902,6 +1879,39 @@ export default {
       }
       var dateTime = year + "-" + month + "-" + day;
       this.dateString = dateTime;
+    },
+    //批量且重命名上传文档
+    uploadFiles(param) {
+      const formData = new FormData();
+      formData.append("file", param.file);
+      NewUploadFiles(formData, {
+        params: {
+          CID: this.companyId,
+          dateStamp: this.dateStamp,
+          dateString: this.dateString,
+          type: "audition"
+        }
+      })
+        .then(res => {
+          if (res.code == 0) {
+            var model = {
+              origin: param.file.name,
+              now: res.data
+            };
+            this.filesSubmit.push(model);
+            //上传成功的文件数=上传的文件数
+            if (
+              this.filesSubmit.length ==
+              this.fileListForAudition.length -
+                this.iniAuditionFileNum +
+                this.deleteFileForAudition.length
+            ) {
+              this.submitAuditionFile(this.kind);
+            }
+          }
+        })
+        .then(() => {})
+        .catch(() => {});
     },
     ...mapMutations("badge", ["addBadge", "releaseBadge"])
   },

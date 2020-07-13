@@ -285,7 +285,7 @@
               </td>
             </tr>
             <!-- 初审意见附件下载 -->
-            <tr v-if="submit.STATE != 'SUBMITTED'">
+            <tr v-if="submit.STATE != 'SUBMITTED'&&submit.STATE != 'SENDBACK'">
               <td class="grayTD" style="height:15px" colspan="1">附件</td>
               <td style="height:15px" colspan="7">
                 <ul class="el-upload-list el-upload-list--text">
@@ -658,7 +658,7 @@
               </td>
             </tr>
             <!-- 初审意见附件下载 -->
-            <tr v-if="submit.STATE != 'SUBMITTED'">
+            <tr v-if="submit.STATE != 'SUBMITTED'&&submit.STATE != 'SENDBACK'">
               <td class="grayTD" style="height:15px" colspan="1">附件</td>
               <td style="height:15px" colspan="7">
                 <ul class="el-upload-list el-upload-list--text">

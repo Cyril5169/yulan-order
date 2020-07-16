@@ -302,7 +302,7 @@
                 </td>
               </tr>
               <!-- 初审意见附件下载 -->
-              <tr v-if="submit.STATE != 'SUBMITTED'">
+              <tr v-if="submit.STATE != 'SUBMITTED'&&submit.STATE != 'SENDBACK'">
                 <td class="grayTD" style="height:15px" colspan="1">附件</td>
                 <td style="height:15px" colspan="7">
                   <ul class="el-upload-list el-upload-list--text">
@@ -632,7 +632,7 @@
               </tr>
               <!-- 初审意见附件上传 -->
               <!-- fileList是否需要改成fileListForAudition -->
-              <tr v-if="submit.STATE != 'CUSTOMERAFFIRM'">
+              <tr v-if="submit.STATE == 'SUBMITTED'||submit.STATE == 'RECEIVE'">
                 <td class="grayTD" style="height:15px" colspan="1">附件</td>
                 <td style="height:15px" colspan="7">
                   <div>
@@ -650,7 +650,7 @@
                   </div>
                 </td>
               </tr>
-              <tr v-else>
+              <tr v-if="submit.STATE != 'SUBMITTED' && submit.STATE != 'RECEIVE'&&submit.STATE != 'SENDBACK'">
                 <td class="grayTD" style="height:15px" colspan="1">附件</td>
                 <td style="height:15px" colspan="7">
                   <ul class="el-upload-list el-upload-list--text">
@@ -1333,6 +1333,7 @@ export default {
             });
             return;
           }
+          this.submitAudition(type);
         } else if (type == 1 || type == 4) {
           //判断信息是否填写完整
           if (!this.submit.FIRST_AUDITION) {

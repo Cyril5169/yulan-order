@@ -112,9 +112,22 @@ export function getPackData(data,config = {}) {
         return Promise.reject(err);
     })
 }
-
-export function getCustomerData(data,config = {}) {
-    return post('/CUSTOMER/getCustomerData',data,config).then((res) => {
+export function getPackByCustomer(data,config = {}) {
+    return post('/PACK_DETAIL/getPackByCustomer',data,config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+export function getCustomerDataForOrder(data,config = {}) {
+    return post('/CUSTOMER/getCustomerDataForOrder',data,config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+export function getCustomerDataForPack(data,config = {}) {
+    return post('/CUSTOMER/getCustomerDataForPack',data,config).then((res) => {
         return Promise.resolve(res);
     }).catch((err) => {
         return Promise.reject(err);

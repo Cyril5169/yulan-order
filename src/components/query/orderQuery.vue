@@ -37,7 +37,7 @@
           </div>
           <div style="display:inline-block;vertical-align:top;margin-left:20px;">
             <div>
-              <span>日期范围</span>
+              <span>提交日期</span>
               <el-date-picker format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="开始日期区间" v-model="beginTime"
                 style="width:150px"></el-date-picker>
               &nbsp;--
@@ -104,7 +104,7 @@
       </div>
     </el-card>
     <!-- 订单汇总 -->
-    <el-dialog width="600px" style="height:100%" :visible.sync="allOrderVisible">
+    <el-dialog width="600px" :visible.sync="allOrderVisible">
       <div style="font-size:18px">
         <div style="text-align:center;">
           客户名称：{{ selectOneCustomer.CUSTOMER_NAME }}
@@ -193,19 +193,13 @@
 <script>
 import checkExamine from "../order/checkExamine";
 import Cookies from "js-cookie";
-import { searchAssignments, orderDetail, manageCoupon } from "@/api/orderList";
+import { orderDetail, manageCoupon } from "@/api/orderList";
 import {
   getAreaCode,
   getDistrictByAreaCode,
-  getCustomerByAreaCode2,
-  getCustomerData,
-  getPackDetails,
-  getCustomerName
+  getCustomerDataForOrder
 } from "@/api/areaInfoASP";
-import {
-  getOrderByAreaCustomer,
-  getOrderInfoByCustomer
-} from "@/api/orderInfoASP";
+import { getOrderByAreaCustomer } from "@/api/orderInfoASP";
 import { getUserMoney } from "@/api/user";
 import { GetOrderAndTaskByCustomer, getCustomerInfo } from "@/api/orderListASP";
 
@@ -422,7 +416,7 @@ export default {
         district: this.selectAreaDistinct, //片区
         customerType: this.selectCustomerType //客户类型
       };
-      getCustomerData(data).then(res => {
+      getCustomerDataForOrder(data).then(res => {
         this.customerData = res.data;
         //自动选中所有客户
         this.selectCustomer = [];
@@ -480,7 +474,6 @@ export default {
       this.selectOneCustomer = row;
       this.getMoney = row.ALL_SPEND;
       this.getOrderAll();
-      this.allOrderVisible = true;
     },
     getOrderAll() {
       this.customerOrderData = [];
@@ -503,6 +496,7 @@ export default {
       getOrderByAreaCustomer(data).then(res => {
         this.count = res.count;
         this.customerOrderData = res.data;
+        this.allOrderVisible = true;
       });
     },
     handleCurrentChange(val) {

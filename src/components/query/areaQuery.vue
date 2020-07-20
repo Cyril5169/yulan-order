@@ -114,12 +114,20 @@
               {{ scope3.row.BILL_ID | transType }}
             </template>
           </el-table-column>
+          <el-table-column prop="BILL_DATE" label="开单日期" align="center">
+            <template slot-scope="scope5">
+              {{ scope5.row.BILL_DATE | datatrans }}
+            </template>
+          </el-table-column>
           <el-table-column prop="DATE_OUT_STOCK" label="提货日期" align="center">
             <template slot-scope="scope5">
               {{ scope5.row.DATE_OUT_STOCK | datatrans }}
             </template>
           </el-table-column>
           <el-table-column prop="MONEY_SUM" label="金额" align="center"></el-table-column>
+          <el-table-column prop="TRANSTYPE_NAME" label="运输方式" align="center"></el-table-column>
+          <el-table-column prop="TRANS_ID" label="运输单号" align="center"></el-table-column>
+          <el-table-column prop="HTBH" label="合同号" align="center"></el-table-column>
         </el-table>
         <!-- 分页 -->
         <div style="margin:0 35%;" class="block">
@@ -241,18 +249,18 @@ export default {
           value: "",
           label: "全部"
         },
-        // {
-        //   value: "1",
-        //   label: "待提"
-        // },
+        {
+          value: "1",
+          label: "待提"
+        },
         {
           value: "2",
           label: "已提货"
         },
-        // {
-        //   value: "3",
-        //   label: "作废"
-        // },
+        {
+          value: "3",
+          label: "作废"
+        },
         {
           value: "4",
           label: "已月结"

@@ -41,7 +41,7 @@
                 </span>
                 <el-dropdown-menu slot="dropdown" style="min-width: 150px;">
                   <el-dropdown-item v-if="identity != 'SUPLY'"><a style="color:#606266;" target="_blank" :href="
-                        'http://14.29.221.109:10250/pc/#/?cid=' +
+                        'http://14.29.221.4:10250/pc/#/?cid=' +
                           cid +
                           '&password=' +
                           userInfo.password

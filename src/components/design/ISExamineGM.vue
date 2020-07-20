@@ -1,7 +1,7 @@
 <template>
   <div class="centerCard">
     <el-card shadow="hover">
-      <div id="tbar" class="tbarStyle">
+      <div class="tbarStyle">
         <el-date-picker
           type="date"
           format="yyyy-MM-dd"

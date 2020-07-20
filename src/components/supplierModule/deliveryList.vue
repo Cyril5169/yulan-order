@@ -2,16 +2,12 @@
 <template>
   <div>
     <el-card shadow="hover">
-      <div slot="header">
-        <span class="fstrong f16">送货单</span>
-      </div>
-      <div id="tbar" class="tbarStyle">
+      <div class="tbarStyle">
         <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询开始日期"
           v-model="beginTime" style="width:14%;"></el-date-picker>
         --
         <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询截止日期"
           v-model="finishTime" style="width:14%;"></el-date-picker>
-
         <el-select v-model="SELECT_STATUS" style="margin-left:10px;width:160px;" placeholder="状态">
           <el-option v-for="item in statusArray" :key="item.label" :label="item.label" :value="item.value"></el-option>
         </el-select>
@@ -68,7 +64,6 @@
     </el-card>
 
     <el-dialog :visible.sync="lanjuDetail" :close-on-click-modal="false" width="70%">
-
       <!-- 查看区 -->
       <div v-show="isCheck">
         <div style="width:100%;text-align:center;font-size:20px">{{DeliverData_1.PUR_NO}} 送货单明细
@@ -243,35 +238,6 @@
     </el-dialog>
 
     <el-dialog title="新增送货单" :visible.sync="DeliverDetail" :close-on-click-modal="false" width="80%">
-      <el-dialog width="80%" title="采购单明细" :visible.sync="innerVisible" append-to-body>
-        <el-table :data="PURData" @selection-change="handleSelectionChange" border highlight-current-row
-          style="width: 100%;font-weight:normal;font-size:12px" class="table_1">
-          <el-table-column type="selection" width="40" class="text-align:center" :selectable="checkActiviyEffect">
-          </el-table-column>
-          <el-table-column prop="ITEM_NO" label="编码" align="center" width="110px"></el-table-column>
-          <el-table-column prop="MNAME" label="名称" align="center" width="150px"></el-table-column>
-          <el-table-column prop="GRADE" label="规格" align="center" width="80px"></el-table-column>
-          <el-table-column prop="PRICE_TAXIN" label="含税单价" align="center" width="80px"></el-table-column>
-          <el-table-column prop="TOTAL_MONEY" label="金额" align="center" width="70px"></el-table-column>
-          <el-table-column prop="PRODUCT_NOTE" label="制作说明" align="center" width="100px"></el-table-column>
-          <el-table-column prop="NOTES" label="备注" align="center" min-width="250px"></el-table-column>
-          <el-table-column prop="QTY_PUR" label="待送货数量" align="center" width="85px"></el-table-column>
-          <el-table-column prop="QTY" label="已送货数量" align="center" width="100px"></el-table-column>
-          <el-table-column label="约定日期" align="center" width="90px">
-            <template slot-scope="scope1">
-              {{ scope1.row.DATE_REQ | datatrans }}
-            </template>
-          </el-table-column>
-          <el-table-column label="送货日期" align="center" width="90px">
-            <template slot-scope="scope2">
-              {{ scope2.row.DATE_DELIVER | datatrans }}
-            </template>
-          </el-table-column>
-        </el-table>
-        <div style="margin-left:45%;margin-top:10px">
-          <el-button @click="isTrue" class="trueButton">确认</el-button>
-        </div>
-      </el-dialog>
       <div>
         <el-input @keyup.enter.native="searchPUR()" placeholder="请输入采购单号" v-model="find"
           style="width:280px;float:left;margin-top:-15px;margin-bottom:5px" clearable>
@@ -384,6 +350,36 @@
       </div>
       <div style="margin-left:45%;margin-top:10px">
         <el-button @click="isAddTrue" class="trueButton">保存</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog width="80%" title="采购单明细" :visible.sync="innerVisible" append-to-body>
+      <el-table :data="PURData" @selection-change="handleSelectionChange" border highlight-current-row
+        style="width: 100%;font-weight:normal;font-size:12px" class="table_1">
+        <el-table-column type="selection" width="40" class="text-align:center" :selectable="checkActiviyEffect">
+        </el-table-column>
+        <el-table-column prop="ITEM_NO" label="编码" align="center" width="110px"></el-table-column>
+        <el-table-column prop="MNAME" label="名称" align="center" width="150px"></el-table-column>
+        <el-table-column prop="GRADE" label="规格" align="center" width="80px"></el-table-column>
+        <el-table-column prop="PRICE_TAXIN" label="含税单价" align="center" width="80px"></el-table-column>
+        <el-table-column prop="TOTAL_MONEY" label="金额" align="center" width="70px"></el-table-column>
+        <el-table-column prop="PRODUCT_NOTE" label="制作说明" align="center" width="100px"></el-table-column>
+        <el-table-column prop="NOTES" label="备注" align="center" min-width="250px"></el-table-column>
+        <el-table-column prop="QTY_PUR" label="待送货数量" align="center" width="85px"></el-table-column>
+        <el-table-column prop="QTY" label="已送货数量" align="center" width="100px"></el-table-column>
+        <el-table-column label="约定日期" align="center" width="90px">
+          <template slot-scope="scope1">
+            {{ scope1.row.DATE_REQ | datatrans }}
+          </template>
+        </el-table-column>
+        <el-table-column label="送货日期" align="center" width="90px">
+          <template slot-scope="scope2">
+            {{ scope2.row.DATE_DELIVER | datatrans }}
+          </template>
+        </el-table-column>
+      </el-table>
+      <div style="margin-left:45%;margin-top:10px">
+        <el-button @click="isTrue" class="trueButton">确认</el-button>
       </div>
     </el-dialog>
   </div>
@@ -665,7 +661,7 @@ export default {
           PUR_NO: this.multipleSelection_1[i].PUR_NO,
           PRODUCT_NOTE: this.multipleSelection_1[i].PRODUCT_NOTE,
           QTY: this.multipleSelection_1[i].QTY,
-          DATE_REG: this.multipleSelection_1[i].DATE_REG,
+          DATE_REQ: this.multipleSelection_1[i].DATE_REQ,
           DATE_DELIVER: this.multipleSelection_1[i].DATE_DELIVER
           //REBACK_QTY:0
         };
@@ -887,7 +883,7 @@ export default {
             PUR_NO: this.DetailData[i].PUR_NO,
             PRODUCT_NOTE: this.DetailData[i].PRODUCT_NOTE,
             QTY: this.DetailData[i].QTY,
-            DATE_REG: this.DetailData[i].DATE_REG,
+            DATE_REQ: this.DetailData[i].DATE_REQ,
             DATE_DELIVER: this.DetailData[i].DATE_DELIVER
           };
           this.$set(this.DetailData_1, i, this.DetailData_1[i]);

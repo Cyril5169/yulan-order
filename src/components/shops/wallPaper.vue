@@ -5,12 +5,10 @@
         <div id="searchBoxW" class="tl">
           <el-input clearable v-model.trim="searchKey" @clear="tableData = []"
             @keyup.enter.native="_getShopsWallPaperMsg" placeholder="输入商品型号查找商品" style="width:25%; min-width:280px;">
-            <div id="searchBtn" slot="append" style="cursor:pointer;" @click="_getShopsWallPaperMsg">
-              搜索
-            </div>
+            <el-button @click="_getShopsWallPaperMsg" slot="append" icon="el-icon-search">搜索</el-button>
           </el-input>
-          <div id="searchHistory" style="margin: 5px 0 0">
-            <ul class="ovh l" style="font-size: 12px;">
+          <div class="searchHistory" style="margin: 5px 0 0">
+            <ul class="ovh l" style="font-size: 12px;margin:0">
               <li>历史搜索：</li>
               <li v-if="history.length === 0">暂无搜索记录</li>
               <li v-for="item in history" :key="item">
@@ -659,14 +657,10 @@ a:hover {
 #shopSearchBox div:hover {
   cursor: pointer;
 }
-#searchBtn {
-  color: #101010;
-  cursor: pointer;
-}
-#searchHistory ul {
+.searchHistory ul {
   display: inline-block;
 }
-#searchHistory ul li {
+.searchHistory ul li {
   min-width: 50px;
   height: 20px;
   line-height: 20px;
@@ -675,12 +669,12 @@ a:hover {
   margin-right: 5px;
   text-align: center;
 }
-#searchHistory ul li a {
+.searchHistory ul li a {
   margin-right: 5px;
   text-decoration: none;
   color: #303133;
 }
-#searchHistory ul li a:hover {
+.searchHistory ul li a:hover {
   color: orangered;
   font-weight: bold;
 }

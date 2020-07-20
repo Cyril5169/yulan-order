@@ -2,31 +2,14 @@
   <div id="curtain">
     <el-card shadow="hover">
       <div id="shopsCon">
-        <p class="f12 tl" style="color: red;">（带*号表示可选择帘头外包盒）</p>
+        <p class="f12" style="color: red;margin:0;">（带*号表示可选择帘头外包盒）</p>
         <div id="shopSearchBox" class="mt10">
-          <el-input
-            clearable
-            v-model.trim="searchKey"
-            @clear="getData(1)"
-            @keyup.enter.native="getDataBlur(1)"
-            placeholder="输入商品型号查找商品"
-            style="width:25%; min-width:250px;"
-          >
-            <div
-              id="searchBtn"
-              slot="append"
-              style="cursor:pointer;"
-              @click="getDataBlur(1)"
-            >
-              搜索
-            </div>
+          <el-input clearable v-model.trim="searchKey" @clear="getData(1)" @keyup.enter.native="getDataBlur(1)"
+            placeholder="输入商品型号查找商品" style="width:300px;">
+            <el-button @click="getDataBlur(1)" slot="append" icon="el-icon-search">搜索</el-button>
           </el-input>
         </div>
-        <el-table
-          class="loading-area"
-          :data="curtainMsg"
-          style="min-width: 750px; margin: 5px auto;"
-        >
+        <el-table class="loading-area" :data="curtainMsg" style="min-width: 750px; margin: 5px auto;">
           <el-table-column label="型号" width="120" align="center">
             <template slot-scope="scope">
               <div v-if="scope.row.wbhFlag === '1'">
@@ -40,21 +23,13 @@
           </el-table-column>
           <el-table-column label="宽度(m)" width="80" align="center">
             <template slot-scope="scope">
-              <currency-input
-                :customStyle="'width: 60px;'"
-                placeholder="0.00"
-                v-model="scope.row.width"
-              >
+              <currency-input :customStyle="'width: 60px;'" placeholder="0.00" v-model="scope.row.width">
               </currency-input>
             </template>
           </el-table-column>
           <el-table-column label="高度(m)" width="80" align="center">
             <template slot-scope="scope">
-              <currency-input
-                :customStyle="'width: 60px;'"
-                placeholder="0.00"
-                v-model="scope.row.height"
-              >
+              <currency-input :customStyle="'width: 60px;'" placeholder="0.00" v-model="scope.row.height">
               </currency-input>
             </template>
           </el-table-column>
@@ -62,23 +37,13 @@
             <template slot-scope="scope">
               <div v-if="scope.row.wbhFlag === '1'">
                 <el-checkbox v-model="scope.row.isWBH">
-                  <currency-input
-                    :customStyle="'width: 60px;'"
-                    placeholder="0.00"
-                    v-model="scope.row.WBH"
-                  >
+                  <currency-input :customStyle="'width: 60px;'" placeholder="0.00" v-model="scope.row.WBH">
                   </currency-input>
                 </el-checkbox>
               </div>
               <div v-else>
                 <el-checkbox v-model="scope.row.isWBH" disabled>
-                  <el-input
-                    style="width:60px;"
-                    size="mini"
-                    placeholder="无"
-                    v-model="scope.row.WBH"
-                    disabled
-                  >
+                  <el-input style="width:60px;" size="mini" placeholder="无" v-model="scope.row.WBH" disabled>
                   </el-input>
                 </el-checkbox>
               </div>
@@ -86,74 +51,42 @@
           </el-table-column>
           <el-table-column label="褶皱倍数" width="100" align="center">
             <template slot-scope="scope">
-              <el-select
-                size="mini"
-                v-model="scope.row.multiple"
-                style="width:70px;"
-              >
-                <el-option
-                  v-for="item in options"
-                  :key="item.value"
-                  :label="item.value"
-                  :value="item.value"
-                >
+              <el-select size="mini" v-model="scope.row.multiple" style="width:70px;">
+                <el-option v-for="item in options" :key="item.value" :label="item.value" :value="item.value">
                 </el-option>
               </el-select>
             </template>
           </el-table-column>
           <el-table-column label="位置" width="140" align="center">
             <template slot-scope="scope">
-              <el-input
-                style="width:120px;"
-                size="mini"
-                ref="location"
-                placeholder="选填(20字符内)"
-                v-model="scope.row.location"
-                @input="oninput($event,scope.$index)"
-              >
+              <el-input style="width:120px;" size="mini" ref="location" placeholder="选填(20字符内)"
+                v-model="scope.row.location" @input="oninput($event,scope.$index)">
               </el-input>
             </template>
           </el-table-column>
           <el-table-column label="活动" width="280" align="center">
             <template slot-scope="scope">
-              <el-select
-                style="width:250px"
-                size="mini"
-                :disabled="isActivity[scope.$index]"
-                v-model="scope.row.activityId"
-                :placeholder="
+              <el-select style="width:250px" size="mini" :disabled="isActivity[scope.$index]"
+                v-model="scope.row.activityId" :placeholder="
                   isActivity[scope.$index] === true
                     ? '无可选活动'
                     : '请选择活动'
-                "
-              >
-                <el-option
-                  v-for="item in activityOptions[scope.$index]"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                >
+                ">
+                <el-option v-for="item in activityOptions[scope.$index]" :key="item.value" :label="item.label"
+                  :value="item.value">
                 </el-option>
               </el-select>
             </template>
           </el-table-column>
           <el-table-column label="操作" width="100" align="center">
             <template slot-scope="scope">
-              <a @click="chooseItem(scope.row, scope.$index)" style="color:red;"
-                >选择此款</a
-              >
+              <a @click="chooseItem(scope.row, scope.$index)" style="color:red;">选择此款</a>
             </template>
           </el-table-column>
         </el-table>
-        <el-pagination
-          style="margin:0 20%;"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page.sync="currentPage"
-          :page-size="pageSize"
-          layout="total, prev, pager, next, jumper"
-          :total="totalNumber"
-        >
+        <el-pagination style="margin:0 20%;" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+          :current-page.sync="currentPage" :page-size="pageSize" layout="total, prev, pager, next, jumper"
+          :total="totalNumber">
         </el-pagination>
       </div>
     </el-card>
@@ -230,14 +163,15 @@ export default {
     }
   },
   methods: {
-    oninput(e,index) {
-      e = this.splitStr(e,20)
+    //限制输入长度
+    oninput(e, index) {
+      e = this.splitStr(e, 20);
       this.curtainMsg[index].location = e;
     },
-    splitStr(str,length){
-       var len = 0;
-       var returnStr = '';
-       for (var i = 0; i < str.length; i++) {
+    splitStr(str, length) {
+      var len = 0;
+      var returnStr = "";
+      for (var i = 0; i < str.length; i++) {
         var c = str.charCodeAt(i);
         //单字节加1
         if ((c >= 0x0001 && c <= 0x007e) || (0xff60 <= c && c <= 0xff9f)) {
@@ -245,7 +179,7 @@ export default {
         } else {
           len += 2;
         }
-        if(len <= length) returnStr += String.fromCharCode(c);
+        if (len <= length) returnStr += String.fromCharCode(c);
       }
       return returnStr;
     },
@@ -510,9 +444,4 @@ a:hover {
   width: 47%;
   display: inline-block;
 }
-#searchBtn {
-  color: #101010;
-  cursor: pointer;
-}
 </style>
-

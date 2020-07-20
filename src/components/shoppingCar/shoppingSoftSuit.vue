@@ -1,7 +1,7 @@
 <template>
   <div id="shoppingCarCon">
     <el-table id="shopBox" default-expand-all width="100%" style="margin-top:10px;" :row-class-name="tableRowClassName"
-      :row-key="getRowKeys" :expand-row-keys="expands" @expand-change="packUpNot" :data="activityData">
+      :row-key="getRowKeys" :expand-row-keys="expands" @expand-change="packUpNot" :data="activityData"  empty-text="该购物车是空的">
       <el-table-column width="100px" type="expand">
         <template slot-scope="scope">
           <el-table :ref="multipleTable(scope.$index)" :data="table(scope.$index)" tooltip-effect="dark"

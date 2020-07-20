@@ -15,38 +15,31 @@
         </el-scrollbar>
       </el-aside>
       <el-container style="width:85%; min-width:1050px;">
-        <el-header height="45px">
+        <el-header height="40px">
           <ul class="l">
             <li :title="asideStatus? '菜单展开' : '菜单收起'" @click="changeAside">
-              <i id="asideControll" class="iconfont" v-if="asideStatus">&#xe61e;</i>
-              <i id="asideControll" class="iconfont" v-else>&#xe65f;</i>
-              <span class="ml10 mr10">{{
+              <i class="iconfont headIcon2" v-if="asideStatus">&#xe61e;</i>
+              <i class="iconfont headIcon2" v-else>&#xe65f;</i>
+              <span class="ml10 mr10 headSpan2">{{
                 asideStatus? "菜单展开" : "菜单收起"
               }}</span>
             </li>
-            <!-- <li title="主页" @click="dialogFormVisible = true">
-              <i class="iconfont">&#xe65e;</i>
-            </li> -->
             <router-link to="/notification/notificationMain" tag="li">
               <li title="公告" @click="addTab('notification/notificationMain')">
-                <i class="el-icon-bell"></i>
-                <span class="ml10 mr10">公告</span>
+                <i class="el-icon-bell headIcon2"></i>
+                <span class="ml10 mr10 headSpan2">公告</span>
               </li>
             </router-link>
           </ul>
           <ul class="r">
             <li>
               <el-dropdown trigger="hover">
-                <span class="el-dropdown-link">
+                <span class="el-dropdown-link" style="color:white">
                   个人中心
                   <el-badge v-if="wangqian > 0" :value="wangqian"></el-badge>
-                  <i class="el-icon-arrow-down el-icon--right"></i>
+                  <i class="el-icon-arrow-down el-icon--right headIcon"></i>
                 </span>
-
                 <el-dropdown-menu slot="dropdown" style="min-width: 150px;">
-                  <!-- <el-dropdown-item>历年经销设计书</el-dropdown-item>
-                  <el-dropdown-item>修改登录密码</el-dropdown-item>
-                  <el-dropdown-item>修改对账密码</el-dropdown-item>-->
                   <el-dropdown-item v-if="identity != 'SUPLY'"><a style="color:#606266;" target="_blank" :href="
                         'http://14.29.221.109:10250/pc/#/?cid=' +
                           cid +
@@ -64,27 +57,16 @@
               </el-dropdown>
             </li>
             <li style="margin-right:20px;" @click="screenfull">
-              <i class="iconfont ml10 mr10">&#xe663;</i>
+              <i class="iconfont ml10 mr10 headIcon">&#xe663;</i>
             </li>
           </ul>
-          <span v-if="isManager !== '1'" style="color:white;line-height:50px;font-size:12px;margin-left:10px;">{{
-              "账户：" +
-                cid +
-                " " +
-                realName +
-                (identity == "ECWEB" ? " " + "操作员" : " ")
-            }}</span>
-          <span v-else style="color:white;line-height:50px;font-size:12px;margin-left:10px;">{{
-              "账户：" +
-                cid +
-                " " +
-                realName +
-                (identity == "ECWEB" ? " " + "管理员" : " ")
+          <span class="headSpan" style="font-size:12px;">{{
+              "账户：" + cid +" " + realName +(identity == "ECWEB" ? " " + (isManager == "1"? "管理员" : "操作员") : " ")
             }}</span>
         </el-header>
         <el-main style="margin:0;padding:0;background:#ECF5EF;" class="backTop" id="mainBackTop">
           <el-tabs class="tabs" v-model="activeTabName" @tab-click="getTab" @tab-remove="closeTab" type="border-card">
-            <div id="notice">
+            <div class="notice">
               <i class="el-icon-bell ml10 mr10 f16" style="line-height:30px;color:gold;font-weight:bold;"></i>
               <span style="color:red;margin-right:5px;margin-top:5px;">最新公告：</span>
               <span v-if="newsTextArr.length == 0">{{ adminText }}</span>
@@ -1608,28 +1590,28 @@ export default {
   cursor: pointer;
   background: #86b450;
 }
-.el-header i {
-  line-height: 50px;
-  color: white;
-}
 .el-header ul {
   margin: 0 10px;
 }
-.el-header ul:nth-child(1) i {
+.headIcon {
+  line-height: 40px;
+  color: white;
+}
+.headIcon2 {
+  line-height: 40px;
+  color: white;
   font-size: 20px;
   margin: 0 10px;
 }
-.el-header ul:nth-child(1) li span {
+.headSpan2 {
   color: white;
-  line-height: 50px;
-  font-size: 14px;
+  line-height: 40px;
   margin-right: 10px;
   margin-left: -10px;
 }
-.el-header ul:nth-child(2) li span {
+.headSpan {
   color: white;
-  line-height: 50px;
-  font-size: 14px;
+  line-height: 40px;
 }
 .el-dropdown {
   margin: 0 15px;
@@ -1644,12 +1626,11 @@ export default {
   width: 100%;
   height: 40px;
 }
-#notice {
+.notice {
   width: 100%;
   height: 30px;
   background: white;
-  margin-bottom: 10px;
-  text-align: left;
+  margin-bottom: 5px;
   vertical-align: middle;
   font-size: 12px;
 }
@@ -1704,19 +1685,11 @@ export default {
 .passwordForm .el-form-item__label {
   width: 80px;
 }
-.el-transfer-panel {
-  width: 300px !important;
-  height: 240px !important;
-}
-.el-transfer-panel__list.is-filterable {
-  height: 136px !important;
-  width: 300px !important;
-}
 .el-card__header {
   padding: 10px 15px !important;
 }
 .el-card__body {
-  padding: 15px;
+  padding: 10px;
 }
 .el-dialog__body {
   padding: 20px;
@@ -1739,5 +1712,8 @@ export default {
 }
 .el-table .success-row {
   background: #f0f9eb;
+}
+.el-tabs--border-card>.el-tabs__content{
+  padding: 10px;
 }
 </style>

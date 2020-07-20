@@ -2,17 +2,12 @@
 <template>
   <div>
     <el-card shadow="hover">
-      <div slot="header">
-        <span class="fstrong f16">送货单确认</span>
-      </div>
-
-      <div id="tbar" class="tbarStyle">
+      <div class="tbarStyle">
         <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询开始日期"
           v-model="beginTime" style="width:14%;"></el-date-picker>
         --
         <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询截止日期"
           v-model="finishTime" style="width:14%;"></el-date-picker>
-
         <el-select v-model="confirm_status" style="margin-left:10px;width:160px;" placeholder="状态">
           <el-option v-for="item in statusArray" :key="item.label" :label="item.label" :value="item.value"></el-option>
         </el-select>
@@ -20,22 +15,10 @@
           style="width:220px;margin-left:10px">
         </el-input>
         <el-button size="medium" type="success" style="margin-left:10px" @click="search()">查询</el-button>
-        <!-- <el-button
-          size="medium"
-          type="primary"
-          style="float:right"
-          @click="_addRecord()"
-          >新增</el-button
-        > -->
       </div>
 
       <div style="margin-top:10px">
         <el-table border :data="DeliverData" style="width: 100%;font-size:12px" class="table_1">
-          <!-- <el-table-column label="状态" align="center" width="65px">
-            <template slot-scope="scope">
-              {{ scope.row.INVOICE_STATUS | transStatus }}
-            </template>
-          </el-table-column> -->
           <el-table-column prop="INVOICE_NO" label="送货单号" align="center" width="100px">
           </el-table-column>
           <el-table-column label="状态" align="center" width="65px">
@@ -43,22 +26,6 @@
               {{ scope.row.INVOICE_STATUS | transStatus }}
             </template>
           </el-table-column>
-          <!-- <el-table-column
-            prop="CREATE_DATE"
-            label="创建时间"
-            align="center"
-            width="90px"
-          >
-            <template slot-scope="scope1">
-              {{ scope1.row.CREATE_DATE | datatrans }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="CREATE_PERSON"
-            label="创建人"
-            align="center"
-            width="70px"
-          ></el-table-column> -->
           <el-table-column prop="LOGISTICS_COMPANY" label="物流公司" align="center" width="100px"></el-table-column>
           <el-table-column prop="LOGISTICS_NUMBER" label="物流单号" align="center" width="100px"></el-table-column>
           <el-table-column prop="AREA_DISTRICT" label="送货地址" align="center">
@@ -272,149 +239,6 @@
         </div>
       </div>
     </el-dialog>
-    <el-dialog title="新增送货单" :visible.sync="DeliverDetail" :close-on-click-modal="false" width="80%">
-      <el-dialog width="80%" title="采购单明细" :visible.sync="innerVisible" append-to-body>
-        <el-table :data="PURData" @selection-change="handleSelectionChange" border highlight-current-row
-          style="width: 100%;font-weight:normal;font-size:12px" class="table_1">
-          <el-table-column type="selection" width="40" class="text-align:center"></el-table-column>
-          <el-table-column prop="ITEM_NO" label="编码" align="center" width="110px"></el-table-column>
-          <el-table-column prop="MNAME" label="名称" align="center" width="200px"></el-table-column>
-          <el-table-column prop="GRADE" label="规格" align="center" width="80px"></el-table-column>
-          <el-table-column prop="QTY_PUR" label="送货数量" align="center" width="85px"></el-table-column>
-          <el-table-column prop="PRICE_TAXIN" label="含税单价" align="center" width="80px"></el-table-column>
-          <el-table-column prop="TOTAL_MONEY" label="金额" align="center" width="80px"></el-table-column>
-          <el-table-column prop="PRODUCT_NOTE" label="制作说明" align="center" width="100px"></el-table-column>
-          <el-table-column prop="NOTES" label="备注" align="center" min-width="300px"></el-table-column>
-          <el-table-column prop="QTY" label="已发货数量" align="center" width="100px"></el-table-column>
-          <el-table-column label="约定日期" align="center" width="90px">
-            <template slot-scope="scope1">
-              {{ scope1.row.DATE_REQ | datatrans }}
-            </template>
-          </el-table-column>
-          <el-table-column label="送货日期" align="center" width="90px">
-            <template slot-scope="scope2">
-              {{ scope2.row.DATE_DELIVER | datatrans }}
-            </template>
-          </el-table-column>
-        </el-table>
-        <div style="margin-left:45%;margin-top:10px">
-          <el-button @click="isTrue" class="trueButton">确认</el-button>
-        </div>
-      </el-dialog>
-      <div>
-        <el-input @keyup.enter.native="searchPUR()" placeholder="请输入采购单号" v-model="find"
-          style="width:280px;float:left;margin-top:-15px;margin-bottom:5px">
-          <el-button @click="searchPUR()" class="button_1" slot="append" icon="el-icon-search">搜索</el-button>
-        </el-input>
-      </div>
-
-      <!-- 新增 -->
-      <table style="width:100%;text-align:center">
-        <tr>
-          <td style="width:12.5%">供应商联系人：</td>
-          <td style="width:12.5%">
-            <input v-model="submitForm.SUPPLY_LINKMAN" clearable class="inputStyle" />
-          </td>
-          <td style="width:12.5%">供应商联系电话：</td>
-          <td style="width:12.5%">
-            <input v-model="submitForm.LINKMAN_TEL" clearable class="inputStyle" />
-          </td>
-          <td style="width:12.5%">填写人：</td>
-          <td>{{ editData.CREATE_PERSON  }}</td>
-          <td style="width:12.5%">创建日期：</td>
-          <td></td>
-        </tr>
-      </table>
-
-      <hr />
-      <div v-show="isAdd" class="table-c">
-        <table style="width:100%">
-          <tr>
-            <td style="width:12.5%">发货单号：</td>
-            <td style="width:12.5%"></td>
-            <td style="width:12.5%">发货日期：</td>
-            <td>
-              <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" v-model="ruleForm_2.dateValue"
-                style="width:100%"></el-date-picker>
-            </td>
-            <td style="width:12.5%">预计到货时间：</td>
-            <td colspan="3">
-              <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" v-model="ruleForm_3.dateValue"
-                style="width:100%"></el-date-picker>
-            </td>
-          </tr>
-
-          <tr>
-            <td>物流单号<span style="color:red;font-size:15px">*</span>：</td>
-            <td>
-              <input v-model="submitForm.logistics_number" clearable class="inputStyle" />
-            </td>
-            <td>物流公司<span style="color:red;font-size:15px">*</span>：</td>
-            <td>
-              <input v-model="submitForm.logistics_company" clearable class="inputStyle" />
-            </td>
-            <td>物流联系人<span style="color:red;font-size:15px">*</span>：</td>
-            <td style="width:12.5%">
-              <input v-model="submitForm.LOGISTICS_LINKMAN" clearable class="inputStyle" />
-            </td>
-            <td style="width:12.5%">
-              物流电话<span style="color:red;font-size:15px">*</span>：
-            </td>
-            <td>
-              <input v-model="submitForm.LOGISTICS_TEL" clearable class="inputStyle" />
-            </td>
-          </tr>
-
-          <tr>
-            <td>送货地址：</td>
-            <td colspan="3">
-              <input v-model="submitForm.area_district" clearable class="inputStyle" />
-            </td>
-            <td>备注：</td>
-            <td colspan="3">
-              <input v-model="submitForm.remarks" clearable class="inputStyle" />
-            </td>
-          </tr>
-        </table>
-
-        <hr />
-        <el-table :data="multipleSelection_2" border highlight-current-row
-          style="width: 100%;font-weight:normal;font-size:12px" class="table_1">
-          <el-table-column type="index" width="45px" label="序号" align="center">
-          </el-table-column>
-          <el-table-column prop="PUR_NO" label="采购单号" align="center" width="100px"></el-table-column>
-          <el-table-column prop="ITEM_NO" label="编码" align="center" width="110px"></el-table-column>
-          <el-table-column prop="NAMEE" label="名称" align="center" width="180px"></el-table-column>
-          <el-table-column prop="GRADE" label="规格" align="center" width="90px"></el-table-column>
-          <el-table-column label="待送货数量" align="center" width="155px">
-            <template slot-scope="scope">
-              <el-input-number v-model="scope.row.INVOICE_QTY" size="mini" controls-position="right" :min="0"
-                :max="scope.row.max_qty"></el-input-number>
-            </template>
-          </el-table-column>
-          <el-table-column prop="PRODUCT_NOTE" label="制作说明" align="center" width="120px"></el-table-column>
-          <el-table-column label="备注" align="center" min-width="300px">
-            <template slot-scope="scope">
-              <el-input v-model="scope.row.NOTE" clearable></el-input>
-            </template>
-          </el-table-column>
-          <el-table-column prop="QTY" label="已发货数量" align="center" width="100px"></el-table-column>
-          <el-table-column label="约定日期" align="center" width="100px">
-            <template slot-scope="scope1">
-              {{ scope1.row.DATE_REQ | datatrans }}
-            </template>
-          </el-table-column>
-          <el-table-column label="送货日期" align="center" width="120px">
-            <template slot-scope="scope2">
-              {{ scope2.row.DATE_DELIVER | datatrans }}
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-      <div style="margin-left:45%;margin-top:10px">
-        <el-button @click="isAddTrue" class="trueButton">保存</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
@@ -618,42 +442,6 @@ export default {
     }
   },
   methods: {
-    //确认新增
-    isAddTrue() {
-      //判断是否填完所有信息
-      if (
-        this.submitForm.logistics_company == "" ||
-        this.submitForm.area_district == "" ||
-        this.submitForm.logistics_number == "" ||
-        this.submitForm.LOGISTICS_LINKMAN == "" ||
-        this.submitForm.LOGISTICS_TEL == ""
-      ) {
-        this.$alert("请完善发货信息", "提示", {
-          confirmButtonText: "确定",
-          type: "warning"
-        });
-        return;
-      }
-      this.isAdd = false;
-      this.DeliverDetail = false;
-      this.submitForm.PUR_NO = this.multipleSelection_1[0].PUR_NO;
-      this.submitForm.INVOICE_DATE = this.ruleForm_2.dateValue;
-      this.submitForm.EXPECT_ARRIVAL_DATE = this.ruleForm_3.dateValue;
-      this.submitForm.INVOICE_STATUS = this.newStatus;
-      AddDelivery({
-        headForm: this.submitForm,
-        gridData: this.multipleSelection_2,
-        cid: Cookies.get("companyId")
-      }).then(res => {
-        if (res.code == "0") {
-          this.$alert("保存成功", "提示", {
-            confirmButtonText: "确定",
-            type: "success"
-          });
-          this.search();
-        }
-      });
-    },
     //确认退回
     rebackTure() {
       this.rebackVisible = false;
@@ -667,10 +455,6 @@ export default {
     isTrue() {
       this.innerVisible = false;
       this.getData();
-    },
-    //采购单详情的选择
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
     },
     //采购单的字段改变
     getData() {
@@ -696,29 +480,10 @@ export default {
           PUR_NO: this.multipleSelection_1[i].PUR_NO,
           PRODUCT_NOTE: this.multipleSelection_1[i].PRODUCT_NOTE,
           QTY: this.multipleSelection_1[i].QTY,
-          DATE_REG: this.multipleSelection_1[i].DATE_REG,
+          DATE_REQ: this.multipleSelection_1[i].DATE_REQ,
           DATE_DELIVER: this.multipleSelection_1[i].DATE_DELIVER
         };
         this.$set(this.multipleSelection_2, i, this.multipleSelection_2[i]);
-      }
-    },
-    //采购单搜索
-    searchPUR() {
-      if (this.find.length == "") {
-        this.$alert("请输入采购单号", "提示", {
-          confirmButtonText: "确定",
-          type: "warning"
-        });
-      } else {
-        this.innerVisible = true;
-        var data = {
-          PUR_NO: this.find
-        };
-        GetPoDetail_1(data).then(res => {
-          this.PURData = res.data;
-          this.submitForm.SUPPLY_LINKMAN = res.data[0].G_LINK;
-          this.submitForm.LINKMAN_TEL = res.data[0].HANDSET;
-        });
       }
     },
     //表头模糊搜索
@@ -761,32 +526,6 @@ export default {
         this.count = res.count;
         this.DeliverData = res.data;
       });
-    },
-    //点击新建采购单
-    _addRecord() {
-      this.invoice_id = 0;
-      this.isAdd = true;
-      this.DeliverDetail = true;
-      this.isEdit = false;
-      (this.submitForm = {
-        create_person: "",
-        logistics_company: "",
-        logistics_number: "",
-        area_district: "东莞市莞龙路段狮龙路莞城科技园",
-        remarks: "",
-        PUR_NO: "",
-        INVOICE_DATE: "",
-        INVOICE_STATUS: 0,
-        SUPPLY_LINKMAN: "",
-        LINKMAN_TEL: "",
-        SUPPLY_CODE: "",
-        EXPECT_ARRIVAL_DATE: "",
-        LOGISTICS_LINKMAN: "",
-        LOGISTICS_TEL: ""
-      }),
-        (this.multipleSelection = []);
-      this.multipleSelection_1 = [];
-      this.multipleSelection_2 = [];
     },
     //查看发货单列表详情
     _CheckDetail(val) {
@@ -890,7 +629,7 @@ export default {
             PUR_NO: this.DetailData[i].PUR_NO,
             PRODUCT_NOTE: this.DetailData[i].PRODUCT_NOTE,
             QTY: this.DetailData[i].QTY,
-            DATE_REG: this.DetailData[i].DATE_REG,
+            DATE_REQ: this.DetailData[i].DATE_REQ,
             DATE_DELIVER: this.DetailData[i].DATE_DELIVER
             // REBACK_QTY:this.DetailData[i].REBACK_QTY,
           };

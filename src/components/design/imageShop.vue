@@ -1,7 +1,7 @@
 <template>
   <div class="centerCard">
     <el-card shadow="hover">
-      <div id="tbar" class="tbarStyle">
+      <div class="tbarStyle">
         <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询开始日期"
           v-model="beginTime" style="width:12%;"></el-date-picker>
         --

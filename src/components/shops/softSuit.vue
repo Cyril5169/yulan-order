@@ -6,9 +6,7 @@
           <div id="shopSearchBox" class="mt10">
             <el-input clearable v-model.trim="searchKey" @clear="_getShopsAllSoftSuitMsg(0)"
               @keyup.enter.native="searchSoftSuit(0)" placeholder="输入商品型号查找商品" style="width:25%; min-width:280px;">
-              <div id="searchBtn" slot="append" style="cursor:pointer;" @click="searchSoftSuit(0)">
-                搜索
-              </div>
+              <el-button @click="searchSoftSuit(0)" slot="append" icon="el-icon-search">搜索</el-button>
             </el-input>
           </div>
           <el-tab-pane lazy v-for="item in softList" :key="item.name" :name="item.name" :label="item.label">
@@ -355,10 +353,6 @@ export default {
 
 <style scoped>
 #shopSearchBox div:hover {
-  cursor: pointer;
-}
-#searchBtn {
-  color: #101010;
   cursor: pointer;
 }
 </style>

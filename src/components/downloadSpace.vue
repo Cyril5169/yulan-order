@@ -1,9 +1,9 @@
 <template>
   <div>
-    <span style="float:right;margin-bottom:10px;">
+    <span style="float:right;margin:10px 0;">
       <el-button v-show="false" :disabled="multipleSelection.length == 0" icon="el-icon-download" type="primary" plain>
         下载</el-button>
-      <el-input @keyup.enter.native="search()" placeholder="搜索文件" v-model="find"
+      <el-input size="small" @keyup.enter.native="search()" placeholder="搜索文件" v-model="find"
         style="width:350px;float:right;margin-right:50px;">
         <el-button @click="search()" slot="append" icon="el-icon-search">搜索</el-button>
       </el-input>
@@ -16,7 +16,8 @@
         :class="[index == navigationList.length - 1 ? 'nolink' : 'islink']"
         @click="gotoIndex(item, index)">&nbsp;{{ item.FILE_NAME }}>&nbsp;</a>
     </div>
-    <el-table :data="fileData" @selection-change="handleSelectionChange" @row-dblclick="handleDbclikc">
+    <el-table :data="fileData" @selection-change="handleSelectionChange" @row-dblclick="handleDbclikc"
+      max-height='560px'>
       <!-- <el-table-column type="selection" width="35"></el-table-column> -->
       <el-table-column label="文件名" header-align="center">
         <template slot-scope="scope">

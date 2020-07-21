@@ -121,7 +121,7 @@ export default {
 }
 .el-menu i {
   font-size: 18px;
-  margin: 0 10px;
+  margin: 0 10px 0 0;
 }
 .el-menu-item-group span {
   margin-left: 20px;

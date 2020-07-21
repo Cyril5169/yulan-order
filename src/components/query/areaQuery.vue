@@ -25,16 +25,16 @@
           </el-select>
           <!-- <el-checkbox v-model="isValid" style="margin-left:10px" @change="getCustomerDataList">仅有效客户</el-checkbox> -->
           <span style="margin-left:5px;">关键字筛选</span>
-          <el-input size="small" @keyup.enter.native="getCustomerDataList()" placeholder="客户名称，客户代码" v-model="condition"
-            style="width:300px;">
+          <el-input size="small" @keyup.enter.native="getCustomerDataList()" placeholder="客户名称，客户代码" clearable
+            v-model="condition" style="width:250px;">
             <el-button @click="getCustomerDataList()" slot="append" icon="el-icon-search">搜索</el-button>
           </el-input>
         </div>
         <hr />
         <div style="margin-top:10px;">
           <div style="display:inline-block;">
-            <el-transfer :titles="['可选用户', '已选用户']" class="transferP"
-              v-model="selectCustomer" :data="customerData" :props="{
+            <el-transfer :titles="['可选用户', '已选用户']" class="transferP" v-model="selectCustomer" :data="customerData"
+              :props="{
                   key: 'CUSTOMER_CODE',
                   label: 'CUSTOMER_NAME'
                 }" @left-check-change="checkChange" @right-check-change="checkChange2">
@@ -564,6 +564,9 @@ export default {
   height: 165px;
 }
 .transferP .el-transfer-panel__list.is-filterable {
+  height: 100px;
+}
+.transferP .el-transfer-panel__list {
   height: 135px;
 }
 .transferP .el-transfer-panel .el-transfer-panel__header {

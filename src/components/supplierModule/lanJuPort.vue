@@ -1929,7 +1929,6 @@ export default {
       };
       GetPoDetail(data).then(res => {
         this.gridData = res.data;
-        let details = this.gridData;
         let loc = [];
         let tab1 = [];
         let tab2 = [];

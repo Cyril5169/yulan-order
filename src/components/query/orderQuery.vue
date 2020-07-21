@@ -24,11 +24,16 @@
             </el-option>
           </el-select>
           <!-- <el-checkbox v-model="isValid" style="margin-left:10px" @change="getCustomerDataList">仅有效客户</el-checkbox> -->
+          <span style="margin-left:5px;">关键字筛选</span>
+          <el-input size="small" @keyup.enter.native="getCustomerDataList()" placeholder="客户名称，客户代码" v-model="condition"
+            style="width:300px;">
+            <el-button @click="getCustomerDataList()" slot="append" icon="el-icon-search">搜索</el-button>
+          </el-input>
         </div>
         <hr />
         <div style="margin-top:10px;">
           <div style="display:inline-block;">
-            <el-transfer :titles="['可选用户', '已选用户']" class="transferP" filterable filter-placeholder="筛选"
+            <el-transfer :titles="['可选用户', '已选用户']" class="transferP"
               v-model="selectCustomer" :data="customerData" :props="{
                   key: 'CUSTOMER_CODE',
                   label: 'CUSTOMER_NAME'
@@ -414,7 +419,8 @@ export default {
       var data = {
         areaCode: this.selectAreaCode, //市场
         district: this.selectAreaDistinct, //片区
-        customerType: this.selectCustomerType //客户类型
+        customerType: this.selectCustomerType, //客户类型
+        condition: this.condition
       };
       getCustomerDataForOrder(data).then(res => {
         this.customerData = res.data;
@@ -454,6 +460,7 @@ export default {
         finishTime: this.finishTime,
         status: this.selectOrderType
       };
+      data.finishTime = data.finishTime + " 23:59:59";
       GetOrderAndTaskByCustomer(data).then(res => {
         this.customerOrderTaskData = res.data;
         this.nowBeginTime = this.beginTime;
@@ -485,14 +492,7 @@ export default {
         page: this.currentPage, //页数
         status: this.nowSelectOrderType //状态
       };
-      if (!data.beginTime) {
-        data.beginTime = "0001/1/1";
-      }
-      if (!data.finishTime) {
-        data.finishTime = "9999/12/31";
-      } else {
-        data.finishTime = data.finishTime;
-      }
+      data.finishTime = data.finishTime + " 23:59:59";
       getOrderByAreaCustomer(data).then(res => {
         this.count = res.count;
         this.customerOrderData = res.data;
@@ -564,7 +564,7 @@ export default {
 <style>
 .transferP .el-transfer-panel {
   width: 300px;
-  height: 200px;
+  height: 165px;
 }
 .transferP .el-transfer-panel__list.is-filterable {
   height: 135px;

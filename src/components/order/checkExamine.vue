@@ -17,6 +17,9 @@
 
     <div slot="header">
       <span class="headSpan">订单详情</span>
+      <el-button @click="exportProductExcel" v-if="check_CURTAIN_STATUS_ID == -1" size="mini" plain>
+        导出生产模板
+      </el-button>
       <el-button @click="backTowhere()" style="float:right;" size="small" type="success" plain v-if="button_1">返回
       </el-button>
     </div>
@@ -192,13 +195,16 @@ import {
   getOperationRecord,
   GetCtmOrder,
   GetPromotionByType,
-  GetOrderUseRebate
+  GetOrderUseRebate,
+  ljExportProductExcel
 } from "@/api/orderListASP";
 import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
 import Cookies from "js-cookie";
 import DetailCurtainTable from "../detail/detailCurtainTable";
 import { async } from "q";
+import { downLoadFile } from "@/common/js/downLoadFile";
+
 export default {
   name: "examineDatail",
   props: ["isShowButton"],
@@ -334,8 +340,10 @@ export default {
         transCookies[i].activityId = item.ORDERBODY[i].curtains[0].activityId;
         transCookies[i].quantity = item.ORDERBODY[i].QTY_REQUIRED;
         var price = 0;
-        for(let j = 0;j< item.ORDERBODY[i].curtains.length;j++){
-          price += (item.ORDERBODY[i].curtains[j].price.mul(item.ORDERBODY[i].curtains[j].dosage));
+        for (let j = 0; j < item.ORDERBODY[i].curtains.length; j++) {
+          price += item.ORDERBODY[i].curtains[j].price.mul(
+            item.ORDERBODY[i].curtains[j].dosage
+          );
         }
         transCookies[i].price = price;
         transCookies[i].splitShipment = item.ORDERBODY[i].PART_SEND_ID;
@@ -709,6 +717,31 @@ export default {
       }
       this.fileList2 = tempImgList.concat(temp);
       this.showViewer = true;
+    },
+    exportProductExcel() {
+      this.$confirm("导出后订单将变成审核通过的状态，确定导出吗？", "提示", {
+        confirmButtonText: "确定",
+        type: "warning"
+      })
+        .then(() => {
+          ljExportProductExcel({
+            cid: Cookies.get("cid"),
+            orderNo: this.orderNum
+          }).then(res => {
+            if (res.msg) {
+              downLoadFile(
+                this.Global.baseUrl + `DownLoadAPI/DownloadFile?path=${res.msg}`
+              );
+              this.closeToTab({
+                oldUrl: "order/checkExamine",
+                newUrl: "order/examine"
+              });
+            }
+          });
+        })
+        .catch(() => {
+          return;
+        });
     },
     //合计行显示
     getSummaries({ columns, data }) {

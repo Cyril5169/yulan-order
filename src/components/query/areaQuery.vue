@@ -18,6 +18,7 @@
               :value="item.DISTRICT_ID">
             </el-option>
           </el-select>
+          <span style="margin-left:5px;">客户类型</span>
           <el-select size="small" v-model="selectCustomerType" placeholder="请选择客户类型" style="width:130px"
             @change="getCustomerDataList">
             <el-option v-for="item in customerTypeData" :key="item.value" :label="item.label" :value="item.value">
@@ -49,13 +50,13 @@
               <el-date-picker format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="结束日期区间" v-model="finishTime"
                 style="width:150px;"></el-date-picker>
             </div>
-            <div style="margin-top:20px;">
+            <!-- <div style="margin-top:20px;">
               <span>提货状态</span>
               <el-select v-model="selectOrderType" style="width:150px">
                 <el-option v-for="item in orderTypeData" :key="item.value" :label="item.label" :value="item.value">
                 </el-option>
               </el-select>
-            </div>
+            </div> -->
             <div style="margin-top:20px;">
               <el-button icon="el-icon-search" class="greenBtn" @click="searchData">查询</el-button>
               <el-button icon="el-icon-s-grid" class="greenBtn" @click="resetData" style="margin-left:35px;">重置
@@ -68,7 +69,7 @@
           <div style="font-size:15px;color:blue;margin:5px" v-if="sumOrderMoney > 0">
             订单金额汇总：{{ sumOrderMoney }}元
           </div>
-          <el-table :data="customerOrderTaskData" border class="orderDataTable">
+          <!-- <el-table :data="customerOrderTaskData" border class="orderDataTable">
             <el-table-column type="index">
             </el-table-column>
             <el-table-column label="客户代码" align="center">
@@ -79,14 +80,58 @@
             </el-table-column>
             <el-table-column prop="CUSTOMER_NAME" label="客户名称" align="center">
             </el-table-column>
-            <el-table-column prop="MONEYSUM" label="时间段内订单提货总额" align="center">
+            <el-table-column prop="MONEY_SUM" label="时间段内订单提货总额" align="center">
             </el-table-column>
+          </el-table> -->
+          <el-table :summary-method="getSummaries2" show-summary :data="customerOrderData" border highlight-current-row
+            style="width: 100%;">
+            <el-table-column type="index">
+            </el-table-column>
+            <el-table-column prop="CUSTOMER_NAME" label="客户名称" align="center" width="200" show-overflow-tooltip>
+            </el-table-column>
+            <el-table-column label="提货单号" width="100" align="center">
+              <template slot-scope="scope1">
+                <el-button size="mini" @click="getOrderDetail(scope1.row)" type="text">{{ scope1.row.SALE_NO }}
+                </el-button>
+              </template>
+            </el-table-column>
+            <el-table-column label="状态" align="center">
+              <template slot-scope="scope2">
+                {{ scope2.row.STATUS_ID | transStatus }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="CONTRACT_NO" label="B2B订单号" align="center"></el-table-column>
+            <el-table-column label="单据类型" align="center" prop="BILL_ID"
+              :filters="[{text: '冲减单', value: '0'}, {text: '自动提货单', value: '1'},{text: '手工提货单', value: '2'},{text: '退货单', value: '3'}, ]"
+              :filter-method="filterHandler">
+              <template slot-scope="scope3">
+                {{ scope3.row.BILL_ID | transType }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="BILL_DATE" label="开单日期" align="center">
+              <template slot-scope="scope5">
+                {{ scope5.row.BILL_DATE | datatrans }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="DATE_OUT_STOCK" label="提货日期" align="center">
+              <template slot-scope="scope5">
+                {{ scope5.row.DATE_OUT_STOCK | datatrans }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="MONEY_SUM" label="金额" align="center"></el-table-column>
+            <el-table-column prop="TRANSTYPE_NAME" label="运输方式" align="center"></el-table-column>
+            <el-table-column prop="TRANS_ID" label="运输单号" align="center"></el-table-column>
+            <el-table-column prop="HTBM" label="合同号" align="center"></el-table-column>
           </el-table>
+          <div style="margin:0 35%;" class="block">
+            <el-pagination @current-change="handleCurrentChange2" :current-page="currentPage" :page-size="limit"
+              layout="total, prev, pager, next, jumper" :total="count"></el-pagination>
+          </div>
         </div>
       </div>
     </el-card>
     <!-- 提货单汇总 -->
-    <el-dialog :visible.sync="allOrderVisible" width="1100px">
+    <el-dialog :visible.sync="allOrderVisible" width="1100px" top="5vh">
       <div style="font-size:18px">
         <div style="text-align:center;">
           客户名称：{{ selectOneCustomer.CUSTOMER_NAME }}
@@ -111,8 +156,8 @@
               {{ scope2.row.STATUS_ID | transStatus }}
             </template>
           </el-table-column>
-          <el-table-column prop="CONTRACT_NO" label="订单号" align="center"></el-table-column>
-          <el-table-column label="类型" align="center" prop="BILL_ID"
+          <el-table-column prop="CONTRACT_NO" label="B2B订单号" align="center"></el-table-column>
+          <el-table-column label="单据类型" align="center" prop="BILL_ID"
             :filters="[{text: '冲减单', value: '0'}, {text: '自动提货单', value: '1'},{text: '手工提货单', value: '2'},{text: '退货单', value: '3'}, ]"
             :filter-method="filterHandler">
             <template slot-scope="scope3">
@@ -132,7 +177,7 @@
           <el-table-column prop="MONEY_SUM" label="金额" align="center"></el-table-column>
           <el-table-column prop="TRANSTYPE_NAME" label="运输方式" align="center"></el-table-column>
           <el-table-column prop="TRANS_ID" label="运输单号" align="center"></el-table-column>
-          <el-table-column prop="HTBH" label="合同号" align="center"></el-table-column>
+          <el-table-column prop="HTBM" label="合同号" align="center"></el-table-column>
         </el-table>
         <!-- 分页 -->
         <div style="margin:0 35%;" class="block">
@@ -142,8 +187,9 @@
       </div>
     </el-dialog>
     <!-- 提货单明细 -->
-    <el-dialog title="提货单详情" :visible.sync="orderVisible" :close-on-click-modal="false" width="1100px" append-to-body>
-      <div style="width:100% ;margin:0 auto;font-size:13px;margin-top:-12px" class="diagTable">
+    <el-dialog title="提货单详情" :visible.sync="orderVisible" :close-on-click-modal="false" width="1100px" append-to-body
+      top="5vh">
+      <div style="margin:0 auto;">
         <table style="width:100%;height:160px" class="table_2" border="1">
           <tr>
             <td class="td_1">提货单</td>
@@ -180,7 +226,8 @@
           </tr>
         </table>
         <br>
-        <el-table max-height="500" :data="orderDetailList" border style="width:100%;">
+        <el-table max-height="500" :data="orderDetailList" border style="width:100%;" show-summary
+          :summary-method="getSummaries2">
           <el-table-column width="80" label="状态" align="center">
             <template slot-scope="scope1">
               <span>{{ scope1.row.STATUS_ID | transStatus }}</span>
@@ -234,6 +281,7 @@ export default {
       selectAreaDistinct: "",
       customerData: [],
       selectCustomer: [],
+      nowCustomers:[],
       customerTypeData: [
         {
           value: "",
@@ -356,7 +404,7 @@ export default {
     sumOrderMoney() {
       var sum = 0;
       for (var i = 0; i < this.customerOrderTaskData.length; i++) {
-        sum = sum.add(this.customerOrderTaskData[i].MONEYSUM);
+        sum = sum.add(this.customerOrderTaskData[i].MONEY_SUM);
       }
       return sum;
     }
@@ -447,11 +495,30 @@ export default {
         CUSTOMER_CODEs: this.selectCustomer,
         beginTime: this.beginTime,
         finishTime: this.finishTime,
-        status: this.selectOrderType
       };
       data.finishTime = data.finishTime + " 23:59:59";
       getPackByCustomer(data).then(res => {
         this.customerOrderTaskData = res.data;
+      });
+      this.nowBeginTime = this.beginTime;
+      this.nowFinishTime = this.finishTime;
+      this.nowCustomers = this.selectCustomer;
+      this.currentPage = 1;
+      this.getAllCustomerAllOrder();
+    },
+    getAllCustomerAllOrder(){
+      this.customerOrderData = [];
+      var data = {
+        CUSTOMER_CODEs: this.nowCustomers, //已选用户
+        beginTime: this.nowBeginTime, //起始时间
+        finishTime: this.nowFinishTime, //结束时间
+        limit: this.limit, //限制数
+        page: this.currentPage, //页数
+      };
+      data.finishTime = data.finishTime + " 23:59:59";
+      getPackDetails(data).then(res => {
+        this.count = res.count;
+        this.customerOrderData = res.data;
         this.nowBeginTime = this.beginTime;
         this.nowFinishTime = this.finishTime;
         this.nowSelectOrderType = this.selectOrderType;
@@ -460,19 +527,17 @@ export default {
     getCustomerAllOrder(row) {
       this.currentPage = 1;
       this.selectOneCustomer = row;
-      this.getMoney = row.MONEYSUM;
+      this.getMoney = row.MONEY_SUM;
       this.getOrderAll();
     },
     getOrderAll() {
       this.customerOrderData = [];
       var data = {
-        type: "", //类型筛选
-        costomerCodes: this.selectOneCustomer.CUSTOMER_CODE, //已选用户
+        CUSTOMER_CODEs: this.selectOneCustomer.CUSTOMER_CODE, //已选用户
         beginTime: this.nowBeginTime, //起始时间
         finishTime: this.nowFinishTime, //结束时间
         limit: this.limit, //限制数
         page: this.currentPage, //页数
-        status: this.nowSelectOrderType //状态
       };
       data.finishTime = data.finishTime + " 23:59:59";
       getPackDetails(data).then(res => {
@@ -484,6 +549,10 @@ export default {
     handleCurrentChange(val) {
       this.currentPage = val;
       this.getOrderAll();
+    },
+    handleCurrentChange2(val){
+      this.currentPage = val;
+      this.getAllCustomerAllOrder();
     },
     getOrderDetail(row) {
       this.orderHead = row;
@@ -509,7 +578,38 @@ export default {
           if (index === 1) {
             sums[index] = "页合计";
             return;
-          } else if (index == 6) {
+          } else if (index == 7) {
+            var values = data.map(item => Number(item[column.property]));
+            if (!values.every(value => isNaN(value))) {
+              sums[index] = values.reduce((prev, curr) => {
+                const value = Number(curr);
+                if (!isNaN(value)) {
+                  return prev + curr;
+                } else {
+                  return prev;
+                }
+              }, 0);
+              sums[index] = sums[index].toFixed(2);
+              if (this.isManager == "0") sums[index] = "***";
+            } else {
+              sums[index] = "";
+            }
+          } else {
+            sums[index] = "";
+          }
+        });
+      }
+      return sums;
+    },
+    getSummaries2(param) {
+      const { columns, data } = param;
+      const sums = [];
+      if (data && data.length > 0) {
+        columns.forEach((column, index) => {
+          if (index === 1) {
+            sums[index] = "页合计";
+            return;
+          } else if (index == 8) {
             var values = data.map(item => Number(item[column.property]));
             if (!values.every(value => isNaN(value))) {
               sums[index] = values.reduce((prev, curr) => {

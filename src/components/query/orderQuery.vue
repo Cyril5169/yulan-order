@@ -18,6 +18,7 @@
               :value="item.DISTRICT_ID">
             </el-option>
           </el-select>
+          <span style="margin-left:5px;">客户类型</span>
           <el-select size="small" v-model="selectCustomerType" placeholder="请选择客户类型" style="width:130px"
             @change="getCustomerDataList">
             <el-option v-for="item in customerTypeData" :key="item.value" :label="item.label" :value="item.value">

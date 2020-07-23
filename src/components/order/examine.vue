@@ -50,6 +50,9 @@
               (item.CURTAIN_STATUS_ID == '0' && item.STATUS_ID == '1') ||
                 item.CURTAIN_STATUS_ID == '3'
             " @click="_back(item)" size="mini" type="warning" plain>直接退回</el-button>
+          <el-button style="float: right;" @click="exportProductExcel(item)" v-if="item.collapse" size="mini" plain>
+            导出生产模板
+          </el-button>
           <span class="zoomLeft">时间：</span>
           <span class="zoomRight">{{ item.DATE_CRE }}</span>
           <span class="zoomLeft">订单号：</span>
@@ -124,6 +127,12 @@
                     item.CURTAIN_STATUS_ID == '3'
                 " @click="_back(item)" size="medium" type="warning" plain>直接退回</el-button>
             </p>
+            <p>
+              <el-button style="float: right;" @click="exportProductExcel(item)" v-if="!item.collapse" size="mini"
+                plain>
+                导出生产模板
+              </el-button>
+            </p>
           </div>
         </div>
       </el-card>
@@ -141,11 +150,16 @@
 
 <script>
 import { getOrderlist, getExamineOrder } from "@/api/orderList";
-import { getCurtainOrders, updateCurtainOrder } from "@/api/orderListASP";
+import {
+  getCurtainOrders,
+  updateCurtainOrder,
+  ljExportProductExcel
+} from "@/api/orderListASP";
 import { cancelOrder } from "@/api/orderList";
 import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
 import Cookies from "js-cookie";
+import { downLoadFile } from "@/common/js/downLoadFile";
 
 export default {
   name: "examine",
@@ -283,11 +297,11 @@ export default {
     }
   },
   methods: {
-    //订单详情
     toExamineDetail(val) {
       Cookies.set("ORDER_NO", val);
       this.addTab("order/examineDetailNew");
     },
+    //订单详情
     toCheckExamine(val) {
       Cookies.set("ORDER_NO", val);
       Cookies.set("CURTAIN_STATUS_ID", -1);
@@ -338,6 +352,28 @@ export default {
               });
               console.log(res);
             });
+        })
+        .catch(() => {
+          return;
+        });
+    },
+    exportProductExcel(item) {
+      this.$confirm("导出后订单将变成审核通过的状态，确定导出吗？", "提示", {
+        confirmButtonText: "确定",
+        type: "warning"
+      })
+        .then(() => {
+          ljExportProductExcel({
+            cid: Cookies.get("cid"),
+            orderNo: item.ORDER_NO
+          }).then(res => {
+            if (res.msg) {
+              downLoadFile(
+                this.Global.baseUrl + `DownLoadAPI/DownloadFile?path=${res.msg}`
+              );
+              this.getorderList();
+            }
+          });
         })
         .catch(() => {
           return;

@@ -266,3 +266,11 @@ export function GetOrderAndTaskByCustomer(data, config = {}) {
         return Promise.reject(err);
     })
 }
+
+export function ljExportProductExcel(data, config = {}) {
+    return post('/CTM_ORDER/ljExportProductExcel', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}

@@ -377,8 +377,12 @@ export default {
           value: 3
         },
         {
-          label: "待处理",
+          label: "财务审核通过",
           value: 8
+        },
+        {
+          label: "广美审核通过",
+          value: 5
         },
         {
           label: "已完成设计图",

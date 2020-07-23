@@ -1124,6 +1124,11 @@ export default {
         if (res.count > 0) {
           this.submit = res.data[0];
           if (
+            this.submit.STATE == "SUBMITTED" 
+          ) {
+            this.submit.FIRST_AUDITION = "";
+          }
+          if (
             this.submit.STATE == "CUSTOMERAFFIRM" ||
             this.submit.STATE == "APPROVED"
           ) {

@@ -28,7 +28,7 @@ export function tabsName(index) {
     case "design/imageShop":
       return "形象店设计";
     case "design/lanJu":
-      return "兰居设计";
+      return "软装设计";
     case "marketInfo":
       return "调查表";
     case "downloadSpace":
@@ -90,9 +90,9 @@ export function tabsName(index) {
     case "design/ISExamineGM":
       return "形象店设计审核";
     case "design/lanJuGMExamine":
-      return "兰居设计审核";
+      return "软装设计广美审核";
     case "design/lanJuMarketExamine":
-      return "兰居设计审核";
+      return "软装设计市场部审核";
     case "supplierModule/payDelegation":
       return "付款委托书";
     case "supplierModule/payDelegationExamine":

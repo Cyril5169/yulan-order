@@ -4,7 +4,7 @@
     <el-card shadow="hover">
 
       <div slot="header">
-        <span class="fstrong f16">兰居设计</span>
+        <span class="fstrong f16">软装设计</span>
       </div>
 
       <div id="tbar" class="tbarStyle">

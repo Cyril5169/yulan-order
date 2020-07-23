@@ -158,7 +158,7 @@
     <el-dialog
       :visible.sync="imageStoreDetail"
       :close-on-click-modal="false"
-      width="58%"
+      width="1000px"
       top="5vh"
     >
       <!-- 编辑区 -->
@@ -373,7 +373,7 @@
 
           <tr>
             <td colspan="3" border="0px" style="text-align:left;height:28px;">
-              <span style="margin-left:10px;">责任人签字：</span>
+              <span style="margin-left:10px;">责任人签字：{{tableData.CUSTOMER_AGENT}}</span>
             </td>
             <td colspan="2" style="text-align:left;height:28px;">
               <span v-if="!EDITorCHECK" style="margin-left:10px;"

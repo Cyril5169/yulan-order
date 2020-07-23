@@ -1716,4 +1716,10 @@ export default {
 .el-tabs--border-card>.el-tabs__content{
   padding: 10px;
 }
+/* .el-input.is-disabled .el-input__inner{
+  color: #606266;
+}
+.el-textarea.is-disabled .el-textarea__inner{
+  color: #606266;
+} */
 </style>

@@ -170,7 +170,7 @@
     <el-dialog
       :visible.sync="imageStoreDetail"
       :close-on-click-modal="false"
-      width="58%"
+      width="1000px"
       top="5vh"
     >
       <!-- 编辑区 -->
@@ -385,7 +385,7 @@
 
           <tr>
             <td colspan="3" border="0px" style="text-align:left;height:28px;">
-              <span style="margin-left:10px;">责任人签字：</span>
+              <span style="margin-left:10px;">责任人签字：{{tableData.CUSTOMER_AGENT}}</span>
             </td>
             <td colspan="2" style="text-align:left;height:28px;">
               <span v-if="!EDITorCHECK" style="margin-left:10px;"
@@ -460,7 +460,7 @@
         <div style="display:inline-block;width:30%;margin-left:50px;">
           <el-upload
             v-if="tableData.STATUS == 2"
-            class="upload-de2"
+            class="upload-IM-GM"
             :action="Global.baseUrl + '/IMAGE_STORE/UploadFiles'"
             drag
             multiple
@@ -892,8 +892,8 @@ export default {
 .upload-de .el-upload-dragger {
   height: 100px;
 }
-.upload-de2 .el-upload-dragger {
-  height: 100px;
-  width: 200px;
+.upload-IM-GM .el-upload-dragger {
+  height: 100px !important;
+  width: 200px!important
 }
 </style>

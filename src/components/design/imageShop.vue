@@ -89,7 +89,7 @@
       </div>
     </el-card>
 
-    <el-dialog :visible.sync="imageStoreDetail" :close-on-click-modal="false" width="58%" top="5vh">
+    <el-dialog :visible.sync="imageStoreDetail" :close-on-click-modal="false" width="1000px" top="5vh">
       <!-- 编辑区 -->
       <div class="table-c">
         <h2 style="text-align:center;margin:0 0 10px 0;">
@@ -269,7 +269,7 @@
             </td>
 
             <td colspan="2" style="height:14px;">
-              <el-upload v-if="!EDITorCHECK" class="upload-de" :action="Global.baseUrl + '/IMAGE_STORE/UploadFiles'"
+              <el-upload v-if="!EDITorCHECK" class="upload-IM-CUS" :action="Global.baseUrl + '/IMAGE_STORE/UploadFiles'"
                 style="margin-top:10px;" drag multiple :on-change="handleChange" :on-remove="handleRemove"
                 :on-success="handleSuccess" :on-error="handleError" ref="upload" :auto-upload="false"
                 :file-list="fileList" :data="{ cid: cid, dateStamp: dateStamp }">
@@ -320,7 +320,7 @@
 
           <tr>
             <td colspan="3" border="0px" style="text-align:left;height:28px;">
-              <span style="margin-left:10px;">责任人签字：</span>
+              <span style="margin-left:10px;">责任人签字：{{tableData.CUSTOMER_AGENT}}</span>
             </td>
             <td colspan="2" style="text-align:left;height:28px;">
               <span v-if="!EDITorCHECK && !newORedit"
@@ -984,7 +984,7 @@ export default {
 .inputStyle .el-textarea__inner {
   border-radius: 0;
 }
-.upload-de .el-upload-dragger {
+.upload-IM-CUS .el-upload-dragger {
   height: 100px;
 }
 </style>

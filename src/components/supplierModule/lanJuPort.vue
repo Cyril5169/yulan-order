@@ -15,7 +15,7 @@
       </el-dialog>
       <!-- X开头（窗帘）确认采购单界面 -->
       <el-dialog :show-close="true" :visible.sync="checkX_Visible" :close-on-click-modal="false" disabled="true"
-        width="1070px" top="8vh">
+        width="1170px" top="8vh">
         <div style="width:100%">
           <div style="margin-bottom:10px">
             <div align="center" class="th-font18"> <span>广东玉兰集团股份有限公司采购单（<span
@@ -210,7 +210,6 @@
           </div>
         </div>
       </el-dialog>
-
       <!-- 非X开头确认采购单界面兰 ==================================================================================-->
       <el-dialog :show-close="true" :visible.sync="checkY_Visible" :close-on-click-modal="false" disabled="true"
         width="1080px" top="8vh">

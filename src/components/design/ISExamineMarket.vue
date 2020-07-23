@@ -2,69 +2,22 @@
   <div class="centerCard">
     <el-card shadow="hover">
       <div class="tbarStyle">
-        <el-date-picker
-          type="date"
-          format="yyyy-MM-dd"
-          value-format="yyyy-MM-dd"
-          placeholder="查询开始日期"
-          v-model="beginTime"
-          style="width:12%;"
-        ></el-date-picker>
+        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询开始日期"
+          v-model="beginTime" style="width:12%;"></el-date-picker>
         --
-        <el-date-picker
-          type="date"
-          format="yyyy-MM-dd"
-          value-format="yyyy-MM-dd"
-          placeholder="查询截止日期"
-          v-model="finishTime"
-          style="width:12%;"
-        ></el-date-picker>
-        <el-select
-          v-model="status"
-          style="margin-left: 10px;width:12%;"
-          placeholder="全部状态"
-        >
-          <el-option
-            v-for="item in options"
-            :key="item.label"
-            :label="item.label"
-            :value="item.value"
-          ></el-option>
+        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询截止日期"
+          v-model="finishTime" style="width:12%;"></el-date-picker>
+        <el-select v-model="status" style="margin-left: 10px;width:12%;" placeholder="全部状态">
+          <el-option v-for="item in options" :key="item.label" :label="item.label" :value="item.value"></el-option>
         </el-select>
-        <el-input
-          @keyup.enter.native="search()"
-          placeholder="可搜索单号、申请人、实施形式"
-          v-model="find"
-          style="width:250px;"
-          clearable
-        >
+        <el-input @keyup.enter.native="search()" placeholder="可搜索单号、申请人、实施形式" v-model="find" style="width:250px;"
+          clearable>
         </el-input>
-        <el-button
-          size="medium"
-          type="success"
-          style="margin-left: 10px"
-          @click="search()"
-          >查询</el-button
-        >
+        <el-button size="medium" type="success" style="margin-left: 10px" @click="search()">查询</el-button>
       </div>
-      <el-table
-        border
-        :data="imageStoreData"
-        style="width: 100%"
-        :row-class-name="tableRowClassName"
-      >
-        <el-table-column
-          width="130"
-          prop="ID"
-          label="申请单号"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          prop="CREATER"
-          label="申请人"
-          align="center"
-          width="80"
-        ></el-table-column>
+      <el-table border :data="imageStoreData" style="width: 100%" :row-class-name="tableRowClassName">
+        <el-table-column width="130" prop="ID" label="申请单号" align="center"></el-table-column>
+        <el-table-column prop="CREATER" label="申请人" align="center" width="80"></el-table-column>
         <el-table-column width="100" label="申请时间" align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.DATE_CRE | datatrans }}</span>
@@ -73,20 +26,9 @@
         <el-table-column width="80" label="店面形式" align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.STORE_FORM | formTrans }}</span>
-          </template></el-table-column
-        >
-        <el-table-column
-          prop="STORE_AREA"
-          label="店面面积(m2)"
-          align="center"
-          width="110"
-        ></el-table-column>
-        <el-table-column
-          prop="STORE_PLIE"
-          label="层数"
-          align="center"
-          width="60"
-        ></el-table-column>
+          </template></el-table-column>
+        <el-table-column prop="STORE_AREA" label="店面面积(m2)" align="center" width="110"></el-table-column>
+        <el-table-column prop="STORE_PLIE" label="层数" align="center" width="60"></el-table-column>
         <el-table-column width="110" label="计划动工时间" align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.PLAN_DATE | datatrans }}</span>
@@ -110,57 +52,33 @@
         </el-table-column>
         <el-table-column label="付款凭证" align="center" width="130">
           <template slot-scope="scope">
-            <el-link
-              type="primary"
-              size="mini"
-              @click="showImage(scope.row.PAYMENT)"
-              >{{ scope.row.PAYMENT }}</el-link
-            >
+            <el-link type="primary" size="mini" @click="showImage(scope.row.PAYMENT)">{{ scope.row.PAYMENT }}</el-link>
           </template>
         </el-table-column>
         <el-table-column width="60" label="附件" align="center">
           <template slot-scope="scope">
-            <a
-              v-if="scope.row.ATTACHMENT_FILE != ''"
-              title="点击下载压缩包"
-              class="attachLink"
-              @click="downLoadCompress(scope.row.ATTACHMENT_FILE_FOLDER)"
-              >{{ scope.row.ATTACHMENT_FILE.split(";").length - 1 }}个</a
-            >
+            <a v-if="scope.row.ATTACHMENT_FILE != ''" title="点击下载压缩包" class="attachLink"
+              @click="downLoadCompress(scope.row.ATTACHMENT_FILE_FOLDER)">{{ scope.row.ATTACHMENT_FILE.split(";").length - 1 }}个</a>
             <span v-else>0个</span>
           </template>
         </el-table-column>
         <el-table-column align="center" label="操作">
           <template slot-scope="scope">
-            <el-button
-              @click="checkDetail(scope.row)"
-              type="success"
-              icon="el-icon-search"
-              size="mini"
-              circle
-            ></el-button>
+            <el-button @click="checkDetail(scope.row)" type="success" v-if="scope.row.STATUS != 1" icon="el-icon-search"
+              size="mini" circle></el-button>
+            <el-button @click="checkDetail(scope.row)" v-if="scope.row.STATUS == 1" type="primary" icon="el-icon-edit"
+              size="mini" circle></el-button>
           </template>
         </el-table-column>
       </el-table>
       <div style="margin:0 25%;" class="block">
-        <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page.sync="currentPage"
-          :page-sizes="[5, 10, 15, 20]"
-          :page-size="limit"
-          layout="total,sizes,prev, pager, next, jumper"
-          :total="count"
-        ></el-pagination>
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+          :current-page.sync="currentPage" :page-sizes="[5, 10, 15, 20]" :page-size="limit"
+          layout="total,sizes,prev, pager, next, jumper" :total="count"></el-pagination>
       </div>
     </el-card>
 
-    <el-dialog
-      :visible.sync="imageStoreDetail"
-      :close-on-click-modal="false"
-      width="1000px"
-      top="5vh"
-    >
+    <el-dialog :visible.sync="imageStoreDetail" :close-on-click-modal="false" width="1000px" top="5vh">
       <!-- 编辑区 -->
       <div class="table-c">
         <h2 style="text-align:center;margin:0 0 10px 0;">
@@ -169,26 +87,20 @@
         <h3 v-if="EDITorCHECK">
           提交时间：{{ tableData.DATE_CRE | datatrans }}
         </h3>
-        <h3
-          v-if="
+        <h3 v-if="
             (EDITorCHECK || newORedit) &&
               (tableData.STATUS == 2 ||
                 tableData.STATUS == 3 ||
                 tableData.STATUS == 5)
-          "
-        >
+          ">
           市场部确认时间：{{
             tableData.DATE_ENTER | datatrans
-          }}&nbsp;&nbsp;&nbsp;&nbsp;<span v-if="tableData.ENTER_SUG"
-            >审核意见：{{ tableData.ENTER_SUG }}</span
-          >
+          }}&nbsp;&nbsp;&nbsp;&nbsp;<span v-if="tableData.ENTER_SUG">审核意见：{{ tableData.ENTER_SUG }}</span>
         </h3>
         <h3 v-if="(EDITorCHECK || newORedit) && tableData.STATUS == 3">
           广美确认时间：{{
             tableData.DATE_PASS | datatrans
-          }}&nbsp;&nbsp;&nbsp;&nbsp;<span v-if="tableData.PASS_SUG"
-            >审核意见：{{ tableData.PASS_SUG }}</span
-          >
+          }}&nbsp;&nbsp;&nbsp;&nbsp;<span v-if="tableData.PASS_SUG">审核意见：{{ tableData.PASS_SUG }}</span>
         </h3>
         <h3 v-if="(EDITorCHECK || newORedit) && tableData.STATUS == 4">
           市场部退回时间：{{
@@ -243,13 +155,7 @@
           </tr>
 
           <tr>
-            <td
-              class="grayTD"
-              colspan="1"
-              rowspan="2"
-              border="0px"
-              style="height:28px;"
-            >
+            <td class="grayTD" colspan="1" rowspan="2" border="0px" style="height:28px;">
               店面信息
             </td>
             <td class="grayTD" colspan="1" style="height:28px;">
@@ -277,13 +183,7 @@
           </tr>
 
           <tr>
-            <td
-              class="grayTD"
-              colspan="1"
-              rowspan="5"
-              border="0px"
-              style="height:28px;"
-            >
+            <td class="grayTD" colspan="1" rowspan="5" border="0px" style="height:28px;">
               设计需求
             </td>
             <td class="grayTD" colspan="1" style="height:28px;">
@@ -299,9 +199,7 @@
               实施形式<span style="color:red;">*</span>
             </td>
             <td colspan="3" style="height:45px;">
-              <span v-if="tableData.IMPLEMENTTATION_FORM == 1"
-                >100%按公司设计方案落地，软装物料由公司配置，享受公司建店支持</span
-              >
+              <span v-if="tableData.IMPLEMENTTATION_FORM == 1">100%按公司设计方案落地，软装物料由公司配置，享受公司建店支持</span>
               <span v-else>自行落地</span>
             </td>
           </tr>
@@ -334,21 +232,13 @@
 
             <td colspan="2" style="height:14px;">
               <ul class="el-upload-list el-upload-list--text">
-                <li
-                  v-for="(fileList, index) in fileList"
-                  :key="index"
-                  class="el-upload-list__item is-success"
-                  tabindex="0"
-                >
+                <li v-for="(fileList, index) in fileList" :key="index" class="el-upload-list__item is-success"
+                  tabindex="0">
                   <a class="el-upload-list__item-name">
                     <i class="el-icon-document"> </i>{{ fileList.name }}
                   </a>
-                  <label
-                    style="display:block;position:absolute;top:1px;right:20px;"
-                  >
-                    <a style="cursor:pointer;" @click="downLoad(fileList.url)"
-                      >下载附件</a
-                    >
+                  <label style="display:block;position:absolute;top:1px;right:20px;">
+                    <a style="cursor:pointer;" @click="downLoad(fileList.url)">下载附件</a>
                   </label>
                 </li>
               </ul>
@@ -376,21 +266,13 @@
               <span style="margin-left:10px;">责任人签字：{{tableData.CUSTOMER_AGENT}}</span>
             </td>
             <td colspan="2" style="text-align:left;height:28px;">
-              <span v-if="!EDITorCHECK" style="margin-left:10px;"
-                >日期：{{ new Date().getTime() | datatrans }}</span
-              >
-              <span v-else style="margin-left:10px;"
-                >日期：{{ tableData.DATE_CRE | datatrans }}</span
-              >
+              <span v-if="!EDITorCHECK" style="margin-left:10px;">日期：{{ new Date().getTime() | datatrans }}</span>
+              <span v-else style="margin-left:10px;">日期：{{ tableData.DATE_CRE | datatrans }}</span>
             </td>
           </tr>
 
           <tr style="height:60px">
-            <td
-              colspan="5"
-              border="0px"
-              style="font-size:13px;color:gray;text-align:left"
-            >
+            <td colspan="5" border="0px" style="font-size:13px;color:gray;text-align:left">
               <div style="margin:0 5px;">
                 1.请提前15个工作日提交设计需求申请。<br />
                 2.请附上店面平面图（清晰标注尺寸以及消防位等障碍位置）。<br />
@@ -403,32 +285,13 @@
         </table>
 
         <br />
-        <span v-if="tableData.STATUS == 1 && tableData.ENTER_SUG"
-          >上次审核意见:{{ tableData.ENTER_SUG }}</span
-        >
+        <span v-if="tableData.STATUS == 1 && tableData.ENTER_SUG">上次审核意见:{{ tableData.ENTER_SUG }}</span>
         <div style="margin:0 auto; text-align: center;">
-          <el-input
-            v-if="tableData.STATUS == 1"
-            style="margin-bottom: 10px"
-            resize="none"
-            type="textarea"
-            :rows="3"
-            placeholder="请输入审核意见"
-            v-model="examineSuggestion"
-          >
+          <el-input v-if="tableData.STATUS == 1" style="margin-bottom: 10px" resize="none" type="textarea" :rows="3"
+            placeholder="请输入审核意见" v-model="examineSuggestion">
           </el-input>
-          <el-button
-            v-if="tableData.STATUS == 1"
-            type="primary"
-            @click="pass(tableData.ID)"
-            >审核通过</el-button
-          >
-          <el-button
-            v-if="tableData.STATUS == 1"
-            type="warning"
-            @click="reject(tableData.ID)"
-            >审核不通过</el-button
-          >
+          <el-button v-if="tableData.STATUS == 1" type="primary" @click="pass(tableData.ID)">审核通过</el-button>
+          <el-button v-if="tableData.STATUS == 1" type="warning" @click="reject(tableData.ID)">审核不通过</el-button>
         </div>
       </div>
     </el-dialog>
@@ -447,7 +310,7 @@ import { GetPaymentById } from "@/api/paymentASP";
 import {
   GetAllData,
   UploadFiles,
-  MarketUpdateStatus
+  MarketUpdateStatus,
 } from "@/api/imageStoreASP";
 import { downLoadFile } from "@/common/js/downLoadFile";
 import { mapMutations } from "vuex";
@@ -484,32 +347,32 @@ export default {
       options: [
         {
           label: "全部状态",
-          value: ""
+          value: "",
         },
         {
           label: "已提交",
-          value: "1"
+          value: "1",
         },
         {
           label: "市场部确认",
-          value: "2"
+          value: "2",
         },
         {
           label: "广美确认",
-          value: "3"
+          value: "3",
         },
         {
           label: "市场部退回",
-          value: "4"
+          value: "4",
         },
         {
           label: "广美退回",
-          value: "5"
-        }
-      ]
+          value: "5",
+        },
+      ],
     };
   },
-  created: function() {
+  created: function () {
     this.getDetail();
   },
   filters: {
@@ -573,7 +436,7 @@ export default {
           return "自行落地";
           break;
       }
-    }
+    },
   },
   methods: {
     //查看列表详情
@@ -587,7 +450,7 @@ export default {
         var fileName = list[i].substr(index + 1);
         this.fileList.push({
           name: fileName,
-          url: list[i]
+          url: list[i],
         });
       }
       this.EDITorCHECK = true;
@@ -606,7 +469,7 @@ export default {
         beginTime: this.beginTime, //起始时间
         finishTime: this.finishTime, //结束时间
         limit: this.limit, //限制数
-        page: this.currentPage //页数
+        page: this.currentPage, //页数
       };
       if (!data.beginTime) {
         data.beginTime = "0001/1/1";
@@ -616,10 +479,10 @@ export default {
       } else {
         data.finishTime = data.finishTime + " 23:59:59";
       }
-      GetAllData(data).then(res => {
+      GetAllData(data).then((res) => {
         this.count = res.count;
         this.imageStoreData = res.data;
-        this.$root.$emit('refreshBadgeIcon','imageShop2');
+        this.$root.$emit("refreshBadgeIcon", "imageShop2");
       });
     },
     downLoad(path) {
@@ -642,7 +505,7 @@ export default {
     //显示图片
     showImage(id) {
       this.imgUrl = "";
-      GetPaymentById({ id: id }).then(res => {
+      GetPaymentById({ id: id }).then((res) => {
         this.imgUrl = Head + res.data.IMG_URL;
         this.BigPic = true;
       });
@@ -652,9 +515,9 @@ export default {
         id: id,
         cid: Cookies.get("cid"),
         status: 2,
-        suggestion: this.examineSuggestion
+        suggestion: this.examineSuggestion,
       };
-      MarketUpdateStatus(data).then(res => {
+      MarketUpdateStatus(data).then((res) => {
         this.imageStoreDetail = false;
         this.getDetail();
         this.examineSuggestion = "";
@@ -664,7 +527,7 @@ export default {
       if (!this.examineSuggestion) {
         this.$alert("请填写意见", "提示", {
           confirmButtonText: "确定",
-          type: "success"
+          type: "success",
         });
         return;
       }
@@ -672,9 +535,9 @@ export default {
         id: id,
         cid: Cookies.get("cid"),
         status: 4,
-        suggestion: this.examineSuggestion
+        suggestion: this.examineSuggestion,
       };
-      MarketUpdateStatus(data).then(res => {
+      MarketUpdateStatus(data).then((res) => {
         this.imageStoreDetail = false;
         this.getDetail();
         this.examineSuggestion = "";
@@ -694,7 +557,7 @@ export default {
     handleChange(file, fileList) {
       this.fileList = fileList.slice(-3);
     },
-  }
+  },
 };
 </script>
 

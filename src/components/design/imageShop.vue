@@ -381,7 +381,7 @@ import {
   InsertImageStore,
   EditImageStore,
   DeleteImageStore,
-  UploadFiles
+  UploadFiles,
 } from "@/api/imageStoreASP";
 import { getCustomerInfo } from "@/api/orderListASP";
 import { downLoadFile } from "@/common/js/downLoadFile";
@@ -422,32 +422,32 @@ export default {
       options: [
         {
           label: "全部状态",
-          value: ""
+          value: "",
         },
         {
           label: "已提交",
-          value: "1"
+          value: "1",
         },
         {
           label: "市场部确认",
-          value: "2"
+          value: "2",
         },
         {
           label: "广美确认",
-          value: "3"
+          value: "3",
         },
         {
           label: "市场部退回",
-          value: "4"
+          value: "4",
         },
         {
           label: "广美退回",
-          value: "5"
-        }
-      ]
+          value: "5",
+        },
+      ],
     };
   },
-  created: function() {
+  created: function () {
     this.chargeQuery();
     this.getDetail();
     this._getBankList();
@@ -513,16 +513,16 @@ export default {
           return "自行落地";
           break;
       }
-    }
+    },
   },
   methods: {
     //查询经办人
     chargeQuery() {
       var data = {
         cid: Cookies.get("cid"),
-        companyId: Cookies.get("companyId")
+        companyId: Cookies.get("companyId"),
       };
-      getCustomerInfo(data).then(res => {
+      getCustomerInfo(data).then((res) => {
         this.chargeData = res.data;
       });
     },
@@ -543,7 +543,7 @@ export default {
         OFFICE_TEL: this.chargeData.OFFICE_TEL,
         CREATER: Cookies.get("cid"),
         STATUS: 0,
-        MEASURE: 0
+        MEASURE: 0,
       };
       this.dateStamp = new Date().getTime();
       this.fileList = [];
@@ -556,49 +556,49 @@ export default {
       if (!this.tableData.STORE_ADDRESS) {
         this.$alert("请输入店面地址", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
       if (!this.tableData.STORE_FORM) {
         this.$alert("请选择店面形式", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
       if (!this.tableData.STORE_AREA) {
         this.$alert("请输入店面面积", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
       if (!this.tableData.STORE_PLIE) {
         this.$alert("请输入店面层数", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
       if (!this.tableData.PLAN_DATE) {
         this.$alert("请选择计划动工时间", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
       if (!this.tableData.IMPLEMENTTATION_FORM) {
         this.$alert("请选择实施形式", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
       if (!this.tableData.PAYMENT) {
         this.$alert("请选择汇款凭证", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -606,7 +606,7 @@ export default {
       if (this.fileList.length == 0) {
         this.$alert("请上传附件", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -629,10 +629,10 @@ export default {
       this.tableData.ATTACHMENT_FILE_FOLDER =
         "/Files/IMAGE_STORE/" + this.cid + "/" + this.dateStamp;
       InsertImageStore(this.tableData)
-        .then(res => {
+        .then((res) => {
           this.$alert("提交成功", "提示", {
             confirmButtonText: "确定",
-            type: "success"
+            type: "success",
           });
           //this.$refs.upload.clearFiles();
           this.fileList = [];
@@ -640,10 +640,10 @@ export default {
           this.getDetail();
           this.imageStoreDetail = false;
         })
-        .catch(res => {
+        .catch((res) => {
           this.$alert("提交失败，请稍后重试", "提示", {
             confirmButtonText: "确定",
-            type: "warning"
+            type: "warning",
           });
         });
     },
@@ -660,7 +660,7 @@ export default {
         var fileName = list[i].substr(index + 1);
         this.fileList.push({
           name: fileName,
-          url: list[i]
+          url: list[i],
         });
       }
       this.dateStamp = new Date().getTime();
@@ -681,7 +681,7 @@ export default {
       ) {
         this.$alert("请完善信息", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -689,7 +689,7 @@ export default {
       if (this.fileList.length == 0) {
         this.$alert("请上传附件", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -726,22 +726,22 @@ export default {
       EditImageStore({
         model: this.tableData,
         attchmentChange: this.fileChange,
-        deleteFile: this.deleteFile
+        deleteFile: this.deleteFile,
       })
-        .then(res => {
+        .then((res) => {
           this.$alert("提交成功", "提示", {
             confirmButtonText: "确定",
-            type: "success"
+            type: "success",
           });
           this.fileList = [];
           this.currentPage = 1;
           this.getDetail();
           this.imageStoreDetail = false;
         })
-        .catch(res => {
+        .catch((res) => {
           this.$alert("提交失败，请稍后重试", "提示", {
             confirmButtonText: "确定",
-            type: "warning"
+            type: "warning",
           });
         });
     },
@@ -756,7 +756,7 @@ export default {
         var fileName = list[i].substr(index + 1);
         this.fileList.push({
           name: fileName,
-          url: list[i]
+          url: list[i],
         });
       }
       var listGM = this.tableData.GM_FILE.split(";");
@@ -765,7 +765,7 @@ export default {
         var fileName = listGM[i].substr(index + 1);
         this.fileListGM.push({
           name: fileName,
-          url: listGM[i]
+          url: listGM[i],
         });
       }
       this.EDITorCHECK = true;
@@ -775,13 +775,13 @@ export default {
       this.$confirm("删除的数据无法恢复，是否删除？", "提示", {
         confirmButtonText: "是",
         cancelButtonText: "否",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
-          DeleteImageStore(JSON.parse(JSON.stringify(tab))).then(res => {
+          DeleteImageStore(JSON.parse(JSON.stringify(tab))).then((res) => {
             this.$alert("删除成功", "提示", {
               confirmButtonText: "确定",
-              type: "success"
+              type: "success",
             });
             this.currentPage = 1;
             this.getDetail();
@@ -802,7 +802,7 @@ export default {
         beginTime: this.beginTime, //起始时间
         finishTime: this.finishTime, //结束时间
         limit: this.limit, //限制数
-        page: this.currentPage //页数
+        page: this.currentPage, //页数
       };
       if (!data.beginTime) {
         data.beginTime = "0001/1/1";
@@ -812,7 +812,7 @@ export default {
       } else {
         data.finishTime = data.finishTime + " 23:59:59";
       }
-      GetImageCustomer(data).then(res => {
+      GetImageCustomer(data).then((res) => {
         this.count = res.count;
         this.imageStoreData = res.data;
         this.$root.$emit("refreshBadgeIcon", "imageShop1");
@@ -829,9 +829,9 @@ export default {
         beginTime: "", //起始时间
         finishTime: "", //结束时间
         limit: 100000, //限制数
-        page: 1 //页数
+        page: 1, //页数
       };
-      getBankList(url, data).then(res => {
+      getBankList(url, data).then((res) => {
         for (var i = 0; i < res.data.length; i++) {
           this.bankData[i] = new Object();
           this.bankData[i].label =
@@ -865,7 +865,7 @@ export default {
     //显示图片
     showImage(id) {
       this.imgUrl = "";
-      GetPaymentById({ id: id }).then(res => {
+      GetPaymentById({ id: id }).then((res) => {
         this.imgUrl = Head + res.data.IMG_URL;
         this.BigPic = true;
       });
@@ -893,7 +893,7 @@ export default {
       }
     },
     handleSuccess(res, file, fileList) {
-      var successCount = fileList.filter(item => item.status == "success")
+      var successCount = fileList.filter((item) => item.status == "success")
         .length;
       if (successCount == fileList.length) {
         if (this.newORedit) {
@@ -910,10 +910,10 @@ export default {
       this.btnDisable = false;
       this.$alert("文件上传失败", "提示", {
         confirmButtonText: "确定",
-        type: "success"
+        type: "success",
       });
-    }
-  }
+    },
+  },
 };
 </script>
 

@@ -566,7 +566,7 @@
                     " :on-remove="function(file, fileList) {
                         return handleRemove(file, fileList);
                       }
-                    " ref="upload2" :auto-upload="false" :file-list="files">
+                    " :http-request="uploadFiles" ref="upload2" :auto-upload="false" :file-list="files">
                     <i class="el-icon-upload2" style="margin-top:5px;">
                       <span style="font-size:15px;">上传附件</span>
                     </i>
@@ -1071,6 +1071,7 @@ export default {
   name: "refundExamine",
   data() {
     return {
+      initialFileNum: 0,
       picX: "0",
       picY: "0",
       MiniPic: false,
@@ -1121,10 +1122,8 @@ export default {
       fileChange: false,
       inputSaleNo: false, //是否处于输入提货单号状态
       inputItemNo: false, //是否处于输入产品型号状态
-      dateString: "",
-      fileNumber: 0, //存储客户上传文件数量
+      dateString: "",      
       fileNameList: [], //存储用户上传附件的名称
-      //单据状态
       statusArray: [
         { value: null, label: "全部状态" },
         { value: "NEEDPROCESSING", label: "待处理" },
@@ -1286,14 +1285,15 @@ export default {
     },
     //查看详情
     _CheckDetail(val, type) {
-      this.FormRight = false;      
+      this.FormRight = false;
       this.submit = [];
       this.fileList = [];
       this.files = [];
+      this.deleteFile = [];
       this.fileListForAudition = [];
       this.fileListForProcess = [];
       this.processDetail = [];
-      this.fileNumber = 0;
+      this.initialFileNum = 0;
       this.fileNameList = [];
       let data = {
         ID: val.ID,
@@ -1335,12 +1335,7 @@ export default {
             url: list[i]
           });
         }
-        if (list.length >= 2) {
-          var findIndex = list[list.length - 2].lastIndexOf("-");
-          this.fileNumber = parseInt(
-            list[list.length - 2].substr(findIndex + 1, 1)
-          );
-        }
+        this.initialFileNum = this.files.length;
         //查询时，将对应初审意见的附件的字段拆解开来，并作为对象传入文件集合中
         var list2 = this.submit.FIRST_AUDITION_FILE.split(";");
         for (var i = 0; i < list2.length - 1; i++) {
@@ -1632,8 +1627,8 @@ export default {
       this.fileList = [];
       this.files = [];
       this.dateStamp = new Date().getTime();
-      this.fileNumber = 0;
-      this.FormRight = true;      
+      this.initialFileNum = 0;
+      this.FormRight = true;
       this.fileNameList = [];
       this.submitHead = {
         ID: "",
@@ -1816,7 +1811,7 @@ export default {
           "/" +
           this.dateStamp +
           "/" +
-          this.fileList[j] +
+          this.fileList[j].now +
           ";";
       }
 
@@ -1859,10 +1854,36 @@ export default {
           }).catch(() => {});
         });
     },
-    //待修改
+    //修改
     submitEDITANSYC() {
       //附件拼接
-      //相当于同步，等提交成功后再执行
+      //修改退回修改上传文件时，把文件列表中剩下的添加到filesList中
+      if (this.fileChange) {
+        for (let i = 0; i < this.fileList.length; i++) {
+          for (let j = 0; j < this.files.length; j++) {
+            if (this.files[j].name == this.fileList[i].origin) {
+              //问题：返回的是后台修改的
+              this.files.splice(j, 1); //去除文件列表中和上传文件相同的文件
+            }
+          }
+        }
+        for (let j = 0; j < this.files.length; j++) {
+          //剩下的文件的字段并没有改变（因为没有上传，只是转移）
+          var point = this.files[j].name.lastIndexOf(".");
+          var suffix = this.files[j].name.substr(point);
+          var finalFileName = this.fileList[this.fileList.length - 1].now;
+          var num = this.fileList.length + 1; //可能后台转移的顺序不一定和我这里重编号的顺序一样
+          point = finalFileName.lastIndexOf("-");
+          var prefix = finalFileName.substr(0, point + 1);
+          var name = prefix + num + suffix;
+          var model = {
+            origin: this.files[j].name,
+            now: name
+          };
+          this.fileList.push(model);
+        }
+      }
+      //附件拼接
       this.submit.ATTACHMENT_FILE = "";
       for (let j = 0; j < this.fileList.length; j++) {
         this.submit.ATTACHMENT_FILE +=
@@ -1871,11 +1892,24 @@ export default {
           "/" +
           this.dateStamp +
           "/" +
-          this.fileList[j] +
+          this.fileList[j].now +
           ";";
       }
       this.submit.ATTACHMENT_FILE_FOLDER =
         "/Files/RTCB_ITEM/" + this.companyId + "/" + this.dateStamp;
+      // this.submit.ATTACHMENT_FILE = "";
+      // for (let j = 0; j < this.fileList.length; j++) {
+      //   this.submit.ATTACHMENT_FILE +=
+      //     "/Files/RTCB_ITEM/" +
+      //     this.companyId +
+      //     "/" +
+      //     this.dateStamp +
+      //     "/" +
+      //     this.fileList[j] +
+      //     ";";
+      // }
+      // this.submit.ATTACHMENT_FILE_FOLDER =
+      //   "/Files/RTCB_ITEM/" + this.companyId + "/" + this.dateStamp;
       SendBackUpdate({
         updateState: "SUBMITTED",
         detail: this.submit,
@@ -1990,20 +2024,35 @@ export default {
           CID: this.companyId,
           dateStamp: this.dateStamp,
           dateString: this.dateString,
-          type:"customer",
+          type: "customer"
         }
       })
         .then(res => {
           if (res.code == 0) {
-            this.fileList.push(res.data);   
-            //上传成功的文件数=上传的文件数         
-            if (this.fileList.length == this.files.length) {
+            var model = {
+              origin: param.file.name,
+              now: res.data
+            };
+            this.fileList.push(model);
+            if (
+              this.fileList.length ==
+              this.files.length - this.initialFileNum + this.deleteFile.length
+            ) {
               if (this.isRefundAdd) {
                 this.sumbitNEWANSYC();
               } else {
                 this.submitEDITANSYC();
               }
             }
+            // this.fileList.push(res.data);
+            //上传成功的文件数=上传的文件数
+            // if (this.fileList.length == this.files.length) {
+            //   if (this.isRefundAdd) {
+            //     this.sumbitNEWANSYC();
+            //   } else {
+            //     this.submitEDITANSYC();
+            //   }
+            // }
           }
         })
         .then(() => {})

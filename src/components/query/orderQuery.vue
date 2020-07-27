@@ -386,6 +386,7 @@ export default {
     },
     //获得能查看的市场
     getAreaCodeData() {
+      this.areaCodeList = [];
       var userInfo = JSON.parse(Cookies.get("userInfo"));
       getAreaCode({ userid: userInfo.loginName }).then(res => {
         this.areaCodeList = res.data;
@@ -409,6 +410,7 @@ export default {
       this.getCustomerDataList();
     },
     getAreaDistinctData() {
+      this.areaDistinctList = [];
       getDistrictByAreaCode(
         { areaCode: this.selectAreaCode },
         { loading: false }
@@ -520,16 +522,13 @@ export default {
       });
     },
     async getCustomerInfo(val) {
-      var res = await getUserMoney({
-        cid: "",
-        companyId: val.CUSTOMER_CODE
-      });
-      this.moneySituation = res.data;
-      var url = "/order/findRebate.do";
       var data = {
         cid: "",
         companyId: val.CUSTOMER_CODE
       };
+      var res = await getUserMoney(data);
+      this.moneySituation = res.data;
+      var url = "/order/findRebate.do";
       var res2 = await manageCoupon(url, data);
       this.couponData = res2.data;
       this.couponData = this.couponData.filter(

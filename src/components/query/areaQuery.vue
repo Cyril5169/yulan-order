@@ -421,6 +421,7 @@ export default {
     },
     //获得能查看的市场
     getAreaCodeData() {
+      this.areaCodeList = [];
       var userInfo = JSON.parse(Cookies.get("userInfo"));
       getAreaCode({ userid: userInfo.loginName }).then(res => {
         this.areaCodeList = res.data;
@@ -444,6 +445,7 @@ export default {
       this.getCustomerDataList();
     },
     getAreaDistinctData() {
+      this.areaDistinctList = [];
       getDistrictByAreaCode(
         { areaCode: this.selectAreaCode },
         { loading: false }

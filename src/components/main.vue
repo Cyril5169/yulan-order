@@ -1689,10 +1689,10 @@ export default {
   padding: 10px 15px !important;
 }
 .el-card__body {
-  padding: 10px;
+  padding: 10px !important;
 }
 .el-dialog__body {
-  padding: 20px;
+  padding: 20px !important;
 }
 .el-table td,
 .el-table th {
@@ -1711,15 +1711,21 @@ export default {
   display: table-cell !important;
 }
 .el-table .success-row {
-  background: #f0f9eb;
+  background: #f0f9eb !important;
 }
 .el-tabs--border-card>.el-tabs__content{
-  padding: 10px;
+  padding: 10px !important;
 }
-/* .el-input.is-disabled .el-input__inner{
-  color: #606266;
+.el-input.is-disabled .el-input__inner{
+  color: #606266 !important;
 }
 .el-textarea.is-disabled .el-textarea__inner{
+  color: #606266 !important;
+}
+.el-radio__input.is-disabled+span.el-radio__label{
   color: #606266;
-} */
+}
+.el-radio__input.is-checked+.el-radio__label{
+  color: #409EFF !important;
+}
 </style>

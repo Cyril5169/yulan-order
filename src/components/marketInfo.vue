@@ -1,52 +1,40 @@
 <template>
   <div>
     <el-card class="studyMain">
-      <el-table
-        style="width: 95%"
-        :data="studyData"
-        :row-class-name="tableRowClassName"
-      >
+      <el-table style="width: 95%" :data="studyData" :row-class-name="tableRowClassName">
         <el-table-column label="主题" header-align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.TITLE }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="状态" width="150">
+        <el-table-column label="生效状态" width="150" align="center">
+          <template slot-scope="scope">
+            {{ scope.row.STATE | stateFilter }}
+          </template>
+        </el-table-column>
+        <el-table-column label="填写状态" width="150" align="center">
           <template slot-scope="scope">
             {{ scope.row.completeStatus | comFilter }}
           </template>
         </el-table-column>
         <el-table-column align="center" width="150" label="操作">
           <template slot-scope="scope">
-            <el-button
-              :disabled="scope.row.completeStatus == 2"
-              @click="editStudy(scope.row)"
-              type="primary"
-              size="mini"
-              icon="el-icon-edit"
-              circle
-            ></el-button>
+            <el-button v-if="scope.row.completeStatus != 2 && scope.row.STATE == 'PUBLISH'"
+              @click="editStudy(scope.row, false)" type="primary" size="mini" icon="el-icon-edit" circle></el-button>
+              <el-button v-else
+              @click="editStudy(scope.row, true)" type="primary" size="mini" icon="el-icon-search" circle></el-button>
           </template>
         </el-table-column>
       </el-table>
-      <el-dialog
-        :show-close="true"
-        :close-on-click-modal="false"
-        :visible.sync="studyVisible"
-        width="900px"
-        top="5vh"
-        center
-      >
+      <el-dialog :show-close="true" :close-on-click-modal="false" :visible.sync="studyVisible" width="900px" top="5vh"
+        center>
         <keep-alive>
-          <studyContextDetail
-            ref="studyContextDetail"
-            v-if="studyVisible"
-            :selectData="studySelectData"
-            @refresh="refreshStudy"
-          ></studyContextDetail>
+          <studyContextDetail ref="studyContextDetail" v-if="studyVisible" :selectData="studySelectData" :checkType="checkType"
+            @refresh="refreshStudy"></studyContextDetail>
         </keep-alive>
         <span slot="footer" class="dialog-footer">
-          <el-button type="primary" @click="submitStudy">提交调查表</el-button>
+          <el-button type="primary" @click="submitStudy" v-if="!checkType">提交调查表</el-button>
+          <el-button type="primary" @click="studyVisible = false" v-else>确定</el-button>
         </span>
       </el-dialog>
     </el-card>
@@ -64,11 +52,12 @@ export default {
     return {
       studyData: [],
       studyVisible: false,
-      studySelectData: []
+      studySelectData: [],
+      checkType: true
     };
   },
   components: {
-    studyContextDetail
+    studyContextDetail,
   },
   filters: {
     comFilter(value) {
@@ -83,24 +72,35 @@ export default {
           return "已完成";
           break;
       }
-    }
+    },
+    stateFilter(value) {
+      switch (value) {
+        case "PUBLISH":
+          return "生效中";
+          break;
+        case "COMPLED":
+          return "已过期";
+          break;
+      }
+    },
   },
   methods: {
     getDetail() {
-      GetCustomerStudy({ cid: Cookies.get("cid") }).then(res => {
+      GetCustomerStudy({ cid: Cookies.get("cid") }).then((res) => {
         this.studyData = res.data;
       });
     },
     refreshStudy() {
       this.$alert("提交成功", "提示", {
         confirmButtonText: "确定",
-        type: "success"
+        type: "success",
       });
       this.studyVisible = false;
       this.getDetail();
     },
-    editStudy(studyItem) {
+    editStudy(studyItem, type) {
       this.studySelectData = studyItem;
+      this.checkType = type;
       this.studyVisible = true;
     },
     submitStudy() {
@@ -111,11 +111,11 @@ export default {
         return "success-row";
       }
       return "";
-    }
+    },
   },
   created() {
     this.studyData = [];
     this.getDetail();
-  }
+  },
 };
 </script>

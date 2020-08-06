@@ -1689,10 +1689,10 @@ export default {
   padding: 10px 15px !important;
 }
 .el-card__body {
-  padding: 10px !important;
+  padding: 10px
 }
 .el-dialog__body {
-  padding: 20px !important;
+  padding: 20px;
 }
 .el-table td,
 .el-table th {
@@ -1711,7 +1711,7 @@ export default {
   display: table-cell !important;
 }
 .el-table .success-row {
-  background: #f0f9eb !important;
+  background: #f0f9eb;
 }
 .el-tabs--border-card>.el-tabs__content{
   padding: 10px !important;

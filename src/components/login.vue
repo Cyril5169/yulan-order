@@ -80,7 +80,7 @@
       <img width="100%" src="../assets/img/loginTitle.png" alt />
     </div>
     <div class="kuaidi100">
-      <a href="https://m.kuaidi100.com/" target="_blank">快递查询</a>
+      <a href="https://kuaidi100.com/" target="_blank">快递查询</a>
     </div>
     <div v-if="maskShow" class="photoMask" @click="maskShow = false">
       <div class="photoMaskContain">

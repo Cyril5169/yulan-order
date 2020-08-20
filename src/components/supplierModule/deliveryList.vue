@@ -63,6 +63,7 @@
       </div>
     </el-card>
 
+    <!-- 查看和编辑 -->
     <el-dialog :visible.sync="lanjuDetail" :close-on-click-modal="false" width="70%">
       <!-- 查看区 -->
       <div v-show="isCheck">
@@ -74,17 +75,17 @@
         <br>
         <table style="width:100%;text-align:center">
           <tr>
-            <td style="width:12.5%">供应商联系人：</td>
+            <td style="width:12.5%"><span style="font-weight:bold">供应商联系人：</span></td>
             <td style="width:12.5%">
               {{DeliverData_1.SUPPLY_LINKMAN}}
             </td>
-            <td style="width:12.5%">供应商联系电话：</td>
+            <td style="width:12.5%"><span style="font-weight:bold">供应商联系电话：</span></td>
             <td style="width:12.5%">
               {{DeliverData_1.LINKMAN_TEL}}
             </td>
-            <td style="width:12.5%">填写人：</td>
+            <td style="width:12.5%"><span style="font-weight:bold">填写人：</span></td>
             <td style="width:12.5%">{{ DeliverData_1.CREATE_PERSON }}</td>
-            <td style="width:12.5%">创建日期：</td>
+            <td style="width:12.5%"><span style="font-weight:bold">>填写时间：</span< /td>
             <td>{{ DeliverData_1.CREATE_DATE | datatrans }}</td>
           </tr>
         </table>
@@ -98,7 +99,8 @@
               <td style="width:12.5%">送货日期：</td>
               <td style="width:12.5%">{{ DeliverData_1.INVOICE_DATE | datatrans }}</td>
               <td style="width:12.5%">预计到货时间：</td>
-              <td colspan="3">{{ DeliverData_1.EXPECT_ARRIVAL_DATE | datatrans }}</td>
+              <td style="width:12.5%">{{ DeliverData_1.EXPECT_ARRIVAL_DATE | datatrans }}</td>
+              <td style="width:12.5%">客户名称：</td>
             </tr>
 
             <tr>
@@ -143,17 +145,17 @@
 
         <table style="width:100%;text-align:center">
           <tr>
-            <td style="width:12.5%">供应商联系人：</td>
+            <td style="width:12.5%"><span style="font-weight:bold">供应商联系人：</span></td>
             <td style="width:12.5%">
               <input v-model="submit.SUPPLY_LINKMAN" clearable class="inputStyle" />
             </td>
-            <td style="width:12.5%">供应商联系电话：</td>
+            <td style="width:12.5%"><span style="font-weight:bold">供应商联系电话：</span></td>
             <td style="width:12.5%">
               <input v-model="submit.LINKMAN_TEL" clearable class="inputStyle" />
             </td>
-            <td style="width:12.5%">填写人：</td>
+            <td style="width:12.5%"><span style="font-weight:bold">填写人：</span></td>
             <td style="width:12.5%">{{ editData.CREATE_PERSON }}</td>
-            <td style="width:12.5%">填写日期：</td>
+            <td style="width:12.5%"><span style="font-weight:bold">填写时间：</span></td>
             <td>{{ editData.CREATE_DATE | datatrans }}</td>
           </tr>
         </table>
@@ -187,12 +189,12 @@
               <td>
                 <input v-model="submit.LOGISTICS_COMPANY" clearable class="inputStyle" />
               </td>
-              <td>物流联系人<span style="color:red;font-size:15px">*</span>：</td>
+              <td>物流联系人：</td>
               <td style="width:12.5%">
                 <input v-model="submit.LOGISTICS_LINKMAN" clearable class="inputStyle" />
               </td>
 
-              <td style="width:12.5%">物流联系电话<span style="color:red;font-size:15px">*</span>：</td>
+              <td style="width:12.5%">物流联系电话：</td>
               <td>
                 <input v-model="submit.LOGISTICS_TEL" clearable class="inputStyle" />
               </td>
@@ -236,7 +238,7 @@
         </div>
       </div>
     </el-dialog>
-
+    <!-- 新增 -->
     <el-dialog title="新增送货单" :visible.sync="DeliverDetail" :close-on-click-modal="false" width="80%">
       <div>
         <el-input @keyup.enter.native="searchPUR()" placeholder="请输入采购单号" v-model="find"
@@ -248,17 +250,17 @@
       <!-- 新增 -->
       <table style="width:100%;text-align:center">
         <tr>
-          <td style="width:12.5%">供应商联系人：</td>
+          <td style="width:12.5%"><span style="font-weight:bold">供应商联系人：</span></td>
           <td style="width:12.5%">
             <input v-model="submitForm.SUPPLY_LINKMAN" clearable class="inputStyle" />
           </td>
-          <td style="width:12.5%">供应商联系电话：</td>
+          <td style="width:12.5%"><span style="font-weight:bold">供应商联系电话：</span></td>
           <td style="width:12.5%">
             <input v-model="submitForm.LINKMAN_TEL" clearable class="inputStyle" />
           </td>
-          <td style="width:12.5%">填写人：</td>
+          <td style="width:12.5%"><span style="font-weight:bold">填写人：</span></td>
           <td>{{ editData.CREATE_PERSON  }}</td>
-          <td style="width:12.5%">创建日期：</td>
+          <td style="width:12.5%"><span style="font-weight:bold">填写时间：</span></td>
           <td></td>
         </tr>
       </table>
@@ -284,18 +286,18 @@
           <tr>
             <td>物流单号<span style="color:red;font-size:15px">*</span>：</td>
             <td>
-              <input v-model="submitForm.logistics_number" clearable class="inputStyle" />
+              <input v-model="submitForm.LOGISTICS_NUMBER" clearable class="inputStyle" />
             </td>
             <td>物流公司<span style="color:red;font-size:15px">*</span>：</td>
             <td>
-              <input v-model="submitForm.logistics_company" clearable class="inputStyle" />
+              <input v-model="submitForm.LOGISTICS_COMPANY" clearable class="inputStyle" />
             </td>
-            <td>物流联系人<span style="color:red;font-size:15px">*</span>：</td>
+            <td>物流联系人：</td>
             <td style="width:12.5%">
               <input v-model="submitForm.LOGISTICS_LINKMAN" clearable class="inputStyle" />
             </td>
             <td style="width:12.5%">
-              物流电话<span style="color:red;font-size:15px">*</span>：
+              物流电话：
             </td>
             <td>
               <input v-model="submitForm.LOGISTICS_TEL" clearable class="inputStyle" />
@@ -305,11 +307,11 @@
           <tr>
             <td>送货地址：</td>
             <td colspan="3">
-              <input v-model="submitForm.area_district" clearable class="inputStyle" />
+              <input v-model="submitForm.AREA_DISTRICT" clearable class="inputStyle" />
             </td>
             <td>备注：</td>
             <td colspan="3">
-              <input v-model="submitForm.remarks" clearable class="inputStyle" />
+              <input v-model="submitForm.REMARKS" clearable class="inputStyle" />
             </td>
           </tr>
         </table>
@@ -387,23 +389,15 @@
 
 <script>
 import {
-  GetAllData,
-  CheckDetailByID,
-  addSubmit,
-  editByCustomer
-} from "@/api/lanju";
-import {
   GetRelativeDelivery,
   GetDeliveryDetail,
   GetPoDetail_1,
   AddDelivery,
   UpdateDelivery,
-  DeleteDelivery
+  DeleteDelivery,
 } from "@/api/supplierASP";
-import { UploadFiles } from "@/api/imageStoreASP";
 import { downLoadFile } from "@/common/js/downLoadFile";
 import Cookies from "js-cookie";
-const Head = "http://14.29.223.114:10250/upload";
 
 export default {
   name: "DeliveryList",
@@ -412,23 +406,8 @@ export default {
       reback_notes: "",
       max_qty: [],
       editData: [],
-      submit: {
-        INVOICE_STATUS: "",
-        INVOICE_DATE: "",
-        CREATE_DATE: "",
-        CREATE_PERSON: "",
-        LOGISTICS_COMPANY: "",
-        LOGISTICS_NUMBER: "",
-        AREA_DISTRICT: "",
-        REMARKS: "",
-        SUPPLY_LINKMAN: "",
-        LINKMAN_TEL: "",
-        EXPECT_ARRIVAL_DATE: "",
-        LOGISTICS_LINKMAN: "",
-        LOGISTICS_TEL: ""
-      },
+      submit: {},
       newStatus: 2,
-      editStatus: 1,
       multipleSelection_2: [],
       multipleSelection_1: [],
       invoice_id: 0,
@@ -440,66 +419,47 @@ export default {
       innerVisible: false,
       PURData: [],
       find: "",
-      DeliverData_2: [],
       DetailData_1: [],
-      DetailData_2: [],
       DeliverDetail: false,
       DetailData: [],
       DeliverData_1: [],
       DeliverData: [],
-      dateStamp: "",
-      fileChange: false,
-      deleteFile: [],
-      subtractDeleteFile: [], //点击减号准备删除明细，预删除的文件集合
-      deleteIndex: [], //删除文件对应的明细的索引
-      btnDisable: false,
       companyId: "",
       CID: Cookies.get("cid"), //客户账号
-      CNAME: "", //客户名
       beginTime: "", //查询的开始时间
       finishTime: "", //查询的结束时间
       SEARCHKEY: "", //搜索栏关键字
       SELECT_STATUS: "", //存储下拉框的值
       CONFIRM_STATUS: "",
-      rowPlus: 0, //兰居软装设计需求表中的户型编辑项添加数
       isAdd: false, //新增记录
       isEdit: false, //编辑记录
       isCheck: false, //查看记录
-      initRowspan: 5, //基本信息中的初始行数
-      usedRowspan: 5, //基本信息中的行数
-      fileListGM: [], //广美上传的文件集合
-      successCount: 0,
-      allCount: 0,
-      ServiceDetail: false,
       lanjuDetail: false,
       limit: 10,
       count: 0,
-      detailCount: 0, //新增户型记录数
       currentPage: 1,
       statusArray: [
         {
           label: "全部",
-          value: ""
+          value: "",
         },
         {
           label: "已通过",
-          value: "1"
+          value: "1",
         },
         {
           label: "待确认",
-          value: "2"
+          value: "2",
         },
         {
           label: "未通过",
-          value: "3"
-        }
+          value: "3",
+        },
       ],
-      lanjuData: [],
       submitForm: [], //提交的表头信息
-      submitDetailForm: [] //提交的明细信息
     };
   },
-  created: function() {
+  created: function () {
     let time = new Date();
     this.refresh();
   },
@@ -524,7 +484,7 @@ export default {
         "-" +
         (date.getDate() + 3);
       return s1;
-    }
+    },
   },
   filters: {
     transStatus(value) {
@@ -562,25 +522,6 @@ export default {
       s = s < 10 ? "0" + s : s;
       return y + "-" + MM + "-" + d + " ";
     },
-    datatransDetail(value) {
-      //时间戳转化大法
-      if (value == null || value == "9999/12/31 00:00:00") {
-        return "";
-      }
-      let date = new Date(value);
-      let y = date.getFullYear();
-      let MM = date.getMonth() + 1;
-      MM = MM < 10 ? "0" + MM : MM;
-      let d = date.getDate();
-      d = d < 10 ? "0" + d : d;
-      let h = date.getHours();
-      h = h < 10 ? "0" + h : h;
-      let m = date.getMinutes();
-      m = m < 10 ? "0" + m : m;
-      let s = date.getSeconds();
-      s = s < 10 ? "0" + s : s;
-      return y + "-" + MM + "-" + d + " " + h + ":" + m;
-    }
   },
   methods: {
     checkActiviyEffect(row, index) {
@@ -590,15 +531,12 @@ export default {
     isAddTrue() {
       //判断是否填完所有信息
       if (
-        this.submitForm.logistics_company == "" ||
-        this.submitForm.area_district == "" ||
-        this.submitForm.logistics_number == "" ||
-        this.submitForm.LOGISTICS_LINKMAN == "" ||
-        this.submitForm.LOGISTICS_TEL == ""
+        this.submitForm.LOGISTICS_COMPANY == "" ||
+        this.submitForm.LOGISTICS_NUMBER == ""
       ) {
         this.$alert("请完善送货信息", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -612,18 +550,18 @@ export default {
       AddDelivery({
         headForm: this.submitForm,
         gridData: this.multipleSelection_2,
-        cid: Cookies.get("companyId")
-      }).then(res => {
+        cid: Cookies.get("companyId"),
+      }).then((res) => {
         if (res.code == "0") {
           this.$alert("保存成功", "提示", {
             confirmButtonText: "确定",
-            type: "success"
+            type: "success",
           });
           this.search();
         } else {
           this.$alert("保存失败，请尝试刷新重试", "提示", {
             confirmButtonText: "确定",
-            type: "success"
+            type: "success",
           });
         }
       });
@@ -645,25 +583,19 @@ export default {
           ITEM_NO: this.multipleSelection_1[i].ITEM_NO,
           INVOICE_QTY: this.multipleSelection_1[i].QTY_PUR,
           max_qty: this.multipleSelection_1[i].QTY_PUR,
-          //PRICE :this.multipleSelection_1[i].PRICE1,
           MONEY1: this.multipleSelection_1[i].TOTAL_MONEY,
-          //this.multipleSelection.MONEY_TAX =val.MONEY_TAX;
           PRICE_TAXIN: this.multipleSelection_1[i].PRICE_TAXIN,
           TOTAL_AMOUNT: this.multipleSelection_1[i].TOTAL_MONEY,
           UNIT1: this.multipleSelection_1[i].UNIT1,
-          //WEIGHT1:this.multipleSelection_1[i].WEIGHT,
           NAMEE: this.multipleSelection_1[i].MNAME,
           GRADE: this.multipleSelection_1[i].GRADE,
-          //this.multipleSelection.QTY_BACK =val.PUR_ID;
-          //this.multipleSelection.FREE_ITEM =val.PUR_ID;
           NOTE: this.multipleSelection_1[i].NOTES,
           PUR_ID: this.multipleSelection_1[i].PUR_ID,
           PUR_NO: this.multipleSelection_1[i].PUR_NO,
           PRODUCT_NOTE: this.multipleSelection_1[i].PRODUCT_NOTE,
           QTY: this.multipleSelection_1[i].QTY,
           DATE_REQ: this.multipleSelection_1[i].DATE_REQ,
-          DATE_DELIVER: this.multipleSelection_1[i].DATE_DELIVER
-          //REBACK_QTY:0
+          DATE_DELIVER: this.multipleSelection_1[i].DATE_DELIVER,
         };
         this.$set(this.multipleSelection_2, i, this.multipleSelection_2[i]);
       }
@@ -673,18 +605,18 @@ export default {
       if (this.find.length == "") {
         this.$alert("请输入采购单号", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
       } else {
         var data = {
-          PUR_NO: this.find
+          PUR_NO: this.find,
         };
-        GetPoDetail_1(data).then(res => {
+        GetPoDetail_1(data).then((res) => {
           this.PURData = res.data;
           if (res.data.length == 0) {
             this.$alert("采购单未确认", "提示", {
               confirmButtonText: "确定",
-              type: "warning"
+              type: "warning",
             });
             return;
           } else {
@@ -703,7 +635,7 @@ export default {
             } else {
               this.$alert("该单已发货完成", "提示", {
                 confirmButtonText: "确定",
-                type: "warning"
+                type: "warning",
               });
               return;
             }
@@ -737,7 +669,7 @@ export default {
         finishTime: this.finishTime,
         status: this.SELECT_STATUS,
         find: this.SEARCHKEY,
-        confirm_status: this.CONFIRM_STATUS
+        confirm_status: this.CONFIRM_STATUS,
       };
       if (!data.beginTime) {
         data.beginTime = "0001/1/1";
@@ -747,7 +679,7 @@ export default {
       } else {
         data.finishTime = data.finishTime + " 23:59:59";
       }
-      GetRelativeDelivery(data).then(res => {
+      GetRelativeDelivery(data).then((res) => {
         this.count = res.count;
         this.DeliverData = res.data;
       });
@@ -760,11 +692,11 @@ export default {
       this.isEdit = false;
       this.find = "";
       this.submitForm = {
-        create_person: "",
-        logistics_company: "",
-        logistics_number: "",
-        area_district: "东莞市莞龙路段狮龙路莞城科技园",
-        remarks: "",
+        CREATE_PERSON: "",
+        LOGISTICS_COMPANY: "",
+        LOGISTICS_NUMBER: "",
+        AREA_DISTRICT: "东莞市莞龙路段狮龙路莞城科技园",
+        REMARKS: "",
         PUR_NO: "",
         INVOICE_DATE: "",
         INVOICE_STATUS: 0,
@@ -774,7 +706,7 @@ export default {
         EXPECT_ARRIVAL_DATE: "",
         LOGISTICS_LINKMAN: "",
         LOGISTICS_TEL: "",
-        CONFIRM_STATUS: 2
+        CONFIRM_STATUS: 2,
       };
       this.multipleSelection = [];
       this.multipleSelection_1 = [];
@@ -802,13 +734,13 @@ export default {
         LOGISTICS_TEL: val.LOGISTICS_TEL, //物流联系电话
         INVOICE_STATUS: val.INVOICE_STATUS, //送货状态
         CONFIRM_STATUS: val.CONFIRM_STATUS,
-        REBACK_NOTES: val.REBACK_NOTES
+        REBACK_NOTES: val.REBACK_NOTES,
       };
       this.DeliverData_1 = data;
       var data_1 = {
-        deliverNo: val.INVOICE_NO
+        deliverNo: val.INVOICE_NO,
       };
-      GetDeliveryDetail(data_1).then(res => {
+      GetDeliveryDetail(data_1).then((res) => {
         this.DetailData = res.data;
       });
     },
@@ -858,13 +790,13 @@ export default {
         PUR_ID: val.PUR_ID,
         INVOICE_STATUS: val.INVOICE_STATUS,
         CONFIRM_STATUS: val.CONFIRM_STATUS,
-        REBACK_NOTES: val.REBACK_NOTES
+        REBACK_NOTES: val.REBACK_NOTES,
       };
       this.editData = data;
       var data_1 = {
-        deliverNo: val.INVOICE_NO
+        deliverNo: val.INVOICE_NO,
       };
-      GetDeliveryDetail(data_1).then(res => {
+      GetDeliveryDetail(data_1).then((res) => {
         this.DetailData = res.data;
         for (var i = 0; i < this.DetailData.length; i++) {
           this.DetailData_1[i] = {
@@ -884,7 +816,7 @@ export default {
             PRODUCT_NOTE: this.DetailData[i].PRODUCT_NOTE,
             QTY: this.DetailData[i].QTY,
             DATE_REQ: this.DetailData[i].DATE_REQ,
-            DATE_DELIVER: this.DetailData[i].DATE_DELIVER
+            DATE_DELIVER: this.DetailData[i].DATE_DELIVER,
           };
           this.$set(this.DetailData_1, i, this.DetailData_1[i]);
         }
@@ -893,9 +825,9 @@ export default {
     //删除
     Delete() {
       var data = {
-        invoice_no: this.submit.INVOICE_NO
+        invoice_no: this.submit.INVOICE_NO,
       };
-      DeleteDelivery(data).then(res => {
+      DeleteDelivery(data).then((res) => {
         this.search();
       });
       this.lanjuDetail = false;
@@ -914,18 +846,18 @@ export default {
       UpdateDelivery({
         headForm: this.submit,
         gridData: this.DetailData_1,
-        cid: Cookies.get("companyId")
-      }).then(res => {
+        cid: Cookies.get("companyId"),
+      }).then((res) => {
         if (res.code == "0") {
           this.$alert("保存成功", "提示", {
             confirmButtonText: "确定",
-            type: "success"
+            type: "success",
           });
           this.search();
         }
       });
-    }
-  }
+    },
+  },
 };
 </script>
 

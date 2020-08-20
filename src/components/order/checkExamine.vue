@@ -719,7 +719,7 @@ export default {
       this.showViewer = true;
     },
     exportProductExcel() {
-      this.$confirm("导出后订单将变成审核通过的状态，确定导出吗？", "提示", {
+      this.$confirm("此功能只适用于导出测试账号订单，导出模板后订单状态将变成已完成状态，请慎重操作，是否确认导出？", "提示", {
         confirmButtonText: "确定",
         type: "warning"
       })

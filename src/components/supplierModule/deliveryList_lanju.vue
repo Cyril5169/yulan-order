@@ -105,7 +105,9 @@
               <td style="width:12.5%">发货日期：</td>
               <td style="width:12.5%">{{ submitForm.INVOICE_DATE | datatrans }}</td>
               <td style="width:12.5%">预计到货时间：</td>
-              <td colspan="3">{{ submitForm.EXPECT_ARRIVAL_DATE | datatrans }}</td>
+              <td style="width:12.5%">{{ submitForm.EXPECT_ARRIVAL_DATE | datatrans }}</td>
+              <td style="width:12.5%">客户名称：</td>
+              <td>{{ submitForm.CUSTOMER_CODE }}</td>
             </tr>
 
             <tr>
@@ -114,9 +116,20 @@
               <td>物流公司：</td>
               <td>{{ submitForm.LOGISTICS_COMPANY }}</td>
               <td>物流联系人：</td>
-              <td style="width:12.5%">{{ submitForm.LOGISTICS_LINKMAN }}</td>
-              <td style="width:12.5%">物流电话：</td>
+              <td>{{ submitForm.LOGISTICS_LINKMAN }}</td>
+              <td>物流电话：</td>
               <td>{{ submitForm.LOGISTICS_TEL }}</td>
+            </tr>
+
+            <tr>
+              <td>物流费用：</td>
+              <td>{{ submitForm.LOGISTICS_FEE }}</td>
+              <td>件数：</td>
+              <td>{{ submitForm.NUMBER_OF_PIECES }}</td>
+              <td>总重量：</td>
+              <td>{{ submitForm.WEIGHT }}</td>
+              <td></td>
+              <td></td>
             </tr>
 
             <tr>
@@ -148,14 +161,16 @@
           <tr>
             <td style="width:12.5%"><span style="font-weight:bold">供应商联系人：</span></td>
             <td style="width:12.5%">
-              <input v-model="submitForm.SUPPLY_LINKMAN" clearable class="inputStyle" />
+              <input v-model="submitForm.SUPPLY_LINKMAN" class="inputStyle" />
             </td>
             <td style="width:12.5%"><span style="font-weight:bold">供应商联系电话：</span></td>
             <td style="width:12.5%">
-              <input v-model="submitForm.LINKMAN_TEL" clearable class="inputStyle" />
+              <input v-model="submitForm.LINKMAN_TEL" class="inputStyle" />
             </td>
             <td style="width:12.5%"><span style="font-weight:bold">填写人：</span></td>
-            <td style="width:12.5%">{{ submitForm.CREATE_PERSON }}</td>
+            <td style="width:12.5%">
+              <input v-model="submitForm.CREATE_PERSON" class="inputStyle" />
+            </td>
             <td style="width:12.5%"><span style="font-weight:bold">填写时间：</span></td>
             <td>{{ submitForm.CREATE_DATE | datatrans }}</td>
           </tr>
@@ -169,53 +184,79 @@
               <td style="width:12.5%">{{ submitForm.INVOICE_NO }}</td>
               <td style="width:12.5%">发货日期：</td>
               <td style="width:12.5%">
-                <el-date-picker clearable type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
-                  v-model="submitForm.INVOICE_DATE" style="width:100%;">
+                <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
+                  v-model="submitForm.INVOICE_DATE" class="inputStyle">
                 </el-date-picker>
               </td>
               <td style="width:12.5%">预计到货时间：</td>
-              <td colspan="3">
-                <el-date-picker clearable type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
-                  v-model="submitForm.EXPECT_ARRIVAL_DATE" style="width:100%;">
+              <td style="width:12.5%">
+                <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
+                  v-model="submitForm.EXPECT_ARRIVAL_DATE" class="inputStyle">
                 </el-date-picker>
+              </td>
+              <td style="width:12.5%">客户名称：</td>
+              <td>{{ submitForm.CUSTOMER_CODE }}</td>
               </td>
             </tr>
 
             <tr>
               <td>物流单号<span style="color:red;font-size:15px">*</span>：</td>
               <td>
-                <input v-model="submitForm.LOGISTICS_NUMBER" clearable class="inputStyle" />
+                <input v-model="submitForm.LOGISTICS_NUMBER" class="inputStyle" />
               </td>
               <td>物流公司<span style="color:red;font-size:15px">*</span>：</td>
               <td>
-                <input v-model="submitForm.LOGISTICS_COMPANY" clearable class="inputStyle" />
+                <input v-model="submitForm.LOGISTICS_COMPANY" class="inputStyle" />
               </td>
               <td>物流联系人：</td>
-              <td style="width:12.5%">
-                <input v-model="submitForm.LOGISTICS_LINKMAN" clearable class="inputStyle" />
+              <td>
+                <input v-model="submitForm.LOGISTICS_LINKMAN" class="inputStyle" />
               </td>
 
-              <td style="width:12.5%">物流联系电话：</td>
+              <td>物流联系电话：</td>
               <td>
-                <input v-model="submitForm.LOGISTICS_TEL" clearable class="inputStyle" />
+                <input v-model="submitForm.LOGISTICS_TEL" class="inputStyle" />
               </td>
+            </tr>
+
+            <tr>
+              <td>物流费用<span style="color:red;font-size:15px">*</span>：</td>
+              <td>
+                <input v-model="submitForm.LOGISTICS_FEE" class="inputStyle" />
+              </td>
+              <td>件数<span style="color:red;font-size:15px">*</span>：</td>
+              <td>
+                <input v-model="submitForm.NUMBER_OF_PIECES" oninput="value=value.replace(/[^\d]/g,'')"
+                  class="inputStyle" />
+              </td>
+              <td>总重量<span style="color:red;font-size:15px">*</span>：</td>
+              <td>
+                <input v-model="submitForm.WEIGHT" oninput="value=value.replace(/[^\d.]/g,'')
+                                .replace(/^\./g, '').replace(/\.{2,}/g, '')
+                                .replace('.', '$#$').replace(/\./g, '')
+                                .replace('$#$', '.')
+                                .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"
+                  class="inputStyle" />
+              </td>
+              <td></td>
+              <td></td>
             </tr>
 
             <tr>
               <td>送货地址：</td>
               <td colspan="3">
-                <input v-model="submitForm.AREA_DISTRICT" clearable class="inputStyle" />
+                <input v-model="submitForm.AREA_DISTRICT" class="inputStyle" />
               </td>
               <td>备注：</td>
               <td colspan="3">
-                <input v-model="submitForm.REMARKS" clearable class="inputStyle" />
+                <input v-model="submitForm.REMARKS" class="inputStyle" />
               </td>
             </tr>
           </table>
         </div>
         <hr />
-        <el-table :data="DetailData" border highlight-current-row
-          style="width: 100%;font-weight:normal;font-size:12px" class="table_1">
+        <el-table :data="DetailData" border highlight-current-row style="width: 100%;font-weight:normal;font-size:12px"
+          class="table_1">
           <el-table-column prop="ITEM_NO" label="物料编码" align="center" width="150px"></el-table-column>
           <el-table-column prop="NAMEE" label="物料名称" align="center" width="180px"></el-table-column>
           <el-table-column prop="INVOICE_QTY" label="发货数量" align="center" width="155px">
@@ -295,27 +336,8 @@ export default {
       submitForm: {}, //提交的表头信息
     };
   },
-  created: function () {
-    let time = new Date();
+  created() {
     this.refresh();
-  },
-  computed: {
-    timeDefault_2() {
-      var date = new Date();
-      var s1 =
-        date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
-      return s1;
-    },
-    timeDefault_3() {
-      var date = new Date();
-      var s1 =
-        date.getFullYear() +
-        "-" +
-        (date.getMonth() + 1) +
-        "-" +
-        (date.getDate() + 3);
-      return s1;
-    },
   },
   filters: {
     transStatus(value) {
@@ -465,7 +487,6 @@ export default {
     },
     //通过
     isTrueEdit() {
-      this.lanjuDetail = false;
       this.submitForm.CONFIRM_STATUS = 1;
       this.submitForm.INVOICE_STATUS = 1;
       UpdateDelivery({
@@ -477,18 +498,13 @@ export default {
           confirmButtonText: "确定",
           type: "success",
         });
+        this.lanjuDetail = false;
         this.search();
       });
     },
   },
 };
 </script>
-
-<style>
-.table_1 .el-table__row {
-  height: 6px;
-}
-</style>
 
  <style scoped>
 .trueButton {

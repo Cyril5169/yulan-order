@@ -101,7 +101,7 @@
               <td style="width:12.5%">预计到货时间：</td>
               <td style="width:12.5%">{{ submitForm.EXPECT_ARRIVAL_DATE | datatrans }}</td>
               <td style="width:12.5%">客户名称：</td>
-              <td>xxx</td>
+              <td>{{ submitForm.CUSTOMER_CODE }}</td>
             </tr>
 
             <tr>
@@ -110,9 +110,20 @@
               <td>物流公司：</td>
               <td>{{ submitForm.LOGISTICS_COMPANY }}</td>
               <td>物流联系人：</td>
-              <td style="width:12.5%">{{ submitForm.LOGISTICS_LINKMAN }}</td>
-              <td style="width:12.5%">物流电话：</td>
+              <td>{{ submitForm.LOGISTICS_LINKMAN }}</td>
+              <td>物流电话：</td>
               <td>{{ submitForm.LOGISTICS_TEL }}</td>
+            </tr>
+
+            <tr>
+              <td>物流费用：</td>
+              <td>{{ submitForm.LOGISTICS_FEE }}</td>
+              <td>件数：</td>
+              <td>{{ submitForm.NUMBER_OF_PIECES }}</td>
+              <td>总重量：</td>
+              <td>{{ submitForm.WEIGHT }}</td>
+              <td></td>
+              <td></td>
             </tr>
 
             <tr>
@@ -148,14 +159,15 @@
           <tr>
             <td style="width:12.5%"><span style="font-weight:bold">供应商联系人：</span></td>
             <td style="width:12.5%">
-              <input v-model="submitForm.SUPPLY_LINKMAN" clearable class="inputStyle" />
+              <input v-model="submitForm.SUPPLY_LINKMAN" class="inputStyle" />
             </td>
             <td style="width:12.5%"><span style="font-weight:bold">供应商联系电话：</span></td>
             <td style="width:12.5%">
-              <input v-model="submitForm.LINKMAN_TEL" clearable class="inputStyle" />
+              <input v-model="submitForm.LINKMAN_TEL" class="inputStyle" />
             </td>
             <td style="width:12.5%"><span style="font-weight:bold">填写人：</span></td>
-            <td style="width:12.5%">{{ submitForm.CREATE_PERSON }}</td>
+            <td style="width:12.5%">
+              <input v-model="submitForm.CREATE_PERSON" class="inputStyle" /></td>
             <td style="width:12.5%"><span style="font-weight:bold">填写时间：</span></td>
             <td>{{ submitForm.CREATE_DATE | datatrans }}</td>
           </tr>
@@ -169,46 +181,70 @@
               <td style="width:12.5%">{{ submitForm.INVOICE_NO }}</td>
               <td style="width:12.5%">送货日期：</td>
               <td style="width:12.5%">
-                <el-date-picker clearable type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
-                  v-model="submitForm.INVOICE_DATE" style="width:100%;">
+                <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
+                  v-model="submitForm.INVOICE_DATE" class="inputStyle">
                 </el-date-picker>
               </td>
               <td style="width:12.5%">预计到货时间：</td>
-              <td colspan="3">
-                <el-date-picker clearable type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
-                  v-model="submitForm.EXPECT_ARRIVAL_DATE" style="width:100%;">
+              <td style="width:12.5%">
+                <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
+                  v-model="submitForm.EXPECT_ARRIVAL_DATE" class="inputStyle">
                 </el-date-picker>
               </td>
+              <td style="width:12.5%">客户名称：</td>
+              <td>{{ submitForm.CUSTOMER_CODE }}</td>
             </tr>
 
             <tr>
               <td>物流单号<span style="color:red;font-size:15px">*</span>：</td>
               <td>
-                <input v-model="submitForm.LOGISTICS_NUMBER" clearable class="inputStyle" />
+                <input v-model="submitForm.LOGISTICS_NUMBER" class="inputStyle" />
               </td>
               <td>物流公司<span style="color:red;font-size:15px">*</span>：</td>
               <td>
-                <input v-model="submitForm.LOGISTICS_COMPANY" clearable class="inputStyle" />
+                <input v-model="submitForm.LOGISTICS_COMPANY" class="inputStyle" />
               </td>
               <td>物流联系人：</td>
-              <td style="width:12.5%">
-                <input v-model="submitForm.LOGISTICS_LINKMAN" clearable class="inputStyle" />
-              </td>
-
-              <td style="width:12.5%">物流联系电话：</td>
               <td>
-                <input v-model="submitForm.LOGISTICS_TEL" clearable class="inputStyle" />
+                <input v-model="submitForm.LOGISTICS_LINKMAN" class="inputStyle" />
               </td>
+              <td>物流联系电话：</td>
+              <td>
+                <input v-model="submitForm.LOGISTICS_TEL" class="inputStyle" />
+              </td>
+            </tr>
+
+            <tr>
+              <td>物流费用<span style="color:red;font-size:15px">*</span>：</td>
+              <td>
+                <input v-model="submitForm.LOGISTICS_FEE" class="inputStyle" />
+              </td>
+              <td>件数<span style="color:red;font-size:15px">*</span>：</td>
+              <td>
+                <input v-model="submitForm.NUMBER_OF_PIECES" oninput="value=value.replace(/[^\d]/g,'')"
+                  class="inputStyle" />
+              </td>
+              <td>总重量<span style="color:red;font-size:15px">*</span>：</td>
+              <td>
+                <input v-model="submitForm.WEIGHT" oninput="value=value.replace(/[^\d.]/g,'')
+                                .replace(/^\./g, '').replace(/\.{2,}/g, '')
+                                .replace('.', '$#$').replace(/\./g, '')
+                                .replace('$#$', '.')
+                                .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"
+                  class="inputStyle" />
+              </td>
+              <td></td>
+              <td></td>
             </tr>
 
             <tr>
               <td>送货地址：</td>
               <td colspan="3">
-                <input v-model="submitForm.AREA_DISTRICT" clearable class="inputStyle" />
+                <input v-model="submitForm.AREA_DISTRICT" class="inputStyle" />
               </td>
               <td>备注：</td>
               <td colspan="3">
-                <input v-model="submitForm.REMARKS" clearable class="inputStyle" />
+                <input v-model="submitForm.REMARKS" class="inputStyle" />
               </td>
             </tr>
           </table>
@@ -253,16 +289,18 @@
         <tr>
           <td style="width:12.5%"><span style="font-weight:bold">供应商联系人：</span></td>
           <td style="width:12.5%">
-            <input v-model="submitForm.SUPPLY_LINKMAN" clearable class="inputStyle" />
+            <input v-model="submitForm.SUPPLY_LINKMAN" class="inputStyle" />
           </td>
           <td style="width:12.5%"><span style="font-weight:bold">供应商联系电话：</span></td>
           <td style="width:12.5%">
-            <input v-model="submitForm.LINKMAN_TEL" clearable class="inputStyle" />
+            <input v-model="submitForm.LINKMAN_TEL" class="inputStyle" />
           </td>
           <td style="width:12.5%"><span style="font-weight:bold">填写人：</span></td>
-          <td>{{ submitForm.CREATE_PERSON  }}</td>
+          <td style="width:12.5%">
+            <input v-model="submitForm.CREATE_PERSON" class="inputStyle" />
+          </td>
           <td style="width:12.5%"><span style="font-weight:bold">填写时间：</span></td>
-          <td></td>
+          <td>{{ submitForm.CREATE_DATE | datatrans }}</td>
         </tr>
       </table>
 
@@ -275,44 +313,72 @@
             <td style="width:12.5%">送货日期：</td>
             <td>
               <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
-                v-model="submitForm.INVOICE_DATE" style="width:100%"></el-date-picker>
+                v-model="submitForm.INVOICE_DATE" class="inputStyle"></el-date-picker>
             </td>
             <td style="width:12.5%">预计到货时间：</td>
-            <td colspan="3">
+            <td style="width:12.5%">
               <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
-                v-model="submitForm.EXPECT_ARRIVAL_DATE" style="width:100%"></el-date-picker>
+                v-model="submitForm.EXPECT_ARRIVAL_DATE" class="inputStyle"></el-date-picker>
             </td>
+            <td style="width:12.5%">客户名称：</td>
+            <td>{{ submitForm.CUSTOMER_CODE }}</td>
           </tr>
 
           <tr>
             <td>物流单号<span style="color:red;font-size:15px">*</span>：</td>
             <td>
-              <input v-model="submitForm.LOGISTICS_NUMBER" clearable class="inputStyle" />
+              <input v-model="submitForm.LOGISTICS_NUMBER" class="inputStyle" />
             </td>
             <td>物流公司<span style="color:red;font-size:15px">*</span>：</td>
             <td>
-              <input v-model="submitForm.LOGISTICS_COMPANY" clearable class="inputStyle" />
+              <input v-model="submitForm.LOGISTICS_COMPANY" class="inputStyle" />
             </td>
             <td>物流联系人：</td>
-            <td style="width:12.5%">
-              <input v-model="submitForm.LOGISTICS_LINKMAN" clearable class="inputStyle" />
-            </td>
-            <td style="width:12.5%">
-              物流电话：
-            </td>
             <td>
-              <input v-model="submitForm.LOGISTICS_TEL" clearable class="inputStyle" />
+              <input v-model="submitForm.LOGISTICS_LINKMAN" class="inputStyle" />
             </td>
+            <td>物流电话：</td>
+            <td>
+              <input v-model="submitForm.LOGISTICS_TEL" class="inputStyle" />
+            </td>
+          </tr>
+
+          <tr>
+            <td>物流费用<span style="color:red;font-size:15px">*</span>：</td>
+            <td>
+              <input v-model="submitForm.LOGISTICS_FEE" oninput="value=value.replace(/[^\d.]/g,'')
+                                .replace(/^\./g, '').replace(/\.{2,}/g, '')
+                                .replace('.', '$#$').replace(/\./g, '')
+                                .replace('$#$', '.')
+                                .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"
+                class="inputStyle" />
+            </td>
+            <td>件数<span style="color:red;font-size:15px">*</span>：</td>
+            <td>
+              <input v-model="submitForm.NUMBER_OF_PIECES" oninput="value=value.replace(/[^\d]/g,'')"
+                class="inputStyle" />
+            </td>
+            <td>重量<span style="color:red;font-size:15px">*</span>：</td>
+            <td>
+              <input v-model="submitForm.WEIGHT" oninput="value=value.replace(/[^\d.]/g,'')
+                                .replace(/^\./g, '').replace(/\.{2,}/g, '')
+                                .replace('.', '$#$').replace(/\./g, '')
+                                .replace('$#$', '.')
+                                .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"
+                class="inputStyle" />
+            </td>
+            <td></td>
+            <td></td>
           </tr>
 
           <tr>
             <td>送货地址：</td>
             <td colspan="3">
-              <input v-model="submitForm.AREA_DISTRICT" clearable class="inputStyle" />
+              <input v-model="submitForm.AREA_DISTRICT" class="inputStyle" />
             </td>
             <td>备注：</td>
             <td colspan="3">
-              <input v-model="submitForm.REMARKS" clearable class="inputStyle" />
+              <input v-model="submitForm.REMARKS" class="inputStyle" />
             </td>
           </tr>
         </table>
@@ -520,6 +586,7 @@ export default {
       this.isEdit = false;
       this.find = "";
       this.submitForm = {
+        CREATE_DATE: new Date(),
         CREATE_PERSON: "",
         LOGISTICS_COMPANY: "",
         LOGISTICS_NUMBER: "",
@@ -530,11 +597,14 @@ export default {
         INVOICE_STATUS: 2,
         SUPPLY_LINKMAN: "",
         LINKMAN_TEL: "",
-        SUPPLY_CODE: "",
+        SUPPLY_CODE: Cookies.get("companyId"),
         EXPECT_ARRIVAL_DATE: this.timeDefault_3,
         LOGISTICS_LINKMAN: "",
         LOGISTICS_TEL: "",
         CONFIRM_STATUS: 2,
+        LOGISTICS_FEE: "",
+        NUMBER_OF_PIECES: "",
+        WEIGHT: "",
       };
       this.multipleSelection = [];
       this.selectPurDetail = [];
@@ -542,22 +612,10 @@ export default {
     //确认新增
     isAddTrue() {
       //判断是否填完所有信息
-      if (
-        this.submitForm.LOGISTICS_COMPANY == "" ||
-        this.submitForm.LOGISTICS_NUMBER == ""
-      ) {
-        this.$alert("请完善信息", "提示", {
-          confirmButtonText: "确定",
-          type: "warning",
-        });
-        return;
-      }
-      this.isAdd = false;
-
+      if (!this.cheeckSubmit()) return;
       AddDelivery({
         headForm: this.submitForm,
         gridData: this.selectPurDetail,
-        cid: Cookies.get("companyId"),
       }).then((res) => {
         this.$alert("保存成功", "提示", {
           confirmButtonText: "确定",
@@ -567,12 +625,62 @@ export default {
         this.search();
       });
     },
+    //检查填写信息完整
+    cheeckSubmit() {
+      if (this.submitForm.LOGISTICS_NUMBER == "") {
+        this.$alert("请填写物流单号", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
+        return false;
+      }
+      if (this.submitForm.LOGISTICS_COMPANY == "") {
+        this.$alert("请填写物流公司", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
+        return false;
+      }
+      if (this.submitForm.LOGISTICS_FEE == "") {
+        this.$alert("请填写物流费用", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
+        return false;
+      }
+      if (this.submitForm.NUMBER_OF_PIECES == "") {
+        this.$alert("请填写件数", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
+        return false;
+      }
+      if (this.submitForm.WEIGHT == "") {
+        this.$alert("请填写总重量", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
+        return false;
+      }
+      if (!this.selectPurDetail.length) {
+        this.$alert("请添加明细", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
+        return false;
+      }
+      return true;
+    },
     //添加采购明细
     isTrue() {
       this.innerVisible = false;
       if (this.multipleSelection.length) {
+        if (this.submitForm.PUR_NO != this.multipleSelection[0].PUR_NO) {
+          //不同单号
+          this.selectPurDetail = [];
+        }
         for (var i = 0; i < this.multipleSelection.length; i++) {
-          console.log(this.multipleSelection[i]);
+          //同一明细
           var hasPur = this.selectPurDetail.filter(
             (item) =>
               item.PUR_NO == this.multipleSelection[i].PUR_NO &&
@@ -600,6 +708,7 @@ export default {
           }
         }
         this.submitForm.PUR_NO = this.multipleSelection[0].PUR_NO;
+        this.submitForm.CUSTOMER_CODE = this.multipleSelection[0].CUSTOMER_CODE;
         this.submitForm.SUPPLY_LINKMAN = this.multipleSelection[0].G_LINK;
         this.submitForm.LINKMAN_TEL = this.multipleSelection[0].HANDSET;
       }
@@ -735,7 +844,7 @@ export default {
     },
     //编辑
     isTrueEdit() {
-      this.lanjuDetail = false;
+      if (!this.cheeckSubmit()) return;
       this.submitForm.INVOICE_STATUS = 2;
       this.submitForm.CONFIRM_STATUS = 2;
       UpdateDelivery({
@@ -747,18 +856,13 @@ export default {
           confirmButtonText: "确定",
           type: "success",
         });
+        this.lanjuDetail = false;
         this.search();
       });
     },
   },
 };
 </script>
-
-<style>
-.table_1 .el-table__row {
-  height: 6px;
-}
-</style>
 
  <style scoped>
 .trueButton {
@@ -797,7 +901,6 @@ export default {
 .inputStyle {
   height: 100%;
   width: 100%;
-  font-size: 16px;
   text-align: center;
   border: 1px solid #409eff;
   box-sizing: border-box;

@@ -122,11 +122,11 @@
             </tr>
 
             <tr>
-              <td>物流费用：</td>
+              <td>物流费用(元)：</td>
               <td>{{ submitForm.LOGISTICS_FEE }}</td>
               <td>件数：</td>
               <td>{{ submitForm.NUMBER_OF_PIECES }}</td>
-              <td>总重量：</td>
+              <td>总重量(kg)：</td>
               <td>{{ submitForm.WEIGHT }}</td>
               <td></td>
               <td></td>
@@ -220,7 +220,7 @@
             </tr>
 
             <tr>
-              <td>物流费用<span style="color:red;font-size:15px">*</span>：</td>
+              <td>物流费用(元)<span style="color:red;font-size:15px">*</span>：</td>
               <td>
                 <input v-model="submitForm.LOGISTICS_FEE" class="inputStyle" />
               </td>
@@ -229,7 +229,7 @@
                 <input v-model="submitForm.NUMBER_OF_PIECES" oninput="value=value.replace(/[^\d]/g,'')"
                   class="inputStyle" />
               </td>
-              <td>总重量<span style="color:red;font-size:15px">*</span>：</td>
+              <td>总重量(kg)<span style="color:red;font-size:15px">*</span>：</td>
               <td>
                 <input v-model="submitForm.WEIGHT" oninput="value=value.replace(/[^\d.]/g,'')
                                 .replace(/^\./g, '').replace(/\.{2,}/g, '')
@@ -530,23 +530,12 @@ export default {
   height: 30px;
   text-align: center;
 }
-.table-c table {
-  border-right: 1px solid black;
-  border-bottom: 1px solid black;
-}
-.table-c table td {
-  border-left: 1px solid black;
-  border-top: 1px solid black;
-  height: 35px;
-  text-align: center;
-  font-size: 14px;
-}
 .tbarStyle {
   margin-bottom: 13px;
 }
 .inputStyle {
   height: 100%;
-  width: 100%;
+  width: 100% !important;
   font-size: 16px;
   text-align: center;
   border: 1px solid #409eff;

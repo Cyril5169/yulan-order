@@ -508,18 +508,10 @@ export default {
       this.getOrderAll();
     },
     getOrderDetail(order_no) {
-      this.cid = Cookies.get("cid");
-      this.order_no = order_no;
-      let url = "/order/getOrderContent.do";
-      let data = {
-        cid: this.cid,
-        order_no: this.order_no
-      };
-      orderDetail(url, data).then(res => {
-        this.ruleForm = res.data.data[0];
-        Cookies.set("ORDER_NO", this.ruleForm.ORDER_NO);
-        this.orderVisible = true;
-      });
+      Cookies.set("ORDER_NO", order_no);
+      Cookies.set("CURTAIN_STATUS_ID", -2);
+      Cookies.set("status_ID", -2);
+      this.orderVisible = true;
     },
     async getCustomerInfo(val) {
       var data = {

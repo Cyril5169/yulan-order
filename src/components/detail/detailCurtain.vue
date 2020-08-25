@@ -6,7 +6,7 @@
       </div>
       <div class="dib" style="width: 100%;">
         <keep-alive>
-          <detailCurtainTable v-bind:tableStatus="0" v-bind:headerData="headerData" v-bind:curtainData="curtainData">
+          <detailCurtainTable :tableStatus="0" :headerData="headerData" :curtainData="curtainData">
           </detailCurtainTable>
         </keep-alive>
       </div>
@@ -28,11 +28,11 @@ export default {
       customerType: Cookies.get("customerType"),
       getParams: this.$route.params.curtain, //获取到的传参
       headerData: {}, //窗帘头部信息
-      curtainData: [] //窗帘详情
+      curtainData: [], //窗帘详情
     };
   },
   components: {
-    DetailCurtainTable
+    DetailCurtainTable,
   },
   created() {
     this.init();
@@ -65,7 +65,7 @@ export default {
             price: _dataCom.price,
             activityId: _dataCom.activityId,
             item: {
-              itemNo: _dataCom.item.itemNo
+              itemNo: _dataCom.item.itemNo,
             },
             itemType: this.getItemType(_dataCom.curtainPartName),
             productType: _dataCom.item.productType,
@@ -88,14 +88,14 @@ export default {
             changeFlag: _dataCom.changeFlag,
             choose: true,
             suggestion: "",
-            inlineNo: _dataCom.inlineNo
+            inlineNo: _dataCom.inlineNo,
           };
           _arr.push(obj);
         }
       }
       this.headerData = {
         activity: _data.activity, //活动中文名称
-        activityId: _data.activityId?_data.activityId:null,
+        activityId: _data.activityId ? _data.activityId : null,
         activityName: _data.activityName,
         activityGroupType: _data.activityGroupType, //活动组别
         activityEffective: _data.activityEffective,
@@ -111,13 +111,13 @@ export default {
         price: _data.price, //价格
         productGroupType: _data.productGroupType, //产品组别
         quantity: _data.quantity, //数量
-        highJia: _data.falseShadeHigh ///假帘高
+        highJia: _data.falseShadeHigh, ///假帘高
       };
       this.curtainData = _arr;
       //保存数据
       sessionStorage.setItem("curtainDetail", JSON.stringify(_arr));
       Cookies.set("curtainHead", this.headerData);
-      console.log(_data)
+      console.log(_data);
     },
     //根据中文名称获取itemType
     getItemType(partName) {
@@ -135,9 +135,9 @@ export default {
       }
     },
     ...mapMutations("navTabs", ["addTab"]),
-    ...mapActions("navTabs", ["closeTab", "closeToTab"])
+    ...mapActions("navTabs", ["closeTab", "closeToTab"]),
   },
-  watch: {}
+  watch: {},
 };
 </script>
 

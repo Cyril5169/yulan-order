@@ -3,10 +3,10 @@
     <el-dialog title="窗帘详情" :show-close="false" :visible.sync="detailVisible" :close-on-click-modal="false" width="95%"
       top="5vh">
       <keep-alive>
-        <detailCurtainTable v-if="detailVisible" v-bind:tableStatus="tableStatus" v-bind:STATUS_ID="STATUS_ID"
-          v-bind:isModified="isModified" v-bind:headerData="headerData" v-bind:curtainData="curtainData"
-          v-bind:suggestion="ljsuggestion" v-on:visible="closeTheDialog" v-on:finalData="getFinalData"
-          v-on:deleteArr="getDeleteArr" v-on:suggest="getSuggest"></detailCurtainTable>
+        <detailCurtainTable v-if="detailVisible" :tableStatus="tableStatus" :STATUS_ID="STATUS_ID"
+          :isModified="isModified" :headerData="headerData" :curtainData="curtainData" :suggestion="ljsuggestion"
+          @visible="closeTheDialog" @finalData="getFinalData" @deleteArr="getDeleteArr" @suggest="getSuggest">
+        </detailCurtainTable>
       </keep-alive>
     </el-dialog>
 
@@ -333,8 +333,8 @@
                 </el-table-column>
                 <el-table-column label="生产备注" header-align="center" v-if="tableStatus !== 0">
                   <template slot-scope="scope1">
-                    <el-input resize="none" type="textarea" :autosize="{ minRows:1, maxRows: 1 }" placeholder="专门给生产人员查看"
-                      v-model="scope1.row.productNote" clearable>
+                    <el-input resize="none" type="textarea" :autosize="{ minRows:1, maxRows: 1 }"
+                      placeholder="专门给生产人员查看" v-model="scope1.row.productNote" clearable>
                     </el-input>
                   </template>
                 </el-table-column>
@@ -467,7 +467,7 @@ import {
   getOrderlist,
   passExamine,
   orderDetail,
-  defeatChange
+  defeatChange,
 } from "@/api/orderList";
 import {
   getCurtainDetailMsg,
@@ -477,13 +477,13 @@ import {
   changeItem,
   changeItemBlur,
   updateCurtain,
-  deleteTheGroup
+  deleteTheGroup,
 } from "@/api/curtain";
 import { GetDosageByNo } from "@/api/itemInfoASP";
 import {
   updateCurtainOrder,
   getOperationRecord,
-  getCustomerInfo
+  getCustomerInfo,
 } from "@/api/orderListASP";
 import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
@@ -519,7 +519,7 @@ export default {
         WL_TEL: "",
         POST_ADDRESS: "",
         NOTES: "",
-        ORDERBODY: []
+        ORDERBODY: [],
       },
       expands: [],
       tableStatus: 1,
@@ -547,12 +547,12 @@ export default {
       fixType: [
         {
           value: 0,
-          label: "定高"
+          label: "定高",
         },
         {
           value: 1,
-          label: "定宽"
-        }
+          label: "定宽",
+        },
       ],
       //根据编号查询制造说明
       partpart: [],
@@ -561,14 +561,14 @@ export default {
         { value: "么术贴正车" },
         { value: "么术贴反车" },
         { value: "穿/挂杆款" },
-        { value: "特殊见备注" }
+        { value: "特殊见备注" },
       ],
       //帘身、纱制造说明
       part1: [
         { value: "对开" },
         { value: "左单开" },
         { value: "右单开" },
-        { value: "特殊开备注" }
+        { value: "特殊开备注" },
       ],
       //帘身配布制造说明
       part3: [
@@ -577,16 +577,16 @@ export default {
         { value: "二个褶" },
         { value: "二个半褶" },
         { value: "三个褶" },
-        { value: "三个半褶" }
+        { value: "三个半褶" },
       ],
       //配件编码
       part2: [],
       suggestionLJ: [],
-      isFixed: false
+      isFixed: false,
     };
   },
   components: {
-    DetailCurtainTable
+    DetailCurtainTable,
   },
   filters: {
     datatrans(value) {
@@ -604,7 +604,7 @@ export default {
       let s = date.getSeconds();
       s = s < 10 ? "0" + s : s;
       return y + "-" + MM + "-" + d + " " + h + ":" + m + ":" + s;
-    }
+    },
   },
   methods: {
     allTotal(index) {
@@ -672,7 +672,7 @@ export default {
         this.ctmOrderDetails.push(transData);
       } else {
         var isContainIndex = this.ctmOrderDetails.findIndex(
-          item => item.lineNo == this.cyLineNo
+          (item) => item.lineNo == this.cyLineNo
         );
         if (isContainIndex != -1) {
           this.ctmOrderDetails[isContainIndex] = transData;
@@ -761,9 +761,9 @@ export default {
     getCustomer() {
       var data = {
         cid: this.ruleForm.CUSTOMER_CODE,
-        companyId: this.ruleForm.CUSTOMER_CODE
+        companyId: this.ruleForm.CUSTOMER_CODE,
       };
-      getCustomerInfo(data, { loading: false }).then(res => {
+      getCustomerInfo(data, { loading: false }).then((res) => {
         this.cus_customerType = res.data.CUSTOMER_TYPE;
       });
     },
@@ -771,9 +771,9 @@ export default {
       let url = "/order/getOrderContent.do";
       let data = {
         cid: Cookies.get("cid"),
-        order_no: Cookies.get("ORDER_NO")
+        order_no: Cookies.get("ORDER_NO"),
       };
-      orderDetail(url, data).then(res => {
+      orderDetail(url, data).then((res) => {
         this.ruleForm = res.data.data[0];
         this.getCustomer();
         for (let i = 0; i < this.ruleForm.ORDERBODY.length; i++) {
@@ -782,9 +782,9 @@ export default {
         }
         this.dealCurtainData();
         var recordData = {
-          orderNo: this.orderNumber
+          orderNo: this.orderNumber,
         };
-        getOperationRecord(recordData, { loading: false }).then(res => {
+        getOperationRecord(recordData, { loading: false }).then((res) => {
           this.operationRecords = res.data;
         });
       });
@@ -795,32 +795,32 @@ export default {
       let _obj = {
         limit: 999,
         page: 1,
-        itemNO: "PJB"
+        itemNO: "PJB",
       };
       changeItem(_obj, { loading: false })
-        .then(res => {
+        .then((res) => {
           let _arr = [];
-          res.data.forEach(item => {
+          res.data.forEach((item) => {
             _arr.push({
               label: `${item.itemNo}:${item.note}`,
               value: item.itemNo,
               unit: item.unit === "°ü" ? "包" : item.unit,
               note: item.note,
-              item: item
+              item: item,
             });
           });
-          _arr.sort(function(a, b) {
+          _arr.sort(function (a, b) {
             return a.value > b.value ? 1 : -1; //升序
           });
           _arr.push({
             label: "-未选择配件包-",
             value: null,
             unit: "",
-            note: ""
+            note: "",
           });
           this.part2 = _arr;
         })
-        .catch(err => {
+        .catch((err) => {
           this.part2 = [];
         });
       this.ruleForm.headerData = [];
@@ -839,7 +839,7 @@ export default {
           data.curtains[cur].dosage =
             Math.round(data.curtains[cur].dosage.mul(100)) / 100;
         }
-        data.curtains.sort(function(a, b) {
+        data.curtains.sort(function (a, b) {
           let rule = ["lt", "ls", "lspb", "sha", "pjb"];
           return rule.indexOf(a.itemType) - rule.indexOf(b.itemType);
         });
@@ -886,9 +886,9 @@ export default {
             ? headerDataTemp.outsourcingBoxWidth.toString()
             : "0",
           multiple: headerDataTemp.drape.toString(),
-          location: headerDataTemp.location
+          location: headerDataTemp.location,
         };
-        getCurtainDetailMsg(obj, { loading: false }).then(async res => {
+        getCurtainDetailMsg(obj, { loading: false }).then(async (res) => {
           let _data = res.itemList;
           let itemIndex = 0;
           for (var i = 0; i < this.ruleForm.headerData.length; i++) {
@@ -921,7 +921,7 @@ export default {
                     itemType: _comData.productType,
                     itemNO: this.allCurtaindata[itemIndex][index].item.itemNo,
                     limit: 1,
-                    page: 1
+                    page: 1,
                   };
                   let ress = await changeItemBlur(_itemObj, { loading: false });
                   if (ress.data.length > 0) {
@@ -968,7 +968,7 @@ export default {
         let _col = _row > 0 ? 1 : 0;
         return {
           rowspan: _row,
-          colspan: _col
+          colspan: _col,
         };
       }
       if (columnIndex === 1) {
@@ -976,7 +976,7 @@ export default {
         let _col = _row > 0 ? 1 : 0;
         return {
           rowspan: _row,
-          colspan: _col
+          colspan: _col,
         };
       }
       if (columnIndex === 2) {
@@ -987,7 +987,7 @@ export default {
         ) {
           return {
             rowspan: 1,
-            colspan: 2
+            colspan: 2,
           };
         }
       }
@@ -999,14 +999,14 @@ export default {
         ) {
           return {
             rowspan: 1,
-            colspan: 0
+            colspan: 0,
           };
         }
       }
     },
     changePJBUnit(index, rowIndex) {
       let _data = this.allCurtaindata[rowIndex][index].item.itemNo;
-      this.part2.forEach(item => {
+      this.part2.forEach((item) => {
         if (item.value === _data) {
           this.allCurtaindata[rowIndex][index].unit = item.unit;
           this.allCurtaindata[rowIndex][index].curtainItemName = item.note;
@@ -1061,7 +1061,7 @@ export default {
        * 即取消双向绑定，帘头固定
        */
       if (_index >= 1 && _index <= 4) {
-        _arr.forEach(item => {
+        _arr.forEach((item) => {
           if (item.deleteFlag !== "Y" || item.choose === true) {
             flag = false;
           }
@@ -1074,7 +1074,7 @@ export default {
     //获取某个大类的全部数据
     getBigType(type, rowIndex) {
       let arr = [];
-      this.allCurtaindata[rowIndex].forEach(item => {
+      this.allCurtaindata[rowIndex].forEach((item) => {
         if (item.itemType === type) {
           arr.push(item);
         }
@@ -1086,7 +1086,7 @@ export default {
       if (this.isModified === 1) {
         this.$confirm("此窗帘已经修改了，依然确认通过吗？", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         })
           .then(() => {
             this.$emit("visible", false);
@@ -1100,7 +1100,7 @@ export default {
         //同一过滤
         let _data = JSON.parse(JSON.stringify(this.allCurtaindata));
         var _data_temp = [];
-        _data.forEach(item => {
+        _data.forEach((item) => {
           item.dosage = Number(item.dosage);
           if (item.curtainItemName === null || item.curtainItemName === "") {
             item.curtainItemName = this.getTypeName(item.itemType);
@@ -1111,13 +1111,13 @@ export default {
           _data_temp.push(JSON.parse(JSON.stringify(item)));
         });
         //把不需要比对的备注和意见拿出来
-        _data_temp.forEach(item => {
+        _data_temp.forEach((item) => {
           item.note = "";
           item.suggestion = "";
           item.productNote = "";
         });
         var oldData_temp = [];
-        this.oldData.forEach(item => {
+        this.oldData.forEach((item) => {
           item.dosage = Number(item.dosage);
           if (item.curtainItemName === null || item.curtainItemName === "") {
             item.curtainItemName = this.getTypeName(item.itemType);
@@ -1127,7 +1127,7 @@ export default {
           oldData_temp.push(JSON.parse(JSON.stringify(item)));
         });
         //把不需要比对的备注和意见拿出来
-        oldData_temp.forEach(item => {
+        oldData_temp.forEach((item) => {
           item.note = "";
           item.suggestion = "";
         });
@@ -1138,7 +1138,7 @@ export default {
             "提示",
             {
               confirmButtonText: "确定",
-              type: "info"
+              type: "info",
             }
           )
             .then(() => {
@@ -1173,7 +1173,7 @@ export default {
       if (_data.length === 0) {
         this.$alert("请至少选择一款配件!", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -1186,7 +1186,7 @@ export default {
         ) {
           this.$alert(`请填写${item.manufacturingInstructions}的备注`, "提示", {
             confirmButtonText: "确定",
-            type: "warning"
+            type: "warning",
           });
           return;
         }
@@ -1237,14 +1237,14 @@ export default {
       let obj = {
         itemNO: this.chooseType,
         limit: this.pageSize,
-        page: this.currentPage
+        page: this.currentPage,
       };
       changeItem(obj)
-        .then(res => {
+        .then((res) => {
           this.items = res.data;
           this.totalNumber = res.data[0].total;
         })
-        .catch(err => {
+        .catch((err) => {
           this.items = [];
           this.currentPage = 1;
           this.totalNumber = 0;
@@ -1259,14 +1259,14 @@ export default {
         itemType: this.chooseType,
         itemNO: this.searchKey.toUpperCase(),
         limit: this.pageSize,
-        page: this.currentPage
+        page: this.currentPage,
       };
       changeItemBlur(obj)
-        .then(res => {
+        .then((res) => {
           this.items = res.data;
           this.totalNumber = res.data[0].total;
         })
-        .catch(err => {
+        .catch((err) => {
           this.items = [];
           this.currentPage = 1;
           this.totalNumber = 0;
@@ -1291,7 +1291,7 @@ export default {
       if (this.itemNo === "") {
         this.$alert("请选择一个产品", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -1306,7 +1306,7 @@ export default {
       let status1 = _productType === "GY" ? true : false;
       this.dialogTableVisible = false;
       //修改对应的名称规格
-      let data = this.items.find(v => {
+      let data = this.items.find((v) => {
         if (v.itemNo === this.itemNo) return v;
       });
       var price = this.getPrice(this.cus_customerType, data);
@@ -1365,7 +1365,7 @@ export default {
         itemNO: this.itemNo,
         itemType: this.allCurtaindata[this.chooseRowIndex][this.chooseIndex]
           .itemType,
-        fixType: _fixType
+        fixType: _fixType,
       };
       if (
         !status1 &&
@@ -1375,11 +1375,11 @@ export default {
         //修改用量
         //changeDosageByNo(obj)
         GetDosageByNo(obj)
-          .then(res => {
+          .then((res) => {
             if (res.data.length == 0) {
               this.$alert("用量获取失败", "提示", {
                 confirmButtonText: "好的",
-                type: "warning"
+                type: "warning",
               });
               return;
             }
@@ -1409,7 +1409,7 @@ export default {
               this.chooseRowIndex
             );
           })
-          .catch(err => {
+          .catch((err) => {
             console.log(err);
           });
       } else if (status1) {
@@ -1425,7 +1425,7 @@ export default {
           this.allCurtaindata[this.chooseRowIndex][this.chooseIndex].item
             .itemNo === "GY-003"
         ) {
-          GetDosageByNo(obj).then(res => {
+          GetDosageByNo(obj).then((res) => {
             this.allCurtaindata[this.chooseRowIndex][this.chooseIndex].dosage =
               Math.round(res.data[0].dosage * 10) / 10;
           });
@@ -1474,15 +1474,15 @@ export default {
         parentItemNo: _headerData.modelNumber,
         itemNO: this.allCurtaindata[rowIndex][index].item.itemNo,
         itemType: this.allCurtaindata[rowIndex][index].itemType,
-        fixType: _fixType
+        fixType: _fixType,
       };
       //changeDosageByNo(obj)
       GetDosageByNo(obj, { loading: false })
-        .then(res => {
+        .then((res) => {
           if (res.data.length == 0) {
             this.$alert("用量获取失败", "提示", {
               confirmButtonText: "好的",
-              type: "warning"
+              type: "warning",
             });
             return;
           }
@@ -1501,7 +1501,7 @@ export default {
           }
           this.judgeTip(this.allCurtaindata[rowIndex][index], index, rowIndex);
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     },
@@ -1591,18 +1591,18 @@ export default {
     //通过编号获取工艺
     getTheGY(itemNo) {
       let data = {
-        itemNO: itemNo
+        itemNO: itemNo,
       };
       this.currentPage = 1;
       getGY(data)
-        .then(res => {
+        .then((res) => {
           // res.itemList.sort(function(a, b) {
           //   return a.itemNO > b.itemNO ? 1 : -1;
           // });
           this.items = res.itemList;
           this.totalNumber = res.itemList.length;
         })
-        .catch(err => {
+        .catch((err) => {
           this.items = [];
           this.totalNumber = 0;
         });
@@ -1656,7 +1656,7 @@ export default {
           this.allCurtaindata[rowIndex][index].illustrate = "";
       }
     },
-    bigToSmall: function(data) {
+    bigToSmall: function (data) {
       let index = -1;
       switch (data.itemType) {
         case "lt":
@@ -1717,8 +1717,8 @@ export default {
       let _data = JSON.parse(JSON.stringify(this.allCurtains)); //修改后数据
       let _old_data = JSON.parse(JSON.stringify(this.oldData)); //原始数据
       var _data_temp = [];
-      _data.forEach(oneItem => {
-        oneItem.forEach(item => {
+      _data.forEach((oneItem) => {
+        oneItem.forEach((item) => {
           item.dosage = Number(item.dosage);
           if (item.curtainItemName === null || item.curtainItemName === "") {
             item.curtainItemName = this.getTypeName(item.itemType);
@@ -1731,14 +1731,14 @@ export default {
         });
       });
       //把不需要比对的备注和意见拿出来
-      _data_temp.forEach(item => {
+      _data_temp.forEach((item) => {
         item.note = "";
         item.suggestion = "";
         item.productNote = "";
       });
       var oldData_temp = [];
-      _old_data.forEach(oneItem => {
-        oneItem.forEach(item => {
+      _old_data.forEach((oneItem) => {
+        oneItem.forEach((item) => {
           item.dosage = Number(item.dosage);
           if (item.curtainItemName === null || item.curtainItemName === "") {
             item.curtainItemName = this.getTypeName(item.itemType);
@@ -1751,7 +1751,7 @@ export default {
         });
       });
       //把不需要比对的备注和意见拿出来
-      oldData_temp.forEach(item => {
+      oldData_temp.forEach((item) => {
         item.note = "";
         item.suggestion = "";
         item.productNote = "";
@@ -1766,7 +1766,7 @@ export default {
         if (this.allCurtains[i].length == 0) {
           this.$alert("请至少选择一款配件!", "提示", {
             confirmButtonText: "好的",
-            type: "warning"
+            type: "warning",
           });
           return;
         } else {
@@ -1779,7 +1779,7 @@ export default {
             ) {
               this.$alert(`请填写特殊开的备注`, "提示", {
                 confirmButtonText: "确定",
-                type: "warning"
+                type: "warning",
               });
               return;
             }
@@ -1793,12 +1793,12 @@ export default {
         curtainStatusId: "2",
         allCurtains: this.allCurtains,
         ctmOrderDetails: this.ctmOrderDetails,
-        deleteIds: this.deleteIds
+        deleteIds: this.deleteIds,
       };
       if (this.contrastData()) {
         this.$confirm("所有窗帘未修改，依然修改吗？", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         })
           .then(() => {
             this.LanjuChangeANYS(data);
@@ -1809,7 +1809,7 @@ export default {
       } else {
         this.$confirm("确认修改吗？", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         })
           .then(() => {
             this.LanjuChangeANYS(data);
@@ -1822,27 +1822,27 @@ export default {
     LanjuChangeANYS(data) {
       //defeatChange(url, data).then(res => {
       updateCurtainOrder(data)
-        .then(res => {
+        .then((res) => {
           if (res.code == 0) {
             this.$alert("操作成功,已将该订单退回给客户进行确认", "提示", {
               confirmButtonText: "确定",
-              type: "success"
+              type: "success",
             });
             this.closeToTab({
               oldUrl: "order/examineDetailNew",
-              newUrl: "order/examine"
+              newUrl: "order/examine",
             });
           } else {
             this.$alert("操作失败，请稍后重试", "提示", {
               confirmButtonText: "确定",
-              type: "warning"
+              type: "warning",
             });
           }
         })
-        .catch(res => {
+        .catch((res) => {
           this.$alert("操作失败:" + res.msg, "提示", {
             confirmButtonText: "确定",
-            type: "warning"
+            type: "warning",
           });
           console.log(res);
         });
@@ -1857,7 +1857,7 @@ export default {
         orderNo: this.orderNumber,
         curtainStatusId: "1",
         allCurtains: [],
-        ctmOrderDetails: this.ctmOrderDetails
+        ctmOrderDetails: this.ctmOrderDetails,
       };
       for (let j = 0; j < this.allCurtains.length; j++) {
         let array = new Array();
@@ -1874,7 +1874,7 @@ export default {
       if (!this.contrastData()) {
         this.$confirm("有窗帘已经修改了，依然确认退回吗？", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         })
           .then(() => {
             this._backANSCYC(data);
@@ -1885,7 +1885,7 @@ export default {
       } else {
         this.$confirm("确认退回吗？", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         })
           .then(() => {
             this._backANSCYC(data);
@@ -1898,27 +1898,27 @@ export default {
     _backANSCYC(data) {
       //defeatChange(url, data).then(res => {
       updateCurtainOrder(data)
-        .then(res => {
+        .then((res) => {
           if (res.code == 0) {
             this.$alert("操作成功,已将该订单退回给客户进行确认", "提示", {
               confirmButtonText: "确定",
-              type: "success"
+              type: "success",
             });
             this.closeToTab({
               oldUrl: "order/examineDetailNew",
-              newUrl: "order/examine"
+              newUrl: "order/examine",
             });
           } else {
             this.$alert("操作失败，请稍后重试", "提示", {
               confirmButtonText: "确定",
-              type: "warning"
+              type: "warning",
             });
           }
         })
-        .catch(res => {
+        .catch((res) => {
           this.$alert("操作失败:" + res.msg, "提示", {
             confirmButtonText: "确定",
-            type: "warning"
+            type: "warning",
           });
           console.log(res);
         });
@@ -1933,7 +1933,7 @@ export default {
         orderNo: Cookies.get("ORDER_NO"),
         curtainStatusId: "4",
         allCurtains: [],
-        ctmOrderDetails: this.ctmOrderDetails
+        ctmOrderDetails: this.ctmOrderDetails,
       };
       for (let j = 0; j < this.allCurtains.length; j++) {
         let array = new Array();
@@ -1951,7 +1951,7 @@ export default {
       if (!this.contrastData()) {
         this.$confirm("有窗帘已经修改了，依然确认通过吗？", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         })
           .then(() => {
             this._passANSYC(data);
@@ -1962,7 +1962,7 @@ export default {
       } else {
         this.$confirm("确认通过吗？", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         })
           .then(() => {
             this._passANSYC(data);
@@ -1975,29 +1975,29 @@ export default {
     _passANSYC(data) {
       //passExamine(url, data).then(res => {
       updateCurtainOrder(data)
-        .then(res => {
+        .then((res) => {
           if (res.code == 0) {
             this.$alert("操作成功,该订单已通过审核", "提示", {
               confirmButtonText: "确定",
-              type: "success"
+              type: "success",
             });
             //this.addTab('order/examine');
             this.closeToTab({
               oldUrl: "order/examineDetailNew",
-              newUrl: "order/examine"
+              newUrl: "order/examine",
             });
             //跳转
           } else {
             this.$alert("操作失败，请稍后重试", "提示", {
               confirmButtonText: "确定",
-              type: "warning"
+              type: "warning",
             });
           }
         })
-        .catch(res => {
+        .catch((res) => {
           this.$alert("操作失败:" + res.msg, "提示", {
             confirmButtonText: "确定",
-            type: "warning"
+            type: "warning",
           });
           console.log(res);
         });
@@ -2034,9 +2034,9 @@ export default {
           this.isFixed = false;
         }
       });
-    }
+    },
   },
-  created: function() {
+  created: function () {
     this.orderNumber = Cookies.get("ORDER_NO");
     this.getDetail();
   },
@@ -2045,7 +2045,7 @@ export default {
   },
   destroyed() {
     window.removeEventListener("scroll", this.handleScroll, true);
-  }
+  },
 };
 </script>
 

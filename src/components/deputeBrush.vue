@@ -56,7 +56,6 @@
         <el-table-column :label="tableHead1">
           <el-table-column label="订单号" align="center">
             <template slot-scope="scope1">
-              <!-- <el-button @click="toOrderDetail(scope1.row.ORDER_NO,scope1.row.STATUS_ID)" type="text">{{scope1.row.ORDER_NO}}</el-button> -->
               <el-button
                 @click="openDialog(scope1.row.ORDER_NO, scope1.row.STATUS_ID)"
                 type="text"
@@ -180,11 +179,6 @@ export default {
       this.date1 = `${year}-${month}-01`;
       this.date2 = this.date1;
       this.searchByMonth();
-    },
-    toOrderDetail(val, status) {
-      Cookies.set("ORDER_NO", val);
-      Cookies.set("status_ID", status);
-      this.addTab("order/orderDetail");
     },
     //计算表格末行
     getSummaries(param) {

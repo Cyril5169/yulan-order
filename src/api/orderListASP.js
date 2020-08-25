@@ -24,6 +24,13 @@ export function getAllOrders(data, config = {}) {
         return Promise.reject(err);
     })
 }
+export function getOrderDetails(data, config = {}) {
+    return post('/CTM_ORDER/getOrderDetails', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
 //窗帘订单提交，再次提交
 export function orderSettlement(data, config = {}) {
     return post('/CTM_ORDER/orderSettlement', data, config).then((res) => {

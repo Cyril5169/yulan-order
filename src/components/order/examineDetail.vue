@@ -11,16 +11,16 @@
       <keep-alive>
         <detailCurtainTable
           v-if="detailVisible"
-          v-bind:tableStatus="1"
-          v-bind:STATUS_ID="STATUS_ID"
-          v-bind:isModified="isModified"
-          v-bind:headerData="headerData"
-          v-bind:curtainData="curtainData"
-          v-bind:suggestion="ljsuggestion"
-          v-on:visible="closeTheDialog"
-          v-on:finalData="getFinalData"
-          v-on:deleteArr="getDeleteArr"
-          v-on:suggest="getSuggest"
+          :tableStatus="1"
+          :STATUS_ID="STATUS_ID"
+          :isModified="isModified"
+          :headerData="headerData"
+          :curtainData="curtainData"
+          :suggestion="ljsuggestion"
+          @visible="closeTheDialog"
+          @finalData="getFinalData"
+          @deleteArr="getDeleteArr"
+          @suggest="getSuggest"
         ></detailCurtainTable>
       </keep-alive>
     </el-dialog>

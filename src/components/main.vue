@@ -18,7 +18,7 @@
         <el-header height="40px">
           <ul class="l">
             <li :title="asideStatus? '菜单展开' : '菜单收起'" @click="changeAside">
-              <i class="iconfont headIcon2" v-if="asideStatus">&#xe61e;</i>
+              <i class="iconfont headIcon2" v-if="!asideStatus">&#xe61e;</i>
               <i class="iconfont headIcon2" v-else>&#xe65f;</i>
               <span class="ml10 mr10 headSpan2">{{
                 asideStatus? "菜单展开" : "菜单收起"
@@ -1377,9 +1377,6 @@ export default {
     //切换标签页时导航菜单的变换,用来满足奇怪需求
     url() {
       let index = this.$store.state.navTabs.activeUrlName;
-      if (index === "order/orderDetail") {
-        return "order/myOrder";
-      }
       if (index === "detail/detailWallPaper") {
         return "shoppingCar/shopping?wallPaper";
       }
@@ -1388,9 +1385,6 @@ export default {
       }
       if (index === "detail/detailCurtain") {
         return "shoppingCar/shopping?curtain";
-      }
-      if (index === "detail/detailRefund") {
-        return "refundCompensation";
       }
       return index;
     },

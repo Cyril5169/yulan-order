@@ -1,7 +1,8 @@
 <template>
-  <div id="shoppingCurtain" class="rel">
-    <el-table id="shopBox" default-expand-all width="100%" style="margin-top:10px;" :row-class-name="tableRowClassName"
-      :row-key="getRowKeys" :expand-row-keys="expands" @expand-change="packUpNot" :data="activityData"  empty-text="该购物车是空的">
+  <div id="shoppingCurtain">
+    <el-table default-expand-all width="100%" style="margin-top:10px;" :row-class-name="tableRowClassName"
+      :row-key="getRowKeys" :expand-row-keys="expands" @expand-change="packUpNot" :data="activityData"
+      empty-text="该购物车是空的">
       <el-table-column width="100px" type="expand">
         <template slot-scope="scope">
           <el-table :ref="multipleTable(scope.$index)" :data="table(scope.$index)" tooltip-effect="dark"
@@ -50,16 +51,6 @@
             </el-table-column>
             <el-table-column width="80" label="数量" align="center">
               <template slot-scope="scope1">
-                <!-- <el-input-number
-                  size="mini"
-                  style="width: 100%;"
-                  v-model="scope1.row.count"
-                  :min="1"
-                  :max="1"
-                  :disabled="true"
-                  :step="1"
-                  step-strictly
-                ></el-input-number> -->
                 {{ scope1.row.count }}
               </template>
             </el-table-column>
@@ -98,22 +89,17 @@
             {{ scope.row.activity }}
             <a class="ml20" style="color:#606266" @click="deleteGroup(scope.$index)">删除分组</a>
           </div>
-          <!-- {{scope.$index}}
-          {{shopsData.cartItems.wallPaper[scope.$index]}}-->
-          <!-- {{typeof(shopsData.cartItems.wallPaper[scope.$index])}} -->
         </template>
       </el-table-column>
       <el-table-column>
         <template slot-scope="scope">
           <div class="r">
-            <!-- <a class="ml20" @click="changeChoose(scope.$index)" style="color: #606266;">切换选择项</a> -->
             <a class="ml20" @click="deleteChoose(scope.$index)" style="color: red;">删除选中的商品</a>
           </div>
         </template>
       </el-table-column>
     </el-table>
     <div id="accountBox">
-      <!-- style="width:1050px;position:fixed;bottom:10px;left:240px;z-index:999;" -->
       <div class="r">
         <div>
           <span>已选择</span>
@@ -125,9 +111,8 @@
           <span v-if="isManager === '0'" style="color:red; font-size:20px;" class="mr10">***</span>
           <span v-else style="color:red; font-size:20px;" class="mr10">￥{{ totalPriceMoney | dosageFilter }}</span>
         </div>
-        <div @click="handleCommitNew" v-bind:style="commitBtn" style="width:80px; height:50px;
-                        color:white; font-size:18px; 
-                        text-align:center; cursor: pointer;">
+        <div @click="handleCommitNew" class="commitBtn"
+          :style="{'background':multipleSelection.length?'#E15B60':'gray'}">
           去结算
         </div>
       </div>
@@ -144,7 +129,7 @@ import {
   deleteCurtains,
   commitLook,
   deleteCurtain,
-  alterCount
+  alterCount,
 } from "@/api/curtain";
 import { GetCartItem } from "@/api/shopASP";
 import { mapMutations, mapActions } from "vuex";
@@ -155,29 +140,21 @@ export default {
   data() {
     return {
       cid: Cookies.get("cid"), //假定给的用户id
-      customerType: Cookies.get("customerType"), //客户类型
       isManager: Cookies.get("isManager"), //是否为管理员
-      //按钮样式
-      commitBtn: {
-        background: "gray"
-      },
-      controllNum: 0, //控制表格下标
       activityData: [], //获取组别
       //全部的商品信息(全类型)
       shopsData: [],
-      tempData: [],
-      numberList: [],
       multipleSelection: [], //选中的数据
       totalMoney: 0,
       totalPriceMoney: 0,
       expands: [], //控制展开行
-      //展开行的标识
-      getRowKeys(row) {
-        return row.activity;
-      }
     };
   },
   methods: {
+    //展开行的标识
+    getRowKeys(row) {
+      return row.activity;
+    },
     //初始化
     init() {
       this.shopsData = [];
@@ -185,21 +162,16 @@ export default {
       this.multipleSelection = [];
       this.expands = [];
       this.totalMoney = 0;
-      this.controllNum = 0;
-      // getUserMarket({
-      //   CID: this.cid
-      // })
       GetCartItem({
         cid: Cookies.get("cid"),
-        commodityType: "curtain"
+        commodityType: "curtain",
       })
-        .then(res => {
+        .then((res) => {
           //过滤无效数据
-          let theData = res.data;
-          this.dataDeal(theData);
+          this.dataDeal(res.data);
           this.$root.$emit("refreshBadgeIcon", "curtainCount");
         })
-        .catch(err => {
+        .catch((err) => {
           this.shopsData = [];
         });
     },
@@ -223,80 +195,14 @@ export default {
         }
         let val = cid + "+" + value + "+" + value1;
         this.activityData.push({
-          activity: val
+          activity: val,
         });
         this.expands.push(val);
         for (let j = 0; j < theData[i].curtainCartItems.length; j++) {
           theData[i].curtainCartItems[j].index = i; //赋值下标
         }
-        // for (let j = 0; j < theData[i].curtainCartItems.length; j++) {
-        //   for (
-        //     let k = 0;
-        //     k < theData[i].curtainCartItems[j].curtainLists.length;
-        //     k++
-        //   ) {
-        //     let index =
-        //       theData[i].curtainCartItems[j].curtainLists[k].curtainCommodities
-        //         .length;
-        //     if (index > 0) {
-        //       theData[i].curtainCartItems[j].unNullNum = k;
-        //       break;
-        //     }
-        //   }
-        // }
-        //总价赋值
-        // for (let j = 0; j < theData[i].curtainCartItems.length; j++) {
-        //   if (theData[i].curtainCartItems[j].price == 0) {
-        //     var totalPrice = 0;
-        //     for (
-        //       let k = 0;
-        //       k < theData[i].curtainCartItems[j].curtainLists.length;
-        //       k++
-        //     ) {
-        //       for (
-        //         let l = 0;
-        //         l <
-        //         theData[i].curtainCartItems[j].curtainLists[k]
-        //           .curtainCommodities.length;
-        //         l++
-        //       ) {
-        //         totalPrice +=
-        //           theData[i].curtainCartItems[j].curtainLists[k]
-        //             .curtainCommodities[l].price *
-        //           theData[i].curtainCartItems[j].curtainLists[k]
-        //             .curtainCommodities[l].dosage;
-        //       }
-        //     }
-        //     theData[i].curtainCartItems[j].price = totalPrice;
-        //   }
-        // }
       }
       this.shopsData = theData;
-      //获取中文活动名
-      // let pIdArr = [];
-      // for (let i = 0; i < theData.length; i++) {
-      //   for (let j = 0; j < theData[i].curtainCartItems.length; j++) {
-      //     let index = theData[i].curtainCartItems[j].unNullNum;
-      //     theData[i].curtainCartItems[j].index = i; //赋值下标
-      //     pIdArr.push(
-      //       theData[i].curtainCartItems[j].curtainLists[index]
-      //         .curtainCommodities[0].activityId
-      //     );
-      //   }
-      // }
-      // getActivityByList(pIdArr)
-      //   .then(res => {
-      //     let k = 0;
-      //     for (let i = 0; i < theData.length; i++) {
-      //       for (let j = 0; j < theData[i].curtainCartItems.length; j++) {
-      //         theData[i].curtainCartItems[j].activity = res[k++];
-      //       }
-      //     }
-      //     this.shopsData = theData;
-      //   })
-      //   .catch(err => {
-      //     console.log(err);
-      //   });
     },
     ...mapMutations("navTabs", ["addTab"]),
     ...mapActions("navTabs", ["closeTab"]),
@@ -313,9 +219,7 @@ export default {
     },
     //判断商品是否可选(活动是否有效)
     checkActiviyEffect(row, index) {
-      if (
-        row.activityEffective === false
-      ) {
+      if (row.activityEffective === false) {
         return false;
       } else {
         return true;
@@ -343,17 +247,12 @@ export default {
               ? val[i].salPromotion.type == 1
                 ? val[i].salPromotion.discount * sub
                 : val[i].salPromotion.price * val[i].count
-              : sub).mul(100)
+              : sub
+            ).mul(100)
           ) / 100;
       }
       this.totalMoney = total;
       this.totalPriceMoney = totalPrice;
-      //无勾选时按钮黯淡
-      if (this.multipleSelection.length === 0) {
-        this.commitBtn.background = "gray";
-      } else {
-        this.commitBtn.background = "#E15B60";
-      }
     },
     //数量修改
     //7.23新需求，数量不作修改，仅为1
@@ -368,14 +267,14 @@ export default {
       //调用修改数量的接口
       let obj = {
         cartItemID: data.cartItemId,
-        count: data.count
+        count: data.count,
       };
       alterCount(obj)
-        .then(res => {
+        .then((res) => {
           //若该商品被选中，修改总价
           //判断是否选中
           let val = this.multipleSelection;
-          let result = val.some(item => {
+          let result = val.some((item) => {
             if (item === data) {
               return true;
             }
@@ -389,10 +288,10 @@ export default {
           }
           this.totalMoney = total;
         })
-        .catch(err => {
+        .catch((err) => {
           this.$alert("修改数量失败", "提示", {
             confirmButtonText: "好的",
-            type: "warning"
+            type: "warning",
           });
         });
     },
@@ -403,8 +302,8 @@ export default {
       this.$router.push({
         name: `detailCurtain`,
         params: {
-          curtain: data
-        }
+          curtain: data,
+        },
       });
     },
     //删除一整个表格
@@ -423,23 +322,23 @@ export default {
       this.$confirm("是否删除选中的商品？删除后将不可恢复！", "提示", {
         confirmButtonText: "确定删除",
         cancelButtonText: "我再想想",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
           let _data = [];
           _data.push(data.cartItemId);
           deleteTheGroup(_data)
-            .then(res => {
+            .then((res) => {
               this.$alert("删除成功", "提示", {
                 confirmButtonText: "确定",
-                type: "success"
+                type: "success",
               });
               this.init();
             })
-            .catch(err => {
+            .catch((err) => {
               this.$alert("发生错误，删除失败", "提示", {
                 confirmButtonText: "确定",
-                type: "warning"
+                type: "warning",
               });
             });
         })
@@ -451,7 +350,7 @@ export default {
       this.$confirm("是否删除选中的商品？", "提示", {
         confirmButtonText: "确定删除",
         cancelButtonText: "我再想想",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
           let obj = [];
@@ -460,17 +359,17 @@ export default {
             obj.push(this.multipleSelection[i].cartItemId);
           }
           deleteTheGroup(obj)
-            .then(res => {
+            .then((res) => {
               this.$alert("删除成功", "提示", {
                 confirmButtonText: "确定",
-                type: "success"
+                type: "success",
               });
               this.init();
             })
-            .catch(err => {
+            .catch((err) => {
               this.$alert("发生错误，删除失败", "提示", {
                 confirmButtonText: "确定",
-                type: "warning"
+                type: "warning",
               });
             });
         })
@@ -484,18 +383,18 @@ export default {
         obj.push(this.shopsData[index].curtainCartItems[i].cartItemId);
       }
       deleteTheGroup(obj)
-        .then(res => {
+        .then((res) => {
           this.deleteTable(index);
           this.$refs[multipleTable].clearSelection();
           this.$alert("删除成功", "提示", {
             confirmButtonText: "确定",
-            type: "success"
+            type: "success",
           });
         })
-        .catch(err => {
+        .catch((err) => {
           this.$alert("删除失败", "提示", {
             confirmButtonText: "确定",
-            type: "warning"
+            type: "warning",
           }).then(() => {
             this.$refs[multipleTable].clearSelection();
           });
@@ -503,11 +402,10 @@ export default {
     },
     //新建一个方法，不动原来的
     handleCommitNew() {
-      let ids = [];
       if (this.multipleSelection.length === 0) {
         this.$alert("选择不能为空！", "提示", {
           type: "warning",
-          confirmButtonText: "确定"
+          confirmButtonText: "确定",
         });
         return;
       }
@@ -518,139 +416,25 @@ export default {
             "提示",
             {
               type: "warning",
-              confirmButtonText: "确定"
+              confirmButtonText: "确定",
             }
           );
           return;
         }
-        ids.push(this.multipleSelection[i].cartItemId);
-        //添加item用于结算页面的判断
-        let _index = this.multipleSelection[i].unNullNum;
-        let _data = this.multipleSelection[i].curtainLists[_index]
-          .curtainCommodities[0];
-        let _itemNoSample = _data.item.oldItemNo;
-        this.multipleSelection[i].item = new Object();
-        this.multipleSelection[i].item.itemNo = this.multipleSelection[
-          i
-        ].modelNumber;
-        this.multipleSelection[i].item.itemNoSample = !_itemNoSample
-          ? this.multipleSelection[i].modelNumber
-          : _itemNoSample;
-        this.multipleSelection[i].item.itemVersion = _data.item.itemVersion;
-        this.multipleSelection[i].item.groupType = "E";
-        this.multipleSelection[i].id = _data.id;
-        this.multipleSelection[i].unit = "米";
-        this.multipleSelection[i].quantity = 1;
       }
-      let theData = this.multipleSelection;
-      this.addTab("order/checkOrder");
-      sessionStorage.setItem("shopping", JSON.stringify(theData));
+      sessionStorage.setItem(
+        "shopping",
+        JSON.stringify(this.multipleSelection)
+      );
       Cookies.set("cur_status", 3);
-      this.$router.push({
-        name: `checkOrder`
-      });
-    },
-    //提交审核
-    handleCommit() {
-      //判断是否为空
-      let val = this.multipleSelection;
-      if (val.length === 0) {
-        this.$alert("选择不能为空！", "提示", {
-          type: "warning",
-          confirmButtonText: "确定"
-        });
-        return;
-      }
-      //提交审核
-      let orders = [];
-      let ids = [];
-      let deleteId = [];
-      for (let i = 0; i < val.length; i++) {
-        let _index = val[i].unNullNum;
-        let _data = val[i].curtainLists[_index].curtainCommodities[0];
-        let _itemNoSample = _data.item.oldItemNo;
-        let _outHeightChoose = val[i].outsourcingBoxExist;
-        let _wbh = val[i].outsourcingBoxWidth;
-        let _order = {
-          flagFlType: !val[i].salPromotion ? "" : val[i].salPromotion.flagFl, //新增活动字段
-          itemNo: val[i].modelNumber, //型号
-          itemNoSample: !_itemNoSample ? val[i].modelNumber : _itemNoSample, //样本型号
-          partSendId: "0", //分批发货标志，0不可以，1可以
-          productionVersion: _data.item.itemVersion, //产品版本
-          //7.23新需求只要1个
-          qtyRequired: "1",
-          //qtyRequired: val[i].count.toString(),//数量
-          //notes: '',//备注
-          unitPrice: val[i].price.toString(), //单价
-          promotionCost: "0", //(必传，初为0)
-          promotion: val[i].activity, //活动名称
-          promotionType: _data.activityId, //活动类型代号
-          curtainWidth: val[i].width, //成品尺寸（宽）xing
-          curtainHeight: val[i].height, //成品尺寸（高）xing
-          curtainHeight2: val[i].falseShadeHigh, //假帘（高) xing
-          curtainSizeTimes: val[i].drape, //窗帘褶皱倍数2-3 xing
-          curtainRoomName: val[i].location
-        };
-        if (_wbh !== null && _wbh !== 0) {
-          _order.curtainWbhSize = _wbh;
-        }
-        orders.push(_order);
-        ids.push(val[i].cartItemId);
-        deleteId.push(val[i].cartItemId);
-      }
-      let obj = {
-        cid: this.cid,
-        companyId: Cookies.get("companyId"),
-        ctm_order: {
-          allSpend: this.totalMoney.toString(),
-          arrearsFlag: val[0].salPromotion
-            ? val[0].salPromotion.arrearsFlag
-            : null
-        }, //头部信息
-        ctm_orders: orders, //订单信息
-        cartItemIDs: ids //购物车id信息
-      };
-      commitLook(obj)
-        .then(res => {
-          deleteCurtain(deleteId).then(res => {
-            let _index = this.multipleSelection[0].index;
-            let multipleTable = "multipleTable" + _index;
-            if (
-              this.multipleSelection.length ===
-              this.$refs[multipleTable].data.length
-            ) {
-              this.deleteTable(_index);
-            } else {
-              for (let i = 0; i < this.multipleSelection.length; i++) {
-                let num = this.shopsData[_index].curtainCartItems.indexOf(
-                  this.multipleSelection[i]
-                );
-                this.shopsData[_index].curtainCartItems.splice(num, 1);
-              }
-            }
-            this.$refs[multipleTable].clearSelection();
-            this.$alert("提交成功，请在我的订单中查看", "提示", {
-              confirmButtonText: "确定"
-            });
-          });
-        })
-        .catch(err => {
-          this.$refs[multipleTable].clearSelection();
-          this.$alert("提交失败", "提示", {
-            confirmButtonText: "确定",
-            type: "warning"
-          });
-          console.log(err);
-        });
+      this.addTab("order/checkOrder");
     },
     //收起不能
     packUpNot(row, expandsRow) {
-      var that = this;
       that.expands.push(row.activity);
     },
     multipleTable(index) {
-      var re = "multipleTable" + index;
-      return re;
+      return "multipleTable" + index;
     },
     //返回展开行的商品数据
     table(index) {
@@ -662,23 +446,11 @@ export default {
         return this.shopsData[index].curtainCartItems;
       }
       return [];
-    }
+    },
   },
   created() {
     this.init();
-  }
-  // watch: {
-  //   curtainData(data) {
-  //     this.shopsData = [];
-  //     this.activityData = [];
-  //     this.multipleSelection = [];
-  //     this.expands = [];
-  //     this.totalMoney = 0;
-  //     this.controllNum = 0;
-  //     this.tempData = data;
-  //     if (this.tempData.length > 0) this.dataDeal(this.tempData);
-  //   }
-  // }
+  },
 };
 </script>
 <style>
@@ -743,5 +515,13 @@ a:hover {
   color: #13ce66;
   margin: 0 5px;
   display: inline;
+}
+.commitBtn {
+  width: 80px;
+  height: 50px;
+  color: white;
+  font-size: 18px;
+  text-align: center;
+  cursor: pointer;
 }
 </style>

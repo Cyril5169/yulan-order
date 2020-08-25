@@ -2,9 +2,9 @@
   <el-card class="centerCard">
     <el-dialog title="窗帘详情" :visible.sync="detailVisible" width="95%" top="5vh">
       <keep-alive>
-        <detailCurtainTable v-if="detailVisible" v-bind:tableStatus="check_CURTAIN_STATUS_ID != 1 ? 3 : 2"
-          v-bind:headerData="headerData" v-bind:curtainData="curtainData" v-bind:suggestion="ljsuggestion"
-          v-on:visible="closeTheDialog" v-on:deleteArr="getDeleteArr" v-on:finalData="getFinalData">
+        <detailCurtainTable v-if="detailVisible" :tableStatus="check_CURTAIN_STATUS_ID != 1 ? 3 : 2"
+          :headerData="headerData" :curtainData="curtainData" :suggestion="ljsuggestion" @visible="closeTheDialog"
+          @deleteArr="getDeleteArr" @finalData="getFinalData">
         </detailCurtainTable>
       </keep-alive>
     </el-dialog>
@@ -17,7 +17,8 @@
 
     <div slot="header">
       <span class="headSpan">订单详情</span>
-      <el-button @click="exportProductExcel" v-if="check_CURTAIN_STATUS_ID == -1" size="mini" plain>
+      <el-button @click="exportProductExcel" v-if="check_CURTAIN_STATUS_ID == -1 && showExportProduct" size="mini"
+        plain>
         导出生产模板
       </el-button>
       <el-button @click="backTowhere()" style="float:right;" size="small" type="success" plain v-if="button_1">返回
@@ -74,7 +75,7 @@
         <el-table-column align="center" prop="ITEM_NO" label="型号" width="140"></el-table-column>
         <el-table-column align="center" label="经销单价" width="80">
           <template slot-scope="scope1">
-            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID != -1">***</span>
+            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID > -1">***</span>
             <span v-else>{{ scope1.row.UNIT_PRICE | priceFilter }}</span>
           </template>
         </el-table-column>
@@ -84,19 +85,19 @@
         </el-table-column>
         <el-table-column prop="PROMOTION_COST" align="center" label="折后金额" width="90">
           <template slot-scope="scope1">
-            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID != -1">***</span>
+            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID > -1">***</span>
             <span v-else>{{ scope1.row.PROMOTION_COST }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="BACK_Y" align="center" label="年返利使用金额" width="90">
           <template slot-scope="scope1">
-            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID != -1">***</span>
+            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID >-1">***</span>
             <span v-else>{{ scope1.row.BACK_Y }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="BACK_M" align="center" label="月返利使用金额" width="90">
           <template slot-scope="scope1">
-            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID != -1">***</span>
+            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID > -1">***</span>
             <span v-else>{{ scope1.row.BACK_M }}</span>
           </template>
         </el-table-column>
@@ -159,10 +160,6 @@
       </div>
       <el-divider></el-divider>
       <div style="margin-top:0px;">
-        <!-- <span style="margin-left:10px;color:red;"
-          >订单修改说明：当修改数量不超过200卷时，双方可通过电话在原订单上进行修改，当修改数量超过200卷时，乙方应向甲方提供书面修改说明。</span
-        >
-        <br /> -->
         <span style="margin-left:10px;color:red;">法律效力：本订单是双方合作协议不可分割的一部分，是乙方向甲方订货的凭证，具法力效力。</span>
       </div>
       <div v-if="operationRecords.length > 0" style="width:800px;margin-bottom:20px;">
@@ -187,16 +184,17 @@ import {
   orderDetail,
   defeatChange,
   queryCash,
-  payAgain
+  payAgain,
 } from "@/api/orderList";
 import {
   updateCurtainOrder,
   InsertOperationRecord,
   getOperationRecord,
+  getOrderDetails,
   GetCtmOrder,
   GetPromotionByType,
   GetOrderUseRebate,
-  ljExportProductExcel
+  ljExportProductExcel,
 } from "@/api/orderListASP";
 import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
@@ -241,11 +239,12 @@ export default {
         POST_ADDRESS: "",
         NOTES: "",
         ORDERBODY: []
-      }
+      },
+      showExportProduct: false,
     };
   },
   components: {
-    DetailCurtainTable
+    DetailCurtainTable,
   },
   filters: {
     priceFilter(value) {
@@ -273,9 +272,9 @@ export default {
       let s = date.getSeconds();
       s = s < 10 ? "0" + s : s;
       return y + "-" + MM + "-" + d + " " + h + ":" + m + ":" + s;
-    }
+    },
   },
-  created: function() {
+  created: function () {
     this.orderNum = Cookies.get("ORDER_NO");
     this.isX = this.orderNum.slice(0, 1) == "X";
     this.check_CURTAIN_STATUS_ID = Cookies.get("CURTAIN_STATUS_ID");
@@ -295,7 +294,7 @@ export default {
     }
   },
   methods: {
-    formatRole: function(row, column) {
+    formatRole: function (row, column) {
       if (row.PART_SEND_ID == 0) {
         return "等生产";
       } else if (row.PART_SEND_ID == 1) {
@@ -331,35 +330,30 @@ export default {
       var item = this.ruleForm;
       let orderBody = item.ORDERBODY;
       let transCookies = [];
-      for (let i = 0; i < item.ORDERBODY.length; i++) {
+      for (let i = 0; i < orderBody.length; i++) {
         transCookies[i] = new Object();
-        transCookies[i].width = item.ORDERBODY[i].CURTAIN_WIDTH;
-        transCookies[i].height = item.ORDERBODY[i].CURTAIN_HEIGHT;
+        transCookies[i].width = orderBody[i].CURTAIN_WIDTH;
+        transCookies[i].height = orderBody[i].CURTAIN_HEIGHT;
         transCookies[i].orderNumber = item.ORDER_NO;
-        transCookies[i].lineNo = item.ORDERBODY[i].LINE_NO;
-        transCookies[i].activityId = item.ORDERBODY[i].curtains[0].activityId;
-        transCookies[i].quantity = item.ORDERBODY[i].QTY_REQUIRED;
+        transCookies[i].lineNo = orderBody[i].LINE_NO;
+        transCookies[i].activityId = orderBody[i].curtains[0].activityId;
+        transCookies[i].quantity = orderBody[i].QTY_REQUIRED;
         var price = 0;
-        for (let j = 0; j < item.ORDERBODY[i].curtains.length; j++) {
-          price += item.ORDERBODY[i].curtains[j].price.mul(
-            item.ORDERBODY[i].curtains[j].dosage
+        for (let j = 0; j < orderBody[i].curtains.length; j++) {
+          price += orderBody[i].curtains[j].price.mul(
+            orderBody[i].curtains[j].dosage
           );
         }
         transCookies[i].price = price;
-        transCookies[i].splitShipment = item.ORDERBODY[i].PART_SEND_ID;
-        transCookies[i].activityName = item.ORDERBODY[i].PROMOTION;
-        transCookies[i].unit = "米";
-        transCookies[i].item = new Object();
-        transCookies[i].item.itemNo = item.ORDERBODY[i].ITEM_NO;
-        transCookies[i].item.note = item.ORDERBODY[i].NOTES;
-        transCookies[i].item.itemVersion = item.ORDERBODY[i].PRODUCTION_VERSION;
+        transCookies[i].splitShipment = orderBody[i].PART_SEND_ID;
+        transCookies[i].activityName = orderBody[i].PROMOTION;
+        transCookies[i].unit = orderBody[i].UNIT;
+        transCookies[i].item = orderBody[i].item;
         transCookies[i].salPromotion = new Object();
-        transCookies[i].salPromotion.orderType =
-          item.ORDERBODY[i].PROMOTION_TYPE;
+        transCookies[i].salPromotion.orderType = orderBody[i].PROMOTION_TYPE;
         transCookies[i].salPromotion.arrearsFlag = item.ARREARSFLAG;
-        transCookies[i].salPromotion.flagFl = item.ORDERBODY[i].FLAG_FL_TYPE;
+        transCookies[i].salPromotion.flagFl = orderBody[i].FLAG_FL_TYPE;
       }
-      transCookies[0].item.groupType = "E";
       sessionStorage.setItem("shopping", JSON.stringify(transCookies));
       sessionStorage.setItem("shoppingHead", JSON.stringify(item));
       Cookies.set("cur_status", 3);
@@ -374,29 +368,29 @@ export default {
         orderNo: this.orderNum,
         curtainStatusId: "0",
         allCurtains: this.allCurtains,
-        deleteIds: this.deleteIds
+        deleteIds: this.deleteIds,
       };
       //defeatChange(url,data).then(res =>{
       updateCurtainOrder(data)
-        .then(res => {
+        .then((res) => {
           if (res.code == 0) {
             this.$alert("操作成功,请提交结算再次审核", "提示", {
               confirmButtonText: "确定",
-              type: "success"
+              type: "success",
             });
             this.check_CURTAIN_STATUS_ID = "0";
             this.getDetail();
           } else {
             this.$alert("操作失败，请稍后重试", "提示", {
               confirmButtonText: "确定",
-              type: "warning"
+              type: "warning",
             });
           }
         })
-        .catch(res => {
+        .catch((res) => {
           this.$alert("操作失败:" + res.msg, "提示", {
             confirmButtonText: "确定",
-            type: "warning"
+            type: "warning",
           });
         });
     },
@@ -405,39 +399,39 @@ export default {
       var url = "/order/updateCurOrderStatus.do";
       var data = {
         orderNo: this.orderNum,
-        curtainStatusId: "4"
+        curtainStatusId: "4",
       };
       this.$confirm("确认同意兰居修改？", "提示", {
         confirmButtonText: "是",
         cancelButtonText: "否",
-        type: "info"
+        type: "info",
       }).then(() => {
         passExamine(url, data)
-          .then(res => {
+          .then((res) => {
             if (res.code == 0) {
               var recordData = {
                 ORDER_NO: this.orderNum,
                 OPERATION_PERSON: Cookies.get("cid"),
-                OPERATION_NAME: "确认兰居修改"
+                OPERATION_NAME: "确认兰居修改",
               };
               InsertOperationRecord(recordData); //插入操作记录
               this.$alert("操作成功,该订单已经确认,可再次提交", "提示", {
                 confirmButtonText: "确定",
-                type: "success"
+                type: "success",
               }).then(() => {
                 this.check_CURTAIN_STATUS_ID = "4";
               });
             } else {
               this.$alert("操作失败，请稍后重试", "提示", {
                 confirmButtonText: "确定",
-                type: "warning"
+                type: "warning",
               });
             }
           })
-          .catch(res => {
+          .catch((res) => {
             this.$alert("操作失败，请稍后重试", "提示", {
               confirmButtonText: "确定",
-              type: "warning"
+              type: "warning",
             });
           });
       });
@@ -447,42 +441,42 @@ export default {
       var url = "/order/updateCurOrderStatus.do";
       var data = {
         orderNo: this.orderNum,
-        curtainStatusId: "3"
+        curtainStatusId: "3",
       };
       this.$confirm("确定将订单退回兰居重新修改？", "提示", {
         confirmButtonText: "是",
         cancelButtonText: "否",
-        type: "info"
+        type: "info",
       }).then(() => {
         passExamine(url, data)
-          .then(res => {
+          .then((res) => {
             if (res.code == 0) {
               var recordData = {
                 ORDER_NO: this.orderNum,
                 OPERATION_PERSON: Cookies.get("cid"),
-                OPERATION_NAME: "退回兰居修改"
+                OPERATION_NAME: "退回兰居修改",
               };
               InsertOperationRecord(recordData); //插入操作记录
               this.$alert("操作成功,该订单已退回兰居修改", "提示", {
                 confirmButtonText: "确定",
-                type: "success"
+                type: "success",
               }).then(() => {
                 this.closeToTab({
                   oldUrl: "order/checkExamine",
-                  newUrl: "order/myOrder"
+                  newUrl: "order/myOrder",
                 });
               });
             } else {
               this.$alert("操作失败，请稍后重试", "提示", {
                 confirmButtonText: "确定",
-                type: "warning"
+                type: "warning",
               });
             }
           })
-          .catch(res => {
+          .catch((res) => {
             this.$alert("操作失败，请稍后重试", "提示", {
               confirmButtonText: "确定",
-              type: "warning"
+              type: "warning",
             });
           });
       });
@@ -496,10 +490,6 @@ export default {
         tab.curtains[i].choose = true;
         tab.curtains[i].productType = tab.curtains[i].item.productType;
         tab.curtains[i].itemType = tab.curtains[i].curtainPartName;
-        //tab.curtains[i].suggestion='';
-        if (tab.curtains[i].unit === "°ü") {
-          tab.curtains[i].unit = "包";
-        }
       }
       this.curtainData = tab.curtains;
       for (let i = 0; i < this.allCurtains.length; i++) {
@@ -512,21 +502,21 @@ export default {
       this.headerData.productGroupType = ""; //
       this.headerData.price = tab.all_cost;
       if (tab.CURTAIN_WBH_SIZE == -1) {
-        this.headerData.outsourcingBoxExist = 0; //判断
+        this.headerData.outsourcingBoxExist = 0;
       } else {
-        this.headerData.outsourcingBoxExist = 1; //判断
+        this.headerData.outsourcingBoxExist = 1;
       }
       this.headerData.outsourcingBoxWidth = tab.CURTAIN_WBH_SIZE;
       this.headerData.modelNumber = tab.ITEM_NO;
       this.headerData.location = tab.CURTAIN_ROOM_NAME
         ? tab.CURTAIN_ROOM_NAME
-        : "无"; //'无';
+        : "无";
       this.headerData.height = tab.CURTAIN_HEIGHT;
       this.headerData.width = tab.CURTAIN_WIDTH;
       this.headerData.drape = tab.CURTAIN_SIZE_TIMES;
       this.headerData.checked = "";
       this.headerData.cartItemId = "";
-      this.headerData.activityGroupType = ""; //
+      this.headerData.activityGroupType = "";
       this.headerData.activity = tab.PROMOTION_TYPE;
       this.headerData.activityId = tab.curtains[0].activityId;
       this.headerData.activityName = tab.PROMOTION;
@@ -549,36 +539,33 @@ export default {
       let url = "/order/getOrderContent.do";
       let data = {
         cid: Cookies.get("cid"),
-        order_no: Cookies.get("ORDER_NO")
+        order_no: this.orderNum,
       };
-      orderDetail(url, data).then(res => {
-        GetCtmOrder({ orderNo: Cookies.get("ORDER_NO") }).then(res2 => {
-          this.ruleForm = res.data.data[0];
-          this.ruleForm.PACKING_NOTE = res2.data.PACKING_NOTE; //先这样处理，后台换了后台就不需要了
-          this.ruleForm.BUYUSER_ADDRESS = res2.data.BUYUSER_ADDRESS;
-          this.ruleForm.BUYUSER_PICTURE = res2.data.BUYUSER_PICTURE;
-          this.ruleForm.BUYUSER_AREA1 = res2.data.BUYUSER_AREA1;
-          this.ruleForm.BUYUSER_AREA2 = res2.data.BUYUSER_AREA2;
-          this.ruleForm.BUYUSER_AREA3 = res2.data.BUYUSER_AREA3;
-          this.ruleForm.BUYUSER_POST_ADDRESS = res2.data.BUYUSER_POST_ADDRESS;
-          if (this.ruleForm.BUYUSER_PICTURE) {
-            var list = this.ruleForm.BUYUSER_PICTURE.split(";");
-            for (var i = 0; i < list.length - 1; i++) {
-              var index = list[i].lastIndexOf("/");
-              if (index == -1) index = list[i].lastIndexOf("\\");
-              var fileName = list[i].substr(index + 1);
-              this.fileList.push(this.Global.baseUrl + list[i]);
-            }
+      getOrderDetails({ orderNo: this.orderNum }).then((res) => {
+        this.ruleForm = res.data[0];
+        if (
+          this.ruleForm.CUSTOMER_CODE == "C01613" ||
+          this.ruleForm.CUSTOMER_CODE == "C01613A"
+        ) {
+          this.showExportProduct = true;
+        }
+        if (this.ruleForm.BUYUSER_PICTURE) {
+          var list = this.ruleForm.BUYUSER_PICTURE.split(";");
+          for (var i = 0; i < list.length - 1; i++) {
+            var index = list[i].lastIndexOf("/");
+            if (index == -1) index = list[i].lastIndexOf("\\");
+            var fileName = list[i].substr(index + 1);
+            this.fileList.push(this.Global.baseUrl + list[i]);
           }
-          for (let i = 0; i < this.ruleForm.ORDERBODY.length; i++) {
-            this.ruleForm.ORDERBODY[i].checkStatus = "未修改";
-          }
-          var recordData = {
-            orderNo: this.orderNum
-          };
-          getOperationRecord(recordData).then(res => {
-            this.operationRecords = res.data;
-          });
+        }
+        for (let i = 0; i < this.ruleForm.ORDERBODY.length; i++) {
+          this.ruleForm.ORDERBODY[i].checkStatus = "未修改";
+        }
+        var recordData = {
+          orderNo: this.orderNum,
+        };
+        getOperationRecord(recordData).then((res2) => {
+          this.operationRecords = res2.data;
         });
       });
     },
@@ -595,15 +582,15 @@ export default {
       var url = "/order/getResidemoney.do";
       var data = {
         cid: Cookies.get("cid"),
-        companyId: Cookies.get("companyId")
+        companyId: Cookies.get("companyId"),
       };
       //每次重新提交的时候判断一下余额
-      queryCash(url, data).then(async res => {
+      queryCash(url, data).then(async (res) => {
         this.Initial_balance = res.data;
         var url2 = "/order/putAgainOrder.do";
         var data2 = {
           cid: Cookies.get("cid"),
-          orderNo: this.orderNum
+          orderNo: this.orderNum,
         };
         if (
           this.ruleForm.ALL_SPEND > this.Initial_balance &&
@@ -617,7 +604,7 @@ export default {
             "提示",
             {
               confirmButtonText: "确定",
-              type: "warning"
+              type: "warning",
             }
           );
         } else {
@@ -630,7 +617,7 @@ export default {
               ) {
                 var res = await GetPromotionByType({
                   proType: this.ruleForm.ORDERBODY[i].PROMOTION_TYPE,
-                  cid: Cookies.get("cid")
+                  cid: Cookies.get("cid"),
                 });
                 if (!res.data) {
                   this.$alert(
@@ -638,7 +625,7 @@ export default {
                     "提示",
                     {
                       confirmButtonText: "确定",
-                      type: "success"
+                      type: "success",
                     }
                   );
                   return;
@@ -651,7 +638,7 @@ export default {
                     "提示",
                     {
                       confirmButtonText: "确定",
-                      type: "success"
+                      type: "success",
                     }
                   );
                   return;
@@ -663,12 +650,12 @@ export default {
               ) {
                 var res = await GetOrderUseRebate({
                   orderNo: this.ruleForm.ORDERBODY[i].ORDER_NO,
-                  lineNo: this.ruleForm.ORDERBODY[i].LINE_NO
+                  lineNo: this.ruleForm.ORDERBODY[i].LINE_NO,
                 });
                 if (res.data.length == 0) {
                   this.$alert(`优惠券不存在`, "提示", {
                     confirmButtonText: "确定",
-                    type: "success"
+                    type: "success",
                   });
                   return;
                 }
@@ -676,7 +663,7 @@ export default {
                   if (new Date(res.data[j].DATE_END) < new Date()) {
                     this.$alert(`优惠券已过期，请删除订单后重新下单`, "提示", {
                       confirmButtonText: "确定",
-                      type: "success"
+                      type: "success",
                     });
                     return;
                   }
@@ -685,25 +672,24 @@ export default {
             }
           }
           payAgain(url2, data2)
-            .then(res => {
+            .then((res) => {
               var recordData = {
                 ORDER_NO: this.orderNum,
                 OPERATION_PERSON: Cookies.get("cid"),
-                OPERATION_NAME: "重新提交"
+                OPERATION_NAME: "重新提交",
               };
               InsertOperationRecord(recordData); //插入操作记录
               this.$alert("提交成功", "提示", {
                 confirmButtonText: "确定",
-                type: "success"
+                type: "success",
               });
               this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
               this.addTab("order/myOrder");
-              this.closeTab("order/orderDetail");
             })
-            .catch(res => {
+            .catch((res) => {
               this.$alert("操作失败，请稍后重试", "提示", {
                 confirmButtonText: "确定",
-                type: "warning"
+                type: "warning",
               });
             });
         }
@@ -719,22 +705,26 @@ export default {
       this.showViewer = true;
     },
     exportProductExcel() {
-      this.$confirm("此功能只适用于导出测试账号订单，导出模板后订单状态将变成已完成状态，请慎重操作，是否确认导出？", "提示", {
-        confirmButtonText: "确定",
-        type: "warning"
-      })
+      this.$confirm(
+        "此功能只适用于导出测试账号订单，导出模板后订单状态将变成已完成状态，请慎重操作，是否确认导出？",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          type: "warning",
+        }
+      )
         .then(() => {
           ljExportProductExcel({
             cid: Cookies.get("cid"),
-            orderNo: this.orderNum
-          }).then(res => {
+            orderNo: this.orderNum,
+          }).then((res) => {
             if (res.msg) {
               downLoadFile(
                 this.Global.baseUrl + `DownLoadAPI/DownloadFile?path=${res.msg}`
               );
               this.closeToTab({
                 oldUrl: "order/checkExamine",
-                newUrl: "order/examine"
+                newUrl: "order/examine",
               });
             }
           });
@@ -751,9 +741,9 @@ export default {
           sums[index] = "总计";
           return;
         } else if (index == 6 || index == 7 || index == 8 || index == 9) {
-          var values = data.map(item => Number(item[column.property]));
-          var cancelIndex = data.map(item => Number(item["STATUS_ID"])); //取得状态判断是否是作废的
-          if (!values.every(value => isNaN(value))) {
+          var values = data.map((item) => Number(item[column.property]));
+          var cancelIndex = data.map((item) => Number(item["STATUS_ID"])); //取得状态判断是否是作废的
+          if (!values.every((value) => isNaN(value))) {
             sums[index] = values.reduce((prev, curr, index) => {
               const value = Number(curr);
               if (!isNaN(value) && cancelIndex[index] != "3") {
@@ -786,8 +776,8 @@ export default {
       return "";
     },
     ...mapMutations("navTabs", ["addTab"]),
-    ...mapActions("navTabs", ["closeTab", "closeToTab"])
-  }
+    ...mapActions("navTabs", ["closeTab", "closeToTab"]),
+  },
 };
 </script>
 

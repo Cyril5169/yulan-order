@@ -56,7 +56,7 @@
                         context.LASTOPTIONEEDINPUT == 1 &&
                           index == context.optionList.length - 1
                       ">{{ option.OPTIONTEXT }}
-                      <el-input style="margin-left:5px;" :disabled="context.optionResultValue != index + 1 && checkType"
+                      <el-input style="margin-left:5px;" :disabled="context.optionResultValue != index + 1 || checkType"
                         v-model="context.optionExtraValue"></el-input>
                     </template>
                     <span v-else>{{ option.OPTIONTEXT }}</span></el-radio>
@@ -78,7 +78,7 @@
                           index == context.optionList.length - 1
                       ">{{ option.OPTIONTEXT }}
                       <el-input style="margin-left:5px;" :disabled="
-                          context.optionResultValue.indexOf(index + 1) == -1 && checkType
+                          context.optionResultValue.indexOf(index + 1) == -1 || checkType
                         " v-model="context.optionExtraValue"></el-input>
                     </template>
                     <span v-else>{{ option.OPTIONTEXT }}</span></el-checkbox>
@@ -154,12 +154,14 @@ export default {
         cid: Cookies.get("cid"),
       }).then((res) => {
         this.studyContextData = res.data;
+        console.log(res.data)
         for (var i = 0; i < this.studyContextData.length; i++) {
           for (
             var j = 0;
             j < this.studyContextData[i].contextList.length;
             j++
           ) {
+            //赋值答案
             if (
               this.studyContextData[i].contextList[j].optionResultValue &&
               this.studyContextData[i].contextList[j].TYPE != "SHORT_INPUT" &&
@@ -198,6 +200,7 @@ export default {
                 );
               }
             }
+            //
             if (
               this.studyContextData[i].contextList[j].TYPE ==
                 "STAND_6_SINGLE" &&
@@ -219,6 +222,7 @@ export default {
       for (var i = 0; i < this.studyContextData.length; i++) {
         for (var j = 0; j < this.studyContextData[i].contextList.length; j++) {
           var context = this.studyContextData[i].contextList[j];
+          //判断完整性
           if (
             !context.optionResultValue ||
             context.optionResultValue.length == 0
@@ -265,6 +269,7 @@ export default {
               return;
             }
           }
+          //拼接答案
           var option = "";
           if (context.TYPE === "CUSTM_MULTIP") {
             option =

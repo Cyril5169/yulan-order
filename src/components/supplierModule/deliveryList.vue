@@ -100,7 +100,7 @@
               <td style="width:12.5%">{{ submitForm.INVOICE_DATE | datatrans }}</td>
               <td style="width:12.5%">预计到货时间：</td>
               <td style="width:12.5%">{{ submitForm.EXPECT_ARRIVAL_DATE | datatrans }}</td>
-              <td style="width:12.5%">客户名称：</td>
+              <td style="width:12.5%">客户代码：</td>
               <td>{{ submitForm.CUSTOMER_CODE }}</td>
             </tr>
 
@@ -191,7 +191,7 @@
                   v-model="submitForm.EXPECT_ARRIVAL_DATE" class="inputStyle">
                 </el-date-picker>
               </td>
-              <td style="width:12.5%">客户名称：</td>
+              <td style="width:12.5%">客户代码：</td>
               <td>{{ submitForm.CUSTOMER_CODE }}</td>
             </tr>
 
@@ -320,7 +320,7 @@
               <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
                 v-model="submitForm.EXPECT_ARRIVAL_DATE" class="inputStyle"></el-date-picker>
             </td>
-            <td style="width:12.5%">客户名称：</td>
+            <td style="width:12.5%">客户代码：</td>
             <td>{{ submitForm.CUSTOMER_CODE }}</td>
           </tr>
 

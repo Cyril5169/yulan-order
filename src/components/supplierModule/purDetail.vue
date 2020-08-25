@@ -25,7 +25,7 @@ import { mapMutations, mapActions } from 'vuex'
 import { mapState } from 'vuex'
 
 export default {
-    name: 'detailCurtainTable',
+    name: 'purDetail',
     data(){
         return{
             cid: Cookies.get('cid'),  //假定给的用户id

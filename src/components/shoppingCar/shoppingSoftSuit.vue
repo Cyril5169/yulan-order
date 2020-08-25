@@ -1,7 +1,8 @@
 <template>
-  <div id="shoppingCarCon">
-    <el-table id="shopBox" default-expand-all width="100%" style="margin-top:10px;" :row-class-name="tableRowClassName"
-      :row-key="getRowKeys" :expand-row-keys="expands" @expand-change="packUpNot" :data="activityData"  empty-text="该购物车是空的">
+  <div id="shoppingSoftSuit">
+    <el-table default-expand-all width="100%" style="margin-top:10px;" :row-class-name="tableRowClassName"
+      :row-key="getRowKeys" :expand-row-keys="expands" @expand-change="packUpNot" :data="activityData"
+      empty-text="该购物车是空的">
       <el-table-column width="100px" type="expand">
         <template slot-scope="scope">
           <el-table :ref="multipleTable(scope.$index)" :data="table(scope.$index)" tooltip-effect="dark"
@@ -48,8 +49,7 @@
                     ">(最小起购数量{{ scope1.row.item.minimumPurchase }})</span>
                 </div>
                 <div v-else>
-                  <span>{{ scope1.row.quantity }}</span><span style="color: red;"
-                    v-if="scope1.row.quantity 
+                  <span>{{ scope1.row.quantity }}</span><span style="color: red;" v-if="scope1.row.quantity 
                     < scope1.row.item.minimumPurchase">(最小起购数量{{ scope1.row.item.minimumPurchase }})</span>
                 </div>
               </template>
@@ -111,15 +111,11 @@
             {{ scope.row.activity }}
             <a class="ml20" style="color:#606266" @click="deleteGroup(scope.$index)">删除分组</a>
           </div>
-          <!-- {{scope.$index}}
-          {{shopsData.cartItems.wallPaper[scope.$index]}}-->
-          <!-- {{typeof(shopsData.cartItems.wallPaper[scope.$index])}} -->
         </template>
       </el-table-column>
       <el-table-column>
         <template slot-scope="scope">
           <div class="r">
-            <!-- <a class="ml20" @click="changeChoose(scope.$index)" style="color: #606266;">切换选择项</a> -->
             <a class="ml20" @click="deleteChoose(scope.$index)" style="color: red;">删除选中的商品</a>
           </div>
         </template>
@@ -137,9 +133,7 @@
           <span v-if="isManager === '0'" style="color:red; font-size:20px;" class="mr10">***</span>
           <span v-else style="color:red; font-size:20px;" class="mr10">￥{{ totalPriceMoney | dosageFilter }}</span>
         </div>
-        <div @click="handleCommit" v-bind:style="commitBtn" style="width:80px; height:50px; 
-                        color:white; font-size:18px; 
-                        text-align:center; cursor: pointer;">
+        <div @click="handleCommit" class="commitBtn" :style="{'background':multipleSelection.length?'#E15B60':'gray'}">
           去结算
         </div>
       </div>
@@ -156,7 +150,7 @@ import {
   getActivityFromName,
   getActivityById,
   getActivityByList,
-  getGroupById
+  getGroupById,
 } from "@/api/findActivity";
 import { GetCartItem } from "@/api/shopASP";
 import { deleteItems, deleteGroup } from "@/api/delete";
@@ -169,32 +163,21 @@ export default {
       cid: Cookies.get("cid"),
       isManager: Cookies.get("isManager"), //是否为管理员
       customerType: Cookies.get("customerType"),
-      //按钮样式
-      commitBtn: {
-        background: "gray"
-      },
       activityData: [], //获取组别
       //全部的商品信息(全类型)
       shopsData: [],
-      tempData: [],
       multipleSelection: [],
-      //促销活动
-      activity: [
-        { value: "活动一" },
-        { value: "活动二" },
-        { value: "活动三" },
-        { value: "活动四" }
-      ],
       totalMoney: 0,
       totalPriceMoney: 0,
       expands: [], //控制展开行
-      //展开行的标识
-      getRowKeys(row) {
-        return row.activity;
-      }
     };
   },
   methods: {
+    ...mapMutations("navTabs", ["addTab"]),
+    //展开行的标识
+    getRowKeys(row) {
+      return row.activity;
+    },
     //初始化
     init() {
       this.shopsData = [];
@@ -202,19 +185,15 @@ export default {
       this.multipleSelection = [];
       this.expands = [];
       this.totalMoney = 0;
-      // getUserMarket({
-      //   CID: this.cid
-      // })
       GetCartItem({
         cid: Cookies.get("cid"),
-        commodityType: "soft"
+        commodityType: "soft",
       })
-        .then(res => {
-          let theData = res.data;
-          this.dataDeal(theData);
+        .then((res) => {
+          this.dataDeal(res.data);
           this.$root.$emit("refreshBadgeIcon", "softCount");
         })
-        .catch(err => {
+        .catch((err) => {
           this.shopsData = [];
         });
     },
@@ -232,39 +211,11 @@ export default {
         if (!value1 || value1 === undefined) value1 = "Z";
         let val = cid + "+" + value + "+" + value1;
         this.activityData.push({
-          activity: val
+          activity: val,
         });
         this.expands.push(val);
       }
       this.shopsData = theData;
-      // let obj = [];
-      // let index = [];
-      // for (var i = 0; i < theData.length; i++) {
-      //   for (var j = 0; j < theData[i].commodities.length; j++) {
-      //     if (
-      //       theData[i].commodities[j].activityId !== undefined &&
-      //       theData[i].commodities[j].activityId !== null &&
-      //       theData[i].commodities[j].activityId !== ''
-      //     ) {
-      //       obj.push(theData[i].commodities[j].activityId);
-      //       index.push({
-      //         group: i,
-      //         item: j
-      //       });
-      //     }
-      //   }
-      // }
-      // getActivityByList(obj)
-      //   .then(res => {
-      //     for (var k = 0; k < index.length; k++) {
-      //       theData[index[k].group].commodities[index[k].item].activityName =
-      //         res[k];
-      //     }
-      //     this.shopsData = theData;
-      //   })
-      //   .catch(err => {
-      //     console.log(err);
-      //   });
     },
     multipleTable(index) {
       var re = "multipleTable" + index;
@@ -277,7 +228,7 @@ export default {
         this.shopsData[index] &&
         this.shopsData[index].commodities
       ) {
-        this.shopsData[index].commodities.forEach(item => {
+        this.shopsData[index].commodities.forEach((item) => {
           if (item.unit === "°ü") {
             item.unit = "包";
           }
@@ -297,8 +248,6 @@ export default {
       }
       return "";
     },
-    ...mapMutations("navTabs", ["addTab"]),
-    ...mapActions("navTabs", ["closeTab"]),
     //计算每件商品的小计:长乘高
     squareChange(value, index, groupIndex, flag) {
       return;
@@ -306,7 +255,7 @@ export default {
       if (re.test(value) === false) {
         this.$alert("请填写正确的数字", "提示", {
           type: "warning",
-          confirmButtonText: "确定"
+          confirmButtonText: "确定",
         });
         if (flag === 0) {
           this.shopsData[groupIndex].commodities[index].width = "";
@@ -322,10 +271,10 @@ export default {
           quantity: "",
           width: value,
           height: this.shopsData[groupIndex].commodities[index].height,
-          remark: this.shopsData[groupIndex].commodities[index].remark
+          remark: this.shopsData[groupIndex].commodities[index].remark,
         })
-          .then(res => {})
-          .catch(err => {
+          .then((res) => {})
+          .catch((err) => {
             console.log(err);
           });
       } else {
@@ -335,10 +284,10 @@ export default {
           quantity: "",
           width: this.shopsData[groupIndex].commodities[index].width,
           height: value,
-          remark: this.shopsData[groupIndex].commodities[index].remark
+          remark: this.shopsData[groupIndex].commodities[index].remark,
         })
-          .then(res => {})
-          .catch(err => {
+          .then((res) => {})
+          .catch((err) => {
             console.log(err);
           });
       }
@@ -373,7 +322,7 @@ export default {
       if (re.test(value) === false) {
         this.$alert("请填写正确的数字", "提示", {
           type: "warning",
-          confirmButtonText: "确定"
+          confirmButtonText: "确定",
         });
         this.shopsData[groupIndex].commodities[index].quantity = "";
         return;
@@ -384,10 +333,10 @@ export default {
         quantity: this.shopsData[groupIndex].commodities[index].quantity,
         width: "",
         height: "",
-        remark: this.shopsData[groupIndex].commodities[index].remark
+        remark: this.shopsData[groupIndex].commodities[index].remark,
       })
-        .then(res => {})
-        .catch(err => {
+        .then((res) => {})
+        .catch((err) => {
           console.log(err);
         });
       for (var i = 0; i < this.shopsData.length; i++) {
@@ -472,11 +421,6 @@ export default {
       }
       this.totalMoney = total;
       this.totalPriceMoney = totalPrice;
-      if (this.multipleSelection.length === 0) {
-        this.commitBtn.background = "gray";
-      } else {
-        this.commitBtn.background = "#E15B60";
-      }
     },
     //查看详情
     handleDetails(index, row) {
@@ -484,8 +428,8 @@ export default {
       this.$router.push({
         name: `detailSoftSuit`,
         params: {
-          message: row
-        }
+          message: row,
+        },
       });
     },
     //判断商品是否可选(活动是否有效)
@@ -496,6 +440,7 @@ export default {
         return this.checkMinimumNumber(row);
       }
     },
+    //最小起购数量
     checkMinimumNumber(row) {
       let val;
       if (row.unit === "平方米") {
@@ -509,36 +454,28 @@ export default {
         return true;
       }
     },
-    //切换选中项
-    changeChoose(index) {
-      var re = "multipleTable" + index;
-      // if(this.multipleSelection.length !== this.shopsData[index].commodities.length)
-      for (var i = 0; i < this.shopsData[index].commodities.length; i++)
-        this.$refs[re].toggleRowSelection(this.shopsData[index].commodities[i]);
-      // else    this.$refs.multipleTable.clearSelection();
-    },
     //删除单件商品
     deleteSingle(data) {
       this.$confirm("是否删除选中的商品？删除后将不可恢复！", "提示", {
         confirmButtonText: "确定删除",
         cancelButtonText: "我再想想",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
           let _data = [];
           _data.push(data.id);
           deleteItems(_data)
-            .then(res => {
+            .then((res) => {
               this.$alert("删除成功", "提示", {
                 confirmButtonText: "确定",
-                type: "success"
+                type: "success",
               });
               this.init();
             })
-            .catch(err => {
+            .catch((err) => {
               this.$alert("删除失败", "提示", {
                 confirmButtonText: "确定",
-                type: "warning"
+                type: "warning",
               });
             });
         })
@@ -561,7 +498,7 @@ export default {
       this.$confirm("是否删除选中的商品？删除后将不可恢复！", "提示", {
         confirmButtonText: "确定删除",
         cancelButtonText: "我再想想",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
           var data = [];
@@ -569,40 +506,28 @@ export default {
             data.push(this.multipleSelection[i].id);
           }
           deleteItems(data)
-            .then(res => {
+            .then((res) => {
               this.$alert("删除成功", "提示", {
                 confirmButtonText: "确定",
-                type: "success"
+                type: "success",
               });
               this.init();
             })
-            .catch(err => {
+            .catch((err) => {
               this.$alert("删除失败", "提示", {
                 confirmButtonText: "确定",
-                type: "warning"
+                type: "warning",
               });
             });
-          // for(var i = 0; i < this.multipleSelection.length; i++){
-          //     this.tableData.splice(this.shopsData[index].commodities.indexOf(this.multipleSelection[i]),1);
-          // }
-          // this.$message({
-          //     type: 'success',
-          //     message: '删除成功!'
-          // });
         })
-        .catch(() => {
-          // this.$message({
-          //     type: 'info',
-          //     message: '已取消删除'
-          // });
-        });
+        .catch(() => {});
     },
     //删除一整个分组
     deleteGroup(index) {
       this.$confirm("是否删除本组中的商品？删除后将不可恢复！", "提示", {
         confirmButtonText: "确定删除",
         cancelButtonText: "我再想想",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
           var data = [];
@@ -610,37 +535,32 @@ export default {
             data.push(this.multipleSelection[i].id);
           }
           deleteGroup([this.shopsData[index].cartItemId])
-            .then(res => {
+            .then((res) => {
               this.activityData = [];
               this.init();
               this.$alert("删除成功", "提示", {
                 confirmButtonText: "确定",
-                type: "success"
+                type: "success",
               });
             })
-            .catch(err => {
+            .catch((err) => {
               this.$alert("删除失败", "提示", {
                 confirmButtonText: "确定",
-                type: "warning"
+                type: "warning",
               });
             });
-          // for(var i = 0; i < this.multipleSelection.length; i++){
-          //     this.tableData.splice(this.shopsData[index].commodities.indexOf(this.multipleSelection[i]),1);
-          // }
-          // this.$message({
-          //     type: 'success',
-          //     message: '删除成功!'
-          // });
         })
-        .catch(() => {
-          // this.$message({
-          //     type: 'info',
-          //     message: '已取消删除'
-          // });
-        });
+        .catch(() => {});
     },
     //判断结算
     handleCommit() {
+      if (this.multipleSelection.length === 0) {
+        this.$alert("选择不能为空！", "提示", {
+          type: "warning",
+          confirmButtonText: "确定",
+        });
+        return;
+      }
       let arr = [];
       for (var i = 0; i < this.multipleSelection.length; i++) {
         if (this.multipleSelection[i].activityEffective === false) {
@@ -649,7 +569,7 @@ export default {
             "提示",
             {
               type: "warning",
-              confirmButtonText: "确定"
+              confirmButtonText: "确定",
             }
           );
           return;
@@ -669,25 +589,17 @@ export default {
           "提示",
           {
             type: "warning",
-            confirmButtonText: "确定"
+            confirmButtonText: "确定",
           }
         );
         return;
       }
-      if (this.multipleSelection.length === 0) {
-        this.$alert("选择不能为空！", "提示", {
-          type: "warning",
-          confirmButtonText: "确定"
-        });
-        return;
-      }
-      let theData = this.multipleSelection;
-      this.addTab("order/checkOrder");
-      sessionStorage.setItem("shopping", JSON.stringify(theData));
+      sessionStorage.setItem(
+        "shopping",
+        JSON.stringify(this.multipleSelection)
+      );
       Cookies.set("cur_status", 0);
-      this.$router.push({
-        name: `checkOrder`
-      });
+      this.addTab("order/checkOrder");
     },
     //收起不能
     packUpNot(row, expandsRow) {
@@ -701,42 +613,31 @@ export default {
       let _price = parseFloat(price);
       let square = Math.round(_width * _height * 100) / 100;
       return Math.round(price * square * 100) / 100;
-    }
+    },
   },
   created() {
     this.init();
-  }
-  // watch: {
-  //   softsuitData(data) {
-  //     this.shopsData = [];
-  //     this.activityData = [];
-  //     this.multipleSelection = [];
-  //     this.expands = [];
-  //     this.totalMoney = 0;
-  //     this.tempData = data;
-  //     if (this.tempData.length > 0) this.dataDeal(this.tempData);
-  //   }
-  // }
+  },
 };
 </script>
 
 <style>
-#shoppingCarCon {
+#shoppingSoftSuit {
   margin-top: -32px;
 }
-#shoppingCarCon .el-table .colorType_0 {
+#shoppingSoftSuit .el-table .colorType_0 {
   background: oldlace;
 }
-#shoppingCarCon .el-table .colorType_1 {
+#shoppingSoftSuit .el-table .colorType_1 {
   background: #ceecbe;
 }
-#shoppingCarCon .el-table .colorType_2 {
+#shoppingSoftSuit .el-table .colorType_2 {
   background: #cde1f7;
 }
-#shoppingCarCon .el-table__expanded-cell[class*="cell"] {
+#shoppingSoftSuit .el-table__expanded-cell[class*="cell"] {
   padding: 0;
 }
-#shoppingCarCon .el-table__expand-icon::after {
+#shoppingSoftSuit .el-table__expand-icon::after {
   position: relative;
   bottom: 1px;
   font-size: 14px;
@@ -746,13 +647,6 @@ export default {
   -webkit-transition: background-color 0.25s ease;
   transition: background-color 0.25s ease;
 }
-/* .el-table .warning-row {
-    background: oldlace;
-}
-
-.el-table .success-row {
-    background: #f0f9eb;
-} */
 </style>
 <style scoped>
 a {
@@ -785,5 +679,13 @@ a:hover {
   color: #13ce66;
   margin: 0 5px;
   display: inline;
+}
+.commitBtn {
+  width: 80px;
+  height: 50px;
+  color: white;
+  font-size: 18px;
+  text-align: center;
+  cursor: pointer;
 }
 </style>

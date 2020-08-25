@@ -1,129 +1,57 @@
 <template>
   <el-card class="centerCard">
     <div>
-      <el-tabs
-        style="display:inline-block;width:580px;"
-        v-model="activeName"
-        @tab-click="handleClick"
-      >
+      <el-tabs style="display:inline-block;width:580px;" v-model="activeName" @tab-click="handleClick">
         <el-tab-pane label="待处理" name="pending"></el-tab-pane>
         <el-tab-pane label="窗帘审核订单" name="LJPending"></el-tab-pane>
         <el-tab-pane label="生效订单" name="YLPending"></el-tab-pane>
         <el-tab-pane label="已作废" name="invalid"></el-tab-pane>
         <el-tab-pane label="全部订单" name="allOrder"></el-tab-pane>
       </el-tabs>
-      <a
-        target="_blank"
-        style="float:right;"
-        href="http://www.luxlano.com/ddkc/"
-        >玉兰·兰居尚品->订单及库存查询</a
-      >
+      <a target="_blank" style="float:right;" href="http://www.luxlano.com/ddkc/">玉兰·兰居尚品->订单及库存查询</a>
     </div>
 
     <div>
-      <el-date-picker
-        type="date"
-        format="yyyy-MM-dd"
-        value-format="yyyy-MM-dd"
-        placeholder="日期区间"
-        v-model="date1"
-        style="width:12%;"
-      ></el-date-picker
-      >&nbsp;至
-      <el-date-picker
-        type="date"
-        format="yyyy-MM-dd"
-        value-format="yyyy-MM-dd"
-        placeholder="日期区间"
-        v-model="date2"
-        style="width:12%;"
-      ></el-date-picker>
-      <el-select
-        style="width:150px;"
-        v-model="commodityType"
-        placeholder="请选择商品类型"
-      >
-        <el-option
-          v-for="item in commodityTypeOptions"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        ></el-option>
+      <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="日期区间" v-model="date1"
+        style="width:12%;"></el-date-picker>&nbsp;至
+      <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="日期区间" v-model="date2"
+        style="width:12%;"></el-date-picker>
+      <el-select style="width:150px;" v-model="commodityType" placeholder="请选择商品类型">
+        <el-option v-for="item in commodityTypeOptions" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
       </el-select>
-      <el-select
-        style="width:160px;"
-        v-model="orderStatus"
-        placeholder="请选择审核状态"
-      >
-        <el-option
-          v-for="item in options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        ></el-option>
+      <el-select style="width:160px;" v-model="orderStatus" placeholder="请选择审核状态">
+        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
       </el-select>
-      <el-input
-        @keyup.enter.native="search()"
-        placeholder="订单号,型号,购买人,联系方式"
-        v-model="find"
-        style="width:310px;"
-      >
-        <el-button @click="search()" slot="append" icon="el-icon-search"
-          >搜索</el-button
-        >
+      <el-input @keyup.enter.native="search()" placeholder="订单号,型号,购买人,联系方式" v-model="find" style="width:310px;">
+        <el-button @click="search()" slot="append" icon="el-icon-search">搜索</el-button>
       </el-input>
     </div>
     <div id="outDiv">
-      <el-card
-        style="position:relative;"
-        v-for="(item, index) of data"
-        :key="index"
-      >
+      <el-card style="position:relative;" v-for="(item, index) of data" :key="index">
         <div slot="header">
           <span class="zoomLeft">时间：</span>
           <span class="zoomRight">{{ item.DATE_CRE }}</span>
           <span class="zoomLeft">订单号：</span>
           <span class="zoomRight">{{ item.ORDER_NO }}</span>
           <span class="zoomLeft">状态：</span>
-          <span style="color:#8BC34A;font-weight:bold;" class="zoomRight"
-            >{{ item.STATUS_ID | transStatus
-            }}{{ item.CURTAIN_STATUS_ID | curtainStatus }}</span
-          >
-          <el-tooltip
-            v-if="
+          <span style="color:#8BC34A;font-weight:bold;" class="zoomRight">{{ item.STATUS_ID | transStatus
+            }}{{ item.CURTAIN_STATUS_ID | curtainStatus }}</span>
+          <el-tooltip v-if="
               item.STATUS_ID == 5 ||
                 item.STATUS_ID == 6 ||
                 item.STATUS_ID == 0 ||
                 (item.STATUS_ID == 1 &&
                   item.CURTAIN_STATUS_ID !== '' &&
                   item.CURTAIN_STATUS_ID == 0)
-            "
-            class="item"
-            effect="dark"
-            content="作废订单"
-            placement="top"
-          >
-            <i
-              style="float:right;cursor: pointer;"
-              class="el-icon-delete"
-              @click="deleteOrder(item.ORDER_NO)"
-            ></i>
+            " class="item" effect="dark" content="作废订单" placement="top">
+            <i style="float:right;cursor: pointer;" class="el-icon-delete" @click="deleteOrder(item.ORDER_NO)"></i>
           </el-tooltip>
-          <el-tooltip
-            v-if="item.STATUS_ID == 3 && item.ORDER_NO.slice(0, 1) == 'X'"
-            class="item"
-            effect="dark"
-            content="退回数据到购物车"
-            placement="top"
-          >
-            <i
-              style="float:right;cursor: pointer;"
-              class="el-icon-sell"
-              @click="copyCart(item.ORDER_NO)"
-            ></i>
+          <el-tooltip v-if="item.STATUS_ID == 3 && item.ORDER_NO.slice(0, 1) == 'X'" class="item" effect="dark"
+            content="退回数据到购物车" placement="top">
+            <i style="float:right;cursor: pointer;" class="el-icon-sell" @click="copyCart(item.ORDER_NO)"></i>
           </el-tooltip>
-          <a
-            v-if="
+          <a v-if="
               ((item.STATUS_ID == 1 &&
                 (item.CURTAIN_STATUS_ID == '' ||
                   item.CURTAIN_STATUS_ID == 4)) ||
@@ -133,72 +61,35 @@
                 item.STATUS_ID == 12) &&
                 (item.ORDER_NO.slice(0, 1) == 'X' ||
                   item.ORDER_NO.slice(0, 1) == 'Y')
-            "
-            target="_blank"
-            style="float:right;cursor: pointer;font-size:13px;"
-            :href="
+            " target="_blank" style="float:right;cursor: pointer;font-size:13px;" :href="
               'http://www.luxlano.com/ddkc/DDrs2.asp?DDid=' + item.ORDER_NO
-            "
-            >兰居订单查询</a
-          >
+            ">兰居订单查询</a>
         </div>
 
         <div class="outDiv" style="float:left;width:90%">
-          <el-table
-            border
-            :data="data[index].ORDERBODY"
-            style="width: 100%;margin-bottom:5px;"
-            :row-class-name="tableRowClassName"
-          >
-            <el-table-column
-              prop="ITEM_NO"
-              label="型号"
-              align="center"
-              width="150"
-            ></el-table-column>
-            <el-table-column
-              prop="BRAND_NAME"
-              label="品牌"
-              align="center"
-              width="150"
-            ></el-table-column>
-            <el-table-column
-              prop="PRODUCTVERSION_NAME"
-              label="版本"
-              align="center"
-              width="150"
-            ></el-table-column>
-            <el-table-column
-              prop="NOTE"
-              label="类型"
-              align="center"
-              width="120"
-            >
+          <el-table border :data="data[index].ORDERBODY" style="width: 100%;margin-bottom:5px;"
+            :row-class-name="tableRowClassName">
+            <el-table-column prop="ITEM_NO" label="型号" align="center" width="150"></el-table-column>
+            <el-table-column prop="BRAND_NAME" label="品牌" align="center" width="150"></el-table-column>
+            <el-table-column prop="PRODUCTVERSION_NAME" label="版本" align="center" width="150"></el-table-column>
+            <el-table-column prop="NOTE" label="类型" align="center" width="120">
               <template slot-scope="scope1">
                 <span v-if="scope1.row.NOTE == '帘头'">定制窗帘</span>
                 <span v-else>{{ scope1.row.NOTE }}</span>
-              </template></el-table-column
-            >
+              </template></el-table-column>
             <el-table-column label="数量" align="center" width="100">
               <template slot-scope="scope1">
-                <span v-if="scope1.row.UNIT == '平方米'"
-                  >{{ scope1.row.CURTAIN_WIDTH }}×{{
+                <span v-if="scope1.row.UNIT == '平方米'">{{ scope1.row.CURTAIN_WIDTH }}×{{
                     scope1.row.CURTAIN_HEIGHT
-                  }}={{ scope1.row.QTY_REQUIRED }}</span
-                >
+                  }}={{ scope1.row.QTY_REQUIRED }}</span>
                 <span v-else>{{ scope1.row.QTY_REQUIRED }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="单位" align="center">
-              <template slot-scope="scope1">
-                <span v-if="scope1.row.UNIT == '°ü'">包</span>
-                <span v-else>{{ scope1.row.UNIT }}</span>
-              </template>
+            <el-table-column prop="UNIT" label="单位" align="center">
             </el-table-column>
             <el-table-column label="实际单价" align="center">
               <template slot-scope="scope1">
                 <span v-if="isManager === '0'">***</span>
-                <!-- <span v-else>{{scope1.row.UNIT_PRICE}}</span> -->
                 <span v-else>{{
                   (scope1.row.FINAL_COST / scope1.row.QTY_REQUIRED)
                     | priceFilter
@@ -214,95 +105,53 @@
             </el-table-column>
             <el-table-column width="150" align="center" label="出货详情">
               <template slot-scope="scope">
-                <el-button
-                  :disabled="scope.row.packDetailId == 0 ? true : false"
-                  @click="shipmentDetail(scope.row)"
-                  type="primary"
-                  size="mini"
-                  >查看详情</el-button
-                >
+                <el-button :disabled="scope.row.packDetailId == 0 ? true : false" @click="shipmentDetail(scope.row)"
+                  type="primary" size="mini">查看详情</el-button>
                 <!-- :disabled="scope.row.packDetailId==0?true:false" -->
               </template>
             </el-table-column>
           </el-table>
         </div>
         <div class="buttonDiv">
-          <p
-            style="width:100px; font-size:18px; color:tomato; text-align:center;"
-          >
+          <p style="width:100px; font-size:18px; color:tomato; text-align:center;">
             {{ item.status }}
           </p>
           <router-link to="/order/checkOrder">
             <p>
-              <el-button
-                @click="summitCurtain(item)"
-                v-if="
+              <el-button @click="summitCurtain(item)" v-if="
                   (item.CURTAIN_STATUS_ID == 0 ||
                     item.CURTAIN_STATUS_ID == 4) &&
                     item.STATUS_ID == 0
-                "
-                size="medium"
-                type="primary"
-                plain
-                >提交订单</el-button
-              >
+                " size="medium" type="primary" plain>提交订单</el-button>
             </p>
           </router-link>
           <p>
-            <el-button
-              v-if="item.STATUS_ID == 5 || item.STATUS_ID == 6"
-              @click="refreshPay(item)"
-              size="medium"
-              type="danger"
-              plain
-              >提交订单</el-button
-            >
+            <el-button v-if="item.STATUS_ID == 5 || item.STATUS_ID == 6" @click="refreshPay(item)" size="medium"
+              type="danger" plain>提交订单</el-button>
           </p>
           <router-link to="/order/checkExamine">
             <p>
-              <el-button
-                @click="
+              <el-button @click="
                   toCheckExamine(
                     item.ORDER_NO,
                     item.CURTAIN_STATUS_ID,
                     item.STATUS_ID
                   )
-                "
-                size="medium"
-                type="success"
-                >订单详情</el-button
-              >
+                " size="medium" type="success">订单详情</el-button>
             </p>
           </router-link>
         </div>
       </el-card>
       <div style="margin:0 25%;" class="block">
-        <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page.sync="currentPage"
-          :page-sizes="[5, 10, 15, 20]"
-          :page-size="limit"
-          layout="total,sizes, prev, pager, next, jumper"
-          :total="count"
-        ></el-pagination>
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+          :current-page.sync="currentPage" :page-sizes="[5, 10, 15, 20]" :page-size="limit"
+          layout="total,sizes, prev, pager, next, jumper" :total="count"></el-pagination>
       </div>
     </div>
-    <el-dialog
-      :show-close="true"
-      :visible.sync="shipmentVisible"
-      width="1100px"
-      title="出货详情"
-    >
+    <el-dialog :show-close="true" :visible.sync="shipmentVisible" width="1100px" title="出货详情">
       <keep-alive>
-        <shipment
-          v-if="shipmentVisible"
-          :orderNo="shipmentOrderNo"
-          :itemNo="shipmentItemNo"
-          :lineNo="shipmentLineNo"
-          :PRODUCT="shipmentNote"
-          :UNIT="shipmentUnit"
-        ></shipment>
+        <shipment v-if="shipmentVisible" :orderNo="shipmentOrderNo" :itemNo="shipmentItemNo" :lineNo="shipmentLineNo"
+          :PRODUCT="shipmentNote" :UNIT="shipmentUnit"></shipment>
       </keep-alive>
     </el-dialog>
   </el-card>
@@ -316,7 +165,7 @@ import {
   cancelOrderNew,
   copyCartItem,
   GetPromotionByType,
-  GetOrderUseRebate
+  GetOrderUseRebate,
 } from "@/api/orderListASP";
 import { cancelOrder, payAgain, queryCash } from "@/api/orderList";
 import { mapMutations, mapActions } from "vuex";
@@ -353,153 +202,153 @@ export default {
       commodityTypeOptions: [
         {
           label: "墙纸配套类",
-          value: "W"
+          value: "W",
         },
         {
           label: "窗帘",
-          value: "X"
+          value: "X",
         },
         {
           label: "软装",
-          value: "Y"
-        }
+          value: "Y",
+        },
       ],
       options: [
         {
           label: "待提交",
-          value: "0"
+          value: "0",
         },
         {
           label: "余额不足待提交",
-          value: "5"
+          value: "5",
         },
         {
           label: "余额不足可提交",
-          value: "6"
+          value: "6",
         },
         {
           label: "待确认",
-          value: "22"
+          value: "22",
         },
         {
           label: "待修改",
-          value: "21"
-        }
+          value: "21",
+        },
       ],
       options1: [
         {
           label: "待提交",
-          value: "0"
+          value: "0",
         },
         {
           label: "余额不足待提交",
-          value: "5"
+          value: "5",
         },
         {
           label: "余额不足可提交",
-          value: "6"
+          value: "6",
         },
         {
           label: "待确认",
-          value: "22"
+          value: "22",
         },
         {
           label: "待修改",
-          value: "21"
-        }
+          value: "21",
+        },
       ],
       options2: [
         {
           label: "待审核",
-          value: "20"
+          value: "20",
         },
         {
           label: "兰居待修改",
-          value: "23"
-        }
+          value: "23",
+        },
       ],
       options3: [
         {
           label: "已提交",
-          value: "1"
+          value: "1",
         },
         {
           label: "已接收",
-          value: "12"
+          value: "12",
         },
         {
           label: "已受理",
-          value: "2"
+          value: "2",
         },
         {
           label: "部分发货",
-          value: "4"
+          value: "4",
         },
         {
           label: "已完成",
-          value: "7"
-        }
+          value: "7",
+        },
       ],
       options4: [
         {
           label: "已作废",
-          value: "3"
-        }
+          value: "3",
+        },
       ],
       options5: [
         {
           label: "待提交",
-          value: "0"
+          value: "0",
         },
         {
           label: "余额不足待提交",
-          value: "5"
+          value: "5",
         },
         {
           label: "余额不足可提交",
-          value: "6"
+          value: "6",
         },
         {
           label: "待确认",
-          value: "22"
+          value: "22",
         },
         {
           label: "待修改",
-          value: "21"
+          value: "21",
         },
         {
           label: "待审核",
-          value: "20"
+          value: "20",
         },
         {
           label: "兰居待修改",
-          value: "23"
+          value: "23",
         },
         {
           label: "已提交",
-          value: "1"
+          value: "1",
         },
         {
           label: "已接收",
-          value: "12"
+          value: "12",
         },
         {
           label: "已受理",
-          value: "2"
+          value: "2",
         },
         {
           label: "部分发货",
-          value: "4"
+          value: "4",
         },
         {
           label: "已完成",
-          value: "7"
+          value: "7",
         },
         {
           label: "已作废",
-          value: "3"
-        }
-      ]
+          value: "3",
+        },
+      ],
     };
   },
   components: { shipment },
@@ -563,40 +412,37 @@ export default {
       }
 
       return realVal;
-    }
+    },
   },
   methods: {
     //窗帘提交订单
     summitCurtain(item) {
       let orderBody = item.ORDERBODY;
       let transCookies = [];
-      for (let i = 0; i < item.ORDERBODY.length; i++) {
+      for (let i = 0; i < orderBody.length; i++) {
         transCookies[i] = new Object();
-        transCookies[i].width = item.ORDERBODY[i].CURTAIN_WIDTH;
-        transCookies[i].height = item.ORDERBODY[i].CURTAIN_HEIGHT;
+        transCookies[i].width = orderBody[i].CURTAIN_WIDTH;
+        transCookies[i].height = orderBody[i].CURTAIN_HEIGHT;
         transCookies[i].orderNumber = item.ORDER_NO;
-        transCookies[i].lineNo = item.ORDERBODY[i].LINE_NO;
-        transCookies[i].activityId = item.ORDERBODY[i].curtains[0].activityId;
-        transCookies[i].quantity = item.ORDERBODY[i].QTY_REQUIRED;
+        transCookies[i].lineNo = orderBody[i].LINE_NO;
+        transCookies[i].activityId = orderBody[i].curtains[0].activityId;
+        transCookies[i].quantity = orderBody[i].QTY_REQUIRED;
         var price = 0;
-        for(let j = 0;j< item.ORDERBODY[i].curtains.length;j++){
-          price += (item.ORDERBODY[i].curtains[j].price.mul(item.ORDERBODY[i].curtains[j].dosage));
+        for (let j = 0; j < orderBody[i].curtains.length; j++) {
+          price += orderBody[i].curtains[j].price.mul(
+            orderBody[i].curtains[j].dosage
+          );
         }
         transCookies[i].price = price;
-        transCookies[i].splitShipment = item.ORDERBODY[i].PART_SEND_ID;
-        transCookies[i].activityName = item.ORDERBODY[i].PROMOTION;
-        transCookies[i].unit = "米";
-        transCookies[i].item = new Object();
-        transCookies[i].item.itemNo = item.ORDERBODY[i].ITEM_NO;
-        transCookies[i].item.note = item.ORDERBODY[i].NOTES;
-        transCookies[i].item.itemVersion = item.ORDERBODY[i].PRODUCTION_VERSION;
+        transCookies[i].splitShipment = orderBody[i].PART_SEND_ID;
+        transCookies[i].activityName = orderBody[i].PROMOTION;
+        transCookies[i].unit = orderBody[i].UNIT;
+        transCookies[i].item = orderBody[i].item;
         transCookies[i].salPromotion = new Object();
-        transCookies[i].salPromotion.orderType =
-          item.ORDERBODY[i].PROMOTION_TYPE;
+        transCookies[i].salPromotion.orderType = orderBody[i].PROMOTION_TYPE;
         transCookies[i].salPromotion.arrearsFlag = item.ARREARSFLAG;
-        transCookies[i].salPromotion.flagFl = item.ORDERBODY[i].FLAG_FL_TYPE;
+        transCookies[i].salPromotion.flagFl = orderBody[i].FLAG_FL_TYPE;
       }
-      transCookies[0].item.groupType = "E";
       sessionStorage.setItem("shopping", JSON.stringify(transCookies));
       sessionStorage.setItem("shoppingHead", JSON.stringify(item));
       Cookies.set("cur_status", 3);
@@ -609,39 +455,8 @@ export default {
       Cookies.set("status_ID", status);
       this.addTab("order/checkExamine");
     },
-    //订单详情
-    toOrderDetail(val, status) {
-      Cookies.set("ORDER_NO", val);
-      Cookies.set("status_ID", status);
-      this.addTab("order/orderDetail");
-    },
     //订单获取
     refresh() {
-      // var url = "/order/getOrders.do";
-      // var data = {
-      //   companyId: Cookies.get("companyId"),
-      //   limit: "4",
-      //   page: this.currentPage /* .toString(), */,
-      //   cid: Cookies.get("cid"),
-      //   state_id: this.state_id,
-      //   find: this.find /* "W1610030066", */,
-      //   beginTime: this.date1,
-      //   finishTime: this.date2,
-      //   orderType: this.commodityType,
-      //   curtainStatusId: ""
-      // };
-      // if (this.date1 != "" || this.date2 != "") {
-      //   data.beginTime = this.date1 + " 00:00:00";
-      //   data.finishTime = this.date2 + " 23:59:59";
-      // }
-      // getOrderlist(url, data).then(res => {
-      //   console.log(res);
-      //   this.count = res.count;
-      //   console.log(res.count);
-      //   this.data = [];
-      //   this.data = res.data;
-      //   console.log(this.data);
-      // });
       //新后台
       this.data = [];
       var data = {
@@ -653,7 +468,7 @@ export default {
         find: this.find,
         beginTime: this.date1,
         finishTime: this.date2,
-        orderType: this.commodityType
+        orderType: this.commodityType,
       };
       if (!data.beginTime) {
         data.beginTime = "0001/1/1";
@@ -663,7 +478,7 @@ export default {
       } else {
         data.finishTime = data.finishTime + " 23:59:59";
       }
-      getAllOrders(data).then(res => {
+      getAllOrders(data).then((res) => {
         this.count = res.count;
         this.data = res.data;
         this.$root.$emit("refreshBadgeIcon", "orderDeal");
@@ -743,31 +558,31 @@ export default {
       var url = "/order/cancelOrder.do";
       var data = {
         cid: Cookies.get("cid"),
-        orderNo: pushOrderNum
+        orderNo: pushOrderNum,
       };
       this.$confirm("确定作废订单？", "提示", {
         confirmButtonText: "是",
         cancelButtonText: "否",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
           //cancelOrder(url, data).then(res => {
           cancelOrderNew(data)
-            .then(res => {
+            .then((res) => {
               if (pushOrderNum.slice(0, 1) == "X") {
                 this.$confirm("作废成功，是否退回数据到购物车？", "提示", {
                   confirmButtonText: "是",
                   cancelButtonText: "否",
-                  type: "warning"
+                  type: "warning",
                 })
                   .then(() => {
                     var data3 = {
-                      orderNo: pushOrderNum
+                      orderNo: pushOrderNum,
                     };
-                    copyCartItem(data3).then(res => {
+                    copyCartItem(data3).then((res) => {
                       this.$alert("复制成功，请到购物车中查看", "提示", {
                         confirmButtonText: "确定",
-                        type: "success"
+                        type: "success",
                       });
                       this.$root.$emit("refreshBadgeIcon", "curtainCount");
                     });
@@ -776,36 +591,36 @@ export default {
               } else {
                 this.$alert("删除成功", "提示", {
                   confirmButtonText: "确定",
-                  type: "success"
+                  type: "success",
                 });
               }
               this.refresh();
               this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
             })
-            .catch(res => {
+            .catch((res) => {
               this.$alert("删除失败,请刷新订单", "提示", {
                 confirmButtonText: "确定",
-                type: "success"
+                type: "success",
               });
             });
           //预留接口-删除订单
         })
-        .catch(err => {});
+        .catch((err) => {});
     },
     copyCart(orderNo) {
       this.$confirm("是否退回数据到购物车？", "提示", {
         confirmButtonText: "是",
         cancelButtonText: "否",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
           var data = {
-            orderNo: orderNo
+            orderNo: orderNo,
           };
-          copyCartItem(data).then(res => {
+          copyCartItem(data).then((res) => {
             this.$alert("复制成功，请到购物车中查看", "提示", {
               confirmButtonText: "确定",
-              type: "success"
+              type: "success",
             });
             this.$root.$emit("refreshBadgeIcon", "curtainCount");
           });
@@ -816,15 +631,15 @@ export default {
       var url = "/order/getResidemoney.do";
       var data = {
         cid: Cookies.get("cid"),
-        companyId: Cookies.get("companyId")
+        companyId: Cookies.get("companyId"),
       };
       //每次重新提交的时候判断一下余额
-      queryCash(url, data).then(async res => {
+      queryCash(url, data).then(async (res) => {
         this.Initial_balance = res.data;
         var url2 = "/order/putAgainOrder.do";
         var data2 = {
           cid: Cookies.get("cid"),
-          orderNo: item.ORDER_NO
+          orderNo: item.ORDER_NO,
         };
         if (item.ALL_SPEND > this.Initial_balance && item.STATUS_ID == 5) {
           //欠款可提交的话可以跳过判断
@@ -835,7 +650,7 @@ export default {
             "提示",
             {
               confirmButtonText: "确定",
-              type: "warning"
+              type: "warning",
             }
           );
         } else {
@@ -845,7 +660,7 @@ export default {
               if (item.ORDERBODY[i].PROMOTION_TYPE) {
                 var res = await GetPromotionByType({
                   proType: item.ORDERBODY[i].PROMOTION_TYPE,
-                  cid: Cookies.get("cid")
+                  cid: Cookies.get("cid"),
                 });
                 if (!res.data) {
                   this.$alert(
@@ -853,7 +668,7 @@ export default {
                     "提示",
                     {
                       confirmButtonText: "确定",
-                      type: "success"
+                      type: "success",
                     }
                   );
                   return;
@@ -866,7 +681,7 @@ export default {
                     "提示",
                     {
                       confirmButtonText: "确定",
-                      type: "success"
+                      type: "success",
                     }
                   );
                   return;
@@ -878,12 +693,12 @@ export default {
               ) {
                 var res = await GetOrderUseRebate({
                   orderNo: item.ORDERBODY[i].ORDER_NO,
-                  lineNo: item.ORDERBODY[i].LINE_NO
+                  lineNo: item.ORDERBODY[i].LINE_NO,
                 });
                 if (res.data.length == 0) {
                   this.$alert(`优惠券不存在`, "提示", {
                     confirmButtonText: "确定",
-                    type: "success"
+                    type: "success",
                   });
                   return;
                 }
@@ -891,7 +706,7 @@ export default {
                   if (new Date(res.data[j].DATE_END) < new Date()) {
                     this.$alert(`优惠券已过期，请删除订单后重新下单`, "提示", {
                       confirmButtonText: "确定",
-                      type: "success"
+                      type: "success",
                     });
                     return;
                   }
@@ -900,24 +715,24 @@ export default {
             }
           }
           payAgain(url2, data2)
-            .then(res => {
+            .then((res) => {
               var recordData = {
                 ORDER_NO: item.ORDER_NO,
                 OPERATION_PERSON: Cookies.get("cid"),
-                OPERATION_NAME: "重新提交"
+                OPERATION_NAME: "重新提交",
               };
               InsertOperationRecord(recordData); //插入操作记录
               this.$alert("提交成功", "提示", {
                 confirmButtonText: "确定",
-                type: "success"
+                type: "success",
               });
               this.refresh();
               this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
             })
-            .catch(res => {
+            .catch((res) => {
               this.$alert("操作失败，请稍后重试", "提示", {
                 confirmButtonText: "确定",
-                type: "warning"
+                type: "warning",
               });
             });
         }
@@ -934,14 +749,14 @@ export default {
         return "success-row";
       }
       return "";
-    }
+    },
   },
   // created() {
   //   this.refresh();
   // },
-  activated: function() {
+  activated: function () {
     this.refresh();
-  }
+  },
 };
 </script>
 

@@ -627,6 +627,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions("navTabs", ["closeToTab"]),
     //清除表单验证规则
     clearRule(formName) {
       this.$refs[formName].resetFields();
@@ -750,9 +751,6 @@ export default {
     RecordUse(itemID) {
       this.useTable = [];
       var url = "/order/findRecrods.do";
-      // var data = {
-      //   id: itemID
-      // };
       var data = {
         couponId: itemID,
         keyWords: "",
@@ -761,7 +759,6 @@ export default {
         page: 1,
         limit: 20
       };
-      //CouponUseRecord(url, data)
       getUseRecord(data).then(res => {
         this.useTable = res.data;
         this.useTable.couponId = itemID;
@@ -1194,7 +1191,6 @@ export default {
         }${this.ctm_order.postAddress}`;
         if (this.data[0].addressId == 0) {
           this.ctm_order.postAddressModified = "0";
-          //console.log("默认地址");
           this.ctm_order.allAddress = this.data[0].postAddress;
         } else {
           this.ctm_order.postAddressModified = "1";
@@ -1372,7 +1368,7 @@ export default {
         var deleteArray = [];
         var getPush3 = JSON.parse(sessionStorage.getItem("shopping"));
         for (var i = 0; i < getPush3.length; i++) {
-          deleteArray[i] = getPush3[i].id; //不像窗帘，这里一个cart_item_id可能对应多个
+          deleteArray[i] = getPush3[i].id;
         }
         var data2 = {
           product_group_tpye: this.product_group_tpye, //产品类别，从购物车出获取
@@ -1484,8 +1480,6 @@ export default {
         newUrl: "order/myOrder"
       });
     },
-    ...mapMutations("navTabs", ["addTab"]),
-    ...mapActions("navTabs", ["closeTab", "closeToTab"]),
     //查询经办人
     chargeQuery() {
       var url = "/order/getlink.do";

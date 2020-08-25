@@ -50,7 +50,8 @@
               (item.CURTAIN_STATUS_ID == '0' && item.STATUS_ID == '1') ||
                 item.CURTAIN_STATUS_ID == '3'
             " @click="_back(item)" size="mini" type="warning" plain>直接退回</el-button>
-          <el-button style="float: right;" @click="exportProductExcel(item)" v-if="item.collapse" size="mini" plain>
+          <el-button style="float: right;" @click="exportProductExcel(item)"
+            v-if="item.collapse && showExportProduct(item)" size="mini" plain>
             导出生产模板
           </el-button>
           <span class="zoomLeft">时间：</span>
@@ -128,8 +129,8 @@
                 " @click="_back(item)" size="medium" type="warning" plain>直接退回</el-button>
             </p>
             <p>
-              <el-button style="float: right;" @click="exportProductExcel(item)" v-if="!item.collapse" size="mini"
-                plain>
+              <el-button style="float: right;" @click="exportProductExcel(item)"
+                v-if="!item.collapse && showExportProduct(item)" size="mini" plain>
                 导出生产模板
               </el-button>
             </p>
@@ -153,7 +154,7 @@ import { getOrderlist, getExamineOrder } from "@/api/orderList";
 import {
   getCurtainOrders,
   updateCurtainOrder,
-  ljExportProductExcel
+  ljExportProductExcel,
 } from "@/api/orderListASP";
 import { cancelOrder } from "@/api/orderList";
 import { mapMutations, mapActions } from "vuex";
@@ -182,66 +183,66 @@ export default {
       options: [
         {
           label: "待审核",
-          value: "0"
+          value: "0",
         },
         {
           label: "兰居待修改",
-          value: "3"
-        }
+          value: "3",
+        },
       ],
       options1: [
         {
           label: "待审核",
-          value: "0"
+          value: "0",
         },
         {
           label: "兰居待修改",
-          value: "3"
-        }
+          value: "3",
+        },
       ],
       options2: [
         {
           label: "客户待修改",
-          value: "1"
+          value: "1",
         },
         {
           label: "客户待确认",
-          value: "2"
+          value: "2",
         },
         {
           label: "客户待提交",
-          value: "8"
-        }
+          value: "8",
+        },
       ],
       options3: [
         {
           label: "已通过",
-          value: "4"
-        }
+          value: "4",
+        },
       ],
       options4: [
         {
           label: "待审核",
-          value: "0"
+          value: "0",
         },
         {
           label: "客户待修改",
-          value: "1"
+          value: "1",
         },
         {
           label: "客户待确认",
-          value: "2"
+          value: "2",
         },
         {
           label: "兰居待修改",
-          value: "3"
+          value: "3",
         },
         {
           label: "已通过",
-          value: "4"
-        }
+          value: "4",
+        },
       ],
-      waitText: "加载中。。。"
+      waitText: "加载中。。。",
     };
   },
   filters: {
@@ -294,9 +295,12 @@ export default {
           return "已通过";
           break;
       }
-    }
+    },
   },
   methods: {
+    showExportProduct(row) {
+      return row.COMPANY_ID == "C01613";
+    },
     toExamineDetail(val) {
       Cookies.set("ORDER_NO", val);
       this.addTab("order/examineDetailNew");
@@ -311,7 +315,7 @@ export default {
     _back(item) {
       this.$confirm("确定直接退回客户吗？", "提示", {
         confirmButtonText: "确定",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
           var ctmOrderDetails = [];
@@ -328,27 +332,27 @@ export default {
             orderNo: item.ORDER_NO,
             curtainStatusId: "1",
             allCurtains: [],
-            ctmOrderDetails: ctmOrderDetails
+            ctmOrderDetails: ctmOrderDetails,
           };
           updateCurtainOrder(data)
-            .then(res => {
+            .then((res) => {
               if (res.code == 0) {
                 this.$alert("操作成功,已将该订单退回给客户", "提示", {
                   confirmButtonText: "确定",
-                  type: "success"
+                  type: "success",
                 });
                 this.getorderList();
               } else {
                 this.$alert("操作失败，请稍后重试", "提示", {
                   confirmButtonText: "确定",
-                  type: "warning"
+                  type: "warning",
                 });
               }
             })
-            .catch(res => {
+            .catch((res) => {
               this.$alert("操作失败:" + res.msg, "提示", {
                 confirmButtonText: "确定",
-                type: "warning"
+                type: "warning",
               });
               console.log(res);
             });
@@ -358,15 +362,19 @@ export default {
         });
     },
     exportProductExcel(item) {
-      this.$confirm("此功能只适用于导出测试账号订单，导出模板后订单状态将变成已完成状态，请慎重操作，是否确认导出？", "提示", {
-        confirmButtonText: "确定",
-        type: "warning"
-      })
+      this.$confirm(
+        "此功能只适用于导出测试账号订单，导出模板后订单状态将变成已完成状态，请慎重操作，是否确认导出？",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          type: "warning",
+        }
+      )
         .then(() => {
           ljExportProductExcel({
             cid: Cookies.get("cid"),
-            orderNo: item.ORDER_NO
-          }).then(res => {
+            orderNo: item.ORDER_NO,
+          }).then((res) => {
             if (res.msg) {
               downLoadFile(
                 this.Global.baseUrl + `DownLoadAPI/DownloadFile?path=${res.msg}`
@@ -428,7 +436,7 @@ export default {
         finishTime: this.date2,
         curtainStatusId: this.orderType || this.canOptionValue,
         isAll: this.isAll,
-        orderBy: this.orderBy
+        orderBy: this.orderBy,
       };
       if (!data.beginTime) {
         data.beginTime = "0001/1/1";
@@ -439,7 +447,7 @@ export default {
         data.finishTime = data.finishTime + " 23:59:59";
       }
       //新后台
-      getCurtainOrders(data).then(res => {
+      getCurtainOrders(data).then((res) => {
         this.count = res.count;
         this.data = [];
         this.data = res.data;
@@ -504,14 +512,14 @@ export default {
         return "success-row";
       }
       return "";
-    }
+    },
   },
   // created() {
   //   this.getorderList();
   // },
-  activated: function() {
+  activated: function () {
     this.getorderList();
-  }
+  },
 };
 </script>
 

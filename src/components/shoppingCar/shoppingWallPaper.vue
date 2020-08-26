@@ -141,21 +141,13 @@
 
 <script>
 import Cookies from "js-cookie";
-import { mapMutations, mapActions } from "vuex";
-import lodash from "lodash";
-import { getUserMarket, updateShoppingCar } from "@/api/shop";
-import {
-  getActivityFromName,
-  getActivityById,
-  getActivityByList,
-  getGroupById,
-} from "@/api/findActivity";
+import { mapMutations } from "vuex";
+import { updateShoppingCar } from "@/api/shop";
 import { GetCartItem } from "@/api/shopASP";
 import { deleteItems, deleteGroup } from "@/api/delete";
 
 export default {
   name: "ShoppingWallPaper",
-  props: ["wallpaperData"],
   data() {
     return {
       cid: Cookies.get("cid"),

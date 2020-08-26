@@ -1,25 +1,21 @@
 <template>
-  <div>
-    <el-card shadow="hover">
-      <div id="shopsCon">
-        <el-tabs v-model="activeName" @tab-click="handleClick">
-          <div id="shopSearchBox" class="mt10">
-            <el-input clearable v-model.trim="searchKey" @clear="_getShopsAllSoftSuitMsg(0)"
-              @keyup.enter.native="searchSoftSuit(0)" placeholder="输入商品型号查找商品" style="width:25%; min-width:280px;">
-              <el-button @click="searchSoftSuit(0)" slot="append" icon="el-icon-search">搜索</el-button>
-            </el-input>
-          </div>
-          <el-tab-pane lazy v-for="item in softList" :key="item.name" :name="item.name" :label="item.label">
-          </el-tab-pane>
-          <shopTab v-bind:tableData="tableData" v-bind:numberList="numberList"></shopTab>
-          <el-pagination style="margin:0 10%;" @size-change="handleSizeChange" @current-change="handleCurrentChange"
-            :current-page.sync="currentPage" :page-size="pageSize" layout="total, prev, pager, next, jumper"
-            :total="totalNumber">
-          </el-pagination>
-        </el-tabs>
+  <el-card shadow="hover">
+    <el-tabs v-model="activeName" @tab-click="handleClick">
+      <div class="mt10">
+        <el-input clearable v-model.trim="searchKey" @clear="init" @keyup.enter.native="searchSoftSuit"
+          placeholder="输入商品型号查找商品" style="width:25%; min-width:280px;">
+          <el-button @click="searchSoftSuit" slot="append" icon="el-icon-search">搜索</el-button>
+        </el-input>
       </div>
-    </el-card>
-  </div>
+      <el-tab-pane lazy v-for="item in softList" :key="item.name" :name="item.name" :label="item.label">
+      </el-tab-pane>
+      <shopTab v-bind:tableData="tableData" v-bind:numberList="numberList"></shopTab>
+      <el-pagination style="margin:0 10%;" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+        :current-page.sync="currentPage" :page-size="pageSize" layout="total, prev, pager, next, jumper"
+        :total="totalNumber">
+      </el-pagination>
+    </el-tabs>
+  </el-card>
 </template>
 
 <script>
@@ -27,7 +23,7 @@ import Cookies from "js-cookie";
 import ShopTab from "./shopTab";
 import {
   getShopsSingleSoftSuit,
-  getShopsAllSoftSuitMsg
+  getShopsAllSoftSuitMsg,
 } from "@/api/shopSearch";
 import { GetSoftByProductType } from "@/api/itemInfoASP";
 
@@ -41,51 +37,48 @@ export default {
       //传给组件的数据
       tableData: [],
       numberList: [],
-      //创建一个总的data，这样只需加载一次请求
-      allData: [[], [], [], [], [], [], []],
-      allNumber: ["", "", "", "", "", "", ""], //总条数
       //软装标签列表
       softList: [
         {
           name: "ML",
-          label: "面料"
+          label: "面料",
         },
         {
           name: "XHB",
-          label: "花边"
+          label: "花边",
         },
         {
           name: "PJB",
-          label: "挂带/配件包"
+          label: "挂带/配件包",
         },
         {
           name: "BZ",
-          label: "抱枕"
+          label: "抱枕",
         },
         {
           name: "GH",
-          label: "装饰画"
+          label: "装饰画",
         },
         {
           name: "TC",
-          label: "成品帘"
+          label: "成品帘",
         },
         {
           name: "CP",
-          label: "床品"
+          label: "床品",
         },
         {
           name: "OTHER",
-          label: "其它"
-        }
+          label: "其它",
+        },
       ],
       currentPage: 1, //当前的页数
       pageSize: 10, //每页的个数
-      totalNumber: 0 //总条数
+      totalNumber: 0, //总条数
     };
   },
   components: {
-    ShopTab
+    ShopTab,
   },
   methods: {
     //获取每页的条数
@@ -93,10 +86,6 @@ export default {
     //获取当前页
     handleCurrentChange(val) {
       this.currentPage = val;
-      // if (this.searchKey.length === 0) this._getShopsAllSoftSuitMsg(1);
-      // else {
-      //   this.searchSoftSuit(1);
-      // }
       this.searchSoftSuit();
     },
     //数组去重
@@ -116,7 +105,7 @@ export default {
     },
     //数据转单位
     changeUnit(data) {
-      data.forEach(item => {
+      data.forEach((item) => {
         if (item.unit === "°ü") {
           item.unit = "包";
         }
@@ -129,138 +118,8 @@ export default {
       for (var i = 0; i < len; i++) {
         this.numberList.push({
           value: "", //主计量
-          value1: "" //辅助计量
+          value1: "", //辅助计量
         });
-      }
-    },
-    //获取对应产品的商品信息
-    _getShopsAllSoftSuitMsg(flag) {
-      this.tableData = [];
-      var status = 0;
-      if (flag !== 1) {
-        switch (this.chooseTab) {
-          case "ML":
-            if (this.allData[0].length !== 0) {
-              this.tableData = this.allData[0];
-              this.totalNumber = this.tableData[0].total;
-              this.createNumberList(this.allData[0].length);
-              return;
-            }
-            status = 0;
-            break;
-          case "XHB":
-            if (this.allData[1].length !== 0) {
-              this.tableData = this.allData[1];
-              this.totalNumber = this.tableData[1].total;
-              this.createNumberList(this.allData[1].length);
-              return;
-            }
-            status = 1;
-            break;
-          case "PJB":
-            if (this.allData[2].length !== 0) {
-              this.tableData = this.allData[2];
-              this.totalNumber = this.tableData[2].total;
-              this.createNumberList(this.allData[2].length);
-              return;
-            }
-            status = 2;
-            break;
-          case "BZ":
-            if (this.allData[3].length !== 0) {
-              this.tableData = this.allData[3];
-              this.totalNumber = this.tableData[3].total;
-              this.createNumberList(this.allData[3].length);
-              return;
-            }
-            status = 3;
-            break;
-          case "GH":
-            if (this.allData[4].length !== 0) {
-              this.tableData = this.allData[4];
-              this.totalNumber = this.tableData[4].total;
-              this.createNumberList(this.allData[4].length);
-              return;
-            }
-            status = 4;
-            break;
-          case "TC":
-            if (this.allData[5].length !== 0) {
-              this.tableData = this.allData[5];
-              this.totalNumber = this.tableData[5].total;
-              this.createNumberList(this.allData[5].length);
-              return;
-            }
-            status = 5;
-            break;
-          case "OTHER":
-            if (this.allData[6].length !== 0) {
-              this.tableData = this.allData[6];
-              this.totalNumber = this.tableData[6].total;
-              this.createNumberList(this.allData[6].length);
-              return;
-            }
-            status = 6;
-            break;
-        }
-        getShopsAllSoftSuitMsg({
-          itemType: this.chooseTab,
-          cid: this.cid,
-          limit: this.pageSize,
-          page: this.currentPage
-        })
-          .then(res => {
-            res.data = this.unique(res.data);
-            res.data = this.changeUnit(res.data);
-            this.allData[status] = res.data;
-            this.allNumber[status] = res.data[0].total;
-            this.totalNumber = this.allNumber[status];
-            this.tableData = this.allData[status];
-            this.createNumberList(this.tableData.length);
-          })
-          .catch(err => {
-            console.log(err);
-          });
-      } else {
-        switch (this.chooseTab) {
-          case "ML":
-            status = 0;
-            break;
-          case "XHB":
-            status = 1;
-            break;
-          case "PJB":
-            status = 2;
-            break;
-          case "BZ":
-            status = 3;
-            break;
-          case "GH":
-            status = 4;
-            break;
-          case "TC":
-            status = 5;
-            break;
-          case "OTHER":
-            status = 6;
-            break;
-        }
-        getShopsAllSoftSuitMsg({
-          itemType: this.chooseTab,
-          cid: this.cid,
-          limit: this.pageSize,
-          page: this.currentPage
-        })
-          .then(res => {
-            res.data = this.unique(res.data);
-            res.data = this.changeUnit(res.data);
-            this.tableData = res.data;
-            this.totalNumber = this.allNumber[status];
-            this.createNumberList(this.tableData.length);
-          })
-          .catch(err => {
-            console.log(err);
-          });
       }
     },
     //软装单类产品的模糊搜索
@@ -270,22 +129,14 @@ export default {
         keywords: this.searchKey.toUpperCase(),
         cid: this.cid,
         page: this.currentPage,
-        limit: this.pageSize
+        limit: this.pageSize,
       })
-        // getShopsSingleSoftSuit({
-        //   itemType: this.chooseTab,
-        //   cid: this.cid,
-        //   itemNo: this.searchKey.toUpperCase(),
-        //   limit: this.pageSize,
-        //   page: this.currentPage
-        // })
-        .then(res => {
+        .then((res) => {
           this.tableData = this.unique(res.data);
-          //this.tableData = this.changeUnit(this.tableData);
           this.totalNumber = res.count;
           this.createNumberList(this.tableData.length);
         })
-        .catch(err => {
+        .catch((err) => {
           this.tableData = [];
           this.totalNumber = 0;
         });
@@ -297,17 +148,12 @@ export default {
       this.searchKey = "";
       this.currentPage = 1;
       Cookies.set("activeNameSoftSuit", tab.name);
-      //this._getShopsAllSoftSuitMsg(0);
       this.init();
     },
     init() {
-      // if (this.searchKey === "") {
-      //   this._getShopsAllSoftSuitMsg(0);
-      // } else {
       this.currentPage = 1;
       this.searchSoftSuit();
-      //}
-    }
+    },
   },
   computed: {
     //获取当前的标签页选项
@@ -323,8 +169,8 @@ export default {
       },
       set(value) {
         Cookies.set("activeNameSoftSuit", value);
-      }
-    }
+      },
+    },
   },
   created() {
     var selectNo = this.$route.params.selectNo;
@@ -347,12 +193,6 @@ export default {
       this.chooseTab = Cookies.get("activeNameSoftSuit");
       this.init();
     }
-  }
+  },
 };
 </script>
-
-<style scoped>
-#shopSearchBox div:hover {
-  cursor: pointer;
-}
-</style>

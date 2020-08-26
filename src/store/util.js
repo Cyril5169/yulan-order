@@ -4,7 +4,7 @@ export function tabsName(index) {
     case 'main':
       return '主页';
     case "shops/wallPaper":
-      return "墙纸";
+      return "墙纸配套类";
     case "shops/curtain":
       return "定制窗帘";
     case "shops/softSuit":

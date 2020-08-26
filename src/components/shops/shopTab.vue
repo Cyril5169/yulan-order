@@ -1,7 +1,7 @@
 <template>
   <div id="shopTabCon">
-    <el-table id="shopTabTable" class="loading-area" :data="tableData" :row-key="getRowKeys" :expand-row-keys="expands"
-      @expand-change="expandChange" style="min-width: 750px; margin: 5px auto;">
+    <el-table :data="tableData" :row-key="getRowKeys" :expand-row-keys="expands" @expand-change="expandChange"
+      style="min-width: 750px; margin: 5px auto;">
       <el-table-column label="型号" prop="ITEM_NO" width="150" align="center">
       </el-table-column>
       <el-table-column label="名称" prop="NOTE" width="140" align="center">
@@ -15,7 +15,6 @@
           <span v-if="scope.row.FIX_TYPE === '01'">
             <span v-if="scope.row.RZ_GRADE">
               定宽
-              <!-- {{ scope.row.RZ_GRADE }} -->
               {{scope.row.FIX_GRADE/1000 + (scope.row.UNIT_NAME?scope.row.UNIT_NAME:'米')}}
             </span>
             <span v-else>
@@ -25,7 +24,6 @@
           <span v-else-if="scope.row.FIX_TYPE === '02'">
             <span v-if="scope.row.RZ_GRADE">
               定高
-              <!-- {{ scope.row.RZ_GRADE }} -->
               {{scope.row.FIX_GRADE/1000 + (scope.row.UNIT_NAME?scope.row.UNIT_NAME:'米')}}
             </span>
             <span v-else>
@@ -38,16 +36,6 @@
           <span v-else>--</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column
-                label="尺寸"
-                prop="FIX_GRADE">
-                <template slot-scope="scope">
-                    <span v-if="scope.row.FIX_GRADE !== null">
-                        {{scope.row.FIX_GRADE/1000}}
-                    </span>
-                    <span v-else>--</span>
-                </template>
-            </el-table-column> -->
       <el-table-column v-if="minimumPurchaseShow" label="起购数量" prop="MINIMUM_PURCHASE" width="80" align="center">
       </el-table-column>
       <el-table-column width="200" label="数量" align="center">
@@ -111,6 +99,7 @@
         </template>
       </el-table-column>
     </el-table>
+
     <el-dialog border title="库存查询" :visible.sync="dialogTableVisible" width="550px">
       <el-table id="storeTable" :data="produceStore" :row-style="rowClass">
         <el-table-column property="header" min-width="30%"></el-table-column>
@@ -144,25 +133,25 @@ export default {
       produceStore: [
         {
           header: "类别",
-          body: "面料"
+          body: "面料",
         },
         {
           header: "编号",
-          body: "MLGB"
+          body: "MLGB",
         },
         {
           header: "尺寸",
-          body: "1.4"
+          body: "1.4",
         },
         {
           header: "库存信息",
-          body: ""
-        }
+          body: "",
+        },
       ],
       storeMsg: [], //储存当前页面的库存信息
       dialogTableVisible: false,
       disableFlag: false, //判断是否禁用选择框
-      minimumPurchaseShow: false
+      minimumPurchaseShow: false,
     };
   },
   props: ["tableData", "numberList"],
@@ -179,7 +168,7 @@ export default {
         }
       }
       return len;
-    }
+    },
   },
   methods: {
     //给库存表格切换不同的颜色
@@ -221,9 +210,9 @@ export default {
         itemNo: row.ITEM_NO,
         itemVersion: row.ITEM_VERSION,
         productType: row.PRODUCT_TYPE,
-        productBrand: row.PRODUCT_BRAND
+        productBrand: row.PRODUCT_BRAND,
       })
-        .then(res => {
+        .then((res) => {
           if (res.data.length === 0) {
             this.disableFlag = true;
           } else {
@@ -231,12 +220,12 @@ export default {
           }
           var defaultSel = {
             pri: 0,
-            id: 0
+            id: 0,
           };
           for (var i = 0; i < res.data.length; i++) {
             var obj = {
               label: res.data[i].ORDER_TYPE + " -- " + res.data[i].ORDER_NAME,
-              value: res.data[i].P_ID
+              value: res.data[i].P_ID,
             };
             if (res.data[i].PRIORITY != 0 && defaultSel.pri == 0) {
               defaultSel.pri = res.data[i].PRIORITY;
@@ -255,10 +244,10 @@ export default {
           }
           this.activity.push({
             label: "不参与活动",
-            value: null
+            value: null,
           });
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
       let temp = this.expands;
@@ -281,7 +270,7 @@ export default {
       if (val === "0" || val === 0) {
         this.$alert("数量不能为空", "提示", {
           type: "warning",
-          confirmButtonText: "确定"
+          confirmButtonText: "确定",
         });
         return;
       }
@@ -292,7 +281,7 @@ export default {
           "提示",
           {
             type: "warning",
-            confirmButtonText: "确定"
+            confirmButtonText: "确定",
           }
         );
         return;
@@ -308,14 +297,14 @@ export default {
       if (re.test(val) === false) {
         this.$alert("数量栏请填写正确的数字", "提示", {
           type: "warning",
-          confirmButtonText: "确定"
+          confirmButtonText: "确定",
         });
         return;
       }
       if (this.seletedActivity === "" && this.disableFlag === false) {
         this.$alert("请选择一个活动", "提示", {
           type: "warning",
-          confirmButtonText: "确定"
+          confirmButtonText: "确定",
         });
         return;
       }
@@ -335,9 +324,9 @@ export default {
         width: row.UNIT_NAME == "平方米" ? this.numberList[index].value : "",
         note: this.remark,
         splitShipment: storeMessage,
-        softType: _type
+        softType: _type,
       })
-        .then(res => {
+        .then((res) => {
           this.numberList[index].value = "";
           this.numberList[index].value1 = "";
           this.expands = [];
@@ -345,7 +334,7 @@ export default {
           if (res.data.code === 0) {
             this.$alert("此型号已添加成功，请前往购物车查看", "添加成功", {
               confirmButtonText: "确定",
-              type: "success"
+              type: "success",
             });
             this.$root.$emit("refreshBadgeIcon", "softCount");
           } else {
@@ -358,11 +347,11 @@ export default {
             }
             this.$alert(msg, "添加失败", {
               confirmButtonText: "确定",
-              type: "warning"
+              type: "warning",
             });
           }
         })
-        .catch(err => {
+        .catch((err) => {
           this.numberList[index].value = "";
           this.numberList[index].value1 = "";
           this.expands = [];
@@ -372,7 +361,7 @@ export default {
             "提示",
             {
               confirmButtonText: "确定",
-              type: "warning"
+              type: "warning",
             }
           );
           console.log(err);
@@ -394,8 +383,6 @@ export default {
           return "";
       }
     },
-    //修改该商品的计量
-    numberChange(value) {},
     //查看该商品的库存
     seeStore(scope) {
       this.dialogTableVisible = true;
@@ -409,31 +396,17 @@ export default {
         ? this.storeMsg[scope.$index]
         : "暂无数据";
     },
-    //选择该商品加入购物车
-    chooseItem() {}
   },
-  created() {},
   computed: {
     msg() {
       return this.tableData;
-    }
-  },
-  mounted() {
-    const self = this;
-    window.addEventListener(
-      "message",
-      function(e) {
-        if (typeof e.data === "string") self.storeMsg.push(e.data);
-      },
-      false
-    );
+    },
   },
   watch: {
     msg(newV, oldV) {
-      // do something
       this.storeMsg = [];
-    }
-  }
+    },
+  },
 };
 </script>
 <style>
@@ -447,10 +420,7 @@ export default {
 #shopTabCon .el-tabs__header {
   margin: 0;
 }
-#shopTabCon .el-dialog__body {
-  padding: 0 20px;
-}
-#shopTabTable .el-table__expand-icon::after {
+#shopTabCon .el-table__expand-icon::after {
   display: block !important;
   position: relative;
   bottom: 1px;

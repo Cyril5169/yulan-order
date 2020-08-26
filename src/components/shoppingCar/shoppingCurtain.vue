@@ -122,21 +122,12 @@
 
 <script>
 import Cookies from "js-cookie";
-import { getUserMarket } from "@/api/shop";
-import { getActivityById, getActivityByList } from "@/api/findActivity";
-import {
-  deleteTheGroup,
-  deleteCurtains,
-  commitLook,
-  deleteCurtain,
-  alterCount,
-} from "@/api/curtain";
+import { deleteTheGroup, alterCount } from "@/api/curtain";
 import { GetCartItem } from "@/api/shopASP";
-import { mapMutations, mapActions } from "vuex";
+import { mapMutations } from "vuex";
 
 export default {
   name: "ShoppingCurtain",
-  props: ["curtainData"],
   data() {
     return {
       cid: Cookies.get("cid"), //假定给的用户id
@@ -205,7 +196,6 @@ export default {
       this.shopsData = theData;
     },
     ...mapMutations("navTabs", ["addTab"]),
-    ...mapActions("navTabs", ["closeTab"]),
     //给不同的行添加样式颜色用于区分
     tableRowClassName({ row, rowIndex }) {
       if (rowIndex % 3 === 0) {

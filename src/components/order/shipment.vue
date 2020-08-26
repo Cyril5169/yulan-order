@@ -721,6 +721,11 @@ export default {
       var list8 = suffix.split("flv");
       var list9 = suffix.split("rm");
       var list10 = suffix.split("mpg");
+      var list11 = suffix.split("doc");
+      var list12 = suffix.split("docx");
+      var list13 = suffix.split("xls");
+      var list14 = suffix.split("xlsx");
+      var list15 = suffix.split("pdf");
       if (
         list1.length > 1 ||
         list2.length > 1 ||
@@ -731,7 +736,12 @@ export default {
         list7.length > 1 ||
         list8.length > 1 ||
         list9.length > 1 ||
-        list10.length > 1
+        list10.length > 1||
+        list11.length > 1||
+        list12.length > 1||
+        list13.length > 1||
+        list14.length > 1||
+        list15.length > 1
       ) {
         this.FormRight = true;
         this.submit.fileList = fileList;
@@ -739,7 +749,7 @@ export default {
       } else {
         this.FormRight = false;
         this.submit.fileList = [];
-        this.$alert("请上传图片或视频，否则无法成功提交", "提示", {
+        this.$alert("请上传图片、视频或文档，否则无法成功提交", "提示", {
           confirmButtonText: "确定",
           type: "warning"
         });

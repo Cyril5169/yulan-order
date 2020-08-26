@@ -48,6 +48,14 @@ export function GetDosageByNo(data, config = {}) {
         return Promise.reject(err);
     })
 }
+//窗帘
+export function GetCurtainByCondition(data, config = {}) {
+    return post('/ITEM/GetCurtainByCondition', data, config).then(res => {
+        return Promise.resolve(res);
+    }).catch(err => {
+        return Promise.reject(err)
+    })
+}
 //软装
 export function GetSoftByProductType(data, config = {}) {
     return post('/ITEM/GetSoftByProductType', data, config).then(res => {

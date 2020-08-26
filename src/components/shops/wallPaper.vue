@@ -2,9 +2,9 @@
   <div id="wallPaperCon">
     <el-card shadow="hover">
       <div>
-        <el-input clearable v-model.trim="searchKey" @clear="tableData = []" @keyup.enter.native="_getShopsWallPaperMsg"
+        <el-input clearable v-model.trim="searchKey" @clear="tableData = []" @keyup.enter.native="searchWallPaper"
           placeholder="输入商品型号查找商品" style="width:25%; min-width:280px;">
-          <el-button @click="_getShopsWallPaperMsg" slot="append" icon="el-icon-search">搜索</el-button>
+          <el-button @click="searchWallPaper" slot="append" icon="el-icon-search">搜索</el-button>
         </el-input>
         <div class="searchHistory" style="margin: 5px 0 0">
           <ul class="ovh l" style="font-size: 12px;margin:0">
@@ -129,48 +129,9 @@ export default {
       seletedActivity: "", //选择的活动
       remark: "", //备注
       numWidth: 100,
-      tableData: [
-        {
-          type: "DT35010", //型号
-          sample: "111", //样本型号
-          versionNumber: "新墙标(大)", //版本
-          version: "窄幅墙纸", //名称
-          brand: "玉兰", //品牌
-          number: "", //计量
-          anotherNumber: "", //辅助计量、
-          unit: "", //单位
-          activity: [
-            { value: "活动一" },
-            { value: "活动二" },
-            { value: "活动三" },
-            { value: "活动四" },
-          ], //活动
-          seletedActivity: "", //选择的活动
-          remark: "", //备注
-          itemFlag: "0", //状态
-        },
-      ],
+      tableData: [],
       expands: [], //展开行type的数组
-      produceStore: [
-        {
-          stockNo: "1", //库房
-          batchNo: "131", //批号
-          qty: "361", //库存
-          itemNo: "", //产品型号
-        },
-        {
-          stockNo: "2",
-          batchNo: "132",
-          qty: "100",
-          itemNo: "",
-        },
-        {
-          stockNo: "3",
-          batchNo: "133",
-          qty: "100",
-          itemNo: "",
-        },
-      ],
+      produceStore: [],
       dialogTableVisible: false, //控制展开的是哪些行
       disableFlag: false, //判断是否禁用选择框
       history: [], //本地存储
@@ -215,21 +176,20 @@ export default {
     },
     //通过历史记录查询产品
     searchByHistory(name) {
-      this.tableData = [];
-      this.expands = [];
       this.clearMsg();
       this.searchKey = name;
-      this._getShopsWallPaperMsg();
+      this.searchWallPaper();
     },
     //查询搜索墙纸
-    _getShopsWallPaperMsg() {
+    searchWallPaper() {
+      this.tableData = [];
+      this.expands = [];
+      this.baobei = false;
       var data = {
         ITEM_NO: this.searchKey.toUpperCase(),
         LOGINNAME: this.cid,
         type: "",
       };
-      this.expands = [];
-      this.baobei = false;
       //getShopsWallPaperMsg(data)
       GetWallpaperInfo(data)
         .then((res) => {
@@ -242,7 +202,6 @@ export default {
             res.data[0].MINIMUM_PURCHASE == 0
               ? (this.minimumPurchaseShow = false)
               : (this.minimumPurchaseShow = true);
-            this.tableData = [];
             this.tableData.push({
               type: res.data[0].ITEM_NO, //型号
               sample: res.data[0].OLD_ITEM_NO, //样本型号
@@ -258,6 +217,7 @@ export default {
               anotherNumber: "", //辅助数量
               minimumPurchase: res.data[0].MINIMUM_PURCHASE, // 起购数量
             });
+            this.expands.push(res.data[0].ITEM_NO);
             if (res.data[0].UNIT == "平方米") this.numWidth = 220;
             else this.numWidth = 100;
             let storage = window.localStorage;
@@ -326,8 +286,6 @@ export default {
               .catch((err) => {
                 console.log(err);
               });
-            this.expands = [];
-            this.expands.push(res.data[0].ITEM_NO);
           });
         })
         .catch((err) => {
@@ -566,8 +524,6 @@ export default {
           console.log(err);
         });
     },
-    //修改该商品的计量
-    numberChange(value, index) {},
     //查看该商品的库存
     seeStore(scope) {
       this.produceStore = [];
@@ -583,8 +539,6 @@ export default {
           console.log(err.data);
         });
     },
-    //选择该商品加入购物车
-    chooseItem(value) {},
     //点击取消收起
     closeExpand() {
       this.searchKey = "";
@@ -616,14 +570,13 @@ export default {
     },
   },
   created() {
-    this.tableData = [];
     this.history = this.localHistory();
   },
   activated() {
     var selectNo = this.$route.params.selectNo;
     if (selectNo) {
       this.searchKey = selectNo;
-      this._getShopsWallPaperMsg();
+      this.searchWallPaper();
     }
   },
   computed: {

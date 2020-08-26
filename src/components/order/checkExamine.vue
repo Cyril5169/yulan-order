@@ -134,22 +134,22 @@
       <div style="padding:10px;">
         <span class="timeLeft">
           创建：
-          <span class="timeRight">{{ ruleForm.DATE_CRE }}</span>
+          <span class="timeRight">{{ ruleForm.DATE_CRE | datatrans}}</span>
         </span>
-        <span v-if="ruleForm.WEB_TJ_TIME" class="timeLeft">
+        <span v-if="ruleForm.WEB_TJ_TIME && ruleForm.WEB_TJ_TIME != '9999/12/31 00:00:00'" class="timeLeft">
           提交：
-          <span class="timeRight">{{ ruleForm.WEB_TJ_TIME }}</span>
+          <span class="timeRight">{{ ruleForm.WEB_TJ_TIME | datatrans}}</span>
         </span>
         <span class="timeLeft">
           更新：
-          <span class="timeRight">{{ ruleForm.DATE_UPDATE }}</span>
+          <span class="timeRight">{{ ruleForm.DATE_UPDATE | datatrans}}</span>
         </span>
         <br />
-        <span v-if="ruleForm.DATE_ACCEPT" class="timeLeft">
+        <span v-if="ruleForm.DATE_ACCEPT && ruleForm.DATE_ACCEPT != '9999/12/31 00:00:00'" class="timeLeft">
           接收：
-          <span class="timeRight">{{ ruleForm.DATE_ACCEPT }}</span>
+          <span class="timeRight">{{ ruleForm.DATE_ACCEPT | datatrans}}</span>
         </span>
-        <span v-if="ruleForm.DATE_DEAL" class="timeLeft">
+        <span v-if="ruleForm.DATE_DEAL && ruleForm.DATE_DEAL != '9999/12/31 00:00:00'" class="timeLeft">
           处理：
           <span class="timeRight">{{ ruleForm.DATE_DEAL | datatrans }}</span>
         </span>

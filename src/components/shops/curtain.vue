@@ -4,15 +4,15 @@
       <div id="shopsCon">
         <p class="f12" style="color: red;margin:0;">（带*号表示可选择帘头外包盒）</p>
         <div class="mt10">
-          <el-input clearable v-model.trim="searchKey" @clear="getData(1)" @keyup.enter.native="getDataBlur(1)"
+          <el-input clearable v-model.trim="searchKey" @clear="searchCurtain" @keyup.enter.native="searchCurtain"
             placeholder="输入商品型号查找商品" style="width:300px;">
-            <el-button @click="getDataBlur(1)" slot="append" icon="el-icon-search">搜索</el-button>
+            <el-button @click="searchCurtain" slot="append" icon="el-icon-search">搜索</el-button>
           </el-input>
         </div>
         <el-table :data="curtainMsg" style="min-width: 750px; margin: 5px auto;">
-          <el-table-column label="型号" width="120" align="center">
+          <el-table-column label="型号" width="100" align="center">
             <template slot-scope="scope">
-              <div v-if="scope.row.wbhFlag === '1'">
+              <div v-if="scope.row.wbhFlag == '1'">
                 {{ scope.row.itemNo }}
                 <span style="color: red;">*</span>
               </div>
@@ -35,7 +35,7 @@
           </el-table-column>
           <el-table-column label="帘外包宽度(m)" prop="fixGrade" width="120" align="center">
             <template slot-scope="scope">
-              <div v-if="scope.row.wbhFlag === '1'">
+              <div v-if="scope.row.wbhFlag == '1'">
                 <el-checkbox v-model="scope.row.isWBH">
                   <currency-input :customStyle="'width: 60px;'" placeholder="0.00" v-model="scope.row.WBH">
                   </currency-input>
@@ -68,7 +68,7 @@
             <template slot-scope="scope">
               <el-select style="width:250px" size="mini" :disabled="isActivity[scope.$index]"
                 v-model="scope.row.activityId" :placeholder="
-                  isActivity[scope.$index] === true
+                  isActivity[scope.$index] == true
                     ? '无可选活动'
                     : '请选择活动'
                 ">
@@ -94,12 +94,10 @@
 </template>
 
 <script>
-import { mapMutations, mapActions } from "vuex";
-import { mapState } from "vuex";
+import { mapMutations } from "vuex";
 import Cookies from "js-cookie";
-import { getCurtainMsg, getShopSingleCurtain } from "@/api/shopSearch";
-import { findItemActivity } from "@/api/findActivity";
-import { getItemById, GetPromotionByItem } from "@/api/orderListASP";
+import { GetCurtainByCondition } from "@/api/itemInfoASP";
+import { GetPromotionByItem } from "@/api/orderListASP";
 
 export default {
   name: "Curtain",
@@ -147,22 +145,8 @@ export default {
       totalNumber: 0, //总条数
     };
   },
-  filters: {
-    calLength(str) {
-      var len = 0;
-      for (var i = 0; i < str.length; i++) {
-        var c = str.charCodeAt(i);
-        //单字节加1
-        if ((c >= 0x0001 && c <= 0x007e) || (0xff60 <= c && c <= 0xff9f)) {
-          len++;
-        } else {
-          len += 2;
-        }
-      }
-      return len;
-    },
-  },
   methods: {
+    ...mapMutations("navTabs", ["addTab"]),
     //限制输入长度
     oninput(e, index) {
       e = this.splitStr(e, 20);
@@ -187,13 +171,13 @@ export default {
     chooseItem(data, index) {
       let arr = [];
       let str = "";
-      if (data.width === "") {
+      if (data.width == "") {
         arr.push("宽度");
       }
-      if (data.height === "") {
+      if (data.height == "") {
         arr.push("高度");
       }
-      if (data.multiple === "") {
+      if (data.multiple == "") {
         arr.push("褶皱倍数");
       }
       if (arr.length !== 0) {
@@ -203,21 +187,21 @@ export default {
         });
         return;
       }
-      if (data.activityId === "") {
-        if (this.isActivity[index] === false) {
+      if (data.activityId == "") {
+        if (this.isActivity[index] == false) {
           this.$alert("请选择活动!!", "提示", {
             confirmButtonText: "好的",
           });
           return;
         } else data.activityId = null;
       }
-      if (data.wbhFlag === "1" && data.isWBH === false && data.WBH !== "") {
+      if (data.wbhFlag == "1" && data.isWBH == false && data.WBH !== "") {
         this.$alert("在填写了帘外包宽度的情况下，请勾选前面的按钮!!", "提示", {
           confirmButtonText: "好的",
         });
         return;
       }
-      if (data.wbhFlag === "1" && data.isWBH === true && data.WBH === "") {
+      if (data.wbhFlag == "1" && data.isWBH == true && data.WBH == "") {
         this.$alert("在勾选了帘外包的情况下，帘外包宽度不能为空!!", "提示", {
           confirmButtonText: "好的",
         });
@@ -225,14 +209,14 @@ export default {
       }
       let _groupType;
       this.activityGroup.forEach((item) => {
-        if (item.pId === data.activityId) {
+        if (item.pId == data.activityId) {
           _groupType = item.groupType;
         }
       });
       this.curtainMsg[index].groupType = _groupType;
       let activeName = "";
       this.activityOptions[index].forEach((item) => {
-        if (item.value === data.activityId) {
+        if (item.value == data.activityId) {
           activeName = item.label;
         }
       });
@@ -243,123 +227,69 @@ export default {
         name: `shoppingCurtainDetail`,
       });
     },
-    ...mapMutations("navTabs", ["addTab"]),
-    ...mapActions("navTabs", ["closeTab"]),
-    //清空信息
-    clearMsg() {
-      this.curtainData = [];
-      this.curtainMsg = [];
-      this.currentPage = 1;
-      this.totalNumber = 0;
-    },
     //获取每页的条数
     handleSizeChange(val) {},
     //当前页改变时的操作
     handleCurrentChange(val) {
-      if (this.searchKey === "") {
-        this.getData(0);
-      } else {
-        this.getDataBlur(0);
-      }
+      this.currentPage = val;
+      this.searchCurtain();
     },
-    //获取窗帘数据--默认搜索
-    getData(status) {
-      if (this.searchKey !== "") return;
-      //0为默认搜索，1为搜索时首页
-      if (status === 1) this.currentPage = 1;
-      let data = {
+    //获取窗帘数据
+    searchCurtain(status) {
+      this.curtainData = [];
+      GetCurtainByCondition({
+        keywords: this.searchKey.toUpperCase(),
         limit: this.pageSize,
         page: this.currentPage,
-      };
-      getCurtainMsg(data)
+      })
         .then((res) => {
-          //赋值给表格
           this.curtainData = res.data;
-          this.curtainData = this.curtainData.filter(
-            (item) => item.saleId != "C" && item.saleId != "F"
-          );
-          this.createCurtainMsg(this.curtainData);
-          //获取总条数
-          if (this.totalNumber !== this.curtainData[0].total) {
-            this.totalNumber = this.curtainData[0].total;
-          }
+          this.totalNumber = res.count;
+          this.createCurtainMsg();
         })
-        .catch((err) => {
-          //获取失败，清空数据
-          this.clearMsg();
-          this.searchKey = "";
-        });
-    },
-    //获取窗帘数据--模糊搜索
-    getDataBlur(status) {
-      //0为默认模糊搜索，1为模糊搜索时首页
-      if (this.searchKey === "") return;
-      if (status === 1) this.currentPage = 1;
-      let data = {
-        itemNo: this.searchKey.toUpperCase(),
-        limit: this.pageSize,
-        page: this.currentPage,
-      };
-      getShopSingleCurtain(data)
-        .then((res) => {
-          //赋值给表格
-          this.curtainData = res.data;
-          this.curtainData = this.curtainData.filter(
-            (item) => item.saleId != "C" && item.saleId != "F"
-          );
-          this.createCurtainMsg(this.curtainData);
-          if (this.totalNumber !== this.curtainData[0].total) {
-            this.totalNumber = this.curtainData[0].total;
-          }
-        })
-        .catch((err) => {
-          //获取失败，清空数据
-          this.clearMsg();
-        });
+        .catch((err) => {});
     },
     //渲染到表格的数
-    async createCurtainMsg(data) {
+    async createCurtainMsg() {
       this.curtainMsg = [];
       this.activityOptions = [];
       this.isActivity = [];
-      for (let i = 0; i < data.length; i++) {
-        var defaultSel = {
-          pri: 0,
-          id: 0,
-        };
+      for (var i = 0; i < this.curtainData.length; i++) {
+        var data = this.curtainData[i];
         this.curtainMsg.push({
-          itemNo: data[i].itemNo, //型号
+          itemNo: data.ITEM_NO, //型号
           width: "", //宽
           height: "", //高
           WBH: "", //假帘高
           isWBH: false, //false:不选假帘高，true：选择假帘高
-          wbhFlag: data[i].wbhFlag, //1：需要假帘高，0：不需要假帘高
+          wbhFlag: data.WBH_FLAG, //1：需要假帘高，0：不需要假帘高
           multiple: "2.2", //褶皱倍数
           location: "", //位置
           activityId: "", //活动
           groupType: "", //groupType
           activeName: "",
         });
-        let itemRes = await getItemById(
-          { itemNo: data[i].itemNo },
-          { loading: false }
-        );
         let res = await GetPromotionByItem(
           {
             cid: this.cid,
             customerType: this.customerType,
-            itemNo: itemRes.data.ITEM_NO,
-            itemVersion: itemRes.data.ITEM_VERSION,
-            productType: itemRes.data.PRODUCT_TYPE,
-            productBrand: itemRes.data.PRODUCT_BRAND,
+            itemNo: data.ITEM_NO,
+            itemVersion: data.ITEM_VERSION,
+            productType: data.PRODUCT_TYPE,
+            productBrand: data.PRODUCT_BRAND,
           },
           { loading: false }
         );
         //没有活动下拉框disable
-        if (res.data.length === 0) this.isActivity.push(true);
+        if (res.data.length == 0) this.isActivity.push(true);
         else this.isActivity.push(false);
         let _obj = [];
 
+        var defaultSel = {
+          pri: 0,
+          id: 0,
+        };
+        //查找默认活动
         for (var j = 0; j < res.data.length; j++) {
           var obj = {
             label: res.data[j].ORDER_TYPE + " -- " + res.data[j].ORDER_NAME,
@@ -379,8 +309,8 @@ export default {
             defaultSel.pri = res.data[j].PRIORITY;
             defaultSel.id = res.data[j].P_ID;
           }
-          let re = this.activityGroup.some((i) => i.pId === obj1.pId);
-          if (re === false) this.activityGroup.push(obj1);
+          let re = this.activityGroup.some((i) => i.pId == obj1.pId);
+          if (re == false) this.activityGroup.push(obj1);
           _obj.push(obj);
         }
         _obj.push({
@@ -396,12 +326,8 @@ export default {
     },
     //初始化
     init() {
-      if (this.searchKey === "") {
-        this.getData(1);
-      } else {
-        this.currentPage = 1;
-        this.getDataBlur(0);
-      }
+      this.currentPage = 1;
+      this.searchCurtain();
     },
   },
   created() {

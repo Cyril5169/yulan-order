@@ -9,7 +9,7 @@
       </div>
       <el-tab-pane lazy v-for="item in softList" :key="item.name" :name="item.name" :label="item.label">
       </el-tab-pane>
-      <shopTab v-bind:tableData="tableData" v-bind:numberList="numberList"></shopTab>
+      <shopTab :tableData="tableData" :numberList="numberList"></shopTab>
       <el-pagination style="margin:0 10%;" @size-change="handleSizeChange" @current-change="handleCurrentChange"
         :current-page.sync="currentPage" :page-size="pageSize" layout="total, prev, pager, next, jumper"
         :total="totalNumber">
@@ -21,10 +21,6 @@
 <script>
 import Cookies from "js-cookie";
 import ShopTab from "./shopTab";
-import {
-  getShopsSingleSoftSuit,
-  getShopsAllSoftSuitMsg,
-} from "@/api/shopSearch";
 import { GetSoftByProductType } from "@/api/itemInfoASP";
 
 export default {
@@ -113,9 +109,9 @@ export default {
       return data;
     },
     //创建每个软装的数量
-    createNumberList(len) {
+    createNumberList() {
       this.numberList = [];
-      for (var i = 0; i < len; i++) {
+      for (var i = 0; i < this.tableData.length; i++) {
         this.numberList.push({
           value: "", //主计量
           value1: "", //辅助计量
@@ -124,6 +120,7 @@ export default {
     },
     //软装单类产品的模糊搜索
     searchSoftSuit() {
+      this.tableData = [];
       GetSoftByProductType({
         productType: this.chooseTab,
         keywords: this.searchKey.toUpperCase(),
@@ -134,12 +131,9 @@ export default {
         .then((res) => {
           this.tableData = this.unique(res.data);
           this.totalNumber = res.count;
-          this.createNumberList(this.tableData.length);
+          this.createNumberList();
         })
-        .catch((err) => {
-          this.tableData = [];
-          this.totalNumber = 0;
-        });
+        .catch((err) => {});
     },
     //切换标签页时的触发事件
     handleClick(tab, event) {
@@ -162,7 +156,6 @@ export default {
         if (Cookies.get("activeNameSoftSuit") === undefined) {
           Cookies.set("activeNameSoftSuit", "ML");
           this.chooseTab = Cookies.get("activeNameSoftSuit");
-          //this._getShopsAllSoftSuitMsg(0);
           this.init();
         } else this.chooseTab = Cookies.get("activeNameSoftSuit");
         return Cookies.get("activeNameSoftSuit");

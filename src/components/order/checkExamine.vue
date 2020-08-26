@@ -258,6 +258,9 @@ export default {
       return realVal;
     },
     datatrans(value) {
+      if (!value || value == "9999/12/31 00:00:00") {
+        return "";
+      }
       //时间戳转化大法
       let date = new Date(value);
       let y = date.getFullYear();

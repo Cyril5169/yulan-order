@@ -10,7 +10,8 @@
     </header>
     <div class="studyContent">
       <!-- 循环组 -->
-      <el-card shadow="hover" v-for="group in studyContextData" :key="group.ORDERINDEX">
+      <el-card shadow="hover" v-for="group in studyContextData" :key="group.ORDERINDEX"
+        style="margin-bottom:10px;border:1px solid;">
         <div v-if="studyContextData.length > 1" slot="header">
           <span class="fstrong f16">{{ group.TITLE }} [{{ group.QUESTIONCOUNT }}]</span>
         </div>
@@ -148,13 +149,14 @@ export default {
     },
     editStudy() {
       this.studyContextData = [];
-      if(!this.checkType) BeginEditStudy({ cid: Cookies.get("cid"), sfid: this.selectData.SID });
+      if (!this.checkType)
+        BeginEditStudy({ cid: Cookies.get("cid"), sfid: this.selectData.SID });
       GetGroupContextOption({
         sfid: this.selectData.SID,
         cid: Cookies.get("cid"),
       }).then((res) => {
         this.studyContextData = res.data;
-        console.log(res.data)
+        console.log(res.data);
         for (var i = 0; i < this.studyContextData.length; i++) {
           for (
             var j = 0;
@@ -200,7 +202,7 @@ export default {
                 );
               }
             }
-            //
+            //如果没有答案赋值组件能接受的值
             if (
               this.studyContextData[i].contextList[j].TYPE ==
                 "STAND_6_SINGLE" &&
@@ -214,7 +216,6 @@ export default {
               this.studyContextData[i].contextList[j].optionResultValue = [];
           }
         }
-        //this.detailVisible = true;
       });
     },
     submitStudy() {
@@ -309,7 +310,7 @@ export default {
 .studyTitle {
   margin: 0 0 20px 0;
   text-align: center;
-  font-size: 30px;
+  font-size: 25px;
   color: #555;
 }
 .studySubTitle {
@@ -328,7 +329,7 @@ export default {
 .questionTitle {
   margin: 0;
   padding: 15px 20px;
-  font-size: 20px;
+  font-size: 18px;
   color: #555;
 }
 .optionClass {

@@ -860,7 +860,7 @@ import {
   getAllRefund,
   deleteRefund,
   updataRefundStatus,
-  updatePrinted
+  updatePrinted,
 } from "@/api/refund";
 import { getReturnInfo2 } from "@/api/orderListASP";
 import {
@@ -870,7 +870,7 @@ import {
   UpdateFirstAudition,
   UpdateProcess,
   UpdatePrintedById,
-  NewUploadFiles
+  NewUploadFiles,
 } from "@/api/paymentASP";
 import { downLoadFile } from "@/common/js/downLoadFile";
 import { mapMutations } from "vuex";
@@ -936,38 +936,38 @@ export default {
         { value: "SENDBACK", label: "退回修改" },
         { value: "RECEIVE", label: "已接收" },
         { value: "CUSTOMERAFFIRM", label: "客户确认中" },
-        { value: "APPROVED", label: "客户同意" }
+        { value: "APPROVED", label: "客户同意" },
       ],
       returnArray: [
         //退货方式
         {
           label: "玉兰取货",
-          value: "玉兰取货"
+          value: "玉兰取货",
         },
         {
           label: "客户邮寄",
-          value: "客户邮寄"
+          value: "客户邮寄",
         },
         {
           label: "无需退货",
-          value: "无需退货"
-        }
+          value: "无需退货",
+        },
       ],
       processArray: [
         //退货方式
         {
           label: "赔偿",
-          value: "赔偿"
+          value: "赔偿",
         },
         {
           label: "退货",
-          value: "退货"
+          value: "退货",
         },
         {
           label: "无质量问题",
-          value: "无质量问题"
-        }
-      ]
+          value: "无质量问题",
+        },
+      ],
     };
   },
   props: ["orderNo", "itemNo", "lineNo"],
@@ -1028,7 +1028,7 @@ export default {
       } else {
         return val;
       }
-    }
+    },
   },
   methods: {
     DealManTrans(row) {
@@ -1054,9 +1054,9 @@ export default {
     },
     //查询未打印的单据
     checkNoPrint() {
-      GetNoPrinted2().then(res => {
+      GetNoPrinted2().then((res) => {
         this.tableData = res.data;
-        this.tableData.forEach(item => {
+        this.tableData.forEach((item) => {
           item.PRINTED = item.PRINTED === "0" ? true : false;
         });
         this.allNum = res.count;
@@ -1073,7 +1073,7 @@ export default {
         state: this.SELECT_STATUS, //状态
         DEALMAN_NAME: this.selectDealor, //创建者名称
         cName: this.selectCNAME, //客户名称
-        itemNo: this.selectItemNo //产品号
+        itemNo: this.selectItemNo, //产品号
       };
       if (!obj.startDate) {
         obj.startDate = "0001/1/1 00:00:00";
@@ -1085,14 +1085,14 @@ export default {
       }
       let filter = this.$options.filters["propertyFilter"];
       GetAllCompensation(filter(obj))
-        .then(res => {
+        .then((res) => {
           this.tableData = res.data;
-          this.tableData.forEach(item => {
+          this.tableData.forEach((item) => {
             item.PRINTED = item.PRINTED === "0" ? true : false;
           });
           this.allNum = res.count;
         })
-        .catch(err => {
+        .catch((err) => {
           this.tableData = [];
           this.allNum = 0;
         });
@@ -1118,14 +1118,12 @@ export default {
       this.dateStamp = new Date().getTime();
       let data = {
         ID: val.ID,
-        STATE: val.STATE
+        STATE: val.STATE,
       };
-      GetCompensationById(data).then(res => {
+      GetCompensationById(data).then((res) => {
         if (res.count > 0) {
           this.submit = res.data[0];
-          if (
-            this.submit.STATE == "SUBMITTED" 
-          ) {
+          if (this.submit.STATE == "SUBMITTED") {
             this.submit.FIRST_AUDITION = "";
           }
           if (
@@ -1142,7 +1140,7 @@ export default {
           var fileName = list[i].substr(index + 1);
           this.fileList.push({
             name: fileName,
-            url: list[i]
+            url: list[i],
           });
         }
         //查询时，将对应初审意见的附件的字段拆解开来，并作为对象传入文件集合中
@@ -1152,7 +1150,7 @@ export default {
           var fileName = list2[i].substr(index + 1);
           this.fileListForAudition.push({
             name: fileName,
-            url: list2[i]
+            url: list2[i],
           });
         }
         this.iniAuditionFileNum = this.fileListForAudition.length;
@@ -1186,7 +1184,7 @@ export default {
             var fileName = list3[i].substr(index + 1);
             this.processDetail[j].fileListForProcess.push({
               name: fileName,
-              url: list3[i]
+              url: list3[i],
             });
           }
           //查询附件名称的末尾最大编号
@@ -1218,7 +1216,7 @@ export default {
               PROCESS_FILE_FOLDER: "",
               fileNumber: 0,
               fileNameList: [],
-              uploadSuccess: false
+              uploadSuccess: false,
             });
             this.deleteFileForProcess.push("");
             this.fileChangeForProcess.push("0");
@@ -1243,7 +1241,7 @@ export default {
             "提示",
             {
               confirmButtonText: "确定",
-              type: "warning"
+              type: "warning",
             }
           );
           return;
@@ -1260,7 +1258,7 @@ export default {
           ) {
             this.$alert("请完善处理结果", "提示", {
               confirmButtonText: "确定",
-              type: "warning"
+              type: "warning",
             });
             return;
           }
@@ -1270,7 +1268,7 @@ export default {
             if (this.FormRight == false) {
               this.$alert("提交失败，附件仅能上传图片或视频", "提示", {
                 confirmButtonText: "确定",
-                type: "warning"
+                type: "warning",
               });
               return;
             }
@@ -1334,7 +1332,7 @@ export default {
           if (!this.submit.FIRST_AUDITION) {
             this.$alert("请填写初审意见或退回原因", "提示", {
               confirmButtonText: "确定",
-              type: "warning"
+              type: "warning",
             });
             return;
           }
@@ -1344,14 +1342,14 @@ export default {
           if (!this.submit.FIRST_AUDITION) {
             this.$alert("请填写初审意见或退回原因", "提示", {
               confirmButtonText: "确定",
-              type: "warning"
+              type: "warning",
             });
             return;
           }
           if (!this.submit.RETURN_TYPE) {
             this.$alert("请选择退货方式", "提示", {
               confirmButtonText: "确定",
-              type: "warning"
+              type: "warning",
             });
             return;
           } else {
@@ -1361,7 +1359,7 @@ export default {
             ) {
               this.$alert("请选择地址和收件人", "提示", {
                 confirmButtonText: "确定",
-                type: "warning"
+                type: "warning",
               });
               return;
             }
@@ -1370,7 +1368,7 @@ export default {
           if (this.fileListForAudition.length != 0 && this.FormRight == false) {
             this.$alert("提交失败，附件仅能上传图片或视频", "提示", {
               confirmButtonText: "确定",
-              type: "warning"
+              type: "warning",
             });
             return;
           }
@@ -1470,7 +1468,7 @@ export default {
       if (this.processDetail.length >= this.submit.QTY) {
         this.$alert("已经达到编辑项的上限", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       } else {
@@ -1488,7 +1486,7 @@ export default {
           PROCESS_FILE_FOLDER: "",
           fileNumber: 0,
           fileNameList: [],
-          uploadSuccess: false
+          uploadSuccess: false,
         });
         this.deleteFileForProcess.push("");
         this.fileChangeForProcess.push("0");
@@ -1500,7 +1498,7 @@ export default {
       if (this.processDetail.length == 1) {
         this.$alert("必须至少有一项该类信息", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       } else {
@@ -1512,7 +1510,7 @@ export default {
     },
     //获得退货或寄样信息
     _getReturnInfo() {
-      getReturnInfo2().then(res => {
+      getReturnInfo2().then((res) => {
         if (res.code == 0) {
           for (var i = 0; i < res.data.length; i++) {
             //这一部分应该在编辑里使用（可以进行初审的时候使用）
@@ -1541,7 +1539,7 @@ export default {
       //updatePrinted({
       UpdatePrintedById({
         id: value.ID,
-        printed: value.PRINTED ? "0" : "1"
+        printed: value.PRINTED ? "0" : "1",
       });
     },
     //执行打印操作
@@ -1551,7 +1549,7 @@ export default {
         type: "html",
         maxWidth: 1300,
         headerStyle: "margin: -2px;",
-        targetStyles: ["*"]
+        targetStyles: ["*"],
       });
     },
     handleChange(file, fileList) {
@@ -1567,6 +1565,11 @@ export default {
       var list8 = suffix.split("flv");
       var list9 = suffix.split("rm");
       var list10 = suffix.split("mpg");
+      var list11 = suffix.split("doc");
+      var list12 = suffix.split("docx");
+      var list13 = suffix.split("xls");
+      var list14 = suffix.split("xlsx");
+      var list15 = suffix.split("pdf");
       if (
         list1.length > 1 ||
         list2.length > 1 ||
@@ -1577,7 +1580,12 @@ export default {
         list7.length > 1 ||
         list8.length > 1 ||
         list9.length > 1 ||
-        list10.length > 1
+        list10.length > 1 ||
+        list11.length > 1 ||
+        list12.length > 1 ||
+        list13.length > 1 ||
+        list14.length > 1 ||
+        list15.length > 1
       ) {
         this.FormRight = true;
         this.fileListForAudition = fileList;
@@ -1585,9 +1593,9 @@ export default {
       } else {
         this.FormRight = false;
         this.fileListForAudition = [];
-        this.$alert("请上传图片或视频，否则无法成功提交", "提示", {
+        this.$alert("请上传图片、视频或文档，否则无法成功提交", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -1605,7 +1613,7 @@ export default {
       this.dateStamp = new Date().getTime();
       this.$alert("文件上传失败", "提示", {
         confirmButtonText: "确定",
-        type: "success"
+        type: "success",
       });
     },
     //新增或修改初审意见的字段拼接
@@ -1633,7 +1641,7 @@ export default {
           var name = prefix + num + suffix;
           var model = {
             origin: this.fileListForAudition[j].name,
-            now: name
+            now: name,
           };
           this.filesSubmit.push(model);
         }
@@ -1669,18 +1677,18 @@ export default {
           type: type,
           attchmentChange: this.fileChangeForAudition,
           deleteFile: this.deleteFileForAudition,
-          firstAddFile: this.firstAddAudition
-        }).then(res => {
+          firstAddFile: this.firstAddAudition,
+        }).then((res) => {
           if (res.code == 0) {
             if (type == 2) {
               this.$alert("退回成功", "提示", {
                 confirmButtonText: "确定",
-                type: "success"
+                type: "success",
               });
             } else if (type == 5) {
               this.$alert("成功修改退回意见", "提示", {
                 confirmButtonText: "确定",
-                type: "success"
+                type: "success",
               });
             }
             this.releaseBadge("newRefund2"); //刷新角标
@@ -1690,7 +1698,7 @@ export default {
           } else {
             this.$alert("退回失败，请稍后重试", "提示", {
               confirmButtonText: "确定",
-              type: "warning"
+              type: "warning",
             });
             return;
           }
@@ -1705,18 +1713,18 @@ export default {
           type: type,
           attchmentChange: this.fileChangeForAudition,
           deleteFile: this.deleteFileForAudition,
-          firstAddFile: this.firstAddAudition
-        }).then(res => {
+          firstAddFile: this.firstAddAudition,
+        }).then((res) => {
           if (res.code == 0) {
             if (type == 1) {
               this.$alert("成功提交初审意见", "提示", {
                 confirmButtonText: "确定",
-                type: "success"
+                type: "success",
               });
             } else if (type == 4) {
               this.$alert("成功修改初审意见", "提示", {
                 confirmButtonText: "确定",
-                type: "success"
+                type: "success",
               });
             }
             this.releaseBadge("newRefund2"); //刷新角标
@@ -1726,7 +1734,7 @@ export default {
           } else {
             this.$alert("提交失败，请稍后重试", "提示", {
               confirmButtonText: "确定",
-              type: "warning"
+              type: "warning",
             });
             return;
           }
@@ -1746,6 +1754,11 @@ export default {
       var list8 = suffix.split("flv");
       var list9 = suffix.split("rm");
       var list10 = suffix.split("mpg"); //判断文件格式
+      var list11 = suffix.split("doc");
+      var list12 = suffix.split("docx");
+      var list13 = suffix.split("xls");
+      var list14 = suffix.split("xlsx");
+      var list15 = suffix.split("pdf");
       if (
         list1.length > 1 ||
         list2.length > 1 ||
@@ -1756,7 +1769,12 @@ export default {
         list7.length > 1 ||
         list8.length > 1 ||
         list9.length > 1 ||
-        list10.length > 1
+        list10.length > 1 ||
+        list11.length > 1 ||
+        list12.length > 1 ||
+        list13.length > 1 ||
+        list14.length > 1 ||
+        list15.length > 1
       ) {
         this.doActionByupload = true;
         if (this.processDetail[index].uploadSuccess) {
@@ -1798,9 +1816,9 @@ export default {
         } else {
           this.fileChangeForProcess[index] = "0";
         }
-        this.$alert("请上传图片或视频，否则无法成功提交", "提示", {
+        this.$alert("请上传图片、视频或文档，否则无法成功提交", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -1832,7 +1850,7 @@ export default {
         if (
           this.processDetail[i].fileListForProcess.length != 0 &&
           this.processDetail[i].fileListForProcess.filter(
-            item => item.status == "success"
+            (item) => item.status == "success"
           ).length == this.processDetail[i].fileListForProcess.length
         ) {
         } else {
@@ -1851,12 +1869,12 @@ export default {
         details: this.processDetail,
         totalMoney: this.submit.TOTALMONEY,
         attchmentChange: this.fileChangeForProcess,
-        deleteFiles: this.deleteFileForProcess
-      }).then(res => {
+        deleteFiles: this.deleteFileForProcess,
+      }).then((res) => {
         if (res.code == 0) {
           this.$alert("处理成功", "提示", {
             confirmButtonText: "确定",
-            type: "success"
+            type: "success",
           });
           this.releaseBadge("newRefund2"); //刷新角标
           this.refresh();
@@ -1865,7 +1883,7 @@ export default {
         } else {
           this.$alert("处理失败，请稍后重试", "提示", {
             confirmButtonText: "确定",
-            type: "warning"
+            type: "warning",
           });
           return;
         }
@@ -1895,14 +1913,14 @@ export default {
           CID: this.companyId,
           dateStamp: this.dateStamp,
           dateString: this.dateString,
-          type: "audition"
-        }
+          type: "audition",
+        },
       })
-        .then(res => {
+        .then((res) => {
           if (res.code == 0) {
             var model = {
               origin: param.file.name,
-              now: res.data
+              now: res.data,
             };
             this.filesSubmit.push(model);
             //上传成功的文件数=上传的文件数
@@ -1919,22 +1937,22 @@ export default {
         .then(() => {})
         .catch(() => {});
     },
-    ...mapMutations("badge", ["addBadge", "releaseBadge"])
+    ...mapMutations("badge", ["addBadge", "releaseBadge"]),
   },
   computed: {
     //返回大写形式的总金额
-    totalMoneyUpper: function() {
+    totalMoneyUpper: function () {
       return digitUppercase(this.submit.TOTALMONEY);
-    }
+    },
   },
   created() {
     this._getReturnInfo();
     this.GetNowDate();
     this.refresh();
   },
-  activated: function() {
+  activated: function () {
     this.refresh();
-  }
+  },
 };
 </script>
 

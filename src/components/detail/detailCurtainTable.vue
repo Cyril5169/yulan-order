@@ -138,7 +138,7 @@
           </template>
         </el-table-column>
         <el-table-column
-          v-if="isManager != '0' ||  (isManager == '0' && check_CURTAIN_STATUS_ID == -1) && salPromotion.P_ID"
+          v-if="(isManager != '0' ||  (isManager == '0' && check_CURTAIN_STATUS_ID == -1)) && salPromotion.P_ID"
           label="折后" align="center" width="55">
           <template slot-scope="scope">
             <span>

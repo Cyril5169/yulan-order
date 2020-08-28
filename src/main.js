@@ -35,7 +35,7 @@ Vue.prototype.Global = {
   sysTitle: sysTitle,
   wangqianUrl: wangqianUrl
 }
-
+Vue.prototype.zj_log = window.console.log;
 //请求拦截
 Axios.interceptors.request.use(config => {
   //解决IE请求缓存

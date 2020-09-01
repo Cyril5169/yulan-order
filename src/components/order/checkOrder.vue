@@ -1276,6 +1276,7 @@ export default {
           ? getPush2[i].location
           : "";
         if (getPush2[0].salPromotion != null) {
+          this.array2[i].pId = getPush2[0].salPromotion.pId;
           this.array2[i].promotionType = getPush2[0].salPromotion.orderType;
           this.array2[i].flagFlType = getPush2[0].salPromotion.flagFl;
         }
@@ -1312,6 +1313,7 @@ export default {
       }
       this.ORDERBODY = this.array2;
     },
+    //窗帘
     payNew() {
       if (!this.checkPay()) return;
       var url = "/order/getResidemoney.do";
@@ -1328,7 +1330,7 @@ export default {
           deleteArray[i] = getPush3[i].cartItemId;
         }
         var data2 = {
-          product_group_tpye: "E", //产品类别
+          product_group_tpye: this.product_group_tpye, //产品类别
           promotion_cost: this.totalPrice, //活动价格【】
           cid: Cookies.get("cid"), //登录用户账号
           companyId: Cookies.get("companyId"),

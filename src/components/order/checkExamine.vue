@@ -193,6 +193,7 @@ import {
   getOrderDetails,
   GetCtmOrder,
   GetPromotionByType,
+  GetPromotionByTypeAndId,
   GetOrderUseRebate,
   ljExportProductExcel,
 } from "@/api/orderListASP";
@@ -353,6 +354,7 @@ export default {
         transCookies[i].unit = orderBody[i].UNIT;
         transCookies[i].item = orderBody[i].item;
         transCookies[i].salPromotion = new Object();
+        transCookies[i].salPromotion.pId = orderBody[i].P_ID;
         transCookies[i].salPromotion.orderType = orderBody[i].PROMOTION_TYPE;
         transCookies[i].salPromotion.arrearsFlag = item.ARREARSFLAG;
         transCookies[i].salPromotion.flagFl = orderBody[i].FLAG_FL_TYPE;
@@ -618,8 +620,9 @@ export default {
                 this.ruleForm.ORDERBODY[i].PROMOTION_TYPE &&
                 this.ruleForm.ORDERBODY[i].PROMOTION_TYPE != " "
               ) {
-                var res = await GetPromotionByType({
+                var res = await GetPromotionByTypeAndId({
                   proType: this.ruleForm.ORDERBODY[i].PROMOTION_TYPE,
+                  pId: this.ruleForm.ORDERBODY[i].P_ID,
                   cid: Cookies.get("cid"),
                 });
                 if (!res.data) {

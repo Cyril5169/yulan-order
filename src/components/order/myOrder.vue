@@ -165,6 +165,7 @@ import {
   cancelOrderNew,
   copyCartItem,
   GetPromotionByType,
+  GetPromotionByTypeAndId,
   GetOrderUseRebate,
 } from "@/api/orderListASP";
 import { cancelOrder, payAgain, queryCash } from "@/api/orderList";
@@ -439,6 +440,7 @@ export default {
         transCookies[i].unit = orderBody[i].UNIT;
         transCookies[i].item = orderBody[i].item;
         transCookies[i].salPromotion = new Object();
+        transCookies[i].salPromotion.pId = orderBody[i].P_ID;
         transCookies[i].salPromotion.orderType = orderBody[i].PROMOTION_TYPE;
         transCookies[i].salPromotion.arrearsFlag = item.ARREARSFLAG;
         transCookies[i].salPromotion.flagFl = orderBody[i].FLAG_FL_TYPE;
@@ -658,8 +660,9 @@ export default {
             //欠款可提交判断活动和优惠券是否过期
             for (var i = 0; i < item.ORDERBODY.length; i++) {
               if (item.ORDERBODY[i].PROMOTION_TYPE) {
-                var res = await GetPromotionByType({
+                var res = await GetPromotionByTypeAndId({
                   proType: item.ORDERBODY[i].PROMOTION_TYPE,
+                  pId: item.ORDERBODY[i].P_ID,
                   cid: Cookies.get("cid"),
                 });
                 if (!res.data) {

@@ -58,47 +58,20 @@
             <el-table-column label="小计" align="center">
               <template slot-scope="scope">
                 <div v-if="isManager === '0'">***</div>
-                <div v-else-if="scope.row.unit === '平方米'">
-                  {{
-                    subtotal(scope.row.width, scope.row.height, scope.row.price)
-                  }}
-                </div>
-                <div v-else>
-                  {{
-                    (parseFloat(scope.row.price) *
-                      parseFloat(scope.row.quantity))
-                      | dosageFilter
-                  }}
-                </div>
+                <div v-else>{{subtotal(scope.row)}}</div>
               </template>
             </el-table-column>
             <el-table-column label="折后金额" align="center">
               <template slot-scope="scope">
                 <div v-if="isManager === '0'">***</div>
-                <div v-else-if="scope.row.unit === '平方米'">
-                  {{
-                    scope.row.salPromotion? 
-                    (scope.row.salPromotion.type == 1? 
-                    scope.row.salPromotion.discount * subtotal( scope.row.width,scope.row.height,scope.row.price)
-                    :subtotal(scope.row.width,scope.row.height,scope.row.salPromotion.price))
-                    : subtotal(scope.row.width,scope.row.height,scope.row.price)
-                  }}
-                </div>
                 <div v-else>
-                  {{
-                    scope.row.salPromotion? 
-                    (scope.row.salPromotion.type == 1? 
-                    scope.row.salPromotion.discount * parseFloat(scope.row.price) * parseFloat(scope.row.quantity)
-                    :parseFloat(scope.row.salPromotion.price) *parseFloat(scope.row.quantity))
-                    : parseFloat(scope.row.price) * parseFloat(scope.row.quantity)
-                        | dosageFilter
-                  }}
+                  {{ calculatePromotionPrice(scope.row) }}
                 </div>
               </template>
             </el-table-column>
             <el-table-column label="操作" width="170px" align="center">
               <template slot-scope="scope">
-                <a class="link-detail" @click="handleDetails(scope.$index, scope.row)">查看详情</a>
+                <a class="link-detail" @click="handleDetails(scope.$index, scope.row)" v-if="canShowDetail(scope.row)">查看详情</a>
                 <a class="link-delete" @click="deleteSingle(scope.row)">删除商品</a>
               </template>
             </el-table-column>
@@ -389,30 +362,48 @@ export default {
       this.multipleSelection = val;
       for (var i = 0; i < this.multipleSelection.length; i++) {
         let _data = this.multipleSelection[i];
-        if (_data.quantity) {
-          let sub = parseFloat(_data.price * _data.quantity);
-          total += sub;
-          totalPrice += _data.salPromotion
-            ? _data.salPromotion.type == 1
-              ? _data.salPromotion.discount * sub
-              : parseFloat(_data.salPromotion.price * _data.quantity)
-            : sub;
-        } else {
-          let sub = this.subtotal(_data.width, _data.height, _data.price);
-          total += sub;
-          totalPrice += _data.salPromotion
-            ? _data.salPromotion.type == 1
-              ? _data.salPromotion.discount * sub
-              : this.subtotal(
-                  _data.width,
-                  _data.height,
-                  _data.salPromotion.price
-                )
-            : sub;
-        }
+        var quantity =
+          _data.quantity | this.dosageFilter(_data.width.mul(_data.height));
+        let sub = _data.price.mul(_data.quantity);
+        total += sub;
+        totalPrice += this.calculatePromotionPrice(_data);
       }
       this.totalMoney = total;
       this.totalPriceMoney = totalPrice;
+    },
+    calculatePromotionPrice(data) {
+      var price = 0;
+      var quantity =
+        data.quantity != 0
+          ? data.quantity
+          : this.dosageFilter(data.width.mul(data.height));
+      //首先判断TYPE,1折扣，2定价。然后判断priority
+      if (data.salPromotion) {
+        //一口价
+        if (data.salPromotion.priority == 99) {
+          if (quantity < 1) quantity = 1;
+          price = quantity.mul(data.salPromotion.price);
+        } else {
+          switch (data.salPromotion.type) {
+            case "1":
+              //折扣
+              price = quantity.mul(data.price).mul(data.salPromotion.discount);
+              break;
+            case "2":
+              //定价
+              price = quantity.mul(data.salPromotion.price);
+          }
+        }
+      } else {
+        price = quantity.mul(data.price);
+      }
+      return this.dosageFilter(price);
+    },
+    canShowDetail(row) {
+      return (
+        !row.salPromotion ||
+        (row.salPromotion && row.salPromotion.modifyFlag != "N")
+      );
     },
     //查看详情
     handleDetails(index, row) {
@@ -566,11 +557,7 @@ export default {
           );
           return;
         }
-        if (
-          this.customerType === "10" &&
-          (this.multipleSelection[i].onlineSalesAmount === null ||
-            this.multipleSelection[i].onlineSalesAmount == 0)
-        ) {
+        if (this.customerType === "10" && !this.multipleSelection[i].onlineSalesAmount){
           arr.push(this.multipleSelection[i].item.itemNo);
         }
       }
@@ -599,12 +586,14 @@ export default {
       that.expands.push(row.activity);
     },
     //小计：面积四舍五入后*价格
-    subtotal(width, height, price) {
-      let _width = parseFloat(width);
-      let _height = parseFloat(height);
-      let _price = parseFloat(price);
-      let square = Math.round(_width * _height * 100) / 100;
-      return Math.round(price * square * 100) / 100;
+    subtotal(data) {
+      var price = 0;
+      var quantity =
+        data.quantity != 0
+          ? data.quantity
+          : this.dosageFilter(data.width.mul(data.height));
+      price = quantity.mul(data.price);
+      return this.dosageFilter(price);
     },
   },
   created() {

@@ -9,6 +9,8 @@ export function tabsName(index) {
       return "定制窗帘";
     case "shops/softSuit":
       return "软装";
+    case "shops/fixPriceShops":
+      return "一口价专区";
     case "shops/shoppingCurtainDetail":
       return "商品详情";
     case "statement":
@@ -100,11 +102,11 @@ export function tabsName(index) {
     case "query/salesQuery":
       return "销售提货单查询";
     case "newRefund":
-        return "退款赔偿";
+      return "退款赔偿";
     case "newRefundExamine":
       return "退款赔偿审核";
     case "expressSearch":
-      return "快递签收查询";  
+      return "快递签收查询";
     default:
       return "xxx";
   }

@@ -264,7 +264,7 @@
       <el-dialog :visible.sync="dialogImageVisible">
         <img width="100%" :src="dialogImageUrl" alt="" />
       </el-dialog>
-      <el-table :data="ORDERBODY" border style="width: 100%" :row-class-name="tableRowClassName">
+      <el-table :data="order_details" border style="width: 100%" :row-class-name="tableRowClassName">
         <el-table-column prop="itemNo" align="center" label="型号"></el-table-column>
         <!-- :formatter="FixIt"  -->
         <el-table-column align="center" label="数量">
@@ -302,7 +302,6 @@
         <el-table-column align="center" label="应付金额">
           <template slot-scope="scope1">
             <span v-if="isManager === '0'">***</span>
-            <!-- <span v-else>{{(scope1.row.qtyRequired*scope1.row.finalPrice)-scope1.row.yuefanli-scope1.row.nianfanli | priceFilter}}</span> -->
             <span v-else>{{
               (scope1.row.finalPrice -
                 scope1.row.yuefanli -
@@ -318,9 +317,9 @@
       <el-collapse v-model="activeNames">
         <el-collapse-item title="使用优惠券/礼品卡" name="1">
           <div v-for="(item, index) of couponData" :key="index"
-            :class="item.canUse ? switchClass.cctv : switchClass.cctvF">
+            :class="canUseConpon(item) ? switchClass.cctv : switchClass.cctvF">
             <div class="couponHead">
-              <div :class="item.canUse ? switchClass.logo : switchClass.logoF"></div>
+              <div :class="canUseConpon(item) ? switchClass.logo : switchClass.logoF"></div>
               <div class="logoTxt">
                 <p style="color:white; font-size:15px; padding-top:5px; font-weight:bold; letter-spacing:2px;">
                   {{ item.notes }}
@@ -332,7 +331,7 @@
 
             <div class="couponBody">
               <p style="text-align:center" :class="
-                  item.canUse ? switchClass.transTxt : switchClass.transTxtF
+                  canUseConpon(item) ? switchClass.transTxt : switchClass.transTxtF
                 ">
                 <span style="font-size:18px;">余额￥</span>
                 <span v-if="isManager === '0'">***</span>
@@ -340,7 +339,7 @@
               </p>
               <div style="margin:0 auto; width:245px;">
                 <div :class="
-                    item.canUse
+                    canUseConpon(item)
                       ? switchClass.roundedRectangle
                       : switchClass.roundedRectangleF
                   ">
@@ -350,7 +349,7 @@
                     }}至{{ item.dateEnd | datatrans }}
                   </p>
                 </div>
-                <el-checkbox :disabled="!item.canUse" v-model="couponStatus[index]" @change="
+                <el-checkbox :disabled="!canUseConpon(item)" v-model="couponStatus[index]" @change="
                     changeCoupon(couponStatus[index], item.id, item.rebateType)
                   "></el-checkbox>
               </div>
@@ -360,8 +359,8 @@
                 <span @click="RecordBack(item.id)" style="cursor: pointer;">查看返利记录>></span>
               </div>
             </div>
-            <div style="margin-left:20px;" v-if="!item.canUse">
-              由于活动："{{ activityArray.ORDER_NAME }}"，该优惠券无法使用
+            <div style="margin-left:20px;" v-if="!canUseConpon(item)">
+              由于活动："{{ salPromotion.ORDER_NAME }}"，该优惠券无法使用
             </div>
           </div>
         </el-collapse-item>
@@ -394,18 +393,14 @@
 <script>
 import Cookies from "js-cookie";
 import { addAddress } from "@/api/orderList";
-import { DeleteShopRecord } from "@/api/orderList";
 import { usetheCoupon } from "@/api/orderList";
 import { querycharge } from "@/api/orderList";
 import { queryCash } from "@/api/orderList";
 import { searchTickets } from "@/api/orderList";
 import { deleteAddress } from "@/api/orderList";
-import { activityPrice } from "@/api/orderList";
 import { editAddress } from "@/api/orderList";
 import { submitOrder } from "@/api/orderList";
-import { CouponUseRecord } from "@/api/orderList";
 import { CouponbackRecord } from "@/api/orderList";
-import { curtainPay } from "@/api/orderList";
 import {
   orderSettlement,
   normalOrderSettlement,
@@ -416,12 +411,11 @@ import {
   InsertBuyUser,
   UpdateBuyUser,
   DeleteBuyUser,
-  DeleteBuyUserList
+  DeleteBuyUserList,
+  GetPromotionByTypeAndId,
 } from "@/api/orderListASP";
-import { deleteCurtain } from "@/api/curtain";
 import Axios from "axios";
 import { mapMutations, mapActions } from "vuex";
-import { mapState } from "vuex";
 import useRecordDetail from "../center/useRecordDetail";
 import couponRecordDetail from "../center/couponRecordDetail";
 
@@ -429,15 +423,14 @@ export default {
   name: "checkOrder",
   components: {
     useRecordDetail,
-    couponRecordDetail
+    couponRecordDetail,
   },
   data() {
     return {
       arrearsFlag: "",
       isManager: Cookies.get("isManager"),
-      cid: "",
-      realName: "",
-      curtainOrOther: true,
+      cid: Cookies.get("cid"),
+      realName: Cookies.get("realName"),
       //返利弹窗
       dialogUse: false,
       dialogBack: false,
@@ -454,8 +447,8 @@ export default {
       add_rules: {
         BUYUSER: [{ required: true, message: "请填写姓名", trigger: "blur" }],
         BUYUSER_PHONE: [
-          { required: true, message: "请填写电话", trigger: "blur" }
-        ]
+          { required: true, message: "请填写电话", trigger: "blur" },
+        ],
       },
       useTable: [],
       backTable: [],
@@ -469,8 +462,8 @@ export default {
           wlContacts: "",
           wlTel: "",
           postAddress: "",
-          addressId: 1
-        }
+          addressId: 1,
+        },
       ],
       packingShow: false,
       formLabelWidth: "80px",
@@ -478,9 +471,7 @@ export default {
       overflow: "",
       addressIt: false,
       radio: 0,
-      totalPrice: 2800.0,
       backPrice: 0.0,
-      ORDERBODY: [],
       ctm_order: {
         buyUser: "",
         buyUserPhone: "",
@@ -503,17 +494,17 @@ export default {
         postAddress: "",
         reciverArea1: "",
         reciverArea2: "",
-        reciverArea3: ""
+        reciverArea3: "",
       },
       options: [
         {
           deliveryType: "1",
-          label: "普通物流(运费由甲方负责)"
+          label: "普通物流(运费由甲方负责)",
         },
         {
           deliveryType: "3",
-          label: "其它物流公司(运费由乙方负责)"
-        }
+          label: "其它物流公司(运费由乙方负责)",
+        },
       ],
       province: [],
       city: [],
@@ -539,9 +530,9 @@ export default {
         shiID: "",
         thequ: "",
         quID: "",
-        addressId: ""
+        addressId: "",
       },
-      array2: [],
+      order_details: [],
       array: [],
       activeNames: ["1"],
       couponData: [],
@@ -549,14 +540,18 @@ export default {
       rebateM: "",
       chargeData: {
         CUSTOMER_AGENT: "",
-        OFFICE_TEL: ""
+        OFFICE_TEL: "",
       },
       formRules: {
         telephone: [
-          { min: 11, max: 11, message: "请填写正确的手机号码", trigger: "blur" }
-        ]
+          {
+            min: 11,
+            max: 11,
+            message: "请填写正确的手机号码",
+            trigger: "blur",
+          },
+        ],
       },
-      activityArray: [], //活动集合
       switchClass: {
         cctv: "cctv",
         cctvF: "cctvF",
@@ -565,12 +560,15 @@ export default {
         transTxt: "transTxt",
         transTxtF: "transTxtF",
         roundedRectangle: "roundedRectangle",
-        roundedRectangleF: "roundedRectangleF"
+        roundedRectangleF: "roundedRectangleF",
       },
       dialogImageUrl: "",
       dialogImageVisible: false,
       fileList: [],
-      userSelect: []
+      userSelect: [],
+      salPromotion: {
+        P_ID: "",
+      },
     };
   },
   filters: {
@@ -618,13 +616,20 @@ export default {
         }
       }
       return len;
-    }
+    },
   },
   computed: {
+    totalPrice(){
+      var allcost = 0;
+      for (var i = 0; i < this.order_details.length; i++) {
+        allcost = allcost.add(this.order_details[i].promotionCost);
+      }
+      return allcost;
+    },
     //计算总价
-    allSpend: function() {
+    allSpend: function () {
       return this.totalPrice - this.backPrice;
-    }
+    },
   },
   methods: {
     ...mapActions("navTabs", ["closeToTab"]),
@@ -644,7 +649,7 @@ export default {
     },
     //将地址按照顺序渲染
     sortAddress() {
-      var compare = function(a, b) {
+      var compare = function (a, b) {
         if (a.addressId < b.addressId) {
           return -1;
         } else if (a.addressId > b.addressId) {
@@ -658,15 +663,8 @@ export default {
       var morendizhi = this.transferData.pop();
       this.transferData.unshift(morendizhi);
     },
-    //渲染
-    Rendering() {
-      /* for(var k=0;k<this.array2.length;k++){
-              this.array2[k].promotionCost=this.array2[k].promotionCost-this.array2[k].nianfanli-this.array2[k].yuefanli
-            } */
-      this.$set(this.ORDERBODY, 0, this.array2[0]);
-    },
     //表格过滤  --是否允许分批
-    formatRole: function(row, column) {
+    formatRole: function (row, column) {
       //return row.PART_SEND_ID ===0? "是":"否";  //预留
       if (row.partSendId == 0) {
         return "等生产";
@@ -686,24 +684,22 @@ export default {
         this.rebateM = "";
       }
       var url = "/order/showRebate.do"; //接口
+      this.ctm_order.allSpend = this.totalPrice;
       var data = {
         product_group_tpye: this.product_group_tpye,
         promotion_cost: this.totalPrice,
         rebateY: this.rebateY,
         rebateM: this.rebateM,
         cid: Cookies.get("cid"),
-        ctm_orders: this.array2,
-        ctm_order: this.ctm_order
+        ctm_orders: this.order_details,
+        ctm_order: this.ctm_order,
       };
-      usetheCoupon(url, data).then(res => {
+      usetheCoupon(url, data).then((res) => {
         for (var i = 0; i < res.data.rebate.length; i++) {
-          this.array2[i].nianfanli = res.data.rebate[i].rebateYear;
-          this.array2[i].yuefanli = res.data.rebate[i].rebateMonth;
-          /* this.array2[i].promotionCost=this.array2[i].promotionCost-this.array2[i].nianfanli-this.array2[i].yuefanli */
+          this.order_details[i].nianfanli = res.data.rebate[i].rebateYear;
+          this.order_details[i].yuefanli = res.data.rebate[i].rebateMonth;
         }
-        this.ORDERBODY = this.array2;
         this.backPrice = res.data.allRebateMonth + res.data.allRebateYear;
-        this.Rendering();
       });
     },
     //获取优惠券
@@ -712,41 +708,33 @@ export default {
       var data = {
         cid: Cookies.get("cid"),
         companyId: Cookies.get("companyId"),
-        typeId: this.product_group_tpye //"A",
+        typeId: this.product_group_tpye, //"A",
       };
-      searchTickets(url, data).then(res => {
-        GetPromotionsById({ PID: this.activityArray }).then(ress => {
-          this.couponData = res.data;
-          for (let i = 0; i < this.couponData.length; i++) {
-            this.couponData[i].canUse = true;
-            if (
-              this.couponData[i].dateId === 0 ||
-              this.couponData[i].rebateMoneyOver <= 0
-            ) {
-              this.couponData.splice(i, 1);
-            }
+      searchTickets(url, data).then((res) => {
+        this.couponData = res.data;
+        for (let i = 0; i < this.couponData.length; i++) {
+          if (
+            this.couponData[i].dateId === 0 ||
+            this.couponData[i].rebateMoneyOver <= 0
+          ) {
+            this.couponData.splice(i, 1);
           }
-          if (ress.data.length > 0) {
-            this.activityArray = ress.data[0]; //一般只有一个活动参与结算
-            for (let i = 0; i < this.couponData.length; i++) {
-              if (this.activityArray.REBATE_FLAG == "N") {
-                //不能使用优惠券
-                this.couponData[i].canUse = false;
-              } else {
-                if (
-                  this.couponData[i].rebateType ==
-                    this.activityArray.REBATE_TYPE ||
-                  this.activityArray.REBATE_TYPE == "all"
-                ) {
-                  this.couponData[i].canUse = true;
-                } else {
-                  this.couponData[i].canUse = false;
-                }
-              }
-            }
-          }
-        });
+        }
       });
+    },
+    canUseConpon(couponData) {
+      if (this.salPromotion.P_ID) {
+        if (this.salPromotion.REBATE_FLAG == "N") {
+          return false;
+        }
+        if (
+          couponData.rebateType != this.salPromotion.REBATE_TYPE &&
+          this.salPromotion.REBATE_TYPE != "all"
+        ) {
+          return false;
+        }
+      }
+      return true;
     },
     RecordUse(itemID) {
       this.useTable = [];
@@ -757,9 +745,9 @@ export default {
         beginTime: "0001/1/1",
         finishTime: "9999/12/31",
         page: 1,
-        limit: 20
+        limit: 20,
       };
-      getUseRecord(data).then(res => {
+      getUseRecord(data).then((res) => {
         this.useTable = res.data;
         this.useTable.couponId = itemID;
         this.useTable.count = res.count;
@@ -769,9 +757,9 @@ export default {
     RecordBack(itemId) {
       var url = "/order/getReturnRecord.do";
       var data = {
-        id: itemId
+        id: itemId,
       };
-      CouponbackRecord(url, data).then(res => {
+      CouponbackRecord(url, data).then((res) => {
         this.backTable = res.data;
         this.backTable.couponId = itemId;
         this.dialogBack = true;
@@ -791,12 +779,12 @@ export default {
         country: this.form.thequ /* "升平区", */,
         provinceID: this.form.shengID /* "P19" */,
         cityID: this.form.shiID /* "S200" */,
-        countryID: this.form.quID /* "D1994" */
+        countryID: this.form.quID /* "D1994" */,
       };
       if (data.country == "" || data.country == undefined) {
         data.countryID = "";
       }
-      this.$refs[formName].validate(valid => {
+      this.$refs[formName].validate((valid) => {
         if (
           valid &&
           data.province != undefined &&
@@ -810,19 +798,19 @@ export default {
           this.form.telephone != "" &&
           this.form.telephone != undefined
         ) {
-          editAddress(url, data).then(res => {
+          editAddress(url, data).then((res) => {
             this.dialogFormVisible = false;
             this.innerVisible = false;
             this.allAddress();
             this.$alert("修改地址成功", "提示", {
               confirmButtonText: "确定",
-              type: "success"
+              type: "success",
             });
           });
         } else {
           this.$alert("请填写正确信息", "提示", {
             confirmButtonText: "确定",
-            type: "warning"
+            type: "warning",
           });
           return false;
         }
@@ -850,22 +838,22 @@ export default {
       //接口
       Axios.post("/areaRegion/getCity.do", {
         regionId: row.provinceID,
-        regionName: row.provinceID
+        regionName: row.provinceID,
       })
-        .then(res => {
+        .then((res) => {
           this.city = res.data.city;
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
       Axios.post("/areaRegion/getCountry.do", {
         regionId: row.cityID,
-        regionName: row.city
+        regionName: row.city,
       })
-        .then(res => {
+        .then((res) => {
           this.country = res.data.country;
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -874,21 +862,21 @@ export default {
       this.$confirm("确定删除该地址吗？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
           var url = "/postAddress/deletePostAddress.do";
           var data = {
             cid: Cookies.get("cid"),
-            addressId: row.addressId
+            addressId: row.addressId,
           };
-          deleteAddress(url, data).then(res => {
+          deleteAddress(url, data).then((res) => {
             this.dialogFormVisible = false;
             this.innerVisible = false;
             this.allAddress();
             this.$alert("删除成功！", "提示", {
               confirmButtonText: "确定",
-              type: "success"
+              type: "success",
             });
             //预留一下
             //this.allAddress();
@@ -906,7 +894,7 @@ export default {
       this.form.quID = this.country[country].regionId;
     },
     printfCountry2(value) {
-      var country = this.country.filter(item => item.regionId == value)[0];
+      var country = this.country.filter((item) => item.regionId == value)[0];
       this.buyUserModel.COUNTRY = country.regionName;
     },
     refreshCountry(regionId, regionName) {
@@ -914,15 +902,15 @@ export default {
         "/areaRegion/getCountry.do",
         {
           regionId: regionId,
-          regionName: regionName
+          regionName: regionName,
         },
         { loading: false }
       )
-        .then(res => {
+        .then((res) => {
           this.country = res.data.country;
           this.countryData = res.data.country;
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -940,14 +928,14 @@ export default {
       this.buyUserModel.COUNTRY = "";
       this.buyUserModel.COUNTRY_ID = "";
       this.country = [];
-      var city = this.city.filter(item => item.regionId == value)[0];
+      var city = this.city.filter((item) => item.regionId == value)[0];
       this.buyUserModel.CITY = city.regionName;
       this.refreshCountry(city.regionId, city.regionName);
     },
     getCountry3(value) {
       this.ctm_order.buyUserArea3 = "";
       this.countryData = [];
-      var city = this.city.filter(item => item.regionName == value)[0];
+      var city = this.city.filter((item) => item.regionName == value)[0];
       this.refreshCountry(city.regionId, city.regionName);
     },
     refreshCity(regionId, regionName) {
@@ -955,15 +943,15 @@ export default {
         "/areaRegion/getCity.do",
         {
           regionId: regionId,
-          regionName: regionName
+          regionName: regionName,
         },
         { loading: false }
       )
-        .then(res => {
+        .then((res) => {
           this.city = res.data.city;
           this.cityData = res.data.city;
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -991,7 +979,7 @@ export default {
       this.buyUserModel.COUNTRY_ID = "";
       this.city = [];
       this.country = [];
-      var shengfen = this.province.filter(item => item.regionId == value)[0];
+      var shengfen = this.province.filter((item) => item.regionId == value)[0];
       this.buyUserModel.PROVINCE = shengfen.regionName;
       this.refreshCity(shengfen.regionId, shengfen.regionName);
     },
@@ -1002,18 +990,18 @@ export default {
       this.cityData = [];
       this.countryData = [];
       var shengfen = this.provinceData.filter(
-        item => item.regionName == value
+        (item) => item.regionName == value
       )[0];
       this.refreshCity(shengfen.regionId, shengfen.regionName);
     },
     //获取省份
     getProvince() {
       Axios.post("/areaRegion/getProvince.do", {})
-        .then(res => {
+        .then((res) => {
           this.province = res.data.province;
           this.provinceData = res.data.province;
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -1051,9 +1039,9 @@ export default {
         country: this.form.thequ,
         provinceID: this.form.shengID,
         cityID: this.form.shiID,
-        countryID: this.form.quID
+        countryID: this.form.quID,
       };
-      this.$refs[formName].validate(valid => {
+      this.$refs[formName].validate((valid) => {
         if (
           valid &&
           data.province != undefined &&
@@ -1067,19 +1055,19 @@ export default {
           this.form.telephone != "" &&
           this.form.telephone != undefined
         ) {
-          addAddress(url, data).then(res => {
+          addAddress(url, data).then((res) => {
             this.dialogFormVisible = false;
             this.innerVisible = false;
             this.allAddress();
             this.$alert("地址添加成功", "提示", {
               confirmButtonText: "确定",
-              type: "success"
+              type: "success",
             });
           });
         } else {
           this.$alert("请完善并填写正确信息", "提示", {
             confirmButtonText: "确定",
-            type: "warning"
+            type: "warning",
           });
           return false;
         }
@@ -1088,9 +1076,9 @@ export default {
     //获取收货地址
     allAddress() {
       Axios.post("/postAddress/getPostAddress.do", {
-        cid: Cookies.get("cid")
+        cid: Cookies.get("cid"),
       })
-        .then(res => {
+        .then((res) => {
           this.transferData = res.data.data;
           this.sortAddress();
           this.data = [];
@@ -1119,7 +1107,7 @@ export default {
                     : this.ctm_order.reciverArea3,
                 provinceID: this.transferData[i].provinceID,
                 cityID: this.transferData[i].cityID,
-                countryID: this.transferData[i].countryID
+                countryID: this.transferData[i].countryID,
               };
               if (
                 JSON.stringify(addArr) == JSON.stringify(this.transferData[i])
@@ -1147,7 +1135,7 @@ export default {
             }${this.ctm_order.postAddress}`;
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -1197,138 +1185,23 @@ export default {
         }
       }
     },
-    //预留算法 获取活动价
-    huodongjia() {
-      let getPush = JSON.parse(sessionStorage.getItem("shopping"));
-      this.product_group_tpye = getPush[0].item.groupType; //产品类别
-      if (this.product_group_tpye == "B" || this.product_group_tpye == "B1")
-        this.packingShow = true;
-      else this.packingShow = false;
-      if (getPush[0].salPromotion != null) {
-        this.arrearsFlag = getPush[0].salPromotion.arrearsFlag; //用于活动是否判断余额N/Y
-      } else {
-        this.arrearsFlag = null;
-      }
-      for (var i = 0; i < getPush.length; i++) {
-        this.array[i] = new Object();
-        //判断有没有活动时候传参的不同
-        if (getPush[i].activityId == null) {
-          this.array[i].pId = "";
-        } else {
-          this.array[i].pId = getPush[i].activityId;
-          if (
-            this.activityArray.indexOf(getPush[i].activityId) == -1 &&
-            getPush[i].activityId
-          )
-            //活动集合
-            this.activityArray.push(getPush[i].activityId);
-        }
-        this.array[i].item_no = getPush[i].item.itemNo;
-        //根据是选择数量还是长*宽
-        if (getPush[i].quantity == null || getPush[i].quantity == 0) {
-          this.array[i].num =
-            Math.round(getPush[i].height * getPush[i].width.mul(100)) / 100;
-          this.array[i].prime_cost = this.subtotal(
-            getPush[i].width,
-            getPush[i].height,
-            getPush[i].price
-          );
-        } else {
-          this.array[i].num = getPush[i].quantity;
-          this.array[i].prime_cost = getPush[i].quantity * getPush[i].price;
-        }
-      }
-      var url = "/order/getPromotion.do";
-      var data = this.array;
-      var allcost = 0;
-      activityPrice(url, data).then(res => {
-        for (var j = 0; j < res.data.length; j++) {
-          this.array[j].questPrice =
-            Math.round(res.data[j].promotion_cost.mul(100)) / 100;
-          allcost = allcost.add(
-            Math.round(parseFloat(res.data[j].promotion_cost).mul(100)) / 100
-          );
-        }
-        /* allcost=allcost.toString(); */
-        //将allspend赋值活动后总价
-        this.ctm_order.allSpend = allcost;
-        this.totalPrice = allcost;
-        this.orderList();
-      });
-    },
-    //预留算法 获取订单列表
-    orderList() {
-      var getPush2 = JSON.parse(sessionStorage.getItem("shopping"));
-      for (var i = 0; i < getPush2.length; i++) {
-        this.array2[i] = new Object();
-        this.array2[i].curtainWidth = getPush2[i].width;
-        this.array2[i].curtainHeight = getPush2[i].height;
-        this.array2[i].curtainHeight2 = getPush2[i].falseShadeHigh
-          ? getPush2[i].falseShadeHigh
-          : 0;
-        this.array2[i].curtainSizeTimes = getPush2[i].drape
-          ? getPush2[i].drape
-          : 0;
-        this.array2[i].curtainWbhSize = getPush2[i].outsourcingBoxWidth
-          ? getPush2[i].outsourcingBoxWidth
-          : 0;
-        this.array2[i].curtainRoomName = getPush2[i].location
-          ? getPush2[i].location
-          : "";
-        if (getPush2[0].salPromotion != null) {
-          this.array2[i].pId = getPush2[0].salPromotion.pId;
-          this.array2[i].promotionType = getPush2[0].salPromotion.orderType;
-          this.array2[i].flagFlType = getPush2[0].salPromotion.flagFl;
-        }
-        //初始化
-        this.array2[i].orderNo = getPush2[i].orderNumber;
-        this.array2[i].yuefanli = 0;
-        this.array2[i].nianfanli = 0;
-        this.array2[i].itemNoSample = getPush2[i].item.itemNo;
-        this.array2[i].lineNo = getPush2[i].lineNo;
-        this.array2[i].itemNo = getPush2[i].item.itemNo;
-        this.array2[i].partSendId = getPush2[i].splitShipment;
-        this.array2[i].productionVersion = getPush2[i].item.itemVersion;
-        this.array2[i].notes = getPush2[i].note;
-        this.array2[i].unitPrice = getPush2[i].price;
-        this.array2[i].prime_cost = this.array[i].prime_cost;
-        this.array2[i].promotionCost = this.array[i].questPrice;
-        this.array2[i].promotion = getPush2[i].activityName;
-        if (this.array2[i].promotion == undefined) {
-          this.array2[i].promotion = "无";
-        }
-        this.array2[i].unit = getPush2[i].unit;
-        if (getPush2[i].unit == "平方米") {
-          this.array2[i].qtyRequired =
-            Math.round(getPush2[i].height.mul(getPush2[i].width).mul(100)) /
-            100;
-        } else {
-          this.array2[i].qtyRequired = getPush2[i].quantity;
-        }
-        //网销
-        if (getPush2[i].onlineSalesAmount !== null) {
-          this.array2[i].onlineSalesAmount = getPush2[i].onlineSalesAmount;
-        }
-        this.array2[i].finalPrice = this.array[i].questPrice;
-      }
-      this.ORDERBODY = this.array2;
-    },
     //窗帘
     payNew() {
       if (!this.checkPay()) return;
       var url = "/order/getResidemoney.do";
       var data = {
         cid: Cookies.get("cid"),
-        companyId: Cookies.get("companyId")
+        companyId: Cookies.get("companyId"),
       };
       //每次提交的时候判断一下余额
-      queryCash(url, data).then(res => {
+      queryCash(url, data).then((res) => {
         this.Initial_balance = res.data;
         var getPush3 = JSON.parse(sessionStorage.getItem("shopping"));
         var deleteArray = [];
         for (var i = 0; i < getPush3.length; i++) {
           deleteArray[i] = getPush3[i].cartItemId;
         }
+        this.ctm_order.allSpend = this.totalPrice;
         var data2 = {
           product_group_tpye: this.product_group_tpye, //产品类别
           promotion_cost: this.totalPrice, //活动价格【】
@@ -1338,18 +1211,18 @@ export default {
           rebateM: this.rebateM, //月优惠券编号
           arrearsFlag: this.arrearsFlag,
           ctm_order: this.ctm_order,
-          ctm_orders: this.array2,
-          cartItemIDs: deleteArray
+          ctm_orders: this.order_details,
+          cartItemIDs: deleteArray,
         };
         orderSettlement(data2)
-          .then(res => {
+          .then((res) => {
             this.afterPay();
             this.$root.$emit("refreshBadgeIcon", "curtainCount");
           })
-          .catch(res => {
-            this.$alert("提交失败，请联系管理员", "提示", {
+          .catch((res) => {
+            this.$alert("提交失败:" + res.msg, "提示", {
               confirmButtonText: "确定",
-              type: "warning"
+              type: "warning",
             });
           });
       });
@@ -1360,10 +1233,10 @@ export default {
       var url = "/order/getResidemoney.do";
       var data = {
         cid: Cookies.get("cid"),
-        companyId: Cookies.get("companyId")
+        companyId: Cookies.get("companyId"),
       };
       //每次提交的时候判断一下余额
-      queryCash(url, data).then(res => {
+      queryCash(url, data).then((res) => {
         this.Initial_balance = res.data;
         var url2 = "/order/orderCount.do";
         //删除购物车数据
@@ -1372,6 +1245,7 @@ export default {
         for (var i = 0; i < getPush3.length; i++) {
           deleteArray[i] = getPush3[i].id;
         }
+        this.ctm_order.allSpend = this.totalPrice;
         var data2 = {
           product_group_tpye: this.product_group_tpye, //产品类别，从购物车出获取
           promotion_cost: this.totalPrice, //活动价格【】
@@ -1381,20 +1255,20 @@ export default {
           rebateM: this.rebateM, //月优惠券编号
           arrearsFlag: this.arrearsFlag,
           ctm_order: this.ctm_order,
-          ctm_orders: this.array2,
-          cartItemIDs: deleteArray
+          ctm_orders: this.order_details,
+          cartItemIDs: deleteArray,
         };
         //submitOrder(url2, data2)
         normalOrderSettlement(data2)
-          .then(res => {
+          .then((res) => {
             this.afterPay();
             this.$root.$emit("refreshBadgeIcon", "wallCount");
             this.$root.$emit("refreshBadgeIcon", "softCount");
           })
-          .catch(res => {
-            this.$alert("提交失败，请联系管理员", "提示", {
+          .catch((res) => {
+            this.$alert("提交失败:" + res.msg, "提示", {
               confirmButtonText: "确定",
-              type: "warning"
+              type: "warning",
             });
           });
       });
@@ -1406,7 +1280,7 @@ export default {
       ) {
         this.$alert("请填写指定的物流公司", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return false;
       }
@@ -1425,7 +1299,7 @@ export default {
         this.ctm_order.buyUserPicture +=
           "/Files/BuyUser/" + this.cid + "/" + this.fileList[i].name + ";";
       }
-      if (this.activityArray.BUYER_FLAG == 1) {
+      if (this.salPromotion.BUYER_FLAG == 1) {
         //要填写购买人信息
         if (
           !this.ctm_order.buyUser ||
@@ -1437,14 +1311,14 @@ export default {
         ) {
           this.$alert("请填写完整的购买用户信息", "提示", {
             confirmButtonText: "确定",
-            type: "warning"
+            type: "warning",
           });
           return false;
         }
         if (!this.ctm_order.buyUserPicture) {
           this.$alert("请上传购买凭证", "提示", {
             confirmButtonText: "确定",
-            type: "warning"
+            type: "warning",
           });
           return false;
         }
@@ -1462,7 +1336,7 @@ export default {
         this.$root.$emit("refreshBadgeIcon", "curtainCount");
         this.$alert("提交成功", "提示", {
           confirmButtonText: "确定",
-          type: "success"
+          type: "success",
         });
       } else {
         this.$alert(
@@ -1472,14 +1346,14 @@ export default {
           "提示",
           {
             confirmButtonText: "确定",
-            type: "warning"
+            type: "warning",
           }
         );
       }
       //跳转到我的订单
       this.closeToTab({
         oldUrl: "order/checkOrder",
-        newUrl: "order/myOrder"
+        newUrl: "order/myOrder",
       });
     },
     //查询经办人
@@ -1487,11 +1361,10 @@ export default {
       var url = "/order/getlink.do";
       var data = {
         cid: Cookies.get("cid"),
-        companyId: Cookies.get("companyId")
+        companyId: Cookies.get("companyId"),
       };
-
       //querycharge(url, data).then(res => {
-      getCustomerInfo(data).then(res => {
+      getCustomerInfo(data).then((res) => {
         this.chargeData = res.data;
       });
     },
@@ -1499,17 +1372,20 @@ export default {
     backToOrder() {
       this.closeToTab({
         oldUrl: "order/checkOrder",
-        newUrl: "order/myOrder"
+        newUrl: "order/myOrder",
       });
     },
-    subtotal(width, height, price) {
-      let _width = parseFloat(width);
-      let _height = parseFloat(height);
-      let _price = parseFloat(price);
-      let square = Math.round(_width.mul(_height).mul(100)) / 100;
-      return Math.round(price.mul(square).mul(100)) / 100;
+    subtotal(data) {
+      var price = 0;
+      var quantity =
+        data.quantity != 0
+          ? data.quantity
+          : this.dosageFilter(data.width.mul(data.height));
+      price = quantity.mul(data.price);
+      return this.dosageFilter(price);
     },
-    getOrderHead() {
+    //获取订单信息
+    getOrderInfo() {
       var getPush = JSON.parse(sessionStorage.getItem("shopping"));
       var orderItem = JSON.parse(sessionStorage.getItem("shoppingHead"));
       if (getPush[0].orderNumber) {
@@ -1532,7 +1408,7 @@ export default {
             var fileName = list[i].substr(index + 1);
             this.fileList.push({
               name: fileName,
-              url: this.Global.baseUrl + list[i]
+              url: this.Global.baseUrl + list[i],
             });
           }
         }
@@ -1552,6 +1428,109 @@ export default {
         this.ctm_order.invoiceFlag = orderItem.INVOICE_FLAG;
         this.ctm_order.allAddress = orderItem.ALL_ADDRESS;
       }
+      //其他信息
+      //分包
+      this.product_group_tpye = getPush[0].item.groupType; //产品类别
+      if (this.product_group_tpye == "B" || this.product_group_tpye == "B1")
+        this.packingShow = true;
+      else this.packingShow = false;
+      //明细
+      this.order_details = [];
+      for (var i = 0; i < getPush.length; i++) {
+        var onedetail = {};
+        //窗帘特有
+        onedetail.curtainWidth = getPush[i].width;
+        onedetail.curtainHeight = getPush[i].height;
+        onedetail.curtainHeight2 = getPush[i].falseShadeHigh
+          ? getPush[i].falseShadeHigh
+          : 0;
+        onedetail.curtainSizeTimes = getPush[i].drape ? getPush[i].drape : 0;
+        onedetail.curtainWbhSize = getPush[i].outsourcingBoxWidth
+          ? getPush[i].outsourcingBoxWidth
+          : 0;
+        onedetail.curtainRoomName = getPush[i].location
+          ? getPush[i].location
+          : "";
+        //共有
+        onedetail.activityId = getPush[i].activityId;
+        onedetail.orderNo = getPush[i].orderNumber;
+        onedetail.yuefanli = 0;
+        onedetail.nianfanli = 0;
+        onedetail.itemNoSample = getPush[i].item.itemNo;
+        onedetail.lineNo = getPush[i].lineNo;
+        onedetail.itemNo = getPush[i].item.itemNo;
+        onedetail.partSendId = getPush[i].splitShipment;
+        onedetail.productionVersion = getPush[i].item.itemVersion;
+        onedetail.notes = getPush[i].note;
+        onedetail.price = getPush[i].price;
+        onedetail.unitPrice = getPush[i].price;
+        onedetail.prime_cost = this.subtotal(getPush[i]);
+        onedetail.promotionCost = onedetail.prime_cost;
+        onedetail.finalPrice = onedetail.prime_cost;
+        onedetail.promotion = getPush[i].activityName;
+        onedetail.unit = getPush[i].unit;
+        onedetail.qtyRequired = getPush[i].quantity
+          ? getPush[i].quantity
+          : this.dosageFilter(getPush[i].width.mul(getPush[i].height));
+        //网销
+        onedetail.onlineSalesAmount = getPush[i].onlineSalesAmount;
+        //一口价
+        onedetail.batchNo = getPush[i].batchNo;
+        onedetail.stockNo = getPush[i].stockNo;
+        this.order_details.push(onedetail);
+      }
+    },
+    //获取活动
+    getActivity() {
+      this.salPromotion.P_ID = this.order_details[0].activityId;
+      if (this.salPromotion.P_ID) {
+        GetPromotionByTypeAndId({ pId: this.salPromotion.P_ID }).then((res) => {
+          this.salPromotion = res.data;
+          this.arrearsFlag = this.salPromotion.ARREARS_FLAG;
+          var allcost = 0;
+          for (var i = 0; i < this.order_details.length; i++) {
+            this.order_details[i].pId = this.salPromotion.P_ID;
+            this.order_details[
+              i
+            ].promotionType = this.salPromotion.PROMPTION_TYPE;
+            this.order_details[i].flagFlType = this.salPromotion.FLAG_FL_TYPE;
+
+            var price = this.calculatePromotionPrice(this.order_details[i]);
+            this.order_details[i].promotionCost = price;
+            this.order_details[i].finalPrice = price;
+            allcost = allcost.add(price);
+          }
+        });
+      } else {
+        this.arrearsFlag = null;
+      }
+    },
+    calculatePromotionPrice(data) {
+      var price = 0;
+      var quantity = data.qtyRequired;
+      //首先判断TYPE,1折扣，2定价。然后判断priority
+      if (this.salPromotion && this.salPromotion.P_ID) {
+        //一口价
+        if (this.salPromotion.PRIORITY == 99) {
+          if (quantity < 1) quantity = 1;
+          price = quantity.mul(this.salPromotion.PRICE);
+        } else {
+          switch (this.salPromotion.TYPE) {
+            case "1":
+              //折扣
+              price = quantity
+                .mul(data.price)
+                .mul(this.salPromotion.DISCOUNT);
+              break;
+            case "2":
+              //定价
+              price = quantity.mul(this.salPromotion.PRICE);
+          }
+        }
+      } else {
+        price = quantity.mul(data.price);
+      }
+      return this.dosageFilter(price);
     },
     handleChange(file, fileList) {
       this.fileList = fileList;
@@ -1577,10 +1556,10 @@ export default {
           cid: Cookies.get("cid"),
           condition: this.condition,
           page: this.currentPage,
-          limit: this.limit
+          limit: this.limit,
         },
         { loaidng: false }
-      ).then(res => {
+      ).then((res) => {
         this.buyUserInfoData = res.data;
       });
     },
@@ -1620,7 +1599,7 @@ export default {
         COUNTRY: "",
         PROVINCE_ID: "",
         CITY_ID: "",
-        COUNTRY_ID: ""
+        COUNTRY_ID: "",
       };
       this.country = [];
       this.city = [];
@@ -1644,49 +1623,45 @@ export default {
       this.addBuyUserVisible = true;
     },
     onSaveTaskClick() {
-      if (
-        !this.buyUserModel.PROVINCE_ID ||
-        !this.buyUserModel.CITY_ID
-        //|| !this.buyUserModel.COUNTRY_ID
-      ) {
+      if (!this.buyUserModel.PROVINCE_ID || !this.buyUserModel.CITY_ID) {
         this.$alert("请填写省市", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
       if (this.addOrNot) {
         InsertBuyUser(this.buyUserModel)
-          .then(res => {
+          .then((res) => {
             this.$message({
               message: "新增成功!",
               type: "success",
-              duration: 1000
+              duration: 1000,
             });
             this.searchBuyUser();
             this.addBuyUserVisible = false;
           })
-          .catch(res => {
+          .catch((res) => {
             this.$alert("新增失败", "提示", {
               confirmButtonText: "确定",
-              type: "warning"
+              type: "warning",
             });
           });
       } else {
         UpdateBuyUser(this.buyUserModel)
-          .then(res => {
+          .then((res) => {
             this.$message({
               message: "编辑成功!",
               type: "success",
-              duration: 1000
+              duration: 1000,
             });
             this.searchBuyUser();
             this.addBuyUserVisible = false;
           })
-          .catch(res => {
+          .catch((res) => {
             this.$alert("编辑失败", "提示", {
               confirmButtonText: "确定",
-              type: "warning"
+              type: "warning",
             });
           });
       }
@@ -1695,22 +1670,22 @@ export default {
       this.$confirm("删除的数据无法恢复，是否删除？", "提示", {
         confirmButtonText: "是",
         cancelButtonText: "否",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
-          DeleteBuyUser(row).then(res => {
+          DeleteBuyUser(row).then((res) => {
             this.$message({
               message: "删除成功!",
               type: "success",
-              duration: 1000
+              duration: 1000,
             });
             this.searchBuyUser();
           });
         })
-        .catch(res => {
+        .catch((res) => {
           this.$alert("删除失败", "提示", {
             confirmButtonText: "确定",
-            type: "warning"
+            type: "warning",
           });
         });
     },
@@ -1718,22 +1693,22 @@ export default {
       this.$confirm("删除的数据无法恢复，是否删除？", "提示", {
         confirmButtonText: "是",
         cancelButtonText: "否",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
-          DeleteBuyUserList(this.userSelect).then(res => {
+          DeleteBuyUserList(this.userSelect).then((res) => {
             this.$message({
               message: "删除成功!",
               type: "success",
-              duration: 1000
+              duration: 1000,
             });
             this.searchBuyUser();
           });
         })
-        .catch(res => {
+        .catch((res) => {
           this.$alert("删除失败", "提示", {
             confirmButtonText: "确定",
-            type: "warning"
+            type: "warning",
           });
         });
     },
@@ -1750,24 +1725,17 @@ export default {
       this.refreshCity(row.PROVINCE_ID, row.PROVINCE);
       this.refreshCountry(row.CITY_ID, row.CITY);
       this.buyUserVisible = false;
-    }
+    },
   },
-  created: function() {
-    this.getOrderHead();
+  created: function () {
+    this.curtainStatus = Cookies.get("cur_status");
+    this.getOrderInfo(); //获得订单相关信息
+    this.getActivity(); //获取活动价
     this.getProvince(); //三级联动
     this.allAddress(); //获取地址
-    this.huodongjia(); //获取活动价
     this._getTickets(); //获取优惠券
     this.chargeQuery(); //经办人
-    this.cid = Cookies.get("cid");
-    this.realName = Cookies.get("realName");
-    this.curtainStatus = Cookies.get("cur_status");
-    if (Cookies.get("cur_status") == 1) {
-      this.curtainOrOther = false;
-    } else {
-      this.curtainOrOther = true;
-    }
-  }
+  },
 };
 </script>
 

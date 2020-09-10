@@ -76,7 +76,8 @@
               <template slot-scope="scope1">
                 <span v-if="scope1.row.NOTE == '帘头'">定制窗帘</span>
                 <span v-else>{{ scope1.row.NOTE }}</span>
-              </template></el-table-column>
+              </template>
+            </el-table-column>
             <el-table-column label="数量" align="center" width="100">
               <template slot-scope="scope1">
                 <span v-if="scope1.row.UNIT == '平方米'">{{ scope1.row.CURTAIN_WIDTH }}×{{
@@ -439,11 +440,6 @@ export default {
         transCookies[i].activityName = orderBody[i].PROMOTION;
         transCookies[i].unit = orderBody[i].UNIT;
         transCookies[i].item = orderBody[i].item;
-        transCookies[i].salPromotion = new Object();
-        transCookies[i].salPromotion.pId = orderBody[i].P_ID;
-        transCookies[i].salPromotion.orderType = orderBody[i].PROMOTION_TYPE;
-        transCookies[i].salPromotion.arrearsFlag = item.ARREARSFLAG;
-        transCookies[i].salPromotion.flagFl = orderBody[i].FLAG_FL_TYPE;
       }
       sessionStorage.setItem("shopping", JSON.stringify(transCookies));
       sessionStorage.setItem("shoppingHead", JSON.stringify(item));
@@ -667,7 +663,7 @@ export default {
                 });
                 if (!res.data) {
                   this.$alert(
-                    `活动‘&${item.ORDERBODY[i].PROMOTION}’不存在`,
+                    `活动‘${item.ORDERBODY[i].PROMOTION}’不存在`,
                     "提示",
                     {
                       confirmButtonText: "确定",

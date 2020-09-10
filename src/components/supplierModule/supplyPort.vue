@@ -7,7 +7,6 @@
         <div id="checkYPrint" style="margin-bottom:10px">
           <div align="center" class="th-font18"> <span>广东玉兰集团股份有限公司采购单（<span
                 class="th-font18color">{{ pur_headForm.PUR_NO }} </span>）</span></div>
-
         </div>
         <div>
           <h4 style="font-weight:normal">收货人：{{ pur_headForm.LINKMAN }}
@@ -453,12 +452,9 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
-          <!-- /待确认页签============================================================================================================== -->
           <!-- 已确认页签============================================================================================================== -->
           <el-tab-pane label="已确认" name="second" align="left">
-
             <div style="margin-bottom:10px;">
-
               <el-input @keyup.enter.native="SelectByPo()" prefix-icon="el-icon-search" style="width:160px;"
                 placeholder=" 采购单号:（模糊）" v-model="po">
               </el-input>
@@ -520,7 +516,6 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
-          <!-- /已确认页签============================================================================================================== -->
           <!-- 已取消页签============================================================================================================== -->
           <el-tab-pane label="已取消" name="third" align="left">
             <div style="margin-bottom:10px;">
@@ -570,13 +565,9 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
-
-          <!-- /已取消页签============================================================================================================== -->
           <!-- 已确认页签============================================================================================================== -->
           <el-tab-pane label="退货已确认" name="forth" align="left">
-
             <div style="margin-bottom:10px;">
-
               <el-input @keyup.enter.native="SelectByPo()" prefix-icon="el-icon-search" style="width:160px;"
                 placeholder=" 采购单号:（模糊）" v-model="po">
               </el-input>
@@ -638,7 +629,6 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
-          <!-- /已确认页签============================================================================================================== -->
           <div style="margin:0 25%;" class="block">
             <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
               :current-page.sync="currentPage" :page-sizes="[5, 10, 15, 20]" :page-size="limit"
@@ -659,7 +649,7 @@ import {
   Submit,
   GetNoPrinted,
   UpdatePrintedById,
-  UpdateCheckFlagBatch
+  UpdateCheckFlagBatch,
 } from "@/api/supplierASP";
 import { downLoadFile } from "@/common/js/downLoadFile";
 import Cookies from "js-cookie";
@@ -671,7 +661,6 @@ export default {
       bill_type: "POT",
       arr_index: [],
       arr_span: [],
-      arr_group: [],
       multipleSelection: [],
       colName: [
         {
@@ -684,39 +673,16 @@ export default {
           name7: "含税单价",
           name8: "金额",
           name9: "制造说明",
-          name10: "备注"
-        }
+          name10: "备注",
+        },
       ],
       sumMoneyCol: [
         {
           name7: "总金额:",
-          name8: 0
-        }
+          name8: 0,
+        },
       ],
-
-      locCol: [
-        {
-          name1: "位置div"
-        }
-      ],
-
-      detailCol: [
-        {
-          name2: "名称",
-          name3: "编码",
-          name4: "名称",
-          name5: "规格",
-          name6: "用量",
-          name7: "含税单价",
-          name8: "金额",
-          name9: "制造说明",
-          name10: "备注"
-        }
-      ],
-
       int_add: 1,
-      reFresh: true,
-      menuTree: [],
       companyId: Cookies.get("companyId"),
       current_id: Cookies.get("cid"),
       sumMoney: 0,
@@ -749,20 +715,11 @@ export default {
         // { value: "cancel", label: "取消" },
         { value: "efficient", label: "生效" },
         { value: "enforce", label: "执行" },
-        { value: "fulfill", label: "完成" }
+        { value: "fulfill", label: "完成" },
       ],
-
       //存一行的数据
-      detailData: [{ cl_place: -1, cl_item_no: "D13445435" }]
+      detailData: [{ cl_place: -1, cl_item_no: "D13445435" }],
     };
-  },
-  watch: {
-    menuTree() {
-      this.reFresh = false;
-      this.$nextTick(() => {
-        this.reFresh = true;
-      });
-    }
   },
   methods: {
     //修改打印标记
@@ -770,7 +727,7 @@ export default {
       //updatePrinted({
       UpdatePrintedById({
         id: value.PUR_NO,
-        printed: value.PRINTED
+        printed: value.PRINTED,
       });
     },
 
@@ -780,7 +737,7 @@ export default {
         type: "html",
         maxWidth: 1300,
         headerStyle: "margin: -2px;",
-        targetStyles: ["*"]
+        targetStyles: ["*"],
       });
     },
     //合并行或列
@@ -793,7 +750,7 @@ export default {
         } else
           return {
             rowspan: 0,
-            colspan: 0
+            colspan: 0,
           };
       }
     },
@@ -804,19 +761,19 @@ export default {
         arr_pur.push(this.multipleSelection[i].PUR_NO);
       }
       var data = {
-        arr_pur: arr_pur
+        arr_pur: arr_pur,
       };
-      UpdateCheckFlagBatch(data).then(res => {
+      UpdateCheckFlagBatch(data).then((res) => {
         if (res.code == 0) {
           this.$alert("批量确认成功", "提示", {
             confirmButtonText: "确定",
-            type: "success"
+            type: "success",
           });
           this.autoSearch();
         } else {
           this.$alert("批量确认失败，请稍后重试", "提示", {
             confirmButtonText: "确定",
-            type: "warning"
+            type: "warning",
           });
         }
       });
@@ -824,47 +781,6 @@ export default {
 
     handleSelectionChange(val) {
       this.multipleSelection = val;
-    },
-    getSummaries(param) {
-      const { columns, data } = param;
-      const sums = [];
-      columns.forEach((column, index) => {
-        if (index === 8) {
-          sums[index] = "汇总";
-          return;
-        }
-        if (
-          index === 4 ||
-          index === 5 ||
-          index === 6 ||
-          index === 10 ||
-          index === 13
-        ) {
-          sums[index] = "";
-          return;
-        }
-        const values = data.map(item => Number(item[column.property]));
-        if (!values.every(value => isNaN(value))) {
-          sums[index] = values.reduce((prev, curr) => {
-            const value = Number(curr);
-            if (!isNaN(value)) {
-              return prev + curr;
-            } else {
-              return prev;
-            }
-          }, 0);
-          sums[index];
-        }
-      });
-
-      return sums;
-    },
-    //强制根据组件id刷新
-    forceHandle(id) {
-      let dom = document.getElementById(id);
-      this.$nextTick(() => {
-        //checkedX
-      });
     },
     datatransMethod(value) {
       //时间戳转化大法
@@ -905,9 +821,6 @@ export default {
           return "暂无名称";
       }
     },
-    addToTable() {
-      var tablec = document.getElementById();
-    },
     //获取产品类型
     getProductType(value) {
       if (value.substring(0, 1) == "X") {
@@ -918,21 +831,6 @@ export default {
         return "墙纸配套类";
       } else return "手工单";
     },
-
-    //获取最近半年时间
-    getPastHalfYear() {
-      var curDate = new Date().getTime();
-      var halfYear = (365 / 2) * 24 * 3600 * 1000;
-      var pastResult = curDate - halfYear;
-      var pastDate = new Date(pastResult);
-      var pastYear = pastDate.getFullYear();
-      var pastMonth = pastDate.getMonth() + 1;
-      var pastDate = pastDate.getDate();
-      var strDay = pastYear + "-" + pastMonth + "-" + pastDate;
-      var date = new Date(strDay);
-      return date;
-    },
-
     getBegintime(value) {
       var startTime = null;
       if (value == null || value == "") {
@@ -963,13 +861,6 @@ export default {
       var date = this.datatransMethod(endTime);
       return date;
     },
-    //获取当月第一天零时
-    getCurrentMonthFirst() {
-      var date = new Date();
-      date.setDate(1);
-      date.setHours(0, 0, 0);
-      return date;
-    },
     //获取最近一周时间
     getCurrentWeek() {
       var date = new Date();
@@ -989,20 +880,6 @@ export default {
       date.setHours(23, 59, 59);
       return date;
     },
-    //获取前500年时间
-    getLongAgao() {
-      var date = new Date();
-      date.setFullYear(date.getFullYear() - 500);
-      date.setHours(0, 0, 0);
-      return date;
-    },
-    //获取后500年时间
-    getLongLater() {
-      var date = new Date();
-      date.setFullYear(date.getFullYear() + 500);
-      date.setHours(0, 0, 0);
-      return date;
-    },
     //打开确认页面，确认页面也分两种情况
     openDialog(PUR_NO, ORDER_NO) {
       this.autoSearchDetail(PUR_NO);
@@ -1010,19 +887,14 @@ export default {
     openDialog1(PUR_NO, ORDER_NO) {
       this.int_add = this.int_add + 1;
       this.detailData[0].cl_place = this.int_add;
-
-      this.forceHandle("checkedX");
-
       this.autoSearchDetail(PUR_NO);
-
-      //将表头内容填充到明细
     },
     //统一送货日期
     Unitdeliver() {
       if (this.date_deliver == "") {
         this.$alert("请选择一个统一的时间！", "提示", {
           confirmButtonText: "好的",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -1122,13 +994,13 @@ export default {
     SaveNotes() {
       var data = {
         PUR_NO: this.pur_headForm.PUR_NO,
-        NOTE: this.supply_check_notes
+        NOTE: this.supply_check_notes,
       };
-      SaveHeadNotes(data).then(res => {
+      SaveHeadNotes(data).then((res) => {
         if (res.code == 0) {
           this.$alert("保存说明成功", "提示", {
             confirmButtonText: "确定",
-            type: "success"
+            type: "success",
           });
           this.autoSearch();
           this.checkX_Visible = false;
@@ -1136,7 +1008,7 @@ export default {
         } else {
           this.$alert("保存失败，请稍后重试", "提示", {
             confirmButtonText: "确定",
-            type: "warning"
+            type: "warning",
           });
         }
       });
@@ -1157,17 +1029,17 @@ export default {
         ) {
           this.$alert("送货日期不能为空！", "提示", {
             confirmButtonText: "好的",
-            type: "warning"
+            type: "warning",
           });
           return;
         }
       }
       var data = {
         pur_headForm: this.pur_headForm,
-        gridData: this.gridData
+        gridData: this.gridData,
       };
 
-      Submit(data).then(res => {
+      Submit(data).then((res) => {
         if (res.code == 0) {
           // this.$alert("确认成功", "提示", {
           //   confirmButtonText: "确定",
@@ -1179,7 +1051,7 @@ export default {
         } else {
           this.$alert("确认失败，请稍后重试", "提示", {
             confirmButtonText: "确定",
-            type: "warning"
+            type: "warning",
           });
         }
       });
@@ -1195,13 +1067,13 @@ export default {
         beginTime: this.getBegintime(this.date1),
         finishTime: this.getEndtime(this.date2),
         po: this.po,
-        bill_type: this.bill_type
+        bill_type: this.bill_type,
       };
       GetRelativePo(data).then(
-        res => {
+        (res) => {
           this.count = res.count;
           this.pur_headData = res.data;
-          this.pur_headData.forEach(item => {
+          this.pur_headData.forEach((item) => {
             item.PRINTED = item.PRINTED === "1" ? true : false;
           });
         },
@@ -1214,13 +1086,13 @@ export default {
       var data = {
         limit: this.limit,
         page: this.currentPage,
-        current_id: Cookies.get("cid")
+        current_id: Cookies.get("cid"),
       };
       GetNoPrinted(data).then(
-        res => {
+        (res) => {
           this.count = res.count;
           this.pur_headData = res.data;
-          this.pur_headData.forEach(item => {
+          this.pur_headData.forEach((item) => {
             item.PRINTED = item.PRINTED === "1" ? true : false;
           });
         },
@@ -1270,9 +1142,9 @@ export default {
     },
     autoSearchDetail(PUR_NO) {
       var data = {
-        PUR_NO: PUR_NO
+        PUR_NO: PUR_NO,
       };
-      GetPoDetail(data).then(res => {
+      GetPoDetail(data).then((res) => {
         this.gridData = res.data;
         let details = this.gridData;
         let loc = [];
@@ -1309,7 +1181,7 @@ export default {
               cl_width: this.gridData[i].CL_WIDTH,
               cl_high: this.gridData[i].CL_HIGH,
               cl_high_jia: this.gridData[i].CL_HIGH_JIA,
-              cl_size_times: this.gridData[i].CL_SIZE_TIMES
+              cl_size_times: this.gridData[i].CL_SIZE_TIMES,
             };
             let date1 =
               "预约：" + this.datatransMethod(this.gridData[i].DATE_REQ);
@@ -1318,7 +1190,7 @@ export default {
             let temObj3 = {
               date_req: date1,
               date_deliver: date2,
-              littleSum: 0
+              littleSum: 0,
             };
             let tempArr3 = [];
             tempArr3.push(temObj3);
@@ -1343,7 +1215,7 @@ export default {
                 price_taxin: this.gridData[i].PRICE_TAXIN,
                 total_money: this.gridData[i].TOTAL_MONEY,
                 product_note: this.gridData[i].PRODUCT_NOTE,
-                notes: this.gridData[i].NOTE
+                notes: this.gridData[i].NOTE,
               };
               tabArr2.push(temObj2);
               tab3[k][0].littleSum += this.gridData[i].TOTAL_MONEY;
@@ -1460,7 +1332,7 @@ export default {
           }
         }
       });
-    }
+    },
   },
   filters: {
     pur_headStatus(value) {
@@ -1514,12 +1386,12 @@ export default {
       let s = date.getSeconds();
       s = s < 10 ? "0" + s : s;
       return y + "-" + MM + "-" + d + " "; /* + h + ':' + m + ':' + s; */
-    }
+    },
   },
   created() {
     this.po_type = "all";
     this.autoSearch();
-  }
+  },
 };
 </script>
 

@@ -65,18 +65,12 @@
             <el-table-column label="折后金额" width="100" align="center">
               <template slot-scope="scope1">
                 <span v-if="isManager === '0'">***</span>
-                <span v-else>{{
-                  scope1.row.salPromotion
-                    ? (scope1.row.salPromotion.type == 1? 
-                    scope1.row.salPromotion.discount *(scope1.row.price * scope1.row.count)
-                    :scope1.row.salPromotion.price * scope1.row.count)
-                    : (scope1.row.price * scope1.row.count) | dosageFilter
-                }}</span>
+                <span v-else>{{ calculatePromotionPrice(scope1.row) }}</span>
               </template>
             </el-table-column>
             <el-table-column label="操作" width="160px" align="center">
               <template slot-scope="scope1">
-                <a class="link-detail" @click="handleDetails(scope1.$index, scope1.row)">查看详情</a>
+                <a class="link-detail" @click="handleDetails(scope1.$index, scope1.row)" v-if="canShowDetail(scope1.row)">查看详情</a>
                 <a class="link-delete" @click="deleteSingle(scope1.row)">删除商品</a>
               </template>
             </el-table-column>
@@ -231,18 +225,29 @@ export default {
       for (let i = 0; i < val.length; i++) {
         let sub = val[i].price * val[i].count;
         total += sub;
-        totalPrice +=
-          Math.round(
-            (val[i].salPromotion
-              ? val[i].salPromotion.type == 1
-                ? val[i].salPromotion.discount * sub
-                : val[i].salPromotion.price * val[i].count
-              : sub
-            ).mul(100)
-          ) / 100;
+        totalPrice += this.calculatePromotionPrice(val[i]);
       }
       this.totalMoney = total;
       this.totalPriceMoney = totalPrice;
+    },
+    calculatePromotionPrice(data) {
+      var price = 0;
+      var quantity = data.count;
+      //首先判断TYPE,1折扣，2定价
+      if (data.salPromotion) {
+        switch (data.salPromotion.type) {
+          case "1":
+            //折扣
+            price = quantity.mul(data.price).mul(data.salPromotion.discount);
+            break;
+          case "2":
+            //定价
+            price = quantity.mul(data.salPromotion.price);
+        }
+      } else {
+        price = quantity.mul(data.price);
+      }
+      return this.dosageFilter(price);
     },
     //数量修改
     //7.23新需求，数量不作修改，仅为1
@@ -284,6 +289,13 @@ export default {
             type: "warning",
           });
         });
+    },
+    //活动是否可以修改
+    canShowDetail(row) {
+      return (
+        !row.salPromotion ||
+        (row.salPromotion && row.salPromotion.modifyFlag != "N")
+      );
     },
     //查看详情
     handleDetails(index, data) {

@@ -119,9 +119,7 @@
         <el-table-column v-if="isManager != '0' && salPromotion.P_ID" label="折后" align="center" width="55">
           <template slot-scope="scope">
             <span>
-              {{ salPromotion.TYPE == 1? 
-                    salPromotion.DISCOUNT * scope.row.price
-                    : salPromotion.PRICE | dosageFilter }}
+              {{ calculatePromotionPrice(scope.row) }}
             </span>
           </template>
         </el-table-column>
@@ -260,12 +258,6 @@
         </footer>
       </el-dialog>
       <div style="text-align: center;" class="mt20">
-        <!-- <router-link to="/shoppingCar/shopping?curtain">
-                    <el-button type="danger" class="mr20" width="130px"
-                        @click.native="addTab('shoppingCar/shopping?curtain')">
-                        保存至购物车
-                    </el-button>
-                </router-link> -->
         <el-button type="danger" class="mr20" width="130px" @click="addCurtainToShoppingCar">
           保存至购物车
         </el-button>
@@ -291,13 +283,12 @@ import {
   changeDosageByNo,
   addCurtainToCar,
   changeItem,
-  changeItemBlur
+  changeItemBlur,
 } from "@/api/curtain";
 import { GetDosageAll, GetDosageByNo } from "@/api/itemInfoASP";
 import {
   getItemById,
   GetPromotionByItem,
-  GetPromotionsById
 } from "@/api/orderListASP";
 import Cookies from "js-cookie";
 import { mapMutations, mapActions } from "vuex";
@@ -338,12 +329,12 @@ export default {
       fixType: [
         {
           value: "01",
-          label: "定宽"
+          label: "定宽",
         },
         {
           value: "02",
-          label: "定高"
-        }
+          label: "定高",
+        },
       ],
       //根据编号查询制造说明
       part: [],
@@ -352,14 +343,14 @@ export default {
         { value: "么术贴正车" },
         { value: "么术贴反车" },
         { value: "穿/挂杆款" },
-        { value: "特殊见备注" }
+        { value: "特殊见备注" },
       ],
       //帘身、纱制造说明
       part1: [
         { value: "对开" },
         { value: "左单开" },
         { value: "右单开" },
-        { value: "特殊开备注" }
+        { value: "特殊开备注" },
       ],
       //帘身配布制造说明
       part3: [
@@ -368,7 +359,7 @@ export default {
         { value: "二个褶" },
         { value: "二个半褶" },
         { value: "三个褶" },
-        { value: "三个半褶" }
+        { value: "三个半褶" },
       ],
       //配件编码
       part2: [
@@ -398,8 +389,8 @@ export default {
         { label: "PJB-009-KAQI:吊球+挂钩", value: "PJB-009-KAQI" },
         { label: "PJB-009-MIHUANG:吊球+挂钩", value: "PJB-009-MIHUANG" },
         { label: "PJB-009-QIANHUI:吊球+挂钩", value: "PJB-009-QIANHUI" },
-        { label: "-未选择配件包-", value: null }
-      ]
+        { label: "-未选择配件包-", value: null },
+      ],
     };
   },
   created() {
@@ -414,10 +405,11 @@ export default {
     }
   },
   methods: {
+    ...mapActions("navTabs", ["closeToTab"]),
     //修改配件包时，对应修改单位
     changePJBUnit(index) {
       let _data = this.curtainData[index].itemNo;
-      this.part2.forEach(item => {
+      this.part2.forEach((item) => {
         if (item.value === _data) {
           this.curtainData[index].unit = item.unit;
           this.curtainData[index].note = item.note;
@@ -466,7 +458,7 @@ export default {
        * 即取消双向绑定，帘头固定
        */
       if (_index >= 1 && _index <= 4) {
-        _arr.forEach(item => {
+        _arr.forEach((item) => {
           if (item.deleteFlag !== "Y" || item.choose === true) {
             flag = false;
           }
@@ -479,7 +471,7 @@ export default {
     //获取某个大类的全部数据
     getBigType(type) {
       let arr = [];
-      this.curtainData.forEach(item => {
+      this.curtainData.forEach((item) => {
         if (item.itemType === type) {
           arr.push(item);
         }
@@ -489,7 +481,7 @@ export default {
     getActivity() {
       this.activityOptions = [];
       getItemById({ itemNo: this.message.itemNo }, { loading: false }).then(
-        itemRes => {
+        (itemRes) => {
           GetPromotionByItem(
             {
               cid: this.cid,
@@ -497,15 +489,15 @@ export default {
               itemNo: itemRes.data.ITEM_NO,
               itemVersion: itemRes.data.ITEM_VERSION,
               productType: itemRes.data.PRODUCT_TYPE,
-              productBrand: itemRes.data.PRODUCT_BRAND
+              productBrand: itemRes.data.PRODUCT_BRAND,
             },
             { loading: false }
-          ).then(res => {
+          ).then((res) => {
             this.activityOptions = res.data;
             this.activityOptions.push({
               ORDER_TYPE: "",
               ORDER_NAME: "不参与活动",
-              P_ID: null
+              P_ID: null,
             });
           });
         }
@@ -517,32 +509,32 @@ export default {
       let obj = {
         limit: 999,
         page: 1,
-        itemNO: "PJB"
+        itemNO: "PJB",
       };
       changeItem(obj)
-        .then(res => {
+        .then((res) => {
           let _arr = [];
-          res.data.forEach(item => {
+          res.data.forEach((item) => {
             _arr.push({
               label: `${item.itemNo}:${item.note}`,
               value: item.itemNo,
               unit: item.unit === "°ü" ? "包" : item.unit,
               note: item.note,
-              item: item
+              item: item,
             });
           });
-          _arr.sort(function(a, b) {
+          _arr.sort(function (a, b) {
             return a.value > b.value ? 1 : -1; //升序
           });
           _arr.push({
             label: "-未选择配件包-",
             value: null,
             unit: "",
-            note: ""
+            note: "",
           });
           this.part2 = _arr;
         })
-        .catch(err => {
+        .catch((err) => {
           this.part2 = [];
         });
     },
@@ -557,45 +549,49 @@ export default {
             ? "0"
             : this.message.WBH, //帘头外包盒宽度
         multiple: this.message.multiple, //褶皱倍数
-        location: this.message.location
+        location: this.message.location,
       };
       getCurtainDetailMsg(data)
-        .then(res => {
-          GetDosageAll(data).then(res2 => {
+        .then((res) => {
+          GetDosageAll(data).then((res2) => {
             this.allData = res;
             this.replaceDosage(res2.data);
             this.getCurtainMsg(res);
             this.getSpanArr(res);
           });
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     },
     replaceDosage(dosageFilter) {
-      var gy003 = dosageFilter.filter(item => item.ITEM_NO == "GY-003");
+      var gy003 = dosageFilter.filter((item) => item.ITEM_NO == "GY-003");
       if (gy003.length > 0) this.allData.GY = gy003[0].dosage;
       if (this.allData.lt) {
-        this.allData.lt = dosageFilter.find(item => item.type == "lt").dosage;
+        this.allData.lt = dosageFilter.find((item) => item.type == "lt").dosage;
       }
       if (this.allData.ls) {
-        this.allData.ls = dosageFilter.find(item => item.type == "ls").dosage;
+        this.allData.ls = dosageFilter.find((item) => item.type == "ls").dosage;
       }
       if (this.allData.XHBlt) {
         this.allData.XHBlt = dosageFilter.find(
-          item => item.type == "XHBlt"
+          (item) => item.type == "XHBlt"
         ).dosage;
       }
       if (this.allData.XHBls) {
         this.allData.XHBls = dosageFilter.find(
-          item => item.type == "XHBls"
+          (item) => item.type == "XHBls"
         ).dosage;
       }
       if (this.allData.LCB) {
-        this.allData.LCB = dosageFilter.find(item => item.type == "LCB").dosage;
+        this.allData.LCB = dosageFilter.find(
+          (item) => item.type == "LCB"
+        ).dosage;
       }
       if (this.allData.sha) {
-        this.allData.sha = dosageFilter.find(item => item.type == "sha").dosage;
+        this.allData.sha = dosageFilter.find(
+          (item) => item.type == "sha"
+        ).dosage;
       }
     },
     //通过接口数据生成窗帘表格信息
@@ -626,7 +622,7 @@ export default {
           deleteFlag: data.itemList[i].itemMLGY.deleteFlag, //物料是否可删除，Y可删除，N不可删除
           changeFlag: data.itemList[i].itemMLGY.changeFlag, //物料是可以替换，Y可替换，N不可替换
           choose: true, //是否选中，默认选中了
-          inlineNo: data.itemList[i].itemMLGY.no //编号
+          inlineNo: data.itemList[i].itemMLGY.no, //编号
         };
         this.curtainData.push(obj);
         this.getDosage(obj, i);
@@ -683,14 +679,14 @@ export default {
       let obj = {
         itemNO: this.chooseType,
         limit: this.pageSize,
-        page: this.currentPage
+        page: this.currentPage,
       };
       changeItem(obj)
-        .then(res => {
+        .then((res) => {
           this.items = res.data;
           this.totalNumber = res.data[0].total;
         })
-        .catch(err => {
+        .catch((err) => {
           this.items = [];
           this.currentPage = 1;
           this.totalNumber = 0;
@@ -705,14 +701,14 @@ export default {
         itemType: this.chooseType,
         itemNO: this.searchKey.toUpperCase(),
         limit: this.pageSize,
-        page: this.currentPage
+        page: this.currentPage,
       };
       changeItemBlur(obj)
-        .then(res => {
+        .then((res) => {
           this.items = res.data;
           this.totalNumber = res.data[0].total;
         })
-        .catch(err => {
+        .catch((err) => {
           this.items = [];
           this.currentPage = 1;
           this.totalNumber = 0;
@@ -723,7 +719,7 @@ export default {
       if (this.itemNo === "") {
         this.$alert("请选择一个产品", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -736,7 +732,7 @@ export default {
       let status1 = _productType === "GY" ? true : false;
       this.dialogTableVisible = false;
       //修改对应的名称规格
-      let data = this.items.find(v => {
+      let data = this.items.find((v) => {
         if (v.itemNo === this.itemNo) return v;
       });
       var price = this.getPrice(this.customerType, data);
@@ -766,15 +762,15 @@ export default {
           parentItemNo: this.message.itemNo,
           itemNO: this.itemNo,
           itemType: this.curtainData[this.chooseIndex].itemType,
-          fixType: this.curtainData[this.chooseIndex].fixType
+          fixType: this.curtainData[this.chooseIndex].fixType,
         };
         //changeDosageByNo(obj)
         GetDosageByNo(obj)
-          .then(res => {
+          .then((res) => {
             if (res.data.length == 0) {
               this.$alert("用量获取失败", "提示", {
                 confirmButtonText: "好的",
-                type: "warning"
+                type: "warning",
               });
               return;
             }
@@ -794,7 +790,7 @@ export default {
             this.curtainData[this.chooseIndex].itemNo = this.itemNo;
             this.judgeTip(_data, this.chooseIndex);
           })
-          .catch(err => {
+          .catch((err) => {
             console.log(err);
           });
       }
@@ -832,15 +828,15 @@ export default {
         parentItemNo: this.message.itemNo,
         itemNO: this.curtainData[index].itemNo,
         itemType: this.curtainData[index].itemType,
-        fixType: this.curtainData[index].fixType
+        fixType: this.curtainData[index].fixType,
       };
       //changeDosageByNo(obj)
       GetDosageByNo(obj)
-        .then(res => {
+        .then((res) => {
           if (res.data.length == 0) {
             this.$alert("用量获取失败", "提示", {
               confirmButtonText: "好的",
-              type: "warning"
+              type: "warning",
             });
             return;
           }
@@ -859,7 +855,7 @@ export default {
           }
           this.judgeTip(this.curtainData[index], index);
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     },
@@ -976,15 +972,15 @@ export default {
     //通过编号获取工艺
     getTheGY(itemNo) {
       let data = {
-        itemNO: itemNo
+        itemNO: itemNo,
       };
       this.currentPage = 1;
       getGY(data)
-        .then(res => {
+        .then((res) => {
           this.items = res.itemList;
           this.totalNumber = res.itemList.length;
         })
-        .catch(err => {
+        .catch((err) => {
           this.items = [];
           this.totalNumber = 0;
         });
@@ -1049,7 +1045,7 @@ export default {
           this.pos = 0;
           this.curtainType.push({
             name: data[i].itemMLGY.itemType,
-            value: true
+            value: true,
           });
         } else {
           this.spanArr0.push(0);
@@ -1062,7 +1058,7 @@ export default {
             this.pos = i;
             this.curtainType.push({
               name: data[i].itemMLGY.itemType,
-              value: true
+              value: true,
             });
           }
         }
@@ -1075,7 +1071,7 @@ export default {
         let _col = _row > 0 ? 1 : 0;
         return {
           rowspan: _row,
-          colspan: _col
+          colspan: _col,
         };
       }
       if (columnIndex === 1) {
@@ -1083,14 +1079,14 @@ export default {
         let _col = _row > 0 ? 1 : 0;
         return {
           rowspan: _row,
-          colspan: _col
+          colspan: _col,
         };
       }
       if (columnIndex === 2) {
         if (row.itemType === "pjb" && row.changeFlag === "Y") {
           return {
             rowspan: 1,
-            colspan: 2
+            colspan: 2,
           };
         }
       }
@@ -1098,7 +1094,7 @@ export default {
         if (row.itemType === "pjb" && row.changeFlag === "Y") {
           return {
             rowspan: 1,
-            colspan: 0
+            colspan: 0,
           };
         }
       }
@@ -1138,7 +1134,7 @@ export default {
             if (_curtainData[i].creator === "" && _curtainData[i].choose) {
               this.$alert("制造说明不能为空", "提示", {
                 confirmButtonText: "好的",
-                type: "warning"
+                type: "warning",
               });
               return;
             }
@@ -1152,7 +1148,7 @@ export default {
         ) {
           this.$alert("制造说明不能为空", "提示", {
             confirmButtonText: "好的",
-            type: "warning"
+            type: "warning",
           });
           return;
         }
@@ -1163,7 +1159,7 @@ export default {
           if (this.isNull(_curtainData[i].remark)) {
             this.$alert(`${_curtainData[i].creator}不能为空`, "提示", {
               confirmButtonText: "好的",
-              type: "warning"
+              type: "warning",
             });
             return;
           }
@@ -1177,7 +1173,7 @@ export default {
         { name: "ls", number: 0 },
         { name: "lspb", number: 0 },
         { name: "sha", number: 0 },
-        { name: "pjb", number: 0 }
+        { name: "pjb", number: 0 },
       ];
       if (this.message.isWBH === false) {
         _isWBH = 0;
@@ -1217,7 +1213,7 @@ export default {
         if (_data[i].number === 0) continue;
         let _obj = {
           partName: this.getTypeName(_data[i].name),
-          curtainCommodities: []
+          curtainCommodities: [],
         };
         let j = 0;
         for (let k = i; k > 0; k--) {
@@ -1235,7 +1231,7 @@ export default {
           let _obj1 = {
             activityId: this.salPromotion.P_ID,
             item: {
-              itemNo: _curtainData[j].itemNo
+              itemNo: _curtainData[j].itemNo,
             },
             note: _curtainData[j].remark,
             unit: _curtainData[j].unit,
@@ -1255,7 +1251,7 @@ export default {
             deleteFlag: _curtainData[j].deleteFlag,
             modifyFlag: _curtainData[j].modifyFlag,
             changeFlag: _curtainData[j].changeFlag,
-            inlineNo: _curtainData[j].inlineNo
+            inlineNo: _curtainData[j].inlineNo,
           };
           _obj.curtainCommodities.push(_obj1);
         }
@@ -1269,7 +1265,7 @@ export default {
       ) {
         this.$alert("请至少选择一款配件!", "提示", {
           confirmButtonText: "好的",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -1286,28 +1282,25 @@ export default {
         outsourcingBoxWidth: _WBH,
         curtainLists: _curtainLists,
         location: this.message.location,
-        falseShadeHigh: this.message.highJia
+        falseShadeHigh: this.message.highJia,
       };
       addCurtainToCar(obj)
-        .then(res => {
+        .then((res) => {
           this.closeToTab({
             oldUrl: "shops/shoppingCurtainDetail",
-            newUrl: "shoppingCar/shopping?curtain"
+            newUrl: "shoppingCar/shopping?curtain",
           });
-          //this.addTab('shoppingCar/shopping?curtain');
           this.$router.push({
-            path: "/shoppingCar/shopping?curtain"
+            path: "/shoppingCar/shopping?curtain",
           });
         })
-        .catch(err => {
+        .catch((err) => {
           this.$alert(err.msg, "提示", {
             confirmButtonText: "好的",
-            type: "warning"
+            type: "warning",
           });
         });
     },
-    ...mapMutations("navTabs", ["addTab"]),
-    ...mapActions("navTabs", ["closeTab", "closeToTab"]),
     //判空
     isNull(str) {
       if (str === "" || str === undefined || str === null) return true;
@@ -1316,7 +1309,7 @@ export default {
       return re.test(str);
     },
     //大类二类的勾选联动，是否出现×号
-    bigToSmall: function(data) {
+    bigToSmall: function (data) {
       let index = -1;
       switch (data.itemType) {
         case "lt":
@@ -1344,22 +1337,32 @@ export default {
       return false;
     },
     oneTotal(row) {
-      return (
-        Math.round(
-          (this.salPromotion.P_ID
-            ? this.salPromotion.TYPE == 1
-              ? this.salPromotion.DISCOUNT * row.price
-              : this.salPromotion.PRICE
-            : row.price
-          ).mul(100)
-        ) / 100
-      ).mul(row.dosage);
-    }
+      var price = this.dosageFilter(this.calculatePromotionPrice(row));
+      return price.mul(row.dosage);
+    },
+    calculatePromotionPrice(data) {
+      var price = 0;
+      //首先判断TYPE,1折扣，2定价
+      if (this.salPromotion && this.salPromotion.P_ID) {
+        switch (this.salPromotion.TYPE) {
+          case "1":
+            //折扣
+            price = data.price.mul(this.salPromotion.DISCOUNT);
+            break;
+          case "2":
+            //定价
+            price = this.salPromotion.PRICE;
+        }
+      } else {
+        price = data.price;
+      }
+      return this.dosageFilter(price);
+    },
   },
   computed: {
     salPromotion() {
       var selectActivity = this.activityOptions.filter(
-        item => item.P_ID == this.message.activityId
+        (item) => item.P_ID == this.message.activityId
       );
       if (selectActivity.length) {
         return selectActivity[0];
@@ -1397,12 +1400,12 @@ export default {
       let totalMoney = 0;
       for (let i = 0; i < _curtainData.length; i++) {
         if (_curtainData[i].choose != false) {
-          totalMoney =  totalMoney.add(this.oneTotal(_curtainData[i]));
+          totalMoney = totalMoney.add(this.oneTotal(_curtainData[i]));
         }
       }
       return totalMoney;
-    }
-  }
+    },
+  },
 };
 </script>
 

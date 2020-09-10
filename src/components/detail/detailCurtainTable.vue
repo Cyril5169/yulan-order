@@ -142,9 +142,7 @@
           label="折后" align="center" width="55">
           <template slot-scope="scope">
             <span>
-              {{ salPromotion.TYPE == 1? 
-                    salPromotion.DISCOUNT * scope.row.price
-                    : salPromotion.PRICE | dosageFilter }}
+              {{ calculatePromotionPrice(scope.row) }}
             </span>
           </template>
         </el-table-column>
@@ -1565,17 +1563,27 @@ export default {
       return false;
     },
     oneTotal(row) {
-      return (
-        Math.round(
-          (this.salPromotion.P_ID
-            ? this.salPromotion.TYPE == 1
-              ? this.salPromotion.DISCOUNT * row.price
-              : this.salPromotion.PRICE
-            : row.price
-          ).mul(100)
-        ) / 100
-      ).mul(row.dosage);
-    }
+      var price = this.dosageFilter(this.calculatePromotionPrice(row));
+      return price.mul(row.dosage);
+    },
+    calculatePromotionPrice(data) {
+      var price = 0;
+      //首先判断TYPE,1折扣，2定价
+      if (this.salPromotion && this.salPromotion.P_ID) {
+        switch (this.salPromotion.TYPE) {
+          case "1":
+            //折扣
+            price = data.price.mul(this.salPromotion.DISCOUNT);
+            break;
+          case "2":
+            //定价
+            price = this.salPromotion.PRICE;
+        }
+      } else {
+        price = data.price;
+      }
+      return this.dosageFilter(price);
+    },
   },
   activated: function() {
     this.getActivity();

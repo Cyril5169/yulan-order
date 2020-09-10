@@ -239,7 +239,7 @@ export default {
         WL_TEL: "",
         POST_ADDRESS: "",
         NOTES: "",
-        ORDERBODY: []
+        ORDERBODY: [],
       },
       showExportProduct: false,
     };
@@ -353,11 +353,6 @@ export default {
         transCookies[i].activityName = orderBody[i].PROMOTION;
         transCookies[i].unit = orderBody[i].UNIT;
         transCookies[i].item = orderBody[i].item;
-        transCookies[i].salPromotion = new Object();
-        transCookies[i].salPromotion.pId = orderBody[i].P_ID;
-        transCookies[i].salPromotion.orderType = orderBody[i].PROMOTION_TYPE;
-        transCookies[i].salPromotion.arrearsFlag = item.ARREARSFLAG;
-        transCookies[i].salPromotion.flagFl = orderBody[i].FLAG_FL_TYPE;
       }
       sessionStorage.setItem("shopping", JSON.stringify(transCookies));
       sessionStorage.setItem("shoppingHead", JSON.stringify(item));
@@ -627,7 +622,7 @@ export default {
                 });
                 if (!res.data) {
                   this.$alert(
-                    `活动‘&${this.ruleForm.ORDERBODY[i].PROMOTION}’不存在`,
+                    `活动‘${this.ruleForm.ORDERBODY[i].PROMOTION}’不存在`,
                     "提示",
                     {
                       confirmButtonText: "确定",

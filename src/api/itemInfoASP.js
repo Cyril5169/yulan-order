@@ -72,6 +72,14 @@ export function GetWallpaperInfo(data, config = {}) {
         return Promise.reject(err)
     })
 }
+//一口价
+export function GetFixPriceShopsByCondition(data, config = {}) {
+    return post('/SAL_PROMOTION_SPECIAL/GetFixPriceShopsByCondition', data, config).then(res => {
+        return Promise.resolve(res);
+    }).catch(err => {
+        return Promise.reject(err)
+    })
+}
 //获得热销榜
 export function GetHotSales(data, config = {}) {
     return post('/HOTSALES/GetHotSales', data, config).then((res) => {

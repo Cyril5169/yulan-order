@@ -56,47 +56,21 @@
             <el-table-column label="小计" align="center">
               <template slot-scope="scope">
                 <div v-if="isManager === '0'">***</div>
-                <div v-else-if="scope.row.unit === '平方米'">
-                  {{
-                    subtotal(scope.row.width, scope.row.height, scope.row.price)
-                  }}
-                </div>
-                <div v-else>
-                  {{
-                    (parseFloat(scope.row.price) *
-                      parseFloat(scope.row.quantity))
-                      | dosageFilter
-                  }}
-                </div>
+                <div v-else>{{subtotal(scope.row)}}</div>
               </template>
             </el-table-column>
             <el-table-column label="折后金额" align="center">
               <template slot-scope="scope">
                 <div v-if="isManager === '0'">***</div>
-                <div v-else-if="scope.row.unit === '平方米'">
-                  {{
-                    scope.row.salPromotion? 
-                    (scope.row.salPromotion.type == 1? 
-                    scope.row.salPromotion.discount * subtotal( scope.row.width,scope.row.height,scope.row.price)
-                    :subtotal(scope.row.width,scope.row.height,scope.row.salPromotion.price))
-                    : subtotal(scope.row.width,scope.row.height,scope.row.price)
-                  }}
-                </div>
                 <div v-else>
-                  {{
-                    scope.row.salPromotion? 
-                    (scope.row.salPromotion.type == 1? 
-                    scope.row.salPromotion.discount * parseFloat(scope.row.price) * parseFloat(scope.row.quantity)
-                    :parseFloat(scope.row.salPromotion.price) *parseFloat(scope.row.quantity))
-                    : parseFloat(scope.row.price) * parseFloat(scope.row.quantity)
-                        | dosageFilter
-                  }}
+                  {{ calculatePromotionPrice(scope.row) }}
                 </div>
               </template>
             </el-table-column>
             <el-table-column label="操作" min-width="170" align="center">
               <template slot-scope="scope">
-                <a class="link-detail" @click="handleDetails(scope.$index, scope.row)">查看详情</a>
+                <a class="link-detail" @click="handleDetails(scope.$index, scope.row)"
+                  v-if="canShowDetail(scope.row)">查看详情</a>
                 <a class="link-delete" @click="deleteSingle(scope.row)">删除商品</a>
               </template>
             </el-table-column>
@@ -157,8 +131,8 @@ export default {
       //全部的商品信息(全类型)
       shopsData: [],
       multipleSelection: [],
-      totalMoney: 0,
-      totalPriceMoney: 0,
+      totalMoney: 0, //原总价
+      totalPriceMoney: 0, //折扣后总价
       expands: [], //控制展开行
     };
   },
@@ -237,126 +211,7 @@ export default {
         return "colorType_2";
       }
       return "";
-    },
-    //计算每件商品的小计:长乘高
-    squareChange(value, index, groupIndex, flag) {
-      return;
-      var re = /((^[1-9](\d+)?(\.\d{1,2})?$)|(^0$)|(^\d\.\d{1,2}$))/;
-      if (re.test(value) === false) {
-        this.$alert("请填写正确的数字", "提示", {
-          type: "warning",
-          confirmButtonText: "确定",
-        });
-        if (flag === 0) {
-          this.shopsData[groupIndex].commodities[index].width = "";
-        } else {
-          this.shopsData[groupIndex].commodities[index].height = "";
-        }
-        return;
-      }
-      if (flag === 0) {
-        updateShoppingCar({
-          commodityID: this.shopsData[groupIndex].commodities[index].id,
-          activityID: this.shopsData[groupIndex].commodities[index].activityId,
-          quantity: "",
-          width: this.shopsData[groupIndex].commodities[index].width,
-          height: this.shopsData[groupIndex].commodities[index].height,
-          remark: this.shopsData[groupIndex].commodities[index].remark,
-        })
-          .then((res) => {})
-          .catch((err) => {
-            console.log(err);
-          });
-      } else {
-        updateShoppingCar({
-          commodityID: this.shopsData[groupIndex].commodities[index].id,
-          activityID: this.shopsData[groupIndex].commodities[index].activityId,
-          quantity: "",
-          width: this.shopsData[groupIndex].commodities[index].width,
-          height: value,
-          remark: this.shopsData[groupIndex].commodities[index].remark,
-        })
-          .then((res) => {})
-          .catch((err) => {
-            console.log(err);
-          });
-      }
-      for (var i = 0; i < this.shopsData.length; i++) {
-        var selected =
-          this.multipleSelection.length &&
-          this.multipleSelection.indexOf(
-            this.shopsData[i].commodities[index]
-          ) !== -1;
-        if (selected === true) break;
-      }
-      if (selected === true) {
-        var total = 0;
-        let _data = this.shopsData[groupIndex].commodities[index];
-        if (this.multipleSelection[i].quantity)
-          total += parseFloat(this.multipleSelection[i].price * _data.quantity);
-        else {
-          let sub = this.subtotal(
-            _data.width,
-            _data.height,
-            this.multipleSelection[i].price
-          );
-          total += sub;
-        }
-        this.totalMoney = total;
-      }
-    },
-    //计算每件商品的小计:非长乘高
-    numberChange(value, index, groupIndex) {
-      return;
-      var re = /((^[1-9](\d+)?(\.\d{1,2})?$)|(^0$)|(^\d\.\d{1,2}$))/;
-      if (re.test(value) === false) {
-        this.$alert("请填写正确的数字", "提示", {
-          type: "warning",
-          confirmButtonText: "确定",
-        });
-        this.shopsData[groupIndex].commodities[index].quantity = "";
-        return;
-      }
-      updateShoppingCar({
-        commodityID: this.shopsData[groupIndex].commodities[index].id,
-        activityID: this.shopsData[groupIndex].commodities[index].activityId,
-        quantity: this.shopsData[groupIndex].commodities[index].quantity,
-        width: "",
-        height: "",
-        remark: this.shopsData[groupIndex].commodities[index].remark,
-      })
-        .then((res) => {})
-        .catch((err) => {
-          console.log(err);
-        });
-      for (var i = 0; i < this.shopsData.length; i++) {
-        var selected =
-          this.multipleSelection.length &&
-          this.multipleSelection.indexOf(
-            this.shopsData[i].commodities[index]
-          ) !== -1;
-        if (selected === true) break;
-      }
-      if (selected === true) {
-        var total = 0;
-        let _data = this.shopsData[groupIndex].commodities[index];
-        if (this.multipleSelection[i].quantity)
-          total += parseFloat(
-            this.multipleSelection[i].price *
-              this.shopsData[groupIndex].commodities[index].quantity
-          );
-        else {
-          let sub = this.subtotal(
-            _data.width,
-            _data.height,
-            this.multipleSelection[i].price
-          );
-          total += sub;
-        }
-        this.totalMoney = total;
-      }
-    },
-    //监测选中项的变化
+    }, //监测选中项的变化
     handleSelectionChange(val) {
       //当已有选项时，只能选当前组其他项，不可选其他组，若选其他组，原有组清空
       if (this.multipleSelection.length !== 0) {
@@ -390,41 +245,52 @@ export default {
       this.multipleSelection = val;
       for (var i = 0; i < this.multipleSelection.length; i++) {
         let _data = this.multipleSelection[i];
-        if (_data.quantity) {
-          let sub = parseFloat(_data.price * _data.quantity);
-          total += sub;
-          totalPrice +=
-            Math.round(
-              (_data.salPromotion
-                ? _data.salPromotion.type == 1
-                  ? _data.salPromotion.discount * sub
-                  : parseFloat(_data.salPromotion.price * _data.quantity)
-                : sub
-              ).mul(100)
-            ) / 100;
-        } else {
-          let sub = this.subtotal(_data.width, _data.height, _data.price);
-          total += sub;
-          totalPrice +=
-            Math.round(
-              (_data.salPromotion
-                ? _data.salPromotion.type == 1
-                  ? _data.salPromotion.discount * sub
-                  : this.subtotal(
-                      _data.width,
-                      _data.height,
-                      _data.salPromotion.price
-                    )
-                : sub
-              ).mul(100)
-            ) / 100;
-        }
+        var quantity =
+          _data.quantity | this.dosageFilter(_data.width.mul(_data.height));
+        let sub = _data.price.mul(_data.quantity);
+        total += sub;
+        totalPrice += this.calculatePromotionPrice(_data);
       }
       this.totalMoney = total;
       this.totalPriceMoney = totalPrice;
     },
+    calculatePromotionPrice(data) {
+      var price = 0;
+      var quantity =
+        data.quantity != 0
+          ? data.quantity
+          : this.dosageFilter(data.width.mul(data.height));
+      //首先判断TYPE,1折扣，2定价。然后判断priority
+      if (data.salPromotion) {
+        //一口价
+        if (data.salPromotion.priority == 99) {
+          if (quantity < 1) quantity = 1;
+          price = quantity.mul(data.salPromotion.price);
+        } else {
+          switch (data.salPromotion.type) {
+            case "1":
+              //折扣
+              price = quantity.mul(data.price).mul(data.salPromotion.discount);
+              break;
+            case "2":
+              //定价
+              price = quantity.mul(data.salPromotion.price);
+          }
+        }
+      } else {
+        price = quantity.mul(data.price);
+      }
+      return this.dosageFilter(price);
+    },
+    canShowDetail(row) {
+      return (
+        !row.salPromotion ||
+        (row.salPromotion && row.salPromotion.modifyFlag != "N")
+      );
+    },
     //查看详情
     handleDetails(index, row) {
+      console.log(row);
       this.addTab("detail/detailWallPaper");
       this.$router.push({
         name: `detailWallPaper`,
@@ -575,11 +441,7 @@ export default {
           );
           return;
         }
-        if (
-          this.customerType === "10" &&
-          (this.multipleSelection[i].onlineSalesAmount === null ||
-            this.multipleSelection[i].onlineSalesAmount == 0)
-        ) {
+        if (this.customerType === "10" && !this.multipleSelection[i].onlineSalesAmount) {
           arr.push(this.multipleSelection[i].item.itemNo);
         }
       }
@@ -608,12 +470,14 @@ export default {
       that.expands.push(row.activity);
     },
     //小计：面积四舍五入后*价格
-    subtotal(width, height, price) {
-      let _width = parseFloat(width);
-      let _height = parseFloat(height);
-      let _price = parseFloat(price);
-      let square = Math.round(_width.mul(_height).mul(100)) / 100;
-      return Math.round(price.mul(square).mul(100)) / 100;
+    subtotal(data) {
+      var price = 0;
+      var quantity =
+        data.quantity != 0
+          ? data.quantity
+          : this.dosageFilter(data.width.mul(data.height));
+      price = quantity.mul(data.price);
+      return this.dosageFilter(price);
     },
   },
   created() {

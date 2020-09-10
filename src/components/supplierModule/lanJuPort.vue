@@ -8,7 +8,6 @@
           <el-card>
             <el-date-picker v-model="batchdate_deliver" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
               placeholder="选择时间" style="width:40%"></el-date-picker>
-
             <el-button style="width:40% align:right" class="button_4" @click="BatchSure">确认</el-button>
           </el-card>
         </div>
@@ -311,7 +310,7 @@
       </el-dialog>
       <!-- X开头（窗帘）订单已确认采购单详情界面 -->
       <el-dialog title="" :visible.sync="checkedX_Visible" :show-close="true" :close-on-click-modal="false"
-        v-if="reFresh" width="1170px" top="8vh">
+        width="1170px" top="8vh">
         <div class="fixedDiv">
           <div style="margin:20px">
             <el-button @click="returnMain" type="primary" size="small">返 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 回
@@ -1030,7 +1029,6 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
-          <!-- /待确认页签============================================================================================================== -->
           <!-- 采购单已确认页签============================================================================================================== -->
           <el-tab-pane label="采购已确认" name="second" align="left">
             <div style="margin-bottom:10px;">
@@ -1097,7 +1095,6 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
-          <!-- /已确认页签============================================================================================================== -->
           <!-- 已取消页签============================================================================================================== -->
           <el-tab-pane label="已取消" name="third" align="left">
             <div style="margin-bottom:10px;">
@@ -1146,8 +1143,6 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
-
-          <!-- /已取消页签============================================================================================================== -->
           <!-- 退货已确认页签============================================================================================================== -->
           <el-tab-pane label="退货已确认" name="forth" align="left">
             <div style="margin-bottom:10px;">
@@ -1212,7 +1207,6 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
-          <!-- /已确认页签============================================================================================================== -->
           <div style="margin:0 25%;" class="block">
             <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
               :current-page.sync="currentPage" :page-sizes="[5, 10, 15, 20]" :page-size="limit"
@@ -1237,6 +1231,7 @@ import {
 } from "@/api/supplierASP";
 import { downLoadFile } from "@/common/js/downLoadFile";
 import Cookies from "js-cookie";
+import Axios from "axios";
 
 export default {
   name: "supplyJuPort",
@@ -1245,7 +1240,6 @@ export default {
       bill_type: "POT",
       arr_index: [],
       arr_span: [],
-      arr_group: [],
       multipleSelection: [],
       colName: [
         {
@@ -1268,30 +1262,7 @@ export default {
           name8: 0,
         },
       ],
-
-      locCol: [
-        {
-          name1: "位置div",
-        },
-      ],
-
-      detailCol: [
-        {
-          name2: "名称",
-          name3: "编码",
-          name4: "名称",
-          name5: "规格",
-          name6: "用量",
-          name7: "含税单价",
-          name8: "金额",
-          name9: "制造说明",
-          name10: "备注",
-        },
-      ],
-
       int_add: 1,
-      reFresh: true,
-      menuTree: [],
       companyId: Cookies.get("companyId"),
       current_id: Cookies.get("cid"),
       sumMoney: 0,
@@ -1329,18 +1300,9 @@ export default {
         { value: "enforce", label: "执行" },
         { value: "fulfill", label: "完成" },
       ],
-
       //存一行的数据
       detailData: [{ cl_place: -1, cl_item_no: "D13445435" }],
     };
-  },
-  watch: {
-    menuTree() {
-      this.reFresh = false;
-      this.$nextTick(() => {
-        this.reFresh = true;
-      });
-    },
   },
   methods: {
     //修改打印标记
@@ -1390,21 +1352,21 @@ export default {
           arr_pur: this.multipleSelection,
           batchdate_deliver: this.batchdate_deliver,
         };
-        UpdateCheckFlagBatch(data).then((res) => {
-          if (res.code == 0) {
+        UpdateCheckFlagBatch(data)
+          .then((res) => {
             this.$alert("批量确认成功", "提示", {
               confirmButtonText: "确定",
               type: "success",
             });
             this.batchTip_Visible = false;
             this.autoSearch();
-          } else {
+          })
+          .catch((res) => {
             this.$alert("批量确认失败，请稍后重试", "提示", {
               confirmButtonText: "确定",
               type: "warning",
             });
-          }
-        });
+          });
       }
     },
     BatchSure() {
@@ -1416,65 +1378,24 @@ export default {
         arr_pur: arr_pur,
         batchdate_deliver: this.batchdate_deliver,
       };
-      UpdateCheckFlagBatch(data).then((res) => {
-        if (res.code == 0) {
+      UpdateCheckFlagBatch(data)
+        .then((res) => {
           this.$alert("批量确认成功", "提示", {
             confirmButtonText: "确定",
             type: "success",
           });
           this.batchTip_Visible = false;
           this.autoSearch();
-        } else {
+        })
+        .catch((res) => {
           this.$alert("批量确认失败，请稍后重试", "提示", {
             confirmButtonText: "确定",
             type: "warning",
           });
-        }
-      });
+        });
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
-    },
-    getSummaries(param) {
-      const { columns, data } = param;
-      const sums = [];
-      columns.forEach((column, index) => {
-        if (index === 7) {
-          sums[index] = "汇总";
-          return;
-        }
-        if (
-          index === 3 ||
-          index === 4 ||
-          index === 5 ||
-          index === 9 ||
-          index === 12
-        ) {
-          sums[index] = "";
-          return;
-        }
-        const values = data.map((item) => Number(item[column.property]));
-        if (!values.every((value) => isNaN(value))) {
-          sums[index] = values.reduce((prev, curr) => {
-            const value = Number(curr);
-            if (!isNaN(value)) {
-              return prev + curr;
-            } else {
-              return prev;
-            }
-          }, 0);
-          sums[index];
-        }
-      });
-
-      return sums;
-    },
-    //强制根据组件id刷新
-    forceHandle(id) {
-      let dom = document.getElementById(id);
-      this.$nextTick(() => {
-        //checkedX
-      });
     },
     datatransMethod(value) {
       //时间戳转化大法
@@ -1515,9 +1436,6 @@ export default {
           return "暂无名称";
       }
     },
-    addToTable() {
-      var tablec = document.getElementById();
-    },
     //获取产品类型
     getProductType(value) {
       if (value.substring(0, 1) == "X") {
@@ -1527,19 +1445,6 @@ export default {
       } else if (value.substring(0, 1) == "W") {
         return "墙纸配套类";
       } else return "手工单";
-    },
-    //获取最近半年时间
-    getPastHalfYear() {
-      var curDate = new Date().getTime();
-      var halfYear = (365 / 2) * 24 * 3600 * 1000;
-      var pastResult = curDate - halfYear;
-      var pastDate = new Date(pastResult);
-      var pastYear = pastDate.getFullYear();
-      var pastMonth = pastDate.getMonth() + 1;
-      var pastDate = pastDate.getDate();
-      var strDay = pastYear + "-" + pastMonth + "-" + pastDate;
-      var date = new Date(strDay);
-      return date;
     },
     getBegintime(value) {
       var startTime = null;
@@ -1571,13 +1476,6 @@ export default {
       var date = this.datatransMethod(endTime);
       return date;
     },
-    //获取当月第一天零时
-    getCurrentMonthFirst() {
-      var date = new Date();
-      date.setDate(1);
-      date.setHours(0, 0, 0);
-      return date;
-    },
     //获取最近一周时间
     getCurrentWeek() {
       var date = new Date();
@@ -1596,20 +1494,6 @@ export default {
     getTodayMaxTime() {
       var date = new Date();
       date.setHours(23, 59, 59);
-      return date;
-    },
-    //获取前500年时间
-    getLongAgao() {
-      var date = new Date();
-      date.setFullYear(date.getFullYear() - 500);
-      date.setHours(0, 0, 0);
-      return date;
-    },
-    //获取后500年时间
-    getLongLater() {
-      var date = new Date();
-      date.setFullYear(date.getFullYear() + 500);
-      date.setHours(0, 0, 0);
       return date;
     },
     //统一送货日期
@@ -1737,22 +1621,18 @@ export default {
         PUR_NO: this.pur_headForm.PUR_NO,
         NOTE: this.supply_check_notes,
       };
-      SaveHeadNotes(data).then((res) => {
-        if (res.code == 0) {
-          this.$alert("保存说明成功", "提示", {
-            confirmButtonText: "确定",
-            type: "success",
-          });
+      SaveHeadNotes(data)
+        .then((res) => {
           this.autoSearch();
           this.checkX_Visible = false;
           this.checkY_Visible = false;
-        } else {
+        })
+        .catch((res) => {
           this.$alert("保存失败，请稍后重试", "提示", {
             confirmButtonText: "确定",
             type: "warning",
           });
-        }
-      });
+        });
     },
     returnMain() {
       this.checkY_Visible = false;
@@ -1778,22 +1658,23 @@ export default {
           });
           return;
         }
-        SubmitX(data, { loading: false }).then((res) => {
-          if (res.code == 0) {
-            // this.$alert("确认成功", "提示", {
-            //   confirmButtonText: "确定",
-            //   type: "success"
-            // });
-            // this.autoSearch();
-          } else {
+        SubmitX(data, { loading: false })
+          .then((res) => {
+            this.checkX_Visible = false;
+            this.checkedX_Visible = true;
+            //同步布精灵数据
+            if (res.data.length) {
+              var res2 = this.asyncBuJingLing([
+                { PUR_NO: res.data[0].PUR_NO, data: res.data },
+              ]);
+            }
+          })
+          .catch((res) => {
             this.$alert("确认失败，请稍后重试", "提示", {
               confirmButtonText: "确定",
               type: "warning",
             });
-          }
-          this.checkX_Visible = false;
-          this.checkedX_Visible = true;
-        });
+          });
       } else {
         for (let i = 0; i < this.gridData.length; i++) {
           if (
@@ -1811,24 +1692,103 @@ export default {
           pur_headForm: this.pur_headForm,
           gridData: this.gridData,
         };
-        Submit(data, { loading: false }).then((res) => {
-          if (res.code == 0) {
-            // this.$alert("确认成功", "提示", {
-            //   confirmButtonText: "确定",
-            //   type: "success"
-            // });
-            // this.autoSearch();
+        Submit(data, { loading: false })
+          .then((res) => {
             this.checkY_Visible = false;
             this.checkedY_Visible = true;
-          } else {
+          })
+          .catch((res) => {
             this.$alert("确认失败，请稍后重试", "提示", {
               confirmButtonText: "确定",
               type: "warning",
             });
-          }
-        });
+          });
       }
       this.autoSearch();
+    },
+    //单列的groupby
+    groupBy(array, name) {
+      let groups = [];
+      array.forEach((item) => {
+        let groupName = item[name];
+        var hasgroup = groups.filter((item) => item.group == groupName);
+        if (hasgroup.length) {
+          hasgroup[0].value.push(item);
+        } else {
+          groups.push({
+            group: groupName,
+            value: [item],
+          });
+        }
+      });
+      return groups;
+    },
+    //同步布精灵数据
+    async asyncBuJingLing(pruData) {
+      var result = "";
+      if (pruData.length) {
+        for (var i = 0; i < pruData.length; i++) {
+          //一个单n个窗帘就要post n次
+          var onedata = pruData[i].data;
+          if (onedata.length) {
+            //通过位置查找窗帘
+            var placeList = this.groupBy(onedata, "CL_PLACE_ID");
+            for (var p = 0; p < placeList.length; p++) {
+              var oneplace = placeList[p].value;
+              //每个窗帘post数据
+              var detailData = [];
+              for (var d = 0; d < oneplace.length; d++) {
+                var detail = oneplace[d];
+                var onedetail = {
+                  buwei: detail.CL_NAME,
+                  leibie: detail.MNAME,
+                  Code: detail.ITEM_NO,
+                  Danwei: detail.UNIT_NAME,
+                  Price: detail.PRICE_TAXIN,
+                  Guige: detail.FIX_GRADE,
+                  Shuliang: detail.QTY_PUR,
+                  Shenhe2Des: detail.PRODUCT_NOTE,
+                  Beizhu: detail.NOTES,
+                };
+                detailData.push(onedetail);
+              }
+              //找找各种款式，开数
+              var ltlist = oneplace.filter(item => item.CL_NAME == "lt");
+              var lslist = oneplace.filter(item => item.CL_NAME == "ls");
+              var shalist = oneplace.filter(item => item.CL_NAME == "sha");
+
+              var postdata = {
+                token: "ljsp-bjl",
+                Custmorname: oneplace[0].CUSTOMER_NAME,
+                templatename: oneplace[0].CL_ITEM_NO,
+                liantou: ltlist.length > 0,
+                lianshen: lslist.length > 0,
+                chuangsha: shalist.length > 0,
+                liantouHeight: null,
+                liantouWidth: oneplace[0].QTY_PUR,
+                liantouLeft: 0,
+                liantouRight: 0,
+                liantouMoshutie: "--",
+                lianshenHeight: oneplace[0].CL_HIGH,
+                lianshenWidth: oneplace[0].CL_WIDTH,
+                lianshenOpen: "--",
+                lianshenType: "--",
+                chuangshaHeight: oneplace[0].CL_HIGH,
+                chuangshaWIdth: oneplace[0].CL_WIDTH,
+                chuangshaOpen: "--",
+                chuangshaType: "--",
+                subcustmorname: "无",
+                Zswz: oneplace[0].CL_PLACE,
+                onlineDanhao: oneplace[0].ORDER_NO,
+                Data: detailData
+              };
+              console.log(postdata)
+              var resB = await Axios.post("http://ljsp.ubxiu.com:8098/syn/add", postdata);
+              console.log(resB)
+            }
+          }
+        }
+      }
     },
     autoSearch() {
       var data = {

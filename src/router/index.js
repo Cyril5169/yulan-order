@@ -6,6 +6,7 @@ import Main from '@/components/main'
 import WallPaper from '@/components/shops/wallPaper'
 import Curtain from '@/components/shops/curtain'
 import SoftSuit from '@/components/shops/softSuit'
+import fixPriceShops from '@/components/shops/fixPriceShops'
 import BankProof from '@/components/bankProof'
 import painting from '@/components/painting'
 import yulanPainting from '@/components/yulanPainting'
@@ -97,6 +98,14 @@ const router = new Router({
           path: '/shops/softSuit',
           name: 'softSuit',
           component: SoftSuit,
+          meta: {
+            keepAlive: true
+          }
+        },
+        {
+          path: '/shops/fixPriceShops',
+          name: 'fixPriceShops',
+          component: fixPriceShops,
           meta: {
             keepAlive: true
           }

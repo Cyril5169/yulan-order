@@ -22,3 +22,10 @@ export function UpdateCartItem(data, config = {}) {
         return Promise.reject(err);
     })
 }
+export function FixPriceShopAddToCart(data, config = {}) {
+    return post('/SAL_PROMOTION_SPECIAL/FixPriceShopAddToCart', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}

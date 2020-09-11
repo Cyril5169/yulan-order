@@ -80,6 +80,13 @@ export function GetFixPriceShopsByCondition(data, config = {}) {
         return Promise.reject(err)
     })
 }
+export function GetFixPriceShopsByItemNo(data, config = {}) {
+    return post('/SAL_PROMOTION_SPECIAL/GetFixPriceShopsByItemNo', data, config).then(res => {
+        return Promise.resolve(res);
+    }).catch(err => {
+        return Promise.reject(err)
+    })
+}
 //获得热销榜
 export function GetHotSales(data, config = {}) {
     return post('/HOTSALES/GetHotSales', data, config).then((res) => {

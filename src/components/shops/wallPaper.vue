@@ -110,12 +110,13 @@ import { getWallPaperStore, checkStore } from "@/api/searchStore";
 import { findItemActivity } from "@/api/findActivity";
 import { addShoppingCar } from "@/api/shop";
 import { getItemById, GetPromotionByItem } from "@/api/orderListASP";
-import Vue from "vue";
+import { mapMutations } from "vuex";
 import Cookies from "js-cookie";
 import {
   GetWallpaperInfo,
   GetSalPutonRecord,
   GetItemStock,
+  GetFixPriceShopsByItemNo,
 } from "@/api/itemInfoASP";
 
 export default {
@@ -156,6 +157,7 @@ export default {
     },
   },
   methods: {
+    ...mapMutations("navTabs", ["addTab"]),
     //给库存表格切换不同的颜色
     rowClass(row, index) {
       if (row.rowIndex % 2 === 0) {
@@ -212,7 +214,6 @@ export default {
               unit: res.data[0].UNIT, //单位
               noteType: res.data[0].NOTE_TYPE,
               noteTypeName: res.data[0].NOTE_TYPE_NAME,
-              itemFlag: res.data[0].ITEM_FALG, //不知是啥
               number: "", //数量
               anotherNumber: "", //辅助数量
               minimumPurchase: res.data[0].MINIMUM_PURCHASE, // 起购数量
@@ -469,6 +470,54 @@ export default {
     },
     //保存到购物车
     saveToShoppingCar(row) {
+      //判断是否有一口价
+      GetFixPriceShopsByItemNo({ ITEM_NO: row.type })
+        .then((res) => {
+          if (res.data.length) {
+            //判断数量
+            var QTY_JUDGE = res.data[0].QTY_JUDGE;
+            var quantity = row.anotherNumber
+              ? row.anotherNumber * row.number
+              : row.number;
+            if (quantity <= QTY_JUDGE) {
+              this.$confirm(
+                "您要购买的产品数量，一口价专区有促销活动，是否前往购买？",
+                "提示",
+                {
+                  confirmButtonText: "是",
+                  cancelButtonText: "否",
+                  type: "warning",
+                }
+              )
+                .then(() => {
+                  //跳转
+                  this.addTab("shops/fixPriceShops");
+                  this.$router.push({
+                    name: "fixPriceShops",
+                    params: {
+                      selectNo: row.type,
+                    },
+                  });
+                })
+                .catch(() => {
+                  //不跳转
+                  this.beforAddToCart(row);
+                });
+            } else {
+              //不到判断数量
+              this.beforAddToCart(row);
+            }
+          } else {
+            //没有一口价
+            this.beforAddToCart(row);
+          }
+        })
+        .catch((res) => {
+          //报错，直接进入后面的环节
+          this.beforAddToCart(row);
+        });
+    },
+    beforAddToCart(row) {
       //库存判断,判断成功才可以添加
       let val;
       if (row.unit === "平方米") {

@@ -167,7 +167,7 @@ export default {
           for (var i = 0; i < this.selectShops.length; i++) {
             ids.push(this.selectShops[i].ID);
           }
-          FixPriceShopAddToCart({ cid: Cookies.get("cid"), ids: ids })
+          FixPriceShopAddListToCart({ cid: Cookies.get("cid"), ids: ids })
             .then((res) => {
               this.$alert("此型号已添加成功，请前往购物车查看", "添加成功", {
                 confirmButtonText: "确定",

@@ -49,6 +49,20 @@ export function SubmitX(data, config = {}) {
         return Promise.reject(err);
     })
 }
+export function AsyncBuJingLing(data, config = {}) {
+    return post('/PUR_HEAD/AsyncBuJingLing', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+export function GetBJLData(data, config = {}) {
+    return post('/PUR_HEAD/GetBJLData', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
 export function UpdateCheckFlag(data, config = {}) {
     return post('/PUR_HEAD/UpdateCheckFlag', data, config).then((res) => {
         return Promise.resolve(res);

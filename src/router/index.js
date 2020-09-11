@@ -105,10 +105,7 @@ const router = new Router({
         {
           path: '/shops/fixPriceShops',
           name: 'fixPriceShops',
-          component: fixPriceShops,
-          meta: {
-            keepAlive: true
-          }
+          component: fixPriceShops
         },
         {
           path: '/shops/shoppingCurtainDetail',

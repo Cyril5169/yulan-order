@@ -1081,9 +1081,15 @@
               <el-table-column prop="NOTES" min-width="200" header-align="center" label="备注" align="left">
               </el-table-column>
               <el-table-column prop="LJ_SUGGESTION" label="兰居备注" min-width="50" align="left"></el-table-column>
-              <el-table-column label="操作" width="120" align="center">
+              <el-table-column label="操作" width="100" align="center">
                 <template slot-scope="scope">
                   <button @click="autoSearchDetail(scope.row.PUR_NO)" class="btn-style">查看详情</button>
+                </template>
+              </el-table-column>
+              <el-table-column width="110" label="同步标记" prop="IMPORT_FLAG" align="center">
+                <template slot-scope="scope">
+                  <span v-if="scope.row.IMPORT_FLAG == 'Y'">已同步</span>
+                  <button v-else class="btn-style">同步布精灵</button>
                 </template>
               </el-table-column>
               <el-table-column width="100" label="打印标记" prop="PRINTED" align="center">
@@ -1228,6 +1234,8 @@ import {
   UpdateCheckFlagBatch,
   UpdatePrintedById,
   GetNoPrinted,
+  AsyncBuJingLing,
+  GetBJLData,
 } from "@/api/supplierASP";
 import { downLoadFile } from "@/common/js/downLoadFile";
 import Cookies from "js-cookie";
@@ -1359,6 +1367,8 @@ export default {
               type: "success",
             });
             this.batchTip_Visible = false;
+            console.log(res.data);
+            this.asyncBuJingLing(res.data);
             this.autoSearch();
           })
           .catch((res) => {
@@ -1664,7 +1674,7 @@ export default {
             this.checkedX_Visible = true;
             //同步布精灵数据
             if (res.data.length) {
-              var res2 = this.asyncBuJingLing([
+              this.asyncBuJingLing([
                 { PUR_NO: res.data[0].PUR_NO, data: res.data },
               ]);
             }
@@ -1723,13 +1733,23 @@ export default {
       });
       return groups;
     },
+    onClickAsync(row) {
+      GetBJLData({ PUR_NO: row.PUR_NO }).then((res) => {
+        var res2 = this.asyncBuJingLing([
+          { PUR_NO: row.PUR_NO, data: res.data },
+        ]);
+        this.autoSearch();
+      });
+    },
     //同步布精灵数据
     async asyncBuJingLing(pruData) {
       var result = "";
       if (pruData.length) {
+        var failPur = "";
         for (var i = 0; i < pruData.length; i++) {
-          //一个单n个窗帘就要post n次
+          //一个单n个位置的窗帘就要post n次
           var onedata = pruData[i].data;
+          var oneFail = "";
           if (onedata.length) {
             //通过位置查找窗帘
             var placeList = this.groupBy(onedata, "CL_PLACE_ID");
@@ -1753,13 +1773,13 @@ export default {
                 detailData.push(onedetail);
               }
               //找找各种款式，开数
-              var ltlist = oneplace.filter(item => item.CL_NAME == "lt");
-              var lslist = oneplace.filter(item => item.CL_NAME == "ls");
-              var shalist = oneplace.filter(item => item.CL_NAME == "sha");
+              var ltlist = oneplace.filter((item) => item.CL_NAME == "lt");
+              var lslist = oneplace.filter((item) => item.CL_NAME == "ls");
+              var shalist = oneplace.filter((item) => item.CL_NAME == "sha");
 
               var postdata = {
                 token: "ljsp-bjl",
-                Custmorname: oneplace[0].CUSTOMER_NAME,
+                custmorname: oneplace[0].CUSTOMER_NAME,
                 templatename: oneplace[0].CL_ITEM_NO,
                 liantou: ltlist.length > 0,
                 lianshen: lslist.length > 0,
@@ -1778,16 +1798,48 @@ export default {
                 chuangshaOpen: "--",
                 chuangshaType: "--",
                 subcustmorname: "无",
-                Zswz: oneplace[0].CL_PLACE,
+                zswz: oneplace[0].CL_PLACE,
                 onlineDanhao: oneplace[0].ORDER_NO,
-                Data: detailData
+                data: JSON.stringify(detailData),
               };
-              console.log(postdata)
-              var resB = await Axios.post("http://ljsp.ubxiu.com:8098/syn/add", postdata);
-              console.log(resB)
+              console.log(postdata);
+              Axios.defaults.withCredentials = false;
+              // var resB = await Axios.post(
+              //   "http://ljsp.ubxiu.com:8098/syn/add",
+              //   postdata,
+              //   { params: postdata }
+              // );
+              // console.log(resB);
+
+              // if (resB.data.state == "ok") {
+              // } else {
+              //   var msg =
+              //     pruData[i].PUR_NO +
+              //     "位置:" +
+              //     oneplace[0].CL_PLACE +
+              //     "同步失败;";
+              //   failPur += msg;
+              //   oneFail += msg;
+              // }
             }
           }
+          if (!oneFail) {
+            //一个单同步成功的修改同步状态
+            //var resC = AsyncBuJingLing({PUR_NO: pruData[i].PUR_NO});
+            //console.log(resC);
+          }
         }
+        if (failPur) {
+          this.$alert(failPur, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return false;
+        } else {
+          return true;
+        }
+      } else {
+        return false;
       }
     },
     autoSearch() {
@@ -2172,6 +2224,7 @@ export default {
   color: rgb(255, 255, 255);
   border: 3px solid #409eff;
   border-radius: 5px;
+  cursor: pointer;
 }
 .messageInput {
   margin: 3px;

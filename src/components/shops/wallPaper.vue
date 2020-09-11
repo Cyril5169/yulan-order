@@ -111,6 +111,7 @@ import { findItemActivity } from "@/api/findActivity";
 import { addShoppingCar } from "@/api/shop";
 import { getItemById, GetPromotionByItem } from "@/api/orderListASP";
 import { mapMutations } from "vuex";
+import { mapState } from "vuex";
 import Cookies from "js-cookie";
 import {
   GetWallpaperInfo,
@@ -156,8 +157,18 @@ export default {
       return len;
     },
   },
+  computed: {
+    ...mapState("navTabs", ["menuTreeListFlatten"]),
+  },
   methods: {
     ...mapMutations("navTabs", ["addTab"]),
+    isContainAttr(attr) {
+      //是否包含权限
+      return (
+        this.menuTreeListFlatten.filter((item) => item.MENU_LINK == attr)
+          .length > 0
+      );
+    },
     //给库存表格切换不同的颜色
     rowClass(row, index) {
       if (row.rowIndex % 2 === 0) {
@@ -295,7 +306,131 @@ export default {
           this.clearMsg();
         });
     },
-    //获取库存信息
+    getPriceTip() {
+      switch (this.customerType) {
+        case "02":
+        case "08":
+        case "10":
+          return "经销";
+        case "05":
+          return "零售";
+        case "06":
+          return "分销";
+        case "09":
+          return "家装";
+        default:
+          return "";
+      }
+    },
+    //保存到购物车
+    saveToShoppingCar(row) {
+      if (this.isContainAttr("shops/fixPriceShops")) {
+        //判断是否有一口价
+        GetFixPriceShopsByItemNo({ ITEM_NO: row.type })
+          .then((res) => {
+            if (res.data.length) {
+              //判断数量
+              var QTY_JUDGE = res.data[0].QTY_JUDGE;
+              var quantity = row.anotherNumber
+                ? row.anotherNumber * row.number
+                : row.number;
+              if (quantity <= QTY_JUDGE) {
+                this.$confirm(
+                  "您要购买的产品数量，一口价专区有促销活动，是否前往购买？",
+                  "提示",
+                  {
+                    confirmButtonText: "是",
+                    cancelButtonText: "否",
+                    type: "warning",
+                  }
+                )
+                  .then(() => {
+                    //跳转
+                    this.addTab("shops/fixPriceShops");
+                    this.$router.push({
+                      name: "fixPriceShops",
+                      params: {
+                        selectNo: row.type,
+                      },
+                    });
+                  })
+                  .catch(() => {
+                    //不跳转
+                    this.beforAddToCart(row);
+                  });
+              } else {
+                //不到判断数量
+                this.beforAddToCart(row);
+              }
+            } else {
+              //没有一口价
+              this.beforAddToCart(row);
+            }
+          })
+          .catch((res) => {
+            //报错，直接进入后面的环节
+            this.beforAddToCart(row);
+          });
+      } else {
+        this.beforAddToCart(row);
+      }
+    },
+    beforAddToCart(row) {
+      //库存判断,判断成功才可以添加
+      let val;
+      if (row.unit === "平方米") {
+        val = row.number * row.anotherNumber;
+      } else {
+        val = row.number;
+      }
+      val = Number(val).toFixed(2);
+      if (val === "0.00" || val === 0.0) {
+        this.$alert("数量不能为空", "提示", {
+          type: "warning",
+          confirmButtonText: "确定",
+        });
+        return;
+      }
+      //判断数字合理性
+      var re = /((^[1-9](\d+)?(\.\d{1,2})?$)|(^0$)|(^\d\.\d{1,2}$))/;
+      if (re.test(val) === false) {
+        this.$alert("请填写正确的数字", "提示", {
+          type: "warning",
+          confirmButtonText: "确定",
+        });
+        return;
+      }
+      //判断起购数量
+      if (row.minimumPurchase != 0 && val < row.minimumPurchase) {
+        this.$alert(
+          "本产品最小起购数量为" + row.minimumPurchase + row.unit,
+          "提示",
+          {
+            type: "warning",
+            confirmButtonText: "确定",
+          }
+        );
+        return;
+      }
+      if (this.seletedActivity === "" && this.disableFlag === false) {
+        this.$alert("请选择一个活动", "提示", {
+          type: "warning",
+          confirmButtonText: "确定",
+        });
+        return;
+      }
+      checkStore({
+        itemNo: row.type,
+        stockShowNum: val,
+      })
+        .then((res) => {
+          this.getStore(row, res);
+          return;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }, //获取库存信息
     getStore(row, res) {
       let storeMessage;
       switch (res.msg) {
@@ -452,127 +587,6 @@ export default {
           this.clearMsg();
         });
     },
-    getPriceTip() {
-      switch (this.customerType) {
-        case "02":
-        case "08":
-        case "10":
-          return "经销";
-        case "05":
-          return "零售";
-        case "06":
-          return "分销";
-        case "09":
-          return "家装";
-        default:
-          return "";
-      }
-    },
-    //保存到购物车
-    saveToShoppingCar(row) {
-      //判断是否有一口价
-      GetFixPriceShopsByItemNo({ ITEM_NO: row.type })
-        .then((res) => {
-          if (res.data.length) {
-            //判断数量
-            var QTY_JUDGE = res.data[0].QTY_JUDGE;
-            var quantity = row.anotherNumber
-              ? row.anotherNumber * row.number
-              : row.number;
-            if (quantity <= QTY_JUDGE) {
-              this.$confirm(
-                "您要购买的产品数量，一口价专区有促销活动，是否前往购买？",
-                "提示",
-                {
-                  confirmButtonText: "是",
-                  cancelButtonText: "否",
-                  type: "warning",
-                }
-              )
-                .then(() => {
-                  //跳转
-                  this.addTab("shops/fixPriceShops");
-                  this.$router.push({
-                    name: "fixPriceShops",
-                    params: {
-                      selectNo: row.type,
-                    },
-                  });
-                })
-                .catch(() => {
-                  //不跳转
-                  this.beforAddToCart(row);
-                });
-            } else {
-              //不到判断数量
-              this.beforAddToCart(row);
-            }
-          } else {
-            //没有一口价
-            this.beforAddToCart(row);
-          }
-        })
-        .catch((res) => {
-          //报错，直接进入后面的环节
-          this.beforAddToCart(row);
-        });
-    },
-    beforAddToCart(row) {
-      //库存判断,判断成功才可以添加
-      let val;
-      if (row.unit === "平方米") {
-        val = row.number * row.anotherNumber;
-      } else {
-        val = row.number;
-      }
-      val = Number(val).toFixed(2);
-      if (val === "0.00" || val === 0.0) {
-        this.$alert("数量不能为空", "提示", {
-          type: "warning",
-          confirmButtonText: "确定",
-        });
-        return;
-      }
-      //判断数字合理性
-      var re = /((^[1-9](\d+)?(\.\d{1,2})?$)|(^0$)|(^\d\.\d{1,2}$))/;
-      if (re.test(val) === false) {
-        this.$alert("请填写正确的数字", "提示", {
-          type: "warning",
-          confirmButtonText: "确定",
-        });
-        return;
-      }
-      //判断起购数量
-      if (row.minimumPurchase != 0 && val < row.minimumPurchase) {
-        this.$alert(
-          "本产品最小起购数量为" + row.minimumPurchase + row.unit,
-          "提示",
-          {
-            type: "warning",
-            confirmButtonText: "确定",
-          }
-        );
-        return;
-      }
-      if (this.seletedActivity === "" && this.disableFlag === false) {
-        this.$alert("请选择一个活动", "提示", {
-          type: "warning",
-          confirmButtonText: "确定",
-        });
-        return;
-      }
-      checkStore({
-        itemNo: row.type,
-        stockShowNum: val,
-      })
-        .then((res) => {
-          this.getStore(row, res);
-          return;
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
     //查看该商品的库存
     seeStore(scope) {
       this.produceStore = [];
@@ -627,12 +641,6 @@ export default {
       this.searchKey = selectNo;
       this.searchWallPaper();
     }
-  },
-  computed: {
-    getNum(index) {
-      if (typeof data !== "number") return "";
-      return data.toFixed(2);
-    },
   },
 };
 </script>

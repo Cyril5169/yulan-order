@@ -34,8 +34,7 @@
           <ul class="r">
             <li>
               <el-dropdown trigger="hover">
-                <span class="el-dropdown-link" style="color:white">
-                  个人中心
+                <span class="el-dropdown-link" style="color:white;display:block;">个人中心
                   <el-badge v-if="wangqian > 0" :value="wangqian"></el-badge>
                   <i class="el-icon-arrow-down el-icon--right headIcon"></i>
                 </span>

@@ -1086,12 +1086,12 @@
                   <button @click="autoSearchDetail(scope.row.PUR_NO)" class="btn-style">查看详情</button>
                 </template>
               </el-table-column>
-              <el-table-column width="100" label="同步标记" prop="IMPORT_FLAG" align="center">
+              <!-- <el-table-column width="100" label="同步标记" prop="IMPORT_FLAG" align="center">
                 <template slot-scope="scope">
                   <span v-if="scope.row.IMPORT_FLAG == 'Y'">已同步</span>
                   <button v-else class="btn-style" @click="onClickAsync(scope.row)">同步订单</button>
                 </template>
-              </el-table-column>
+              </el-table-column> -->
               <el-table-column width="100" label="打印标记" prop="PRINTED" align="center">
                 <template slot-scope="scope">
                   <el-checkbox @change="changePrinted(scope.row, scope.$index)" v-model="scope.row.PRINTED">
@@ -1368,7 +1368,7 @@ export default {
               type: "success",
             });
             this.batchTip_Visible = false;
-            await this.asyncBuJingLing(res.data);
+            //await this.asyncBuJingLing(res.data);
             this.autoSearch();
           })
           .catch((res) => {
@@ -1673,9 +1673,7 @@ export default {
             this.checkX_Visible = false;
             //同步布精灵数据
             if (res.data.length) {
-              await this.asyncBuJingLing([
-                { PUR_NO: res.data[0].PUR_NO, data: res.data },
-              ]);
+              //await this.asyncBuJingLing([{ PUR_NO: res.data[0].PUR_NO, data: res.data }]);
             }
             this.checkedX_Visible = true;
             this.autoSearch();
@@ -1737,7 +1735,7 @@ export default {
     onClickAsync(row) {
       GetBJLData({ PUR_NO: row.PUR_NO }).then(async (res) => {
         if (res.data.length) {
-          await this.asyncBuJingLing([{ PUR_NO: row.PUR_NO, data: res.data }]);
+          //await this.asyncBuJingLing([{ PUR_NO: row.PUR_NO, data: res.data }]);
           this.autoSearch();
         } else {
           this.$alert("查找数据错误", "提示", {
@@ -1754,7 +1752,6 @@ export default {
         var loading = this.$loading({
           lock: true,
           text: "正在同步...",
-          body: true,
           target: document.querySelector(".loading-area"), //设置加载动画区域
         });
         var failPur = "";

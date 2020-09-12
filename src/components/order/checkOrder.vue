@@ -1492,7 +1492,7 @@ export default {
             this.order_details[i].pId = this.salPromotion.P_ID;
             this.order_details[
               i
-            ].promotionType = this.salPromotion.PROMPTION_TYPE;
+            ].promotionType = this.salPromotion.ORDER_TYPE;
             this.order_details[i].flagFlType = this.salPromotion.FLAG_FL_TYPE;
 
             var price = this.calculatePromotionPrice(this.order_details[i]);

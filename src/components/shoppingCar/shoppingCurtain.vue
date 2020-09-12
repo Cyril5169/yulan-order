@@ -168,16 +168,11 @@ export default {
       }
       for (let i = 0; i < theData.length; i++) {
         //获取分组
+        let cid = theData[i].cid;
         let value = theData[i].productGroupType;
         let value1 = theData[i].activityGroupType;
-        let cid;
         if (!value || value === undefined) value = "无产品";
         if (!value1 || value1 === undefined) value1 = "Z";
-        if (!theData[i].curtainCartItems.length) {
-          cid = "";
-        } else {
-          cid = theData[i].curtainCartItems[0].cid;
-        }
         let val = cid + "+" + value + "+" + value1;
         this.activityData.push({
           activity: val,

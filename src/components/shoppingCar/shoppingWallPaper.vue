@@ -9,7 +9,12 @@
             style="width:100%;" @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55" :selectable="checkActiviyEffect" align="center">
             </el-table-column>
-            <el-table-column prop="item.itemNo" label="型号" min-width="100" align="center"></el-table-column>
+            <el-table-column prop="item.itemNo" label="型号" min-width="100" align="center">
+              <template slot-scope="scope">
+                {{scope.row.item.itemNo}}
+                <div style="color: red;" v-if="!scope.row.fixPriceShopEffective">(已被购买)</div>
+              </template>
+            </el-table-column>
             <el-table-column min-width="80" label="版本" prop="item.productversionName" align="center"></el-table-column>
             <el-table-column label="活动" min-width="140px" show-overflow-tooltip align="center">
               <template slot-scope="scope">
@@ -162,6 +167,7 @@ export default {
         });
     },
     dataDeal(theData) {
+      console.log(theData);
       for (var i = theData.length - 1; i >= 0; i--) {
         if (theData[i].commodities.length === 0) {
           theData.splice(i, 1);
@@ -192,11 +198,6 @@ export default {
         this.shopsData[index] &&
         this.shopsData[index].commodities
       ) {
-        this.shopsData[index].commodities.forEach((item) => {
-          if (item.unit === "°ü") {
-            item.unit = "包";
-          }
-        });
         return this.shopsData[index].commodities;
       }
       return [];
@@ -301,25 +302,15 @@ export default {
     },
     //判断商品是否可选(活动是否有效)
     checkActiviyEffect(row, index) {
-      if (row.activityEffective === false) {
-        return false;
-      } else {
-        return this.checkMinimumNumber(row);
-      }
-    },
-    //最小起购数量
-    checkMinimumNumber(row) {
-      let val;
-      if (row.unit === "平方米") {
-        val = row.width.mul(row.height);
-      } else {
-        val = row.quantity;
-      }
-      if (val < row.item.minimumPurchase) {
-        return false;
-      } else {
-        return true;
-      }
+      var activityShow = true;
+      var miniNumberShow = true;
+      var fixPriceShow = true;
+
+      activityShow = row.activityEffective;
+      var quantity = row.quantity ? row.quantity : row.width.mul(row.height);
+      miniNumberShow = quantity >= row.item.minimumPurchase;
+      fixPriceShow = row.fixPriceShopEffective;
+      return activityShow && miniNumberShow && fixPriceShow;
     },
     //删除单件商品
     deleteSingle(data) {
@@ -441,7 +432,10 @@ export default {
           );
           return;
         }
-        if (this.customerType === "10" && !this.multipleSelection[i].onlineSalesAmount) {
+        if (
+          this.customerType === "10" &&
+          !this.multipleSelection[i].onlineSalesAmount
+        ) {
           arr.push(this.multipleSelection[i].item.itemNo);
         }
       }

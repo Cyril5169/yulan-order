@@ -193,11 +193,6 @@ export default {
         this.shopsData[index] &&
         this.shopsData[index].commodities
       ) {
-        this.shopsData[index].commodities.forEach((item) => {
-          if (item.unit === "°ü") {
-            item.unit = "包";
-          }
-        });
         return this.shopsData[index].commodities;
       }
       return [];

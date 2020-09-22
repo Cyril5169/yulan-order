@@ -979,7 +979,7 @@
           <el-tab-pane label="待确认" name="first" align="left">
             <div style="margin-bottom:10px;">
               <el-input @keyup.enter.native="SelectByPo()" prefix-icon="el-icon-search" placeholder=" 采购单号:（模糊）"
-                v-model="po" style="width:160px;">
+                v-model="po" style="width:160px;" clearable>
               </el-input>
               <el-date-picker v-model="date1" placeholder="开始时间" align="right" type="date" format="yyyy-MM-dd"
                 value-format="yyyy-MM-dd" style="width:140px;">
@@ -1033,10 +1033,10 @@
           <el-tab-pane label="采购已确认" name="second" align="left">
             <div style="margin-bottom:10px;">
               <el-input @keyup.enter.native="SelectByCustomer()" prefix-icon="el-icon-search" placeholder=" 客户(输入后回车)"
-                v-model="customer" style="width:160px;">
+                v-model="customer" style="width:160px;" clearable>
               </el-input>
               <el-input @keyup.enter.native="SelectByPo()" prefix-icon="el-icon-search" placeholder=" 采购单号:（模糊）"
-                v-model="po" style="width:160px;">
+                v-model="po" style="width:160px;" clearable>
               </el-input>
               <el-date-picker v-model="date1" placeholder="开始时间" align="right" type="date" format="yyyy-MM-dd"
                 value-format="yyyy-MM-dd" style="width:140px;">
@@ -1086,12 +1086,13 @@
                   <button @click="autoSearchDetail(scope.row.PUR_NO)" class="btn-style">查看详情</button>
                 </template>
               </el-table-column>
-              <!-- <el-table-column width="100" label="同步标记" prop="IMPORT_FLAG" align="center">
+              <el-table-column width="100" label="同步标记" prop="IMPORT_FLAG" align="center">
                 <template slot-scope="scope">
-                  <span v-if="scope.row.IMPORT_FLAG == 'Y'">已同步</span>
+                  <span v-if="scope.row.ORDER_NO.substring(0, 1) != 'X'"></span>
+                  <span v-else-if="scope.row.IMPORT_FLAG == 'Y'">已同步</span>
                   <button v-else class="btn-style" @click="onClickAsync(scope.row)">同步订单</button>
                 </template>
-              </el-table-column> -->
+              </el-table-column>
               <el-table-column width="100" label="打印标记" prop="PRINTED" align="center">
                 <template slot-scope="scope">
                   <el-checkbox @change="changePrinted(scope.row, scope.$index)" v-model="scope.row.PRINTED">
@@ -1105,7 +1106,7 @@
           <el-tab-pane label="已取消" name="third" align="left">
             <div style="margin-bottom:10px;">
               <el-input @keyup.enter.native="SelectByPo()" prefix-icon="el-icon-search" placeholder=" 采购单号:（模糊）"
-                v-model="po" style="width:160px;">
+                v-model="po" style="width:160px;" clearable>
               </el-input>
               <el-date-picker v-model="date1" placeholder="开始时间" align="right" type="date" format="yyyy-MM-dd"
                 value-format="yyyy-MM-dd" style="width:140px;">
@@ -1153,10 +1154,10 @@
           <el-tab-pane label="退货已确认" name="forth" align="left">
             <div style="margin-bottom:10px;">
               <el-input @keyup.enter.native="SelectByCustomer()" prefix-icon="el-icon-search" placeholder=" 客户(输入后回车)"
-                v-model="customer" style="width:160px;">
+                v-model="customer" style="width:160px;" clearable>
               </el-input>
               <el-input @keyup.enter.native="SelectByPo()" prefix-icon="el-icon-search" placeholder=" 采购单号:（模糊）"
-                v-model="po" style="width:160px;">
+                v-model="po" style="width:160px;" clearable>
               </el-input>
               <el-date-picker v-model="date1" placeholder="开始时间" align="right" type="date" format="yyyy-MM-dd"
                 value-format="yyyy-MM-dd" style="width:140px;">
@@ -1830,7 +1831,6 @@ export default {
                   postdata,
                   { params: postdata, loading: false }
                 );
-                console.log(resB);
                 if (resB.data.state == "ok") {
                 } else {
                   var msg =
@@ -1853,7 +1853,7 @@ export default {
           }
           if (!oneFail) {
             //一个单同步成功的修改同步状态
-            var resC = AsyncBuJingLing(
+            var resC = await AsyncBuJingLing(
               { PUR_NO: pruData[i].PUR_NO },
               { loading: false }
             );

@@ -286,10 +286,7 @@ import {
   changeItemBlur,
 } from "@/api/curtain";
 import { GetDosageAll, GetDosageByNo } from "@/api/itemInfoASP";
-import {
-  getItemById,
-  GetPromotionByItem,
-} from "@/api/orderListASP";
+import { getItemById, GetPromotionByItem } from "@/api/orderListASP";
 import Cookies from "js-cookie";
 import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
@@ -362,35 +359,7 @@ export default {
         { value: "三个半褶" },
       ],
       //配件编码
-      part2: [
-        { label: "GD920011:挂带", value: "GD920011" },
-        { label: "GD920012:挂带", value: "GD920012" },
-        { label: "GD920013:挂带", value: "GD920013" },
-        { label: "GD920041:挂带", value: "GD920041" },
-        { label: "GD920042:挂带", value: "GD920042" },
-        { label: "GD920061:挂带", value: "GD920061" },
-        { label: "GD920062:挂带", value: "GD920062" },
-        { label: "GD920063:挂带", value: "GD920063" },
-        { label: "GD920071:挂带", value: "GD920071" },
-        { label: "GD920072:挂带", value: "GD920072" },
-        { label: "GD920073:挂带", value: "GD920073" },
-        { label: "GD920101:挂带", value: "GD920101" },
-        { label: "GD920102:挂带", value: "GD920102" },
-        { label: "GD920103:挂带", value: "GD920103" },
-        { label: "GD920111:挂带", value: "GD920111" },
-        { label: "GD920112:挂带", value: "GD920112" },
-        { label: "GD920113:挂带", value: "GD920113" },
-        { label: "GD920121:挂带", value: "GD920121" },
-        { label: "GD920131:挂带", value: "GD920131" },
-        { label: "GD920141:挂带", value: "GD920141" },
-        { label: "PJB-006:绑带(赠送)", value: "PJB-006" },
-        { label: "PJB-001:挂带+侧钩(赠送)", value: "PJB-001" },
-        { label: "PJB-009-KAFEI:吊球+挂钩", value: "PJB-009-KAFEI" },
-        { label: "PJB-009-KAQI:吊球+挂钩", value: "PJB-009-KAQI" },
-        { label: "PJB-009-MIHUANG:吊球+挂钩", value: "PJB-009-MIHUANG" },
-        { label: "PJB-009-QIANHUI:吊球+挂钩", value: "PJB-009-QIANHUI" },
-        { label: "-未选择配件包-", value: null },
-      ],
+      part2: [],
     };
   },
   created() {
@@ -630,15 +599,17 @@ export default {
     },
     getPrice(type, item) {
       var price = 0;
-      if (type == "02" || type == "08" || type == "10") {
-        //经销
-        price = item.priceSale;
-      } else if (type == "05") {
-        price = item.salePrice;
-      } else if (type == "06") {
-        price = item.priceFx;
-      } else if (type == "09") {
-        price = item.priceHome;
+      if (item) {
+        if (type == "02" || type == "08" || type == "10") {
+          //经销
+          price = item.priceSale;
+        } else if (type == "05") {
+          price = item.salePrice;
+        } else if (type == "06") {
+          price = item.priceFx;
+        } else if (type == "09") {
+          price = item.priceHome;
+        }
       }
       return price;
     },
@@ -716,7 +687,7 @@ export default {
     },
     //修改编码--影响用量
     chooseItemNo() {
-      if (this.itemNo === "") {
+      if (!this.itemNo) {
         this.$alert("请选择一个产品", "提示", {
           confirmButtonText: "确定",
           type: "warning",
@@ -1220,11 +1191,7 @@ export default {
           j += _data[k - 1].number;
         }
         for (; j < _index[i]; j++) {
-          if (
-            _curtainData[j].choose === false ||
-            _curtainData[j].itemNo === null
-          )
-            continue;
+          if (!_curtainData[j].choose || !_curtainData[j].itemNo) continue;
           let _certainHeightWidth = _curtainData[j].fixType;
           if (_certainHeightWidth === "01") _certainHeightWidth = 1;
           if (_certainHeightWidth === "02") _certainHeightWidth = 0;

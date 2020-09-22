@@ -614,11 +614,7 @@ export default {
         for (var i = 0; i < _data.length; i++) {
           for (let j = _data[i].length - 1; j >= 0; j--) {
             _data[i][j].itemId = _data[i][j].item.itemNo;
-            if (
-              !_data[i][j].choose ||
-              _data[i][j].item.itemNo === null ||
-              _data[i][j].item.itemNo === ""
-            ) {
+            if (!_data[i][j].choose || !_data[i][j].item.itemNo) {
               _data[i].splice(j, 1);
             }
           }
@@ -1161,11 +1157,7 @@ export default {
       let _data = JSON.parse(JSON.stringify(this.allCurtaindata));
       let _deleteArr = [];
       for (let i = _data.length - 1; i >= 0; i--) {
-        if (
-          !_data[i].choose ||
-          _data[i].item.itemNo === null ||
-          _data[i].item.itemNo === ""
-        ) {
+        if (!_data[i].choose || !_data[i].item.itemNo) {
           _deleteArr.unshift(_data[i].id);
           _data.splice(i, 1);
         }
@@ -1274,21 +1266,23 @@ export default {
     },
     getPrice(type, item) {
       var price = 0;
-      if (type == "02" || type == "08" || type == "10") {
-        //经销
-        price = item.priceSale;
-      } else if (type == "05") {
-        price = item.salePrice;
-      } else if (type == "06") {
-        price = item.priceFx;
-      } else if (type == "09") {
-        price = item.priceHome;
+      if (item) {
+        if (type == "02" || type == "08" || type == "10") {
+          //经销
+          price = item.priceSale;
+        } else if (type == "05") {
+          price = item.salePrice;
+        } else if (type == "06") {
+          price = item.priceFx;
+        } else if (type == "09") {
+          price = item.priceHome;
+        }
       }
       return price;
     },
     //修改编码--影响用量
     chooseItemNo() {
-      if (this.itemNo === "") {
+      if (!this.itemNo) {
         this.$alert("请选择一个产品", "提示", {
           confirmButtonText: "确定",
           type: "warning",
@@ -1701,11 +1695,7 @@ export default {
       for (var i = 0; i < _data.length; i++) {
         for (let j = _data[i].length - 1; j >= 0; j--) {
           _data[i][j].itemId = _data[i][j].item.itemNo;
-          if (
-            !_data[i][j].choose ||
-            _data[i][j].item.itemNo === null ||
-            _data[i][j].item.itemNo === ""
-          ) {
+          if (!_data[i][j].choose || !_data[i][j].item.itemNo) {
             this.deleteIds.unshift(_data[i][j].id);
             _data[i].splice(j, 1);
           }

@@ -163,11 +163,6 @@ export default {
         });
     },
     dataDeal(theData) {
-      for (var i = theData.length - 1; i >= 0; i--) {
-        if (theData[i].commodities.length === 0) {
-          theData.splice(i, 1);
-        }
-      }
       for (var i = 0; i < theData.length; i++) {
         let cid = theData[i].cid;
         let value = theData[i].productGroupType;
@@ -375,18 +370,18 @@ export default {
       //首先判断TYPE,1折扣，2定价。然后判断priority
       if (data.salPromotion) {
         //一口价
-        if (data.salPromotion.priority == 99) {
+        if (data.salPromotion.PRIORITY == 99) {
           if (quantity < 1) quantity = 1;
-          price = quantity.mul(data.salPromotion.price);
+          price = quantity.mul(data.salPromotion.PRICE);
         } else {
-          switch (data.salPromotion.type) {
+          switch (data.salPromotion.TYPE) {
             case "1":
               //折扣
-              price = quantity.mul(data.price).mul(data.salPromotion.discount);
+              price = quantity.mul(data.price).mul(data.salPromotion.DISCOUNT);
               break;
             case "2":
               //定价
-              price = quantity.mul(data.salPromotion.price);
+              price = quantity.mul(data.salPromotion.PRICE);
           }
         }
       } else {
@@ -397,7 +392,7 @@ export default {
     canShowDetail(row) {
       return (
         !row.salPromotion ||
-        (row.salPromotion && row.salPromotion.modifyFlag != "N")
+        (row.salPromotion && row.salPromotion.MODIFY_FLAG != "N")
       );
     },
     //查看详情

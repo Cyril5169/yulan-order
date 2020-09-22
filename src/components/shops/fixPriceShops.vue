@@ -41,8 +41,8 @@
         <el-table-column label="批号" prop="BATCH_NO" width="200" align="center"></el-table-column>
         <el-table-column label="库存数量" prop="QTY" width="80" align="center"></el-table-column>
         <el-table-column label="单位" prop="UNIT_NAME" width="80" align="center"></el-table-column>
-        <el-table-column label="版本" prop="PRODUCTVERSION_NAME" width="150" align="center"></el-table-column>
-        <el-table-column label="活动" prop="ORDER_NAME" width="120" align="center"></el-table-column>
+        <el-table-column label="版本" prop="PRODUCTVERSION_NAME" width="120" align="center"></el-table-column>
+        <el-table-column label="活动" prop="ORDER_NAME" width="200" align="center"></el-table-column>
         <el-table-column label="更新时间" prop="UPDATE_TIME" width="150" align="center">
           <template slot-scope="scope">
             {{scope.row.UPDATE_TIME | datatrans}}
@@ -138,12 +138,13 @@ export default {
         type: "warning",
       })
         .then(() => {
-          FixPriceShopAddToCart({ cid: Cookies.get("cid"), id: data.ID })
+          FixPriceShopAddToCart({ cid: Cookies.get("cid"), id: data.ID, pId: data.P_ID })
             .then((res) => {
               this.$alert("此型号已添加成功，请前往购物车查看", "添加成功", {
                 confirmButtonText: "确定",
                 type: "success",
               });
+              this.searchShops();
               this.$root.$emit("refreshBadgeIcon", "wallCount");
             })
             .catch((res) => {
@@ -164,15 +165,18 @@ export default {
       })
         .then(() => {
           var ids = [];
+          var pIds = [];
           for (var i = 0; i < this.selectShops.length; i++) {
             ids.push(this.selectShops[i].ID);
+            pIds.push(this.selectShops[i].P_ID)
           }
-          FixPriceShopAddListToCart({ cid: Cookies.get("cid"), ids: ids })
+          FixPriceShopAddListToCart({ cid: Cookies.get("cid"), ids: ids, pIds:pIds })
             .then((res) => {
               this.$alert("此型号已添加成功，请前往购物车查看", "添加成功", {
                 confirmButtonText: "确定",
                 type: "success",
               });
+              this.searchShops();
               this.$root.$emit("refreshBadgeIcon", "wallCount");
             })
             .catch((res) => {

@@ -365,13 +365,13 @@ import {
   changeItem,
   changeItemBlur,
   updateCurtain,
-  deleteTheGroup
+  deleteTheGroup,
 } from "@/api/curtain";
 import { GetDosageByNo } from "@/api/itemInfoASP";
 import {
   getItemById,
   GetPromotionByItem,
-  GetPromotionsById
+  GetPromotionsById,
 } from "@/api/orderListASP";
 import { UpdateCartItem } from "@/api/shopASP";
 import Cookies from "js-cookie";
@@ -393,7 +393,7 @@ export default {
         WBH: parseFloat(1.001), //帘头外包盒宽度
         multiple: parseFloat(2.2), //褶皱倍数
         location: "123",
-        groupType: "" //活动组
+        groupType: "", //活动组
       },
       activityOptions: [],
       chooseBig: [true, true, true, true, true], //是否选择了大类
@@ -422,12 +422,12 @@ export default {
       fixType: [
         {
           value: 0,
-          label: "定高"
+          label: "定高",
         },
         {
           value: 1,
-          label: "定宽"
-        }
+          label: "定宽",
+        },
       ],
       //根据编号查询制造说明
       part: [],
@@ -436,14 +436,14 @@ export default {
         { value: "么术贴正车" },
         { value: "么术贴反车" },
         { value: "穿/挂杆款" },
-        { value: "特殊见备注" }
+        { value: "特殊见备注" },
       ],
       //帘身、纱制造说明
       part1: [
         { value: "对开" },
         { value: "左单开" },
         { value: "右单开" },
-        { value: "特殊开备注" }
+        { value: "特殊开备注" },
       ],
       //帘身配布制造说明
       part3: [
@@ -452,40 +452,12 @@ export default {
         { value: "二个褶" },
         { value: "二个半褶" },
         { value: "三个褶" },
-        { value: "三个半褶" }
+        { value: "三个半褶" },
       ],
       //配件编码
-      part2: [
-        { label: "GD920011:挂带", value: "GD920011" },
-        { label: "GD920012:挂带", value: "GD920012" },
-        { label: "GD920013:挂带", value: "GD920013" },
-        { label: "GD920041:挂带", value: "GD920041" },
-        { label: "GD920042:挂带", value: "GD920042" },
-        { label: "GD920061:挂带", value: "GD920061" },
-        { label: "GD920062:挂带", value: "GD920062" },
-        { label: "GD920063:挂带", value: "GD920063" },
-        { label: "GD920071:挂带", value: "GD920071" },
-        { label: "GD920072:挂带", value: "GD920072" },
-        { label: "GD920073:挂带", value: "GD920073" },
-        { label: "GD920101:挂带", value: "GD920101" },
-        { label: "GD920102:挂带", value: "GD920102" },
-        { label: "GD920103:挂带", value: "GD920103" },
-        { label: "GD920111:挂带", value: "GD920111" },
-        { label: "GD920112:挂带", value: "GD920112" },
-        { label: "GD920113:挂带", value: "GD920113" },
-        { label: "GD920121:挂带", value: "GD920121" },
-        { label: "GD920131:挂带", value: "GD920131" },
-        { label: "GD920141:挂带", value: "GD920141" },
-        { label: "PJB-006:绑带(赠送)", value: "PJB-006" },
-        { label: "PJB-001:挂带+侧钩(赠送)", value: "PJB-001" },
-        { label: "PJB-009-KAFEI:吊球+挂钩", value: "PJB-009-KAFEI" },
-        { label: "PJB-009-KAQI:吊球+挂钩", value: "PJB-009-KAQI" },
-        { label: "PJB-009-MIHUANG:吊球+挂钩", value: "PJB-009-MIHUANG" },
-        { label: "PJB-009-QIANHUI:吊球+挂钩", value: "PJB-009-QIANHUI" },
-        { label: "-未选择配件包-", value: null }
-      ],
+      part2: [],
       suggestionLJ: "", //兰居人员总体审核意见
-      check_CURTAIN_STATUS_ID: Cookies.get("CURTAIN_STATUS_ID")
+      check_CURTAIN_STATUS_ID: Cookies.get("CURTAIN_STATUS_ID"),
     };
   },
   props: [
@@ -494,12 +466,12 @@ export default {
     "tableStatus",
     "suggestion",
     "isModified",
-    "STATUS_ID"
+    "STATUS_ID",
   ],
   computed: {
     salPromotion() {
       var selectActivity = this.activityOptions.filter(
-        item => item.P_ID == this.headerData.activityId
+        (item) => item.P_ID == this.headerData.activityId
       );
       if (selectActivity.length) {
         return selectActivity[0];
@@ -541,13 +513,13 @@ export default {
         }
       }
       return totalMoney;
-    }
+    },
   },
   methods: {
     //修改配件包时，对应修改单位以及名称说明
     changePJBUnit(index) {
       let _data = this.data[index].item.itemNo;
-      this.part2.forEach(item => {
+      this.part2.forEach((item) => {
         if (item.value === _data) {
           this.data[index].unit = item.unit;
           this.data[index].curtainItemName = item.note;
@@ -596,7 +568,7 @@ export default {
        * 即取消双向绑定，帘头固定
        */
       if (_index >= 1 && _index <= 4) {
-        _arr.forEach(item => {
+        _arr.forEach((item) => {
           if (item.deleteFlag !== "Y" || item.choose === true) {
             flag = false;
           }
@@ -609,7 +581,7 @@ export default {
     //获取某个大类的全部数据
     getBigType(type) {
       let arr = [];
-      this.data.forEach(item => {
+      this.data.forEach((item) => {
         if (item.itemType === type) {
           arr.push(item);
         }
@@ -623,14 +595,14 @@ export default {
       }
       this.activityOptions = [];
       if (this.customerType == "110") {
-        GetPromotionsById({ PID: this.headerData.activityId }).then(res => {
+        GetPromotionsById({ PID: this.headerData.activityId }).then((res) => {
           this.activityOptions = res.data;
         });
       } else {
         getItemById(
           { itemNo: this.headerData.modelNumber },
           { loading: false }
-        ).then(itemRes => {
+        ).then((itemRes) => {
           GetPromotionByItem(
             {
               cid: this.cid,
@@ -638,15 +610,15 @@ export default {
               itemNo: itemRes.data.ITEM_NO,
               itemVersion: itemRes.data.ITEM_VERSION,
               productType: itemRes.data.PRODUCT_TYPE,
-              productBrand: itemRes.data.PRODUCT_BRAND
+              productBrand: itemRes.data.PRODUCT_BRAND,
             },
             { loading: false }
-          ).then(res => {
+          ).then((res) => {
             this.activityOptions = res.data;
             this.activityOptions.push({
               ORDER_TYPE: "",
               ORDER_NAME: "不参与活动",
-              P_ID: null
+              P_ID: null,
             });
           });
         });
@@ -663,7 +635,7 @@ export default {
       if (this.isModified === 1) {
         this.$confirm("此窗帘已经修改了，依然确认通过吗？", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         })
           .then(() => {
             this.$emit("visible", false);
@@ -677,7 +649,7 @@ export default {
         //同一过滤
         let _data = JSON.parse(JSON.stringify(this.data));
         var _data_temp = [];
-        _data.forEach(item => {
+        _data.forEach((item) => {
           item.dosage = Number(item.dosage);
           if (item.curtainItemName === null || item.curtainItemName === "") {
             item.curtainItemName = this.getTypeName(item.itemType);
@@ -687,12 +659,12 @@ export default {
           _data_temp.push(JSON.parse(JSON.stringify(item)));
         });
         //把不需要比对的备注和意见拿出来
-        _data_temp.forEach(item => {
+        _data_temp.forEach((item) => {
           item.note = "";
           item.suggestion = "";
         });
         var oldData_temp = [];
-        this.oldData.forEach(item => {
+        this.oldData.forEach((item) => {
           item.dosage = Number(item.dosage);
           if (item.curtainItemName === null || item.curtainItemName === "") {
             item.curtainItemName = this.getTypeName(item.itemType);
@@ -702,7 +674,7 @@ export default {
           oldData_temp.push(JSON.parse(JSON.stringify(item)));
         });
         //把不需要比对的备注和意见拿出来
-        oldData_temp.forEach(item => {
+        oldData_temp.forEach((item) => {
           item.note = "";
           item.suggestion = "";
         });
@@ -713,7 +685,7 @@ export default {
             "提示",
             {
               confirmButtonText: "确定",
-              type: "info"
+              type: "info",
             }
           )
             .then(() => {
@@ -736,11 +708,7 @@ export default {
       let _data = JSON.parse(JSON.stringify(this.data));
       let _deleteArr = [];
       for (let i = _data.length - 1; i >= 0; i--) {
-        if (
-          !_data[i].choose ||
-          _data[i].item.itemNo === null ||
-          _data[i].item.itemNo === ""
-        ) {
+        if (!_data[i].choose || !_data[i].item.itemNo) {
           _deleteArr.unshift(_data[i].id);
           _data.splice(i, 1);
         }
@@ -748,7 +716,7 @@ export default {
       if (_data.length === 0) {
         this.$alert("请至少选择一款配件!", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -761,7 +729,7 @@ export default {
         ) {
           this.$alert(`请填写${item.manufacturingInstructions}的备注`, "提示", {
             confirmButtonText: "确定",
-            type: "warning"
+            type: "warning",
           });
           return;
         }
@@ -811,14 +779,14 @@ export default {
       let obj = {
         itemNO: this.chooseType,
         limit: this.pageSize,
-        page: this.currentPage
+        page: this.currentPage,
       };
       changeItem(obj)
-        .then(res => {
+        .then((res) => {
           this.items = res.data;
           this.totalNumber = res.data[0].total;
         })
-        .catch(err => {
+        .catch((err) => {
           this.items = [];
           this.currentPage = 1;
           this.totalNumber = 0;
@@ -833,14 +801,14 @@ export default {
         itemType: this.chooseType,
         itemNO: this.searchKey.toUpperCase(),
         limit: this.pageSize,
-        page: this.currentPage
+        page: this.currentPage,
       };
       changeItemBlur(obj)
-        .then(res => {
+        .then((res) => {
           this.items = res.data;
           this.totalNumber = res.data[0].total;
         })
-        .catch(err => {
+        .catch((err) => {
           this.items = [];
           this.currentPage = 1;
           this.totalNumber = 0;
@@ -848,24 +816,26 @@ export default {
     },
     getPrice(type, item) {
       var price = 0;
-      if (type == "02" || type == "08" || type == "10") {
-        //经销
-        price = item.priceSale;
-      } else if (type == "05") {
-        price = item.salePrice;
-      } else if (type == "06") {
-        price = item.priceFx;
-      } else if (type == "09") {
-        price = item.priceHome;
+      if (item) {
+        if (type == "02" || type == "08" || type == "10") {
+          //经销
+          price = item.priceSale;
+        } else if (type == "05") {
+          price = item.salePrice;
+        } else if (type == "06") {
+          price = item.priceFx;
+        } else if (type == "09") {
+          price = item.priceHome;
+        }
       }
       return price;
     },
     //修改编码--影响用量
     chooseItemNo() {
-      if (this.itemNo === "") {
+      if (!this.itemNo) {
         this.$alert("请选择一个产品", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -878,7 +848,7 @@ export default {
       let status1 = _productType === "GY" ? true : false;
       this.dialogTableVisible = false;
       //修改对应的名称规格
-      let data = this.items.find(v => {
+      let data = this.items.find((v) => {
         if (v.itemNo === this.itemNo) return v;
       });
       var price = this.getPrice(this.customerType, data);
@@ -920,15 +890,15 @@ export default {
           parentItemNo: _headerData.modelNumber,
           itemNO: this.itemNo,
           itemType: this.data[index].itemType,
-          fixType: _fixType
+          fixType: _fixType,
         };
         //changeDosageByNo(obj)
         GetDosageByNo(obj)
-          .then(res => {
+          .then((res) => {
             if (res.data.length == 0) {
               this.$alert("用量获取失败", "提示", {
                 confirmButtonText: "好的",
-                type: "warning"
+                type: "warning",
               });
               return;
             }
@@ -948,7 +918,7 @@ export default {
             this.data[this.chooseIndex].item.itemNo = this.itemNo;
             this.judgeTip(this.data[this.chooseIndex], this.chooseIndex);
           })
-          .catch(err => {
+          .catch((err) => {
             console.log(err);
           });
       } else if (status1) {
@@ -990,15 +960,15 @@ export default {
         parentItemNo: _headerData.modelNumber,
         itemNO: this.data[index].item.itemNo,
         itemType: this.data[index].itemType,
-        fixType: _fixType
+        fixType: _fixType,
       };
       //changeDosageByNo(obj)
       GetDosageByNo(obj)
-        .then(res => {
+        .then((res) => {
           if (res.data.length == 0) {
             this.$alert("用量获取失败", "提示", {
               confirmButtonText: "好的",
-              type: "warning"
+              type: "warning",
             });
             return;
           }
@@ -1017,7 +987,7 @@ export default {
           }
           this.judgeTip(this.data[index], index);
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     },
@@ -1099,15 +1069,15 @@ export default {
     //通过编号获取工艺
     getTheGY(itemNo) {
       let data = {
-        itemNO: itemNo
+        itemNO: itemNo,
       };
       this.currentPage = 1;
       getGY(data)
-        .then(res => {
+        .then((res) => {
           this.items = res.itemList;
           this.totalNumber = res.itemList.length;
         })
-        .catch(err => {
+        .catch((err) => {
           this.items = [];
           this.totalNumber = 0;
         });
@@ -1176,7 +1146,7 @@ export default {
           this.pos = 0;
           this.curtainType.push({
             name: data[i].itemType,
-            value: true
+            value: true,
           });
         } else {
           this.spanArr0.push(0);
@@ -1189,7 +1159,7 @@ export default {
             this.pos = i;
             this.curtainType.push({
               name: data[i].itemType,
-              value: true
+              value: true,
             });
           }
         }
@@ -1202,7 +1172,7 @@ export default {
         let _col = _row > 0 ? 1 : 0;
         return {
           rowspan: _row,
-          colspan: _col
+          colspan: _col,
         };
       }
       if (columnIndex === 1) {
@@ -1210,7 +1180,7 @@ export default {
         let _col = _row > 0 ? 1 : 0;
         return {
           rowspan: _row,
-          colspan: _col
+          colspan: _col,
         };
       }
       if (columnIndex === 2) {
@@ -1221,7 +1191,7 @@ export default {
         ) {
           return {
             rowspan: 1,
-            colspan: 2
+            colspan: 2,
           };
         }
       }
@@ -1233,7 +1203,7 @@ export default {
         ) {
           return {
             rowspan: 1,
-            colspan: 0
+            colspan: 0,
           };
         }
       }
@@ -1243,7 +1213,7 @@ export default {
       if (this.headerData.activityId === this.headerData.activityName) {
         this.$alert("请选择合适的活动", "提示", {
           type: "warning",
-          confirmButtonText: "确定"
+          confirmButtonText: "确定",
         });
         return;
       }
@@ -1281,7 +1251,7 @@ export default {
             if (_manufacturingInstructions === "" && _curtainData[i].choose) {
               this.$alert("制造说明不能为空", "提示", {
                 confirmButtonText: "好的",
-                type: "warning"
+                type: "warning",
               });
               return;
             }
@@ -1295,7 +1265,7 @@ export default {
         ) {
           this.$alert("制造说明不能为空", "提示", {
             confirmButtonText: "好的",
-            type: "warning"
+            type: "warning",
           });
           return;
         }
@@ -1306,7 +1276,7 @@ export default {
           if (this.isNull(_curtainData[i].note)) {
             this.$alert("特殊开的备注不能为空", "提示", {
               confirmButtonText: "好的",
-              type: "warning"
+              type: "warning",
             });
             return;
           }
@@ -1319,7 +1289,7 @@ export default {
         { name: "ls", number: 0 },
         { name: "lspb", number: 0 },
         { name: "sha", number: 0 },
-        { name: "pjb", number: 0 }
+        { name: "pjb", number: 0 },
       ];
       //判断个数
       for (let i = 0; i < _curtainData.length; i++) {
@@ -1352,18 +1322,14 @@ export default {
         if (_data[i].number === 0) continue;
         let _obj = {
           partName: this.getTypeName(_data[i].name),
-          curtainCommodities: []
+          curtainCommodities: [],
         };
         let j = 0;
         for (let k = i; k > 0; k--) {
           j += _data[k - 1].number;
         }
         for (; j < _index[i]; j++) {
-          if (
-            _curtainData[j].choose === false ||
-            _curtainData[j].item.itemNo === null ||
-            _curtainData[j].item.itemNo === ""
-          ) {
+          if (!_curtainData[j].choose || !_curtainData[j].item.itemNo) {
             _deleteId.push(_curtainData[j].id);
             continue;
           }
@@ -1373,7 +1339,7 @@ export default {
             price: _curtainData[j].price,
             activityId: this.salPromotion.P_ID,
             item: {
-              itemNo: _curtainData[j].item.itemNo
+              itemNo: _curtainData[j].item.itemNo,
             },
             quantity: _curtainData[j].quantity,
             width: _curtainData[j].width,
@@ -1392,7 +1358,7 @@ export default {
             deleteFlag: _curtainData[j].deleteFlag,
             modifyFlag: _curtainData[j].modifyFlag,
             changeFlag: _curtainData[j].changeFlag,
-            inlineNo: _curtainData[j].inlineNo
+            inlineNo: _curtainData[j].inlineNo,
           };
           _obj.curtainCommodities.push(_obj1);
         }
@@ -1408,42 +1374,42 @@ export default {
       ) {
         this.$alert("请至少选择一款配件!", "提示", {
           confirmButtonText: "好的",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
       let obj = {
         customerType: this.customerType,
-        curtainLists: _curtainLists
+        curtainLists: _curtainLists,
       };
       if (_deleteId.length > 0) {
         deleteTheGroup(_deleteId)
-          .then(res => {
+          .then((res) => {
             //console.log(res)
           })
-          .catch(err => {
+          .catch((err) => {
             //console.log(err)
           });
       }
       updateCurtain(obj)
-        .then(res => {
+        .then((res) => {
           UpdateCartItem({
             CART_ITEM_ID: this.headerData.cartItemId,
             ACTIVITY_GROUP_TYPE: this.salPromotion.GROUP_TYPE,
-            UpdateColumns: ["ACTIVITY_GROUP_TYPE"]
-          }).then(res2 => {
+            UpdateColumns: ["ACTIVITY_GROUP_TYPE"],
+          }).then((res2) => {
             this.$alert("修改成功!", "提示", {
               confirmButtonText: "好的",
-              type: "success"
+              type: "success",
             });
             this.addTab("shoppingCar/shopping?curtain");
             this.closeTab("detail/detailCurtain");
           });
         })
-        .catch(err => {
+        .catch((err) => {
           this.$alert(err.msg, "提示", {
             confirmButtonText: "好的",
-            type: "warning"
+            type: "warning",
           });
         });
     },
@@ -1464,32 +1430,32 @@ export default {
       let _obj = {
         limit: 999,
         page: 1,
-        itemNO: "PJB"
+        itemNO: "PJB",
       };
       changeItem(_obj)
-        .then(res => {
+        .then((res) => {
           let _arr = [];
-          res.data.forEach(item => {
+          res.data.forEach((item) => {
             _arr.push({
               label: `${item.itemNo}:${item.note}`,
               value: item.itemNo,
               unit: item.unit === "°ü" ? "包" : item.unit,
               note: item.note,
-              item: item
+              item: item,
             });
           });
-          _arr.sort(function(a, b) {
+          _arr.sort(function (a, b) {
             return a.value > b.value ? 1 : -1; //升序
           });
           _arr.push({
             label: "-未选择配件包-",
             value: null,
             unit: "",
-            note: ""
+            note: "",
           });
           this.part2 = _arr;
         })
-        .catch(err => {
+        .catch((err) => {
           this.part2 = [];
         });
       let obj = {
@@ -1500,9 +1466,9 @@ export default {
           ? data.outsourcingBoxWidth.toString()
           : "0",
         multiple: data.drape.toString(),
-        location: data.location
+        location: data.location,
       };
-      getCurtainDetailMsg(obj).then(async res => {
+      getCurtainDetailMsg(obj).then(async (res) => {
         let _data = res.itemList;
         for (let index = 0; index < this.compareData.length; index++) {
           for (let i = 0; i < _data.length; i++) {
@@ -1520,7 +1486,7 @@ export default {
                   itemType: _comData.productType,
                   itemNO: this.data[index].item.itemNo,
                   limit: 1,
-                  page: 1
+                  page: 1,
                 };
                 let ress = await changeItemBlur(_itemObj);
                 if (ress.data.length > 0) {
@@ -1535,7 +1501,7 @@ export default {
       });
     },
     //大类二类的勾选联动，是否出现×号
-    bigToSmall: function(data) {
+    bigToSmall: function (data) {
       let index = -1;
       switch (data.itemType) {
         case "lt":
@@ -1585,10 +1551,10 @@ export default {
       return this.dosageFilter(price);
     },
   },
-  activated: function() {
+  activated: function () {
     this.getActivity();
     //按规则排序
-    this.curtainData.sort(function(a, b) {
+    this.curtainData.sort(function (a, b) {
       let rule = ["lt", "ls", "lspb", "sha", "pjb"];
       return rule.indexOf(a.itemType) - rule.indexOf(b.itemType);
     });
@@ -1598,7 +1564,7 @@ export default {
     this.clearArr();
     this.getSpanArr(this.data);
     if (this.suggestion) this.suggestionLJ = this.suggestion.toString();
-  }
+  },
 };
 </script>
 

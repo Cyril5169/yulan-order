@@ -161,11 +161,6 @@ export default {
         });
     },
     dataDeal(theData) {
-      for (let i = theData.length - 1; i >= 0; i--) {
-        if (theData[i].curtainCartItems.length === 0) {
-          theData.splice(i, 1);
-        }
-      }
       for (let i = 0; i < theData.length; i++) {
         //获取分组
         let cid = theData[i].cid;
@@ -230,14 +225,14 @@ export default {
       var quantity = data.count;
       //首先判断TYPE,1折扣，2定价
       if (data.salPromotion) {
-        switch (data.salPromotion.type) {
+        switch (data.salPromotion.TYPE) {
           case "1":
             //折扣
-            price = quantity.mul(data.price).mul(data.salPromotion.discount);
+            price = quantity.mul(data.price).mul(data.salPromotion.DISCOUNT);
             break;
           case "2":
             //定价
-            price = quantity.mul(data.salPromotion.price);
+            price = quantity.mul(data.salPromotion.PRICE);
         }
       } else {
         price = quantity.mul(data.price);
@@ -289,7 +284,7 @@ export default {
     canShowDetail(row) {
       return (
         !row.salPromotion ||
-        (row.salPromotion && row.salPromotion.modifyFlag != "N")
+        (row.salPromotion && row.salPromotion.MODIFY_FLAG != "N")
       );
     },
     //查看详情

@@ -1673,7 +1673,9 @@ export default {
             this.checkX_Visible = false;
             //同步布精灵数据
             if (res.data.length) {
-              //await this.asyncBuJingLing([{ PUR_NO: res.data[0].PUR_NO, data: res.data }]);
+              // await this.asyncBuJingLing([
+              //   { PUR_NO: res.data[0].PUR_NO, data: res.data },
+              // ]);
             }
             this.checkedX_Visible = true;
             this.autoSearch();
@@ -1733,17 +1735,27 @@ export default {
       return groups;
     },
     onClickAsync(row) {
-      GetBJLData({ PUR_NO: row.PUR_NO }).then(async (res) => {
-        if (res.data.length) {
-          //await this.asyncBuJingLing([{ PUR_NO: row.PUR_NO, data: res.data }]);
-          this.autoSearch();
-        } else {
-          this.$alert("查找数据错误", "提示", {
-            confirmButtonText: "确定",
-            type: "warning",
+      this.$confirm("确认同步？", "提示", {
+        confirmButtonText: "是",
+        cancelButtonText: "否",
+        type: "warning",
+      })
+        .then(() => {
+          GetBJLData({ PUR_NO: row.PUR_NO }).then(async (res) => {
+            if (res.data.length) {
+              await this.asyncBuJingLing([
+                { PUR_NO: row.PUR_NO, data: res.data },
+              ]);
+              this.autoSearch();
+            } else {
+              this.$alert("查找数据错误", "提示", {
+                confirmButtonText: "确定",
+                type: "warning",
+              });
+            }
           });
-        }
-      });
+        })
+        .catch(() => {});
     },
     //同步布精灵数据
     async asyncBuJingLing(pruData) {
@@ -1812,20 +1824,30 @@ export default {
                 data: JSON.stringify(detailData),
               };
               Axios.defaults.withCredentials = false;
-              var resB = await Axios.post(
-                "http://buyisoft.utools.club/syn/add",
-                postdata,
-                { params: postdata, loading: false }
-              );
-              if (resB.data.state == "ok") {
-              } else {
-                var msg =
-                  pruData[i].PUR_NO +
-                  "位置:" +
-                  oneplace[0].CL_PLACE +
-                  "同步失败;";
-                failPur += msg;
-                oneFail += msg;
+              try {
+                var resB = await Axios.post(
+                  "http://ljsp.ubxiu.com:8098/syn/add",
+                  postdata,
+                  { params: postdata, loading: false }
+                );
+                console.log(resB);
+                if (resB.data.state == "ok") {
+                } else {
+                  var msg =
+                    pruData[i].PUR_NO +
+                    "位置:" +
+                    oneplace[0].CL_PLACE +
+                    "同步失败;";
+                  failPur += msg;
+                  oneFail += msg;
+                }
+              } catch (err) {
+                this.$message({
+                  message: "同步失败!",
+                  type: "error",
+                  duration: 1000,
+                });
+                return;
               }
             }
           }
@@ -1843,11 +1865,11 @@ export default {
             confirmButtonText: "确定",
             type: "warning",
           });
-        }else{
+        } else {
           this.$message({
             message: "同步完成!",
             type: "success",
-            duration: 1000
+            duration: 1000,
           });
         }
       }

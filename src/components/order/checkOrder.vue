@@ -360,7 +360,7 @@
               </div>
             </div>
             <div style="margin-left:20px;" v-if="!canUseConpon(item)">
-              由于活动："{{ salPromotion.ORDER_NAME }}"，该优惠券无法使用
+              由于活动："{{ canNotUseActivity(item) }}"，该优惠券无法使用
             </div>
           </div>
         </el-collapse-item>
@@ -566,9 +566,8 @@ export default {
       dialogImageVisible: false,
       fileList: [],
       userSelect: [],
-      salPromotion: {
-        P_ID: "",
-      },
+      showWriteBuyUser: false,
+      activityArray: [],
     };
   },
   filters: {
@@ -619,7 +618,7 @@ export default {
     },
   },
   computed: {
-    totalPrice(){
+    totalPrice() {
       var allcost = 0;
       for (var i = 0; i < this.order_details.length; i++) {
         allcost = allcost.add(this.order_details[i].promotionCost);
@@ -708,7 +707,7 @@ export default {
       var data = {
         cid: Cookies.get("cid"),
         companyId: Cookies.get("companyId"),
-        typeId: this.product_group_tpye, //"A",
+        typeId: this.product_group_tpye,
       };
       searchTickets(url, data).then((res) => {
         this.couponData = res.data;
@@ -723,18 +722,44 @@ export default {
       });
     },
     canUseConpon(couponData) {
-      if (this.salPromotion.P_ID) {
-        if (this.salPromotion.REBATE_FLAG == "N") {
-          return false;
-        }
+      for (var i = 0; i < this.order_details.length; i++) {
         if (
-          couponData.rebateType != this.salPromotion.REBATE_TYPE &&
-          this.salPromotion.REBATE_TYPE != "all"
+          this.order_details[i].activityId &&
+          this.order_details[i].salPromotion
         ) {
-          return false;
+          var onePro = this.order_details[i].salPromotion;
+          if (onePro.REBATE_FLAG == "N") {
+            return false;
+          }
+          if (
+            couponData.rebateType != onePro.REBATE_TYPE &&
+            onePro.REBATE_TYPE != "all"
+          ) {
+            return false;
+          }
         }
       }
       return true;
+    },
+    canNotUseActivity(couponData) {
+      for (var i = 0; i < this.order_details.length; i++) {
+        if (
+          this.order_details[i].activityId &&
+          this.order_details[i].salPromotion
+        ) {
+          var onePro = this.order_details[i].salPromotion;
+          if (onePro.REBATE_FLAG == "N") {
+            return onePro.ORDER_NAME;
+          }
+          if (
+            couponData.rebateType != onePro.REBATE_TYPE &&
+            onePro.REBATE_TYPE != "all"
+          ) {
+            return onePro.ORDER_NAME;
+          }
+        }
+      }
+      return "";
     },
     RecordUse(itemID) {
       this.useTable = [];
@@ -1299,7 +1324,7 @@ export default {
         this.ctm_order.buyUserPicture +=
           "/Files/BuyUser/" + this.cid + "/" + this.fileList[i].name + ";";
       }
-      if (this.salPromotion.BUYER_FLAG == 1) {
+      if (this.showWriteBuyUser) {
         //要填写购买人信息
         if (
           !this.ctm_order.buyUser ||
@@ -1453,6 +1478,14 @@ export default {
           : "";
         //共有
         onedetail.activityId = getPush[i].activityId;
+        if (
+          this.activityArray.indexOf(getPush[i].activityId) == -1 &&
+          getPush[i].activityId
+        ) {
+          //活动集合
+          this.activityArray.push(getPush[i].activityId);
+        }
+        onedetail.salPromotion = getPush[i].salPromotion;
         onedetail.orderNo = getPush[i].orderNumber;
         onedetail.yuefanli = 0;
         onedetail.nianfanli = 0;
@@ -1480,51 +1513,77 @@ export default {
         this.order_details.push(onedetail);
       }
     },
-    //获取活动
+    //获取所有活动
     getActivity() {
-      this.salPromotion.P_ID = this.order_details[0].activityId;
-      if (this.salPromotion.P_ID) {
-        GetPromotionByTypeAndId({ pId: this.salPromotion.P_ID }).then((res) => {
-          this.salPromotion = res.data;
-          this.arrearsFlag = this.salPromotion.ARREARS_FLAG;
-          var allcost = 0;
+      //看看是否需要加载活动
+      var showLoadActivity = false;
+      for (var i = 0; i < this.order_details.length; i++) {
+        if (
+          this.order_details[i].activityId &&
+          !this.order_details[i].salPromotion
+        ) {
+          showLoadActivity = true;
+          break;
+        }
+      }
+      if (showLoadActivity) {
+        GetPromotionsById({ PID: this.activityArray }).then((res) => {
+          this.activityArray = res.data;
+          //赋值活动
           for (var i = 0; i < this.order_details.length; i++) {
-            this.order_details[i].pId = this.salPromotion.P_ID;
-            this.order_details[
-              i
-            ].promotionType = this.salPromotion.ORDER_TYPE;
-            this.order_details[i].flagFlType = this.salPromotion.FLAG_FL;
-
-            var price = this.calculatePromotionPrice(this.order_details[i]);
-            this.order_details[i].promotionCost = price;
-            this.order_details[i].finalPrice = price;
-            allcost = allcost.add(price);
+            var onePro = this.activityArray.filter(
+              (item) => item.P_ID == this.order_details[i].activityId
+            );
+            if (onePro.length) {
+              this.order_details[i].salPromotion = onePro[0];
+            }
           }
+          this.setActivity();
         });
       } else {
-        this.arrearsFlag = null;
+        this.setActivity();
+      }
+    },
+    setActivity() {
+      for (var i = 0; i < this.order_details.length; i++) {
+        if (
+          this.order_details[i].activityId &&
+          this.order_details[i].salPromotion
+        ) {
+          var onePro = this.order_details[i].salPromotion;
+          //活动需要限制的属性
+          if (this.arrearsFlag != "N") this.arrearsFlag = onePro.ARREARS_FLAG;
+          if (!this.showWriteBuyUser)
+            this.showWriteBuyUser = onePro.BUYER_FLAG == 1;
+          //存入detail的属性
+          this.order_details[i].pId = onePro.P_ID;
+          this.order_details[i].promotionType = onePro.ORDER_TYPE;
+          this.order_details[i].flagFlType = onePro.FLAG_FL;
+          //计算价格
+          var price = this.calculatePromotionPrice(this.order_details[i]);
+          this.order_details[i].promotionCost = price;
+          this.order_details[i].finalPrice = price;
+        }
       }
     },
     calculatePromotionPrice(data) {
       var price = 0;
       var quantity = data.qtyRequired;
       //首先判断TYPE,1折扣，2定价。然后判断priority
-      if (this.salPromotion && this.salPromotion.P_ID) {
+      if (data.salPromotion && data.salPromotion.P_ID) {
         //一口价
-        if (this.salPromotion.PRIORITY == 99) {
+        if (data.salPromotion.PRIORITY == 99) {
           if (quantity < 1) quantity = 1;
-          price = quantity.mul(this.salPromotion.PRICE);
+          price = quantity.mul(data.salPromotion.PRICE);
         } else {
-          switch (this.salPromotion.TYPE) {
+          switch (data.salPromotion.TYPE) {
             case "1":
               //折扣
-              price = quantity
-                .mul(data.price)
-                .mul(this.salPromotion.DISCOUNT);
+              price = quantity.mul(data.price).mul(data.salPromotion.DISCOUNT);
               break;
             case "2":
               //定价
-              price = quantity.mul(this.salPromotion.PRICE);
+              price = quantity.mul(data.salPromotion.PRICE);
           }
         }
       } else {

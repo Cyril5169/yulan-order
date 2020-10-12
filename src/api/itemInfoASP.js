@@ -87,6 +87,13 @@ export function GetFixPriceShopsByItemNo(data, config = {}) {
         return Promise.reject(err)
     })
 }
+export function GetProductVersion(data, config = {}) {
+    return post('/SAL_PROMOTION_SPECIAL/GetProductVersion', data, config).then(res => {
+        return Promise.resolve(res);
+    }).catch(err => {
+        return Promise.reject(err)
+    })
+}
 //获得热销榜
 export function GetHotSales(data, config = {}) {
     return post('/HOTSALES/GetHotSales', data, config).then((res) => {
@@ -106,6 +113,14 @@ export function GetSalPutonRecord(data, config = {}) {
 //获得墙纸库存
 export function GetItemStock(data, config = {}) {
     return post('/ITEM/GetItemStock', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+//获得生产状态
+export function GetProductStatus(data, config = {}) {
+    return post('/ITEM/GetProductStatus', data, config).then((res) => {
         return Promise.resolve(res);
     }).catch((err) => {
         return Promise.reject(err);

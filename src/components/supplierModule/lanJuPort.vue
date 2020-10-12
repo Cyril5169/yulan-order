@@ -1369,7 +1369,8 @@ export default {
               type: "success",
             });
             this.batchTip_Visible = false;
-            //await this.asyncBuJingLing(res.data);
+            //同步到布精灵
+            await this.asyncBuJingLing(res.data);
             this.autoSearch();
           })
           .catch((res) => {
@@ -1674,9 +1675,9 @@ export default {
             this.checkX_Visible = false;
             //同步布精灵数据
             if (res.data.length) {
-              // await this.asyncBuJingLing([
-              //   { PUR_NO: res.data[0].PUR_NO, data: res.data },
-              // ]);
+              await this.asyncBuJingLing([
+                { PUR_NO: res.data[0].PUR_NO, data: res.data },
+              ]);
             }
             this.checkedX_Visible = true;
             this.autoSearch();
@@ -1735,6 +1736,7 @@ export default {
       });
       return groups;
     },
+    //手动同步布精灵
     onClickAsync(row) {
       this.$confirm("确认同步？", "提示", {
         confirmButtonText: "是",
@@ -1794,14 +1796,19 @@ export default {
                 };
                 detailData.push(onedetail);
               }
-              //找找各种款式，开数
+              //找各种款式
               var ltlist = oneplace.filter((item) => item.CL_NAME == "lt");
               var lslist = oneplace.filter((item) => item.CL_NAME == "ls");
               var shalist = oneplace.filter((item) => item.CL_NAME == "sha");
 
               var postdata = {
                 token: "ljsp-bjl",
+                cpPlaceId: detail.CL_PLACE_ID,
                 custmorname: oneplace[0].CUSTOMER_NAME,
+                sortname: oneplace[0].CUSTOMER_CODE,
+                tempCustmorjc: oneplace[0].LINKMAN,
+                tempPhone: oneplace[0].LINKTEL,
+                tempAddress: oneplace[0].POST_ADDRESS,
                 templatename: oneplace[0].CL_ITEM_NO,
                 liantou: ltlist.length > 0,
                 lianshen: lslist.length > 0,
@@ -1816,7 +1823,7 @@ export default {
                 lianshenOpen: "--",
                 lianshenType: "--",
                 chuangshaHeight: oneplace[0].CL_HIGH,
-                chuangshaWIdth: oneplace[0].CL_WIDTH,
+                chuangshaWidth: oneplace[0].CL_WIDTH,
                 chuangshaOpen: "--",
                 chuangshaType: "--",
                 subcustmorname: "无",
@@ -1828,6 +1835,7 @@ export default {
               try {
                 var resB = await Axios.post(
                   "http://ljsp.ubxiu.com:8098/syn/add",
+                  //"http://buyisoft.utools.club/syn/add",
                   postdata,
                   { params: postdata, loading: false }
                 );

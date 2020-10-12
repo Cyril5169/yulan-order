@@ -4,28 +4,33 @@
       <div class="mt10 ml10">
         <span>型号：
         </span>
-        <el-input clearable v-model="itemNoKey" @clear="searchShops" @keyup.enter.native="searchShops"
+        <el-input clearable v-model="itemNoKey" @clear="initSearch" @keyup.enter.native="initSearch"
           placeholder="商品型号" style="width:200px;">
         </el-input>
         <span class="ml10">版本：</span>
-        <el-input clearable v-model="productKey" @clear="searchShops" @keyup.enter.native="searchShops"
+        <!-- <el-input clearable v-model="productKey" @clear="initSearch" @keyup.enter.native="initSearch"
           placeholder="商品版本号" style="width:200px;">
-        </el-input>
+        </el-input> -->
+        <el-select v-model="productKey" placeholder="--请选择版本--" @change="initSearch">
+          <el-option label="全部" value=""></el-option>
+          <el-option v-for="item in productVersionData" :key="item.PRODUCTVERSION_NAME"
+            :label="item.PRODUCTVERSION_NAME" :value="item.PRODUCTVERSION_NAME"></el-option>
+        </el-select>
         <span class="ml10">库存范围:</span>
-        <el-input v-model="minNumber" @keyup.enter.native="searchShops" style="width:80px;" oninput="value=value.replace(/[^\d.]/g,'')
+        <el-input v-model="minNumber" @keyup.enter.native="initSearch" style="width:80px;" oninput="value=value.replace(/[^\d.]/g,'')
                                 .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                                 .replace('.', '$#$').replace(/\./g, '')
                                 .replace('$#$', '.')
                                 .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)">
         </el-input>
         <span>至</span>
-        <el-input v-model="maxNumber" @keyup.enter.native="searchShops" style="width:80px;" oninput="value=value.replace(/[^\d.]/g,'')
+        <el-input v-model="maxNumber" @keyup.enter.native="initSearch" style="width:80px;" oninput="value=value.replace(/[^\d.]/g,'')
                                 .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                                 .replace('.', '$#$').replace(/\./g, '')
                                 .replace('$#$', '.')
                                 .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)">
         </el-input>
-        <el-button type="success" @click="searchShops" icon="el-icon-search" size="medium" style="margin-left:20px;">查询
+        <el-button type="success" @click="initSearch" icon="el-icon-search" size="medium" style="margin-left:20px;">查询
         </el-button>
       </div>
       <div style="margin: 10px 0;">
@@ -54,9 +59,8 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-pagination style="margin:0 20%;" @size-change="handleSizeChange" @current-change="handleCurrentChange"
-        :current-page.sync="currentPage" :page-size="pageSize" layout="total, prev, pager, next, jumper"
-        :total="totalNumber">
+      <el-pagination style="margin:0 20%;" @current-change="handleCurrentChange" :current-page.sync="currentPage"
+        :page-size="pageSize" layout="total, prev, pager, next, jumper" :total="totalNumber">
       </el-pagination>
     </el-card>
   </div>
@@ -65,7 +69,10 @@
 <script>
 import { mapMutations } from "vuex";
 import Cookies from "js-cookie";
-import { GetFixPriceShopsByCondition } from "@/api/itemInfoASP";
+import {
+  GetFixPriceShopsByCondition,
+  GetProductVersion,
+} from "@/api/itemInfoASP";
 import {
   FixPriceShopAddToCart,
   FixPriceShopAddListToCart,
@@ -83,6 +90,7 @@ export default {
       pageSize: 10, //每页的个数
       totalNumber: 0, //总条数
       selectShops: [],
+      productVersionData: [],
     };
   },
   filters: {
@@ -107,6 +115,16 @@ export default {
     },
   },
   methods: {
+    getProductVersion() {
+      this.productVersionData = [];
+      GetProductVersion().then((res) => {
+        this.productVersionData = res.data;
+      });
+    },
+    initSearch(){
+      this.currentPage = 1;
+      this.searchShops();
+    },
     searchShops() {
       this.shopsData = [];
       GetFixPriceShopsByCondition({
@@ -124,7 +142,6 @@ export default {
         })
         .catch((err) => {});
     },
-    handleSizeChange() {},
     handleCurrentChange() {
       this.searchShops();
     },
@@ -138,7 +155,11 @@ export default {
         type: "warning",
       })
         .then(() => {
-          FixPriceShopAddToCart({ cid: Cookies.get("cid"), id: data.ID, pId: data.P_ID })
+          FixPriceShopAddToCart({
+            cid: Cookies.get("cid"),
+            id: data.ID,
+            pId: data.P_ID,
+          })
             .then((res) => {
               this.$alert("此型号已添加成功，请前往购物车查看", "添加成功", {
                 confirmButtonText: "确定",
@@ -168,9 +189,13 @@ export default {
           var pIds = [];
           for (var i = 0; i < this.selectShops.length; i++) {
             ids.push(this.selectShops[i].ID);
-            pIds.push(this.selectShops[i].P_ID)
+            pIds.push(this.selectShops[i].P_ID);
           }
-          FixPriceShopAddListToCart({ cid: Cookies.get("cid"), ids: ids, pIds:pIds })
+          FixPriceShopAddListToCart({
+            cid: Cookies.get("cid"),
+            ids: ids,
+            pIds: pIds,
+          })
             .then((res) => {
               this.$alert("此型号已添加成功，请前往购物车查看", "添加成功", {
                 confirmButtonText: "确定",
@@ -194,6 +219,7 @@ export default {
     if (selectNo) {
       this.itemNoKey = selectNo;
     }
+    this.getProductVersion();
     this.searchShops();
   },
 };

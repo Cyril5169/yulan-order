@@ -1559,6 +1559,9 @@ export default {
           this.order_details[i].pId = onePro.P_ID;
           this.order_details[i].promotionType = onePro.ORDER_TYPE;
           this.order_details[i].flagFlType = onePro.FLAG_FL;
+          this.order_details[i].type = onePro.TYPE;
+          this.order_details[i].salePrice = onePro.PRICE;
+          this.order_details[i].saleDiscount = onePro.DISCOUNT;
           //计算价格
           var price = this.calculatePromotionPrice(this.order_details[i]);
           this.order_details[i].promotionCost = price;

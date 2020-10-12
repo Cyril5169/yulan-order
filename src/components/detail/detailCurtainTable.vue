@@ -69,7 +69,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="名称" header-align="center" width="70">
+        <el-table-column label="名称" header-align="center" width="85">
           <template slot-scope="scope">
             {{ getTypeName(scope.row.curtainPartName) }}
             <!-- <br> -->
@@ -537,6 +537,11 @@ export default {
           this.data[i].choose = this.chooseBig[index];
         }
       }
+      if (type == "ls") {
+        this.chooseBig[2] = this.chooseBig[index];
+        this.changeLink("lspb", 2);
+      }
+      this.changeLinkTip(type, index);
     },
     //大类和二类的反向联动
     changeLinkReverse(data) {
@@ -575,6 +580,25 @@ export default {
         });
         if (data.choose || flag) {
           this.chooseBig[_index] = data.choose;
+          this.changeLinkTip(data.itemType, _index);
+        }
+      }
+    },
+    changeLinkTip(type, index) {
+      if (type == "lspb") {
+        //取消帘身配布如果帘身没有取消，需要在帘身工艺中备注
+        //如果帘身也取消了，就改回来
+        //找到工艺数据
+        var gyData = this.data.filter(
+          (item) => item.itemType == "ls" && item.productType == "GY"
+        );
+        if (gyData.length) {
+          gyData = gyData[0];
+          if (this.chooseBig[1] && !this.chooseBig[2]) {
+            gyData.note = "已取消购买帘身配布;" + gyData.note;
+          } else {
+            gyData.note = gyData.note.replace("已取消购买帘身配布;", "");
+          }
         }
       }
     },
@@ -1103,7 +1127,7 @@ export default {
         else status = 3;
       }
       if (
-        data.itemType === "pjb" ||
+        //data.itemType === "pjb" ||
         data.productType === "LCB" ||
         data.productType == "GY"
       ) {
@@ -1530,6 +1554,7 @@ export default {
     },
     oneTotal(row) {
       var price = this.dosageFilter(this.calculatePromotionPrice(row));
+      if(row.dosage == undefined) row.dosage = 0;
       return price.mul(row.dosage);
     },
     calculatePromotionPrice(data) {

@@ -39,6 +39,7 @@ import StockQuery from '@/components/query/stockQuery'
 import AreaQuery from '@/components/query/areaQuery'
 import SalesQuery from '@/components/query/salesQuery'
 import OrderQuery from '@/components/query/orderQuery'
+import productQuery from '@/components/query/productQuery'
 import SupplyPort from '@/components/supplierModule/supplyPort'
 import Trans from '@/components/supplierModule/trans'
 import LanJuPort from '@/components/supplierModule/lanJuPort'
@@ -304,6 +305,12 @@ const router = new Router({
           path: '/query/orderQuery',
           name: 'orderQuery',
           component: OrderQuery,
+          
+        },
+        {
+          path: '/query/productQuery',
+          name: 'productQuery',
+          component: productQuery,
           
         },
         {

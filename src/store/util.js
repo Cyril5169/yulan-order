@@ -80,6 +80,8 @@ export function tabsName(index) {
       return "区域提货单查询";
     case "query/orderQuery":
       return "区域订单查询";
+    case "query/productQuery":
+      return "生产状态查询";
     case "supplierModule/supplyPort":
       return "采购单确认";
     case "supplierModule/trans":

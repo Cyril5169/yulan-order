@@ -64,8 +64,9 @@
         <template slot-scope="scope">
           <a class="mr10" @click="seeStore(scope)">
             查看库存
-            <iframe :src="storeUrl(scope.row.ITEM_NO)" style="display:none;" frameborder="0"></iframe>
           </a>
+          <iframe v-if="scope.row.ITEM_NO == currentItemNo" :src="storeUrl(scope.row.ITEM_NO)" style="display:none;"
+            frameborder="0"></iframe>
         </template>
       </el-table-column>
       <el-table-column width="100px;" type="expand">
@@ -145,13 +146,14 @@ export default {
         },
         {
           header: "库存信息",
-          body: "",
+          body: "查询中...",
         },
       ],
       storeMsg: [], //储存当前页面的库存信息
       dialogTableVisible: false,
       disableFlag: false, //判断是否禁用选择框
       minimumPurchaseShow: false,
+      currentItemNo: "",
     };
   },
   props: ["tableData", "numberList"],
@@ -385,6 +387,7 @@ export default {
     },
     //查看该商品的库存
     seeStore(scope) {
+      this.currentItemNo = scope.row.ITEM_NO;
       this.dialogTableVisible = true;
       //生成库存表格，依次是类别、编号、尺寸、库存信息
       this.produceStore[0].body = scope.row.NOTE ? scope.row.NOTE : "暂无数据";
@@ -392,20 +395,26 @@ export default {
         ? scope.row.ITEM_NO
         : "暂无数据";
       this.produceStore[2].body = scope.row.FIX_GRADE / 1000;
-      this.produceStore[3].body = this.storeMsg[scope.$index]
-        ? this.storeMsg[scope.$index]
+      this.produceStore[3].body = "查询中...";
+    },
+    showStoreData() {
+      this.produceStore[3].body = this.storeMsg.length
+        ? this.storeMsg[0]
         : "暂无数据";
     },
   },
-  computed: {
-    msg() {
-      return this.tableData;
-    },
-  },
-  watch: {
-    msg(newV, oldV) {
-      this.storeMsg = [];
-    },
+  mounted() {
+    const self = this;
+    window.addEventListener(
+      "message",
+      function (e) {
+        if (e.origin && e.origin != "http://www.luxlano.com") return;
+        self.storeMsg = [];
+        self.storeMsg.push(e.data);
+        self.showStoreData();
+      },
+      false
+    );
   },
 };
 </script>

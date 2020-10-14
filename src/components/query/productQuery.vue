@@ -151,7 +151,7 @@ export default {
   created() {
     this.beginTime = this.timeDefault_1;
     this.finishTime = this.timeDefault_2;
-    this.searchData();
+    //this.searchData();
   },
 };
 </script>

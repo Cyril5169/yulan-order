@@ -16,6 +16,13 @@ export function GetStockByItemNo(data, config = {}) {
         return Promise.reject(err);
     })
 }
+export function GetStockDataByItemNoAndUser(data, config = {}) {
+    return post('/ITEM/GetStockDataByItemNoAndUser', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
 //根据userid查询仓库权限
 export function GetStockByUser(data, config = {}) {
     return post('/STOCK_USER/GetStockByUser', data, config).then((res) => {

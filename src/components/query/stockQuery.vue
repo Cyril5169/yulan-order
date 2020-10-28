@@ -32,7 +32,7 @@
               <el-table style="width:100%;" :data="stockInfo_1" height="180px">
                 <el-table-column prop="NOTE" label="仓库名称" align="center" width="180">
                 </el-table-column>
-                <el-table-column prop="ITEM_NO" label="型号" align="center" width="80">
+                <el-table-column prop="ITEM_NO" label="型号" align="center" width="100">
                 </el-table-column>
                 <el-table-column prop="BATCH_NO" label="批号" align="center" width="150">
                 </el-table-column>
@@ -41,6 +41,11 @@
                 <el-table-column prop="QTY" label="库存量" align="center" width="80">
                 </el-table-column>
                 <el-table-column prop="QTY_ALLOCATE" label="已分配量" align="center" width="80">
+                  <template slot-scope="scope">
+                    <span v-if="scope.row.QTY_ALLOCATE == 0">0</span>
+                    <el-link type="primary" v-else size="mini" @click="showAllocate(scope.row)">
+                      {{ scope.row.QTY_ALLOCATE }}</el-link>
+                  </template>
                 </el-table-column>
                 <el-table-column prop="QTY_ADJ" label="调整量" align="center" width="80">
                 </el-table-column>
@@ -51,7 +56,7 @@
                     {{scope.row.STATUS_ID | transStatusId}}
                   </template>
                 </el-table-column>
-                <el-table-column prop="NOTES" label="备注" align="center" width="100" show-overflow-tooltip>
+                <el-table-column prop="NOTES" label="备注" align="center" width="200" show-overflow-tooltip>
                 </el-table-column>
               </el-table>
             </div>
@@ -115,7 +120,7 @@
                 </tr>
                 <tr>
                   <td class="CPXXBJYS">自产代理</td>
-                  <td>{{ dormitory.GET_ID | transId }}</td>
+                  <td>{{ dormitory.GET_ID | transGetId }}</td>
                   <td class="CPXXBJYS">规格</td>
                   <td>{{ dormitory.GRADE }}</td>
                   <td class="CPXXBJYS">颜色</td>
@@ -146,6 +151,40 @@
           :page-size="limit" layout="prev, pager, next, jumper" :total="count"></el-pagination>
       </div>
     </el-card>
+
+    <el-dialog width="1200px" :visible.sync="allocateVisible" :title="dialogText">
+      <el-table style="width:100%;" :data="allocateData">
+        <el-table-column prop="ITEM_NO" label="型号" align="center" width="100">
+        </el-table-column>
+        <el-table-column prop="BATCH_NO" label="批号" align="center" width="150">
+        </el-table-column>
+        <el-table-column prop="NOTE" label="库房名称" align="center" width="150">
+        </el-table-column>
+        <el-table-column prop="PRESTAY_TYPE" label="预留类型" align="center" width="100">
+          <template slot-scope="scope">
+            {{scope.row.PRESTAY_TYPE | transPrestayType}}
+          </template>
+        </el-table-column>
+        <el-table-column prop="PRESTAY_NUMBER" label="预留数量" align="center" width="100">
+        </el-table-column>
+        <el-table-column prop="UNIT_NAME" label="单位" align="center" width="70">
+        </el-table-column>
+        <el-table-column prop="ORDER_ID" label="单据号" align="center" width="100">
+        </el-table-column>
+        <el-table-column prop="DATE_START" label="预留日期" align="center" width="90">
+          <template slot-scope="scope">
+            {{scope.row.DATE_START | datatrans}}
+          </template>
+        </el-table-column>
+        <el-table-column prop="DATE_LIMIT" label="预留期限" align="center" width="90">
+          <template slot-scope="scope">
+            {{scope.row.DATE_LIMIT | datatrans}}
+          </template>
+        </el-table-column>
+        <el-table-column prop="NOTES" label="说明" header-align="center">
+        </el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
@@ -154,7 +193,8 @@ import {
   GetItemByProductType,
   GetStockByUser,
   GetStockByItemNo,
-  GetStockDataByItemNoAndUser
+  GetStockDataByItemNoAndUser,
+  GetAllocatByItemAndBatch,
 } from "@/api/itemInfoASP";
 import Cookies from "js-cookie";
 export default {
@@ -239,6 +279,9 @@ export default {
       limit: 15,
       count: 0,
       currentPage: 1,
+      allocateVisible: false,
+      dialogText: "预留信息",
+      allocateData: [],
     };
   },
   //生命周期
@@ -402,7 +445,7 @@ export default {
           break;
       }
     },
-    transId(value) {
+    transGetId(value) {
       switch (value) {
         case "A":
           return "自产产品";
@@ -431,6 +474,52 @@ export default {
           return "淘汰";
           break;
       }
+    },
+    transPrestayType(value) {
+      switch (value) {
+        case "C":
+          return "订货";
+        case "P":
+          return "提货";
+        case "CJLL":
+          return "车间领料";
+        case "DYLL":
+          return "打样领料";
+        case "Z":
+          return "转库";
+        case "D":
+          return "调拔";
+        case "XQJH":
+          return "改包装计划";
+        case "GBZLL":
+          return "改包装领料";
+        case "JYZK":
+          return "检验转库";
+        case "SH":
+          return "损耗预留";
+        case "W":
+          return "委外预留";
+          break;
+      }
+    },
+    datatrans(value) {
+      //时间戳转化大法
+      if (value == null || value == "9999/12/31 00:00:00") {
+        return "";
+      }
+      let date = new Date(value);
+      let y = date.getFullYear();
+      let MM = date.getMonth() + 1;
+      MM = MM < 10 ? "0" + MM : MM;
+      let d = date.getDate();
+      d = d < 10 ? "0" + d : d;
+      let h = date.getHours();
+      h = h < 10 ? "0" + h : h;
+      let m = date.getMinutes();
+      m = m < 10 ? "0" + m : m;
+      let s = date.getSeconds();
+      s = s < 10 ? "0" + s : s;
+      return y + "-" + MM + "-" + d + " " + h + ":" + m + ":" + s;
     },
   },
   methods: {
@@ -544,6 +633,22 @@ export default {
     //翻页获取订单
     handleCurrentChange() {
       this.searchStock();
+    },
+    showAllocate(item) {
+      this.allocateData = [];
+      GetAllocatByItemAndBatch({
+        itemNo: item.ITEM_NO,
+        batchNo: item.BATCH_NO,
+      })
+        .then((res) => {
+          this.allocateData = res.data;
+          this.dialogText =
+            item.ITEM_NO + "-(" + item.BATCH_NO + ")" + "预留信息";
+          this.allocateVisible = true;
+        })
+        .catch((res) => {
+          console.log(res);
+        });
     },
   },
 };

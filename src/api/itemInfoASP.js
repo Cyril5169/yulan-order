@@ -16,8 +16,25 @@ export function GetStockByItemNo(data, config = {}) {
         return Promise.reject(err);
     })
 }
+//通过itemNo和userId查询库存
 export function GetStockDataByItemNoAndUser(data, config = {}) {
     return post('/ITEM/GetStockDataByItemNoAndUser', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+//通过所有版本
+export function GetProductVersionData(data, config = {}) {
+    return post('/ITEM/GetProductVersionData', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+//通过itemNo和batchNo查询预留
+export function GetAllocatByItemAndBatch(data, config = {}) {
+    return post('/ITEM/GetAllocatByItemAndBatch', data, config).then((res) => {
         return Promise.resolve(res);
     }).catch((err) => {
         return Promise.reject(err);
@@ -128,6 +145,14 @@ export function GetItemStock(data, config = {}) {
 //获得生产状态
 export function GetProductStatus(data, config = {}) {
     return post('/ITEM/GetProductStatus', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+//获得外销限价
+export function GetLimitPriceByProVersio(data, config = {}) {
+    return post('/ITEM/GetLimitPriceByProVersio', data, config).then((res) => {
         return Promise.resolve(res);
     }).catch((err) => {
         return Promise.reject(err);

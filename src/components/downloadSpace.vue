@@ -21,7 +21,7 @@
       <!-- <el-table-column type="selection" width="35"></el-table-column> -->
       <el-table-column label="文件名" header-align="center">
         <template slot-scope="scope">
-          <span>
+          <span style="margin-left:10px;">
             <div class="format" :class="formatClass(scope.row.FILE_NAME)"></div>
             <div style="display:inline-block;">
               <a :class="[scope.row.FILE_TYPE == 0 ? 'nolink' : 'link']" style="margin-left:5px;"

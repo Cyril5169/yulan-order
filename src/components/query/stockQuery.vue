@@ -17,7 +17,7 @@
       <!--  遍历表格 -->
       <div class="allDataDiv">
         <div class="leftCt">
-          <el-table ref="dormitoryTable" :data="tables" stripe height="500" style="width:100%" @row-click="KC_CP_SC"
+          <el-table ref="dormitoryTable" :data="itemData" stripe height="500" style="width:100%" @row-click="KC_CP_SC"
             border>
             <el-table-column prop="ITEM_NO" label="型号" width="150" align="center"></el-table-column>
             <el-table-column prop="OLD_ITEM_NO" label="版样型号" align="center"></el-table-column>
@@ -29,7 +29,7 @@
               <span>库存信息：</span>
             </div>
             <div>
-              <el-table style="width:100%;" :data="stockInfo_1" height="180px">
+              <el-table style="width:100%;" :data="stockData" height="180px">
                 <el-table-column prop="NOTE" label="仓库名称" align="center" width="180">
                 </el-table-column>
                 <el-table-column prop="ITEM_NO" label="型号" align="center" width="100">
@@ -269,12 +269,12 @@ export default {
         },
       ],
       page_count: 1,
-      stockInfo_1: [], //库存信息
+      stockData: [], //库存信息
       stockIds: [],
       productType: "", //产品类型查询初始值
       dormitory: [], //查询到的数据
       search: "", //搜索产品型号
-      tables: [], //初始表格为空
+      itemData: [], //初始表格为空
       stockInfo: false, //库存信息显示
       limit: 15,
       count: 0,
@@ -549,7 +549,7 @@ export default {
       this.searchStock();
     },
     searchStock() {
-      this.tables = [];
+      this.itemData = [];
       this.dormitory = [];
       this.stockInfo = false; //库存信息显示
       var data = {
@@ -566,9 +566,7 @@ export default {
           if (this.count == 1) {
             this.KC_CP_SC(res.data[0]);
           }
-          this.tables = res.data;
-          // this.tables.itemNo = res.data.itemNo;
-          // this.tables.OLD_ITEM_NO = res.data.OLD_ITEM_NO;
+          this.itemData = res.data;
         })
         .catch((res) => {
           console.log(res);
@@ -578,17 +576,18 @@ export default {
     clear() {
       this.value = "";
       this.search = "";
-      this.tables = [];
+      this.itemData = [];
       this.dormitory = [];
-      this.stockInfo_1 = [];
+      this.stockData = [];
       this.stockInfo = false; //库存信息显示
       this.count = 0;
       this.currentPage = 1;
     },
     //点击行的事件
     KC_CP_SC(val) {
+      this.dormitory = val; //数据集合
       this.stockInfo = true; //库存信息显示
-      this.stockInfo_1 = [];
+      this.stockData = [];
       var userInfo = JSON.parse(Cookies.get("userInfo"));
       var data_1 = {
         itemNo: val.ITEM_NO,
@@ -597,38 +596,11 @@ export default {
       //按行查询库存
       GetStockDataByItemNoAndUser(data_1, { loading: false })
         .then((res) => {
-          this.stockInfo_1 = res.data;
+          this.stockData = res.data;
         })
         .catch((res) => {
           console.log(res);
         });
-
-      //获取数据
-      let data = {
-        ITEM_NO: val.ITEM_NO, //型号
-        OLD_ITEM_NO: val.OLD_ITEM_NO, //样本型号
-        PRODUCTVERSION_NAME: val.PRODUCTVERSION_NAME, //版本号
-        ITEM_TYPE_1: val.ITEM_TYPE_1, //产品类别
-        BOX_TYPE: val.BOX_TYPE, //纸箱规格
-        GRADE: val.GRADE, //规格
-        DUIPIN_SIZE: val.DUIPIN_SIZE, //拼花尺寸
-        LENGTH: val.LENGTH, //长度
-        WIDTH: val.WIDTH, //宽度
-        GROSS: val.GROSS, //毛重
-        BRAND_NAME: val.BRAND_NAME, //品牌
-        PRODUCT_PAPER_ID: val.PRODUCT_PAPER_ID, //墙纸规格
-        PROPERTY_TYPE_NAME: val.PROPERTY_TYPE_NAME, //墙纸基材
-        NET_WEIGHT: val.NET_WEIGHT, //净重
-        MARK_TYPE: val.MARK_TYPE, //墙纸功能
-        DUIPIN_NOTE_1: val.DUIPIN_NOTE_1, //拼花类型
-        PATTERN: val.PATTERN, //图案
-        COLOUR: val.COLOUR, //颜色
-        UNIT: val.UNIT, //单位
-        STYLE: val.STYLE, //风格
-        UNIT_NOTE_1: val.UNIT_NOTE_1, //计量单位
-        GET_ID: val.GET_ID, //代理
-      };
-      this.dormitory = data; //数据集合
     },
     //翻页获取订单
     handleCurrentChange() {

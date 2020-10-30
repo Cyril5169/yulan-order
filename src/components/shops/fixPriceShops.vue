@@ -60,7 +60,7 @@
         </el-table-column>
       </el-table>
       <el-pagination style="margin:0 20%;" @current-change="handleCurrentChange" :current-page.sync="currentPage"
-        :page-size="pageSize" layout="total, prev, pager, next, jumper" :total="totalNumber">
+        :page-size="limit" layout="total, prev, pager, next, jumper" :total="totalNumber">
       </el-pagination>
     </el-card>
   </div>
@@ -87,7 +87,7 @@ export default {
       maxNumber: "",
       shopsData: [],
       currentPage: 1, //当前的页数
-      pageSize: 10, //每页的个数
+      limit: 10, //每页的个数
       totalNumber: 0, //总条数
       selectShops: [],
       productVersionData: [],
@@ -133,7 +133,7 @@ export default {
         minNumber: this.minNumber ? this.minNumber : 0,
         maxNumber: this.maxNumber ? this.maxNumber : 0,
         companyId: Cookies.get("companyId"),
-        limit: this.pageSize,
+        limit: this.limit,
         page: this.currentPage,
       })
         .then((res) => {

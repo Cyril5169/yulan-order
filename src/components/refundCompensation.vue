@@ -223,7 +223,7 @@
           class="dib tc"
           @current-change="handleCurrentChange"
           :current-page.sync="currentPage"
-          :page-size="pageSize"
+          :page-size="limit"
           layout="total, prev, pager, next, jumper"
           :total="allNum"
         >
@@ -260,7 +260,7 @@ export default {
       cid: Cookies.get("cid"), //用户ID
       customerType: Cookies.get("customerType"), //客户类型
       identity: Cookies.get("identity"), //客户身份
-      pageSize: 10, //每页的条数
+      limit: 10, //每页的条数
       currentPage: 1, //当前页数
       dateFrom: "", //时间搜索--起
       dateTo: "", //时间搜索--止
@@ -331,7 +331,7 @@ export default {
       let obj = {
         CID: this.identity === "USER" ? "" : this.cid, //客户ID
         page: this.currentPage, //第几页
-        number: this.pageSize, //一页有多少数据
+        number: this.limit, //一页有多少数据
         startDate: this.dateFrom, //开始日期
         endDate: this.dateTo, //结束日期
         state: this.chooseState, //状态

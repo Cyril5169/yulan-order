@@ -295,7 +295,7 @@
             <span v-else>{{ item.itemNo }}</span>
           </el-radio>
           <el-pagination v-if="data[chooseIndex].productType !== 'GY'" class="tc mt10" @size-change="handleSizeChange"
-            @current-change="handleCurrentChange" :current-page.sync="currentPage" :page-size="pageSize"
+            @current-change="handleCurrentChange" :current-page.sync="currentPage" :page-size="limit"
             layout="prev, pager, next, jumper" :total="totalNumber">
           </el-pagination>
         </div>
@@ -407,7 +407,7 @@ export default {
       searchKey: "", //搜索的关键词
       items: [], //可供选择的全部编码
       currentPage: 1, //当前的页数
-      pageSize: 30, //每页的个数
+      limit: 30, //每页的个数
       totalNumber: 0, //全部编码的数量
       chooseType: "", //选中的产品类型
       itemNo: "", //选中的编码
@@ -802,7 +802,7 @@ export default {
       if (status === 1) this.currentPage = 1;
       let obj = {
         itemNO: this.chooseType,
-        limit: this.pageSize,
+        limit: this.limit,
         page: this.currentPage,
       };
       changeItem(obj)
@@ -824,7 +824,7 @@ export default {
       let obj = {
         itemType: this.chooseType,
         itemNO: this.searchKey.toUpperCase(),
-        limit: this.pageSize,
+        limit: this.limit,
         page: this.currentPage,
       };
       changeItemBlur(obj)

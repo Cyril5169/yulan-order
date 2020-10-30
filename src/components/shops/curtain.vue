@@ -85,7 +85,7 @@
           </el-table-column>
         </el-table>
         <el-pagination style="margin:0 20%;" @size-change="handleSizeChange" @current-change="handleCurrentChange"
-          :current-page.sync="currentPage" :page-size="pageSize" layout="total, prev, pager, next, jumper"
+          :current-page.sync="currentPage" :page-size="limit" layout="total, prev, pager, next, jumper"
           :total="totalNumber">
         </el-pagination>
       </div>
@@ -141,7 +141,7 @@ export default {
       ], //是否有活动
       activityGroup: [], //活动ID对应的groupType
       currentPage: 1, //当前的页数
-      pageSize: 10, //每页的个数
+      limit: 10, //每页的个数
       totalNumber: 0, //总条数
     };
   },
@@ -239,7 +239,7 @@ export default {
       this.curtainData = [];
       GetCurtainByCondition({
         keywords: this.searchKey.toUpperCase(),
-        limit: this.pageSize,
+        limit: this.limit,
         page: this.currentPage,
       })
         .then((res) => {

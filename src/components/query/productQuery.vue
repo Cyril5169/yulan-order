@@ -40,7 +40,7 @@
           </el-table-column>
         </el-table>
         <el-pagination style="margin:0 20%;" @current-change="handleCurrentChange" :current-page.sync="currentPage"
-          :page-size="pageSize" layout="total, prev, pager, next, jumper" :total="totalNumber"></el-pagination>
+          :page-size="limit" layout="total, prev, pager, next, jumper" :total="totalNumber"></el-pagination>
       </div>
     </el-card>
   </div>
@@ -57,7 +57,7 @@ export default {
       finishTime: "",
       productData: [],
       currentPage: 1,
-      pageSize: 15,
+      limit: 15,
       totalNumber: 0,
     };
   },
@@ -127,7 +127,7 @@ export default {
         beginTime: this.beginTime,
         finishTime: this.finishTime,
         condition: this.condition,
-        limit: this.pageSize,
+        limit: this.limit,
         page: this.currentPage,
       };
       if (!data.beginTime) {

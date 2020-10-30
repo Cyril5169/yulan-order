@@ -23,7 +23,7 @@
         <el-table-column label="非普通出后贸易价" prop="PRICE_ADVISE_CK2" width="130" align="center"></el-table-column>
       </el-table>
       <el-pagination style="margin:0 30%;" @current-change="handleCurrentChange" :current-page.sync="currentPage"
-        :page-size="pageSize" layout="total, prev, pager, next, jumper" :total="totalNumber">
+        :page-size="limit" layout="total, prev, pager, next, jumper" :total="totalNumber">
       </el-pagination>
     </el-card>
   </div>
@@ -32,8 +32,9 @@
 <script>
 import {
   GetProductVersionData,
-  GetLimitPriceByProVersio,
+  GetLimitPriceByProVersion,
 } from "@/api/itemInfoASP";
+
 export default {
   data() {
     return {
@@ -41,7 +42,7 @@ export default {
       productKey: "",
       shopsData: [],
       currentPage: 1, //当前的页数
-      pageSize: 12, //每页的个数
+      limit: 12, //每页的个数
       totalNumber: 0, //总条数
     };
   },
@@ -58,9 +59,9 @@ export default {
     },
     searchShops() {
       this.shopsData = [];
-      GetLimitPriceByProVersio({
+      GetLimitPriceByProVersion({
         productVersion: this.productKey,
-        limit: this.pageSize,
+        limit: this.limit,
         page: this.currentPage,
       }).then((res) => {
         this.shopsData = res.data;

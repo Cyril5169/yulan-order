@@ -11,7 +11,7 @@
       </el-tab-pane>
       <shopTab :tableData="tableData" :numberList="numberList"></shopTab>
       <el-pagination style="margin:0 10%;" @size-change="handleSizeChange" @current-change="handleCurrentChange"
-        :current-page.sync="currentPage" :page-size="pageSize" layout="total, prev, pager, next, jumper"
+        :current-page.sync="currentPage" :page-size="limit" layout="total, prev, pager, next, jumper"
         :total="totalNumber">
       </el-pagination>
     </el-tabs>
@@ -69,7 +69,7 @@ export default {
         },
       ],
       currentPage: 1, //当前的页数
-      pageSize: 10, //每页的个数
+      limit: 10, //每页的个数
       totalNumber: 0, //总条数
     };
   },
@@ -126,7 +126,7 @@ export default {
         keywords: this.searchKey.toUpperCase(),
         cid: this.cid,
         page: this.currentPage,
-        limit: this.pageSize,
+        limit: this.limit,
       })
         .then((res) => {
           this.tableData = this.unique(res.data);

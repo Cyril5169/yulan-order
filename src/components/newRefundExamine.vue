@@ -92,7 +92,7 @@
           </el-table-column>
         </el-table>
         <el-pagination style="width: 100%;" class="dib tc" @current-change="handleCurrentChange"
-          :current-page.sync="currentPage" :page-size="pageSize" layout="total, prev, pager, next, jumper"
+          :current-page.sync="currentPage" :page-size="limit" layout="total, prev, pager, next, jumper"
           :total="allNum">
         </el-pagination>
       </div>
@@ -889,7 +889,7 @@ export default {
       tableData: [], //表格数据
       allNum: 0, //表格总共有几条数据
       currentPage: 1, //当前页数
-      pageSize: 10, //每页最多显示数量
+      limit: 10, //每页最多显示数量
       submit: [],
       returnInfo: [],
       processDetail: [], //玉兰处理结果表明细
@@ -1067,7 +1067,7 @@ export default {
       let obj = {
         CID: this.CID,
         page: this.currentPage, //第几页
-        number: this.pageSize, //一页有多少数据
+        number: this.limit, //一页有多少数据
         startDate: this.beginTime, //开始日期
         endDate: this.finishTime, //结束日期
         state: this.SELECT_STATUS, //状态

@@ -280,21 +280,21 @@ import { getShipment } from "@/api/orderList";
 import {
   getPackDetailInfo,
   getReturnInfo,
-  getCompanyInfo
+  getCompanyInfo,
 } from "@/api/orderListASP";
 import {
   InsertCompensation,
   UpdateState,
   CheckOrderAndItemNo,
-  NewUploadFiles
+  NewUploadFiles,
 } from "@/api/paymentASP";
 import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
 export default {
   data() {
     return {
-      fileList:[],//按实际上传到服务器中的存储客户意见的附件
-      uploadSuccessNum:0,//上传成功的文件数
+      fileList: [], //按实际上传到服务器中的存储客户意见的附件
+      uploadSuccessNum: 0, //上传成功的文件数
       tableData: [],
       submitHead: [], //存储退货单单据信息的表
       submit: [], //存储货物信息的表
@@ -327,55 +327,55 @@ export default {
       typeArray: [
         {
           label: "晚点",
-          value: "晚点"
+          value: "晚点",
         },
         {
           label: "破损",
-          value: "破损"
+          value: "破损",
         },
         {
           label: "丢失",
-          value: "丢失"
+          value: "丢失",
         },
         {
           label: "服务",
-          value: "服务"
+          value: "服务",
         },
         {
           label: "其他",
-          value: "其他"
-        }
+          value: "其他",
+        },
       ],
       returnArray: [
         //退货方式
         {
           label: "玉兰取货",
-          value: "玉兰取货"
+          value: "玉兰取货",
         },
         {
           label: "客户邮寄",
-          value: "客户邮寄"
+          value: "客户邮寄",
         },
         {
           label: "无需退货",
-          value: "无需退货"
-        }
+          value: "无需退货",
+        },
       ],
       processArray: [
         //退货方式
         {
           label: "赔偿",
-          value: "赔偿"
+          value: "赔偿",
         },
         {
           label: "退货",
-          value: "退货"
+          value: "退货",
         },
         {
           label: "无质量问题",
-          value: "无质量问题"
-        }
-      ]
+          value: "无质量问题",
+        },
+      ],
     };
   },
   props: ["orderNo", "itemNo", "lineNo", "PRODUCT", "UNIT"],
@@ -396,7 +396,7 @@ export default {
       let s = date.getSeconds();
       s = s < 10 ? "0" + s : s;
       return y + "-" + MM + "-" + d + " "; /* + h + ':' + m + ':' + s; */
-    }
+    },
   },
   methods: {
     //查看物流
@@ -421,20 +421,20 @@ export default {
           QTY: "",
           NOTES: "",
           PROCESS: "",
-          MONEY: ""
-        }
+          MONEY: "",
+        },
       ];
       var data = {
         orderNo: this.orderNo,
         lineNo: this.lineNo,
-        itemNo: this.itemNo
+        itemNo: this.itemNo,
       };
       getPackDetailInfo(data)
-        .then(res => {
+        .then((res) => {
           this.tableData = res.data[0].packDetails;
           this.zongshuliang = res.data[0].allCount;
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -469,7 +469,7 @@ export default {
           DAMAGED_QUANTITY: "", //货物损坏数量
           C_TRANSBILL: "", //物流单号
           DINGDANHAO: "", //b2b订单号
-          SALENO: "" //产品型号
+          SALENO: "", //产品型号
         }),
         (this.submit.DINGDANHAO = this.orderNo);
       this.submit.SALENO = this.itemNo;
@@ -489,7 +489,7 @@ export default {
       ) {
         this.$alert("请完善信息", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -509,7 +509,7 @@ export default {
       ) {
         this.$alert("填写数量必须小于下单数量", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -520,22 +520,21 @@ export default {
       ) {
         this.$alert("填写数量必须为正数", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
-      console.log(data);
-      addSubmit(data).then(res => {
+      addSubmit(data).then((res) => {
         if (res.code == 0) {
           this.$alert("提交成功", "提示", {
             confirmButtonText: "确定",
-            type: "success"
+            type: "success",
           });
           this.init_shipment();
         } else {
           this.$alert("提交失败，请稍后重试", "提示", {
             confirmButtonText: "确定",
-            type: "warning"
+            type: "warning",
           });
         }
       });
@@ -544,9 +543,9 @@ export default {
     //初始化新增记录的信息
     addRefund(data) {
       this.dateStamp = new Date().getTime();
-      this.FormRight = true;  
+      this.FormRight = true;
       this.uploadSuccessNum = 0;
-      this.fileList=[];
+      this.fileList = [];
       this.fileNumber = 0;
       this.fileNameList = [];
       this.submitHead = {
@@ -566,7 +565,7 @@ export default {
         REASSURE_TS: "", //签订日期
         DEALMAN_CODE: "",
         DEAL_TS: "",
-        DEALMAN_NAME: ""
+        DEALMAN_NAME: "",
       };
       this.submit = {
         RTCB_ID: "", //退货单ID
@@ -585,7 +584,7 @@ export default {
         NOTE: "", //类型
         fileList: [], //附件列表
         ATTACHMENT_FILE: "", //附件
-        ATTACHMENT_FILE_FOLDER: "" //附件文件夹
+        ATTACHMENT_FILE_FOLDER: "", //附件文件夹
       };
       this.submit.orderNo = this.orderNo;
       this.submit.ITEM_NO = this.itemNo;
@@ -595,8 +594,8 @@ export default {
       getReturnInfo({
         companyId: this.companyId,
         SALE_NO: this.submit.SALE_NO,
-        ITEM_NO: this.submit.ITEM_NO
-      }).then(res => {
+        ITEM_NO: this.submit.ITEM_NO,
+      }).then((res) => {
         if (res.code == 0) {
           this.companyName = res.data[0].CUSTOMER_NAME;
           this.CONTRACT_NO = res.data[0].CONTRACT_NO;
@@ -609,7 +608,7 @@ export default {
     //新建一条售后记录
     addRefundRecord(data) {
       CheckOrderAndItemNo({ SALE_NO: data.SALE_NO, ITEM_NO: this.itemNo }).then(
-        res => {
+        (res) => {
           if (res.data.length != 0) {
             this.$confirm(
               "此前已对该订单该型号发起退货赔偿申请，是否要再次申请",
@@ -617,7 +616,7 @@ export default {
               {
                 confirmButtonText: "确定",
                 cancelButtonText: "取消",
-                type: "warning"
+                type: "warning",
               }
             ).then(() => {
               this.addRefund(data);
@@ -625,7 +624,6 @@ export default {
           } else {
             this.addRefund(data);
           }
-          console.log(res);
         }
       );
     },
@@ -640,7 +638,7 @@ export default {
       ) {
         this.$alert("请完善信息", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -648,14 +646,14 @@ export default {
       if (this.submit.QTY > this.zongshuliang) {
         this.$alert("填写数量必须小于下单数量", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
       if (this.submit.QTY <= 0) {
         this.$alert("填写数量必须为正数", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -663,7 +661,7 @@ export default {
       if (this.submit.fileList.length == 0) {
         this.$alert("请上传相关附件", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -671,7 +669,7 @@ export default {
       if (this.FormRight == false) {
         this.$alert("提交失败，附件仅能上传图片或视频", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -682,7 +680,7 @@ export default {
       if (this.processDetail.length >= this.submit.QTY) {
         this.$alert("已经达到编辑项的上限", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       } else {
@@ -692,7 +690,7 @@ export default {
           QTY: "",
           NOTES: "",
           PROCESS: "",
-          MONEY: ""
+          MONEY: "",
         });
       }
     },
@@ -701,7 +699,7 @@ export default {
       if (this.processDetail.length == 1) {
         this.$alert("必须至少有一项该类信息", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       } else {
@@ -736,11 +734,11 @@ export default {
         list7.length > 1 ||
         list8.length > 1 ||
         list9.length > 1 ||
-        list10.length > 1||
-        list11.length > 1||
-        list12.length > 1||
-        list13.length > 1||
-        list14.length > 1||
+        list10.length > 1 ||
+        list11.length > 1 ||
+        list12.length > 1 ||
+        list13.length > 1 ||
+        list14.length > 1 ||
         list15.length > 1
       ) {
         this.FormRight = true;
@@ -751,7 +749,7 @@ export default {
         this.submit.fileList = [];
         this.$alert("请上传图片、视频或文档，否则无法成功提交", "提示", {
           confirmButtonText: "确定",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
@@ -789,15 +787,15 @@ export default {
       this.submitHead.SALE_NO = this.submit.SALE_NO;
       this.submitHead.ORDER_NO = this.orderNo;
       InsertCompensation({ head: this.submitHead, details: this.submit })
-        .then(res => {
+        .then((res) => {
           UpdateState({
             id: res.data.ID,
-            state: "SUBMITTED"
+            state: "SUBMITTED",
           })
-            .then(res => {
+            .then((res) => {
               this.$alert("提交成功", "提示", {
                 type: "success",
-                confirmButtonText: "好的"
+                confirmButtonText: "好的",
               });
             })
             .catch(() => {
@@ -806,10 +804,10 @@ export default {
           this.init_shipment();
           this.RefundDetail = false;
         })
-        .catch(err => {
+        .catch((err) => {
           this.$alert("添加失败", "提示", {
             type: "warning",
-            confirmButtonText: "好的"
+            confirmButtonText: "好的",
           }).catch(() => {});
         });
     },
@@ -836,17 +834,17 @@ export default {
           CID: this.companyId,
           dateStamp: this.dateStamp,
           dateString: this.dateString,
-          type: "customer"
-        }
+          type: "customer",
+        },
       })
-        .then(res => {
+        .then((res) => {
           if (res.code == 0) {
             this.fileList.push(res.data);
             this.uploadSuccessNum += 1;
             if (this.uploadSuccessNum == this.submit.fileList.length) {
               if (this.isRefundAdd) {
                 this.sumbitNEWANSYC();
-              } 
+              }
             }
           }
         })
@@ -854,14 +852,14 @@ export default {
         .catch(() => {});
     },
     ...mapMutations("navTabs", ["addTab"]),
-    ...mapActions("navTabs", ["closeTab", "closeToTab"])
+    ...mapActions("navTabs", ["closeTab", "closeToTab"]),
   },
-  activated: function() {
+  activated: function () {
     this.init_shipment();
   },
   created() {
     this.GetNowDate();
-  }
+  },
 };
 </script>
 

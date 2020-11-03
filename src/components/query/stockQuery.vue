@@ -29,12 +29,12 @@
               <span>库存信息：</span>
             </div>
             <div>
-              <el-table style="width:100%;" :data="stockData" height="180px">
+              <el-table style="width:100%;" :data="stockData" height="180px" >
                 <el-table-column prop="NOTE" label="仓库名称" align="center" width="180">
                 </el-table-column>
                 <el-table-column prop="ITEM_NO" label="型号" align="center" width="100">
                 </el-table-column>
-                <el-table-column prop="BATCH_NO" label="批号" align="center" width="150">
+                <el-table-column prop="BATCH_NO" label="批号" align="center" width="160">
                 </el-table-column>
                 <el-table-column prop="PRODUCTVERSION_NAME" label="版本名称" align="center" width="100">
                 </el-table-column>
@@ -156,7 +156,7 @@
       <el-table style="width:100%;" :data="allocateData">
         <el-table-column prop="ITEM_NO" label="型号" align="center" width="100">
         </el-table-column>
-        <el-table-column prop="BATCH_NO" label="批号" align="center" width="150">
+        <el-table-column prop="BATCH_NO" label="批号" align="center" width="160">
         </el-table-column>
         <el-table-column prop="NOTE" label="库房名称" align="center" width="150">
         </el-table-column>
@@ -594,7 +594,7 @@ export default {
         userId: userInfo.userId,
       };
       //按行查询库存
-      GetStockDataByItemNoAndUser(data_1, { loading: false })
+      GetStockDataByItemNoAndUser(data_1)
         .then((res) => {
           this.stockData = res.data;
         })

@@ -1,67 +1,47 @@
 <template>
   <div>
     <el-card shadow="hover">
-      <el-dialog
-        title="订单详情"
-        :show-close="true"
-        :visible.sync="dialogVisible"
-        width="65%"
-      >
+      <el-dialog title="订单详情" :show-close="true" :visible.sync="dialogVisible" width="65%">
         <dialogOrderDetail :ruleForm="ruleForm"></dialogOrderDetail>
       </el-dialog>
-      <div class="block">
+      <div class="tbar">
         <span>选择月份：</span>
-        <el-date-picker
-          :picker-options="pickerOptions1"
-          v-model="date1"
-          type="month"
-          placeholder="请选择月份"
-          value-format="yyyy-MM-dd"
-        ></el-date-picker
-        >&nbsp;至
-        <el-date-picker
-          :picker-options="pickerOptions2"
-          v-model="date2"
-          type="month"
-          placeholder="请选择月份"
-          value-format="yyyy-MM-dd"
-        ></el-date-picker>
-        <el-button
-          @click="searchByMonth()"
-          slot="append"
-          type="success"
-          icon="el-icon-search"
-          >搜索</el-button
-        >
+        <el-date-picker size="mini" style="width:120px;" :picker-options="pickerOptions1" v-model="date1" type="month"
+          placeholder="请选择月份" value-format="yyyy-MM-dd"></el-date-picker>&nbsp;至
+        <el-date-picker size="mini" style="width:120px;" :picker-options="pickerOptions2" v-model="date2" type="month"
+          placeholder="请选择月份" value-format="yyyy-MM-dd"></el-date-picker>
+        <el-button @click="searchByMonth()" slot="append" size="mini" type="success" icon="el-icon-search">搜索
+        </el-button>
+        <div class="yearArea">
+          <div style="text-align:center;">
+            <el-select size="mini" v-model="selectYear" style="width:80px;" @change="searchByYear">
+              <el-option v-for="item in 85" :key="item+2015" :value="item+2015" :label="item+2015"></el-option>
+            </el-select>
+            年任务查询
+          </div>
+          <div class="task-area">
+            <span
+              class="year-task-item">{{selectYear}}年协议年任务:{{yearData.ASSIGNMENTS_TARGET?yearData.ASSIGNMENTS_TARGET:'无'}}</span>
+            <span class="year-task-item">{{selectYear}}年实付总额:{{yearData.ALL_SPEND}}</span>
+            <span
+              class="year-task-item">{{selectYear}}年年任务完成差额:{{(yearData.ASSIGNMENTS_TARGET - yearData.ALL_SPEND) | dosageFilter}}</span>
+            <span class="year-task-item">{{(yearData.ASSIGNMENTS_TARGET - yearData.ALL_SPEND) <= 0? '已完成':'未完成'}}</span>
+          </div>
+        </div>
       </div>
       <div>
         <p class="fstrong f16" style="margin-top:10px;">订单信息汇总表:</p>
       </div>
-      <el-table
-        :data="tableData"
-        border
-        :summary-method="getSummaries"
-        :row-class-name="tableRowClassName"
-        show-summary
-        style="width: 100%; margin-top:10px"
-      >
+      <el-table :data="tableData" border :summary-method="getSummaries" :row-class-name="tableRowClassName" show-summary
+        style="width: 100%; margin-top:10px">
         <el-table-column>
-          <el-table-column
-            prop="WEB_TJ_TIME"
-            width="160"
-            label="提交时间"
-            align="center"
-          ></el-table-column>
+          <el-table-column prop="WEB_TJ_TIME" width="160" label="提交时间" align="center"></el-table-column>
         </el-table-column>
-        <el-table-column :label="tableHead1">
+        <el-table-column :render-header="renderFirstHead">
           <el-table-column label="订单号" align="center">
             <template slot-scope="scope1">
-              <el-button
-                @click="openDialog(scope1.row.ORDER_NO, scope1.row.STATUS_ID)"
-                type="text"
-                size="medium"
-                >{{ scope1.row.ORDER_NO }}</el-button
-              >
+              <el-button @click="openDialog(scope1.row.ORDER_NO, scope1.row.STATUS_ID)" type="text" size="medium">
+                {{ scope1.row.ORDER_NO }}</el-button>
             </template>
           </el-table-column>
           <el-table-column label="订单状态" align="center">
@@ -70,42 +50,26 @@
             </template>
           </el-table-column>
         </el-table-column>
-        <el-table-column :label="tableHead2">
+        <el-table-column>
           <template slot="header">
             <span style="color:red;">{{ tableHead2 }}</span>
           </template>
-          <el-table-column
-            prop="sumMoney"
-            label="订单金额"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            prop="ALLBACK_Y"
-            label="年返利使用金额"
-            align="center"
-          ></el-table-column>
+          <el-table-column prop="sumMoney" label="订单金额" align="center"></el-table-column>
+          <el-table-column prop="ALLBACK_Y" label="年返利使用金额" align="center"></el-table-column>
         </el-table-column>
-        <el-table-column :label="tableHead3">
+        <el-table-column>
           <template slot="header">
             <span style="color:red;">{{ tableHead3 }}</span>
           </template>
-          <el-table-column
-            prop="ALLBACK_M"
-            label="月返利使用金额"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            prop="ALL_SPEND"
-            label="实付金额"
-            align="center"
-          ></el-table-column>
+          <el-table-column prop="ALLBACK_M" label="月返利使用金额" align="center"></el-table-column>
+          <el-table-column prop="ALL_SPEND" label="实付金额" align="center"></el-table-column>
         </el-table-column>
         <el-table-column>
-          <el-table-column
-            prop="REBATE_MONEY"
-            label="返利金额"
-            align="center"
-          ></el-table-column>
+          <template slot="header">
+            <span style="color:red;" v-if="assignmentsReduce > 0">未完成</span>
+            <span style="color:green;" v-else>已完成</span>
+          </template>
+          <el-table-column prop="REBATE_MONEY" label="返利金额" align="center"></el-table-column>
           <el-table-column label="备注" align="center">
             <template slot-scope="scope1">
               <span>{{ scope1.row.REBATE_NOTES }}</span>
@@ -121,7 +85,7 @@ import Axios from "axios";
 import Cookies from "js-cookie";
 import dialogOrderDetail from "../components/order/dialogOrderDetail";
 import { searchAssignments, orderDetail } from "@/api/orderList";
-import { GetTaskProgress } from "@/api/orderListASP";
+import { GetTaskProgress, GetYearTaskProgress } from "@/api/orderListASP";
 import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
 export default {
@@ -133,34 +97,44 @@ export default {
       dialogVisible: false,
       date1: "",
       date2: "",
+      selectYear: new Date().getFullYear(),
       tableData: [],
+      yearData: [],
       assignments: "",
       assignmentsTarget: "",
       assignmentsReduce: "",
+      allSpanSum: 0,
       tableHead1: "",
       tableHead2: "",
       tableHead3: "",
       pickerOptions1: {
-        disabledDate: date1 => {
+        disabledDate: (date1) => {
           if (this.date2) {
-            return date1.getTime() >= new Date(this.date2).getTime();
+            return (
+              date1.getTime() >= new Date(this.date2).getTime() ||
+              date1.getFullYear() != this.selectYear
+            );
           }
-        }
+        },
       },
       pickerOptions2: {
-        disabledDate: date2 => {
+        disabledDate: (date2) => {
           if (this.date1) {
-            return date2.getTime() <= new Date(this.date1).getTime();
+            return (
+              date2.getTime() <= new Date(this.date1).getTime() ||
+              date2.getFullYear() != this.selectYear
+            );
           }
-        }
-      }
+        },
+      },
     };
   },
-  created: function() {
+  created: function () {
     this.initMonth();
+    this.searchByYear();
   },
   components: {
-    dialogOrderDetail
+    dialogOrderDetail,
   },
   methods: {
     openDialog(val, status) {
@@ -189,8 +163,8 @@ export default {
           sums[index] = "总计";
           return;
         }
-        const values = data.map(item => Number(item[column.property]));
-        if (!values.every(value => isNaN(value))) {
+        const values = data.map((item) => Number(item[column.property]));
+        if (!values.every((value) => isNaN(value))) {
           sums[index] = values.reduce((prev, curr) => {
             const value = Number(curr);
             if (!isNaN(value)) {
@@ -213,9 +187,9 @@ export default {
       let url = "/order/getOrderContent.do";
       let data = {
         cid: this.cid,
-        order_no: this.order_no
+        order_no: this.order_no,
       };
-      orderDetail(url, data).then(res => {
+      orderDetail(url, data).then((res) => {
         this.ruleForm = res.data.data[0];
         this.dialogVisible = true;
       });
@@ -239,26 +213,37 @@ export default {
         month: month,
         endMonth: endMonth,
         cid: Cookies.get("cid"),
-        companyId: Cookies.get("companyId")
+        companyId: Cookies.get("companyId"),
       };
-      //searchAssignments(url, data)
-      GetTaskProgress(data).then(res => {
+      GetTaskProgress(data).then((res) => {
         let zoom = res.data[0].orders;
-        let reduce = 0;
+        this.allSpanSum = 0;
         for (let i = 0; i < zoom.length; i++) {
-          zoom[i].sumMoney =
-            zoom[i].ALL_SPEND.add(zoom[i].ALLBACK_Y).add(zoom[i].ALLBACK_M);
-          reduce = reduce.add(zoom[i].ALL_SPEND);
+          zoom[i].sumMoney = zoom[i].ALL_SPEND.add(zoom[i].ALLBACK_Y).add(
+            zoom[i].ALLBACK_M
+          );
+          this.allSpanSum = this.allSpanSum.add(zoom[i].ALL_SPEND);
         }
         this.tableData = zoom;
         if (res.data[0].assignments) {
           this.assignments = res.data[0].assignments.ASSIGNMENTS;
           this.assignmentsTarget = res.data[0].assignments.ASSIGNMENTS_TARGET;
-          this.assignmentsReduce = (this.assignmentsTarget - reduce).toFixed(2);
+          this.assignmentsReduce = (
+            this.assignmentsTarget - this.allSpanSum
+          ).toFixed(2);
           this.tHead();
         } else {
           this.tableHead1 = "所选月无任务";
         }
+      });
+    },
+    searchByYear() {
+      this.yearData = [];
+      GetYearTaskProgress({
+        year: this.selectYear,
+        cid: Cookies.get("cid"),
+      }).then((res) => {
+        this.yearData = res.data[0];
       });
     },
     //隔行变色
@@ -292,13 +277,16 @@ export default {
       this.date1 == this.date2
         ? this.date1.slice(5, 7) + "月"
         : this.date1.slice(5, 7) + "-" + this.date2.slice(5, 7) + "月总";
-      this.tableHead1 = `${selectMonth}协议月任务：${this.assignments}`;
-      this.tableHead2 = `${selectMonth}促销目标任务：${this.assignmentsTarget}`;
+      this.tableHead1 = `${selectMonth}促销目标任务：${this.assignmentsTarget}`;
+      this.tableHead2 = `${selectMonth}实付总额：${this.allSpanSum}`;
       this.tableHead3 = `任务完成差额：${this.assignmentsReduce}`;
-    }
+    },
+    renderFirstHead(h) {
+      return h("span", { attrs: { style: "color:red" } }, this.tableHead1);
+    },
   },
   filters: {
-    transStatus: function(value) {
+    transStatus: function (value) {
       switch (value) {
         case "0":
           return "窗帘待审核";
@@ -328,15 +316,27 @@ export default {
           return "已完成";
           break;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 <style scoped>
-.headSpan {
-  font-weight: bold;
-  font-size: 18px;
-  color: black;
+.yearArea {
+  display: inline-block;
+  width: calc(100% - 450px);
+  padding: 10px 0;
+  border: 1px solid gray;
+  vertical-align: top;
+}
+.task-area {
+  display: flex;
+  margin-top: 10px;
+  font-size: 13px;
+  color: orange;
+}
+.year-task-item {
+  flex: 1;
+  text-align: center;
 }
 </style>
 

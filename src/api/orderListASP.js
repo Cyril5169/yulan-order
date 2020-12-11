@@ -143,6 +143,13 @@ export function GetTaskProgress(data, config = {}) {
         return Promise.reject(err);
     })
 }
+export function GetYearTaskProgress(data, config = {}) {
+    return post('/CTM_ORDER/GetYearTaskProgress', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
 //上传购买人图片
 export function UploadBuyUserFiles(data, config = {}) {
     return post('/CTM_ORDER/UploadBuyUserFiles', data, config).then((res) => {

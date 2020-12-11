@@ -392,6 +392,11 @@
         <el-table-column align="center" prop="BRAND_NAME" label="品牌"></el-table-column>
         <el-table-column align="center" prop="NOTE" label="类型" width="100"></el-table-column>
         <el-table-column prop="PRODUCTION_VERSION" align="center" label="所属版本" width="120"></el-table-column>
+        <el-table-column label="销售状态" align="center">
+          <template slot-scope="scope">
+            <span>{{ scope.row.SALE_ID | transSaleId }}</span>
+          </template>
+        </el-table-column>
         <el-table-column align="center" prop="QTY_REQUIRED" label="数量" width="90"></el-table-column>
         <el-table-column prop="PROMOTION" align="center" label="活动" show-overflow-tooltip></el-table-column>
         <el-table-column label="总价" align="center" width="130">
@@ -481,6 +486,7 @@ import {
 } from "@/api/curtain";
 import { GetDosageByNo } from "@/api/itemInfoASP";
 import {
+  getOrderDetails,
   updateCurtainOrder,
   getOperationRecord,
   getCustomerInfo,
@@ -604,6 +610,28 @@ export default {
       let s = date.getSeconds();
       s = s < 10 ? "0" + s : s;
       return y + "-" + MM + "-" + d + " " + h + ":" + m + ":" + s;
+    },
+    transSaleId(value) {
+      switch (value) {
+        case "A":
+          return "销售";
+          break;
+        case "B":
+          return "待淘汰";
+          break;
+        case "C":
+          return "淘汰";
+          break;
+        case "D":
+          return "内留";
+          break;
+        case "E":
+          return "外留";
+          break;
+        case "F":
+          return "永久淘汰";
+          break;
+      }
     },
   },
   methods: {
@@ -764,13 +792,15 @@ export default {
       });
     },
     getDetail() {
-      let url = "/order/getOrderContent.do";
-      let data = {
-        cid: Cookies.get("cid"),
-        order_no: Cookies.get("ORDER_NO"),
-      };
-      orderDetail(url, data).then((res) => {
-        this.ruleForm = res.data.data[0];
+      // let url = "/order/getOrderContent.do";
+      // let data = {
+      //   cid: Cookies.get("cid"),
+      //   order_no: Cookies.get("ORDER_NO"),
+      // };
+      //orderDetail(url, data).then((res) => {
+      //  this.ruleForm = res.data.data[0];
+      getOrderDetails({ orderNo: Cookies.get("ORDER_NO") }).then((res) => {
+        this.ruleForm = res.data[0];
         this.getCustomer();
         for (let i = 0; i < this.ruleForm.ORDERBODY.length; i++) {
           this.ruleForm.ORDERBODY[i].checkStatus = "未修改";
@@ -1084,7 +1114,8 @@ export default {
         if (gyData.length) {
           gyData = gyData[0];
           if (this.chooseBig[rowIndex][1] && !this.chooseBig[rowIndex][2]) {
-            gyData.note = "已取消购买帘身配布;" + (gyData.note==null?"":gyData.note);
+            gyData.note =
+              "已取消购买帘身配布;" + (gyData.note == null ? "" : gyData.note);
           } else {
             gyData.note = gyData.note.replace("已取消购买帘身配布;", " ");
           }

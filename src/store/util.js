@@ -61,7 +61,6 @@ export function tabsName(index) {
       return "软装详情";
     case "order/examine":
       return "审核订单";
-    case "order/examineDetail":
     case "order/examineDetailNew":
       return "审核详情";
     case "order/checkExamine":

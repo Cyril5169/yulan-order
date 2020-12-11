@@ -22,8 +22,8 @@
       </el-input>
     </div>
     <div id="outDiv">
-      <el-card style="position:relative;" v-for="(item, index) of data" :key="index">
-        <div slot="header">
+      <el-card style="position:relative;" v-for="(item, index) of tableData" :key="index">
+        <div slot="header" @dblclick="item.collapse=!item.collapse">
           <i style="float: right;color:#20a0ff;line-height: 35px;cursor: pointer;"
             :class="[item.collapse?'el-icon-caret-bottom':'el-icon-caret-top']"
             @click="item.collapse=!item.collapse"></i>
@@ -86,6 +86,11 @@
                 <template slot-scope="scope1">
                   <span v-if="scope1.row.NOTE == '帘头'">定制窗帘</span>
                   <span v-else>{{ scope1.row.NOTE }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="销售状态" align="center">
+                <template slot-scope="scope1">
+                  <span>{{ scope1.row.SALE_ID | transSaleId }}</span>
                 </template>
               </el-table-column>
               <el-table-column label="数量" align="center">
@@ -166,7 +171,7 @@ export default {
   name: "examine",
   data() {
     return {
-      data: [],
+      tableData: [],
       date1: "",
       date2: "",
       find: "",
@@ -296,6 +301,28 @@ export default {
           break;
       }
     },
+    transSaleId(value) {
+      switch (value) {
+        case "A":
+          return "销售";
+          break;
+        case "B":
+          return "待淘汰";
+          break;
+        case "C":
+          return "淘汰";
+          break;
+        case "D":
+          return "内留";
+          break;
+        case "E":
+          return "外留";
+          break;
+        case "F":
+          return "永久淘汰";
+          break;
+      }
+    },
   },
   methods: {
     showExportProduct(row) {
@@ -387,47 +414,8 @@ export default {
           return;
         });
     },
-    //[新]获取审核订单
-    // getorderList() {
-    //   let url = "/order/gatAllCurOrders.do";
-    //   let data = {
-    //     limit: this.orderType?this.limit:100000,
-    //     page: this.orderType?this.currentPage:1,
-    //     find: this.find,
-    //     beginTime: this.date1,
-    //     finishTime: this.date2,
-    //     curtainStatusId: this.orderType
-    //   };
-    //   if (data.beginTime == "") {
-    //     data.beginTime = "0001/1/1";
-    //   }
-    //   if (data.finishTime == "") {
-    //     data.finishTime = "9999/12/31";
-    //   } else {
-    //     data.finishTime = data.finishTime + " 23:59:59";
-    //   }
-    //   getOrderlist(url,data).then(res => {
-    //     //不改后台的情况下筛选不同页签的数据
-    //     var allData = res.data;
-    //     var filter = [];
-    //     switch(this.activeName)
-    //     {
-    //       case "unCheck":
-    //            filter  = allData.filter(item =>item.CURTAIN_STATUS_ID =='0'||item.CURTAIN_STATUS_ID=='3');
-    //            break;
-    //            case "customCheck":
-    //              filter  = allData.filter(item =>item.CURTAIN_STATUS_ID =='1'||item.CURTAIN_STATUS_ID=='2');
-    //              break;
-    //              case "checked":
-    //             filter  = allData.filter(item =>item.CURTAIN_STATUS_ID =='4');
-    //              break;
-    //     }
-    //     this.count = filter.length;
-    //     this.data = [];
-    //     this.data = filter.slice(this.currentPage*5 -5,this.currentPage *5);
-    //   });
-    // },
     getorderList() {
+      this.tableData = [];
       let data = {
         limit: this.limit,
         page: this.currentPage,
@@ -449,8 +437,7 @@ export default {
       //新后台
       getCurtainOrders(data).then((res) => {
         this.count = res.count;
-        this.data = [];
-        this.data = res.data;
+        this.tableData = res.data;
       });
     },
     //标签页切换

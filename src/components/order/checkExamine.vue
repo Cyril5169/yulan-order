@@ -536,11 +536,6 @@ export default {
       this.passORback = true;
     },
     getDetail() {
-      let url = "/order/getOrderContent.do";
-      let data = {
-        cid: Cookies.get("cid"),
-        order_no: this.orderNum,
-      };
       getOrderDetails({ orderNo: this.orderNum }).then((res) => {
         this.ruleForm = res.data[0];
         if (

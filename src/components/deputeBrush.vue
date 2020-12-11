@@ -4,7 +4,35 @@
       <el-dialog title="订单详情" :show-close="true" :visible.sync="dialogVisible" width="65%">
         <dialogOrderDetail :ruleForm="ruleForm"></dialogOrderDetail>
       </el-dialog>
-      <div class="tbar">
+
+      <div class="yearArea">
+        <table class="task-area">
+          <tr>
+            <td width="160">
+              <el-select size="mini" v-model="selectYear" style="width:75px;" @change="searchByYear">
+                <el-option v-for="item in 85" :key="item+2015" :value="item+2015" :label="item+2015"></el-option>
+              </el-select>
+              <span style="font-size:14px;">年任务查询</span>
+            </td>
+            <td width="22%">
+              <span class="year-task-item">{{selectYear}}年协议年任务:{{yearData.ASSIGNMENTS?yearData.ASSIGNMENTS:'无'}}</span>
+            </td>
+            <td width="22%">
+              <span class="year-task-item">{{selectYear}}年实付总额:{{yearData.ALL_SPEND}}</span>
+            </td>
+            <td width="22%">
+              <span
+                class="year-task-item">{{selectYear}}年年任务完成差额:{{(yearData.ASSIGNMENTS - yearData.ALL_SPEND) | dosageFilter}}</span>
+            </td>
+            <td>
+              <span class="year-task-item" v-if="(yearData.ASSIGNMENTS - yearData.ALL_SPEND) > 0">未完成</span>
+              <span class="year-task-item" style="color: green;" v-else>已完成</span>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div>
+        <span class="fstrong f16" style="margin-right:20px;">订单信息汇总表:</span>
         <span>选择月份：</span>
         <el-date-picker size="mini" style="width:120px;" :picker-options="pickerOptions1" v-model="date1" type="month"
           placeholder="请选择月份" value-format="yyyy-MM-dd"></el-date-picker>&nbsp;至
@@ -12,25 +40,7 @@
           placeholder="请选择月份" value-format="yyyy-MM-dd"></el-date-picker>
         <el-button @click="searchByMonth()" slot="append" size="mini" type="success" icon="el-icon-search">搜索
         </el-button>
-        <div class="yearArea">
-          <div style="text-align:center;">
-            <el-select size="mini" v-model="selectYear" style="width:80px;" @change="searchByYear">
-              <el-option v-for="item in 85" :key="item+2015" :value="item+2015" :label="item+2015"></el-option>
-            </el-select>
-            年任务查询
-          </div>
-          <div class="task-area">
-            <span
-              class="year-task-item">{{selectYear}}年协议年任务:{{yearData.ASSIGNMENTS_TARGET?yearData.ASSIGNMENTS_TARGET:'无'}}</span>
-            <span class="year-task-item">{{selectYear}}年实付总额:{{yearData.ALL_SPEND}}</span>
-            <span
-              class="year-task-item">{{selectYear}}年年任务完成差额:{{(yearData.ASSIGNMENTS_TARGET - yearData.ALL_SPEND) | dosageFilter}}</span>
-            <span class="year-task-item">{{(yearData.ASSIGNMENTS_TARGET - yearData.ALL_SPEND) <= 0? '已完成':'未完成'}}</span>
-          </div>
-        </div>
-      </div>
-      <div>
-        <p class="fstrong f16" style="margin-top:10px;">订单信息汇总表:</p>
+
       </div>
       <el-table :data="tableData" border :summary-method="getSummaries" :row-class-name="tableRowClassName" show-summary
         style="width: 100%; margin-top:10px">
@@ -206,6 +216,12 @@ export default {
       let endYear = this.date2.slice(0, 4);
       let month = this.date1.slice(5, 7);
       let endMonth = this.date2.slice(5, 7);
+      if (year != endYear) {
+        this.$alert("不能跨年，只能选择同一年度月份查询", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
+      }
       let url = "/assignments/getAssignments.do";
       let data = {
         year: year,
@@ -322,21 +338,19 @@ export default {
 </script>
 <style scoped>
 .yearArea {
-  display: inline-block;
-  width: calc(100% - 450px);
-  padding: 10px 0;
+  padding: 5px;
+  margin-bottom: 20px;
   border: 1px solid gray;
-  vertical-align: top;
+  background: #f5f7fa;
 }
 .task-area {
-  display: flex;
-  margin-top: 10px;
-  font-size: 13px;
-  color: orange;
+  margin-right: 10px;
+  width: 100%;
 }
 .year-task-item {
-  flex: 1;
-  text-align: center;
+  font-size: 14px;
+  color: red;
+  font-weight: bold;
 }
 </style>
 

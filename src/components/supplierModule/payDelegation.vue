@@ -40,6 +40,7 @@
         placeholder="请输入委托编号进行查询"
         v-model="SEARCHKEY"
         style="width:220px;margin-left:10px"
+        clearable
          >
          </el-input>
 

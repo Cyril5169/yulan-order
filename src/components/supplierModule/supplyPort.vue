@@ -502,7 +502,6 @@
               <el-table-column label="操作" width="120" align="center">
                 <template slot-scope="scope">
                   <button @click="openDialog1(scope.row.PUR_NO, scope.row.ORDER_NO)" class="btn-style">
-
                     查看详情
                   </button>
                 </template>

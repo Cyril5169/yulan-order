@@ -1826,7 +1826,7 @@ export default {
                 chuangshaWidth: oneplace[0].CL_WIDTH,
                 chuangshaOpen: "--",
                 chuangshaType: "--",
-                subcustmorname: "无",
+                subcustmorname: detail.PUR_NO,
                 zswz: oneplace[0].CL_PLACE,
                 onlineDanhao: oneplace[0].ORDER_NO,
                 data: JSON.stringify(detailData),

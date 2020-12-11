@@ -38,8 +38,8 @@
                 item.STATUS_ID == 12
             " target="_blank" style="float:right;cursor: pointer;font-size:13px;line-height: 35px;margin-right:10px;"
             :href="
-              'http://www.luxlano.com/ddkc/DDrs2.asp?DDid=' + item.ORDER_NO
-            ">兰居订单查询</a>
+              'http://www.luxlano.com/ddkc/DD_bjl.asp?b2b=' + item.ORDER_NO
+            ">兰居尚品订单进度查询</a>
           <el-button style="float: right;margin-right:20px;" v-if="item.collapse" @click="toCheckExamine(item.ORDER_NO)"
             size="mini" type="primary" plain>订单详情</el-button>
           <el-button style="float: right;margin-right:10px;" v-if=" item.collapse &&

@@ -247,8 +247,8 @@ export default {
         let reduce = 0;
         for (let i = 0; i < zoom.length; i++) {
           zoom[i].sumMoney =
-            zoom[i].ALL_SPEND + zoom[i].ALLBACK_Y + zoom[i].ALLBACK_M;
-          reduce += zoom[i].ALL_SPEND;
+            zoom[i].ALL_SPEND.add(zoom[i].ALLBACK_Y).add(zoom[i].ALLBACK_M);
+          reduce = reduce.add(zoom[i].ALL_SPEND);
         }
         this.tableData = zoom;
         if (res.data[0].assignments) {

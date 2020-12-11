@@ -62,8 +62,8 @@
                 (item.ORDER_NO.slice(0, 1) == 'X' ||
                   item.ORDER_NO.slice(0, 1) == 'Y')
             " target="_blank" style="float:right;cursor: pointer;font-size:13px;" :href="
-              'http://www.luxlano.com/ddkc/DDrs2.asp?DDid=' + item.ORDER_NO
-            ">兰居订单查询</a>
+              'http://www.luxlano.com/ddkc/DD_bjl.asp?b2b=' + item.ORDER_NO
+            ">兰居尚品订单进度查询</a>
         </div>
 
         <div class="outDiv" style="float:left;width:90%">
@@ -78,7 +78,7 @@
                 <span v-else>{{ scope1.row.NOTE }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="数量" align="center" width="100">
+            <el-table-column label="数量（宽x高）" align="center" width="120">
               <template slot-scope="scope1">
                 <span v-if="scope1.row.UNIT == '平方米'">{{ scope1.row.CURTAIN_WIDTH }}×{{
                     scope1.row.CURTAIN_HEIGHT

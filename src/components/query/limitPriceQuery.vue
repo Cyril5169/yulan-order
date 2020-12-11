@@ -20,7 +20,7 @@
         <el-table-column label="宽(mm)" prop="WIDTH" width="100" align="center"></el-table-column>
         <el-table-column label="基材类型" prop="PROPERTY_TYPE_NAME" width="120" align="center"></el-table-column>
         <el-table-column label="财务分类" prop="PROPERTY_TYPE_NAME2" width="120" align="center"></el-table-column>
-        <el-table-column label="非普通出后贸易价" prop="PRICE_ADVISE_CK2" width="130" align="center"></el-table-column>
+        <el-table-column label="非普通出口贸易价" prop="PRICE_ADVISE_CK2" width="130" align="center"></el-table-column>
       </el-table>
       <el-pagination style="margin:0 30%;" @current-change="handleCurrentChange" :current-page.sync="currentPage"
         :page-size="limit" layout="total, prev, pager, next, jumper" :total="totalNumber">

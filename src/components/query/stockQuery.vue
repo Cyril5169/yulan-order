@@ -156,9 +156,9 @@
       <el-table style="width:100%;" :data="allocateData">
         <el-table-column prop="ITEM_NO" label="型号" align="center" width="100">
         </el-table-column>
-        <el-table-column prop="BATCH_NO" label="批号" align="center" width="160">
+        <el-table-column prop="BATCH_NO" label="批号" align="center" width="110">
         </el-table-column>
-        <el-table-column prop="NOTE" label="库房名称" align="center" width="150">
+        <el-table-column prop="NOTE" label="库房名称" align="center" width="110">
         </el-table-column>
         <el-table-column prop="PRESTAY_TYPE" label="预留类型" align="center" width="100">
           <template slot-scope="scope">
@@ -171,6 +171,10 @@
         </el-table-column>
         <el-table-column prop="ORDER_ID" label="单据号" align="center" width="100">
         </el-table-column>
+        <el-table-column prop="CUSTOMER_NAME" label="客户名称" align="center" width="150">
+        </el-table-column>
+        <el-table-column prop="NAME" label="预留人" align="center" width="100">
+        </el-table-column>
         <el-table-column prop="DATE_START" label="预留日期" align="center" width="90">
           <template slot-scope="scope">
             {{scope.row.DATE_START | datatrans}}
@@ -181,7 +185,7 @@
             {{scope.row.DATE_LIMIT | datatrans}}
           </template>
         </el-table-column>
-        <el-table-column prop="NOTES" label="说明" header-align="center">
+        <el-table-column prop="NOTES" label="说明" header-align="center" width="150">
         </el-table-column>
       </el-table>
     </el-dialog>
@@ -652,8 +656,7 @@ export default {
 }
 .leftCt {
   display: inline-block;
-  width: 20%;
-  min-width: 300px;
+  width: 300px;
   height: 100%;
 }
 .rightCt {

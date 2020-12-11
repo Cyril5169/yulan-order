@@ -37,9 +37,10 @@
 
         <el-input
         @keyup.enter.native="search()"
-        placeholder="请输入委托编号进行查询"
+        placeholder="请输入委托编号/客户代码/客户名称"
         v-model="SEARCHKEY"
-        style="width:220px;margin-left:10px"
+        style="width:250px;margin-left:10px"
+        clearable
          >
          </el-input>
 

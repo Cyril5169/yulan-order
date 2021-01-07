@@ -1757,39 +1757,29 @@ export default {
     },
     handleChange(file, fileList) {
       var point = file.name.lastIndexOf(".");
-      var suffix = file.name.substr(point);
-      var list1 = suffix.split("png");
-      var list2 = suffix.split("jpg");
-      var list3 = suffix.split("jpeg");
-      var list4 = suffix.split("bmp");
-      var list5 = suffix.split("avi");
-      var list6 = suffix.split("rmvb");
-      var list7 = suffix.split("mp4");
-      var list8 = suffix.split("flv");
-      var list9 = suffix.split("rm");
-      var list10 = suffix.split("mpg");
-      var list11 = suffix.split("doc");
-      var list12 = suffix.split("docx");
-      var list13 = suffix.split("xls");
-      var list14 = suffix.split("xlsx");
-      var list15 = suffix.split("pdf");
-      if (
-        list1.length > 1 ||
-        list2.length > 1 ||
-        list3.length > 1 ||
-        list4.length > 1 ||
-        list5.length > 1 ||
-        list6.length > 1 ||
-        list7.length > 1 ||
-        list8.length > 1 ||
-        list9.length > 1 ||
-        list10.length > 1 ||
-        list11.length > 1 ||
-        list12.length > 1 ||
-        list13.length > 1 ||
-        list14.length > 1 ||
-        list15.length > 1
-      ) {
+      var suffix = file.name.substr(point + 1).toLowerCase();
+      var formatList = [
+        "png",
+        "jpg",
+        "jpeg",
+        "bmp",
+        "avi",
+        "rmvb",
+        "mp4",
+        "flv",
+        "rm",
+        "mpg",
+        "doc",
+        "docx",
+        "xls",
+        "xlsx",
+        "pdf",
+        "txt"
+      ];
+      var result = formatList.some((item) => {
+        return item == suffix.trim();
+      });
+      if (result) {
         this.FormRight = true;
         this.files = fileList;
         this.fileChange = true;

@@ -176,7 +176,3 @@ export function NewUploadFiles(data, config = {}) {
         return Promise.reject(err);
     })
 }
-
-
-
-

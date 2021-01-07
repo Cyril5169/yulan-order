@@ -65,7 +65,6 @@
           <tr class="grayTD">
             <td style="font-size:20px;height:30px;" colspan="4">投诉登记表</td>
           </tr>
-
           <tr>
             <td class="grayTD" style="width:16%;height:15px">客户代码</td>
             <td style="width:34%;height:15px" class="grayTD">
@@ -89,13 +88,11 @@
             <td class="grayTD" style="height:15px">产品型号</td>
             <td class="grayTD" style="height:15px">{{ submit.SALENO }}</td>
           </tr>
-
           <tr>
             <td class="grayTD" style="font-size:20px;height:30px" colspan="4">
               投诉信息
             </td>
           </tr>
-
           <tr>
             <td class="grayTD" colspan="1" style="height:16px">投诉类型</td>
             <td colspan="1" style="text-align:left;height:16px;">
@@ -124,7 +121,6 @@
             </td>
             <td v-else class="grayTD" colspan="1" style="height:16px"></td>
           </tr>
-
           <tr>
             <td class="grayTD" colspan="1" rowspan="1" style="height:50px;">
               投诉内容
@@ -261,7 +257,6 @@
             </td>
           </tr>
         </table>
-
         <div style="text-align:center;margin-top:5px">
           <el-button type="success" size="mini" @click="_addRefundSubmit()">提交</el-button>
           <el-button type="info" size="mini" @click="isRefundAdd=false;RefundDetail=false">返回</el-button>
@@ -708,39 +703,29 @@ export default {
     },
     handleChange(file, fileList) {
       var point = file.name.lastIndexOf(".");
-      var suffix = file.name.substr(point);
-      var list1 = suffix.split("png");
-      var list2 = suffix.split("jpg");
-      var list3 = suffix.split("jpeg");
-      var list4 = suffix.split("bmp");
-      var list5 = suffix.split("avi");
-      var list6 = suffix.split("rmvb");
-      var list7 = suffix.split("mp4");
-      var list8 = suffix.split("flv");
-      var list9 = suffix.split("rm");
-      var list10 = suffix.split("mpg");
-      var list11 = suffix.split("doc");
-      var list12 = suffix.split("docx");
-      var list13 = suffix.split("xls");
-      var list14 = suffix.split("xlsx");
-      var list15 = suffix.split("pdf");
-      if (
-        list1.length > 1 ||
-        list2.length > 1 ||
-        list3.length > 1 ||
-        list4.length > 1 ||
-        list5.length > 1 ||
-        list6.length > 1 ||
-        list7.length > 1 ||
-        list8.length > 1 ||
-        list9.length > 1 ||
-        list10.length > 1 ||
-        list11.length > 1 ||
-        list12.length > 1 ||
-        list13.length > 1 ||
-        list14.length > 1 ||
-        list15.length > 1
-      ) {
+      var suffix = file.name.substr(point + 1).toLowerCase();
+      var formatList = [
+        "png",
+        "jpg",
+        "jpeg",
+        "bmp",
+        "avi",
+        "rmvb",
+        "mp4",
+        "flv",
+        "rm",
+        "mpg",
+        "doc",
+        "docx",
+        "xls",
+        "xlsx",
+        "pdf",
+        "txt"
+      ];
+      var result = formatList.some((item) => {
+        return item == suffix.trim();
+      });
+      if (result) {
         this.FormRight = true;
         this.submit.fileList = fileList;
         this.fileChange = true;

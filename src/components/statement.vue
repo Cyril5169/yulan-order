@@ -2,134 +2,54 @@
   <div>
     <el-card shadow="hover">
       <div>
-        <el-table
-          :data="tableData"
-          border
-          :row-class-name="tableRowClassName"
-          style="width: 100%; margin-top:10px"
-        >
-          <el-table-column
-            label="广东玉兰集团股份有限公司对账单"
-            align="center"
-          >
+        <el-table :data="tableData" border :row-class-name="tableRowClassName" style="width: 100%; margin-top:10px">
+          <el-table-column label="广东玉兰集团股份有限公司对账单" align="center">
             <template slot="header">
-              <span style="font-size:20px;"
-                >广东玉兰集团股份有限公司对账单</span
-              >
+              <span style="font-size:20px;">广东玉兰集团股份有限公司对账单</span>
             </template>
-            <el-table-column
-              prop="dateStart"
-              label="起始日期"
-              align="center"
-            ></el-table-column>
-            <el-table-column
-              prop="dateEnd"
-              label="结束日期"
-              align="center"
-            ></el-table-column>
-            <el-table-column
-              prop="fhjeMonth"
-              label="本期发货总额"
-              align="center"
-            ></el-table-column>
-            <el-table-column
-              prop="czskMonth"
-              label="本期收款总额"
-              align="center"
-            ></el-table-column>
-            <el-table-column
-              prop="qcczysk"
-              label="上期应收款"
-              align="center"
-            ></el-table-column>
-            <el-table-column
-              prop="czysk"
-              label="应收款(合计)"
-              align="center"
-            ></el-table-column>
-            <el-table-column
-              prop="customerCheckState"
-              label="客户确认状态"
-              align="center"
-            ></el-table-column>
+            <el-table-column prop="dateStart" label="起始日期" align="center"></el-table-column>
+            <el-table-column prop="dateEnd" label="结束日期" align="center"></el-table-column>
+            <el-table-column prop="fhjeMonth" label="本期发货总额" align="center"></el-table-column>
+            <el-table-column prop="czskMonth" label="本期收款总额" align="center"></el-table-column>
+            <el-table-column prop="qcczysk" label="上期应收款" align="center"></el-table-column>
+            <el-table-column prop="czysk" label="应收款(合计)" align="center"></el-table-column>
+            <el-table-column prop="customerCheckState" label="客户确认状态" align="center"></el-table-column>
             <el-table-column label="操作" align="center">
               <template slot-scope="scope1">
-                <el-button
-                  @click="
+                <el-button @click="
                     openDia(
                       scope1.row.dateStart,
                       scope1.row.dateEnd,
                       scope1.row
                     )
-                  "
-                  type="text"
-                  size="mini"
-                  >查看明细</el-button
-                >
+                  " type="text" size="mini">查看明细</el-button>
               </template>
             </el-table-column>
           </el-table-column>
         </el-table>
         <div style="margin:0 35%;" class="block">
-          <el-pagination
-            @current-change="outerCurrentChange"
-            :current-page.sync="outerCurrentPage"
-            :page-size="outerlimit"
-            layout="total, prev, pager, next, jumper"
-            :total="outercount"
-          ></el-pagination>
+          <el-pagination @current-change="outerCurrentChange" :current-page.sync="outerCurrentPage"
+            :page-size="outerlimit" layout="total, prev, pager, next, jumper" :total="outercount"></el-pagination>
         </div>
       </div>
 
-      <el-dialog
-        :visible.sync="detailVisible"
-        :close-on-click-modal="false"
-        width="760px"
-        top="5vh"
-      >
+      <el-dialog :visible.sync="detailVisible" :close-on-click-modal="false" width="760px" top="5vh">
         <div class="fixedDiv">
           <div style="margin:10px">
-            <el-button
-              v-show="showButton"
-              size="mini"
-              type="primary"
-              @click="changeStatus(0)"
-              >客户确认</el-button
-            >
-            <el-button
-              size="mini"
-              type="primary"
-              @click="printRefund('PrintDiv1')"
-              >打印</el-button
-            >
+            <el-button v-show="showButton" size="mini" type="primary" @click="changeStatus(0)">客户确认</el-button>
+            <el-button size="mini" type="primary" @click="printRefund('PrintDiv1')">打印</el-button>
           </div>
           <div style="margin:10px">
-            <el-button
-              v-show="showButton"
-              size="mini"
-              type="danger"
-              @click="dialogFormVisible = true"
-              >客户反馈</el-button
-            >
-            <el-button size="mini" type="primary" @click="OutExcel()"
-              >导出</el-button
-            >
+            <el-button v-show="showButton" size="mini" type="danger" @click="dialogFormVisible = true">客户反馈</el-button>
+            <el-button size="mini" type="primary" @click="OutExcel()">导出</el-button>
           </div>
         </div>
-        <div
-          id="PrintDiv1"
-          class="dialogDetailStyle"
-          style="width:100% ;margin:0 auto;"
-        >
-          <div
-            style="margin:0 auto; height:40px; width:100%;text-align:center;"
-          >
+        <div id="PrintDiv1" class="dialogDetailStyle" style="width:100% ;margin:0 auto;">
+          <div style="margin:0 auto; height:40px; width:100%;text-align:center;">
             <h2 style="margin:0;">广东玉兰集团股份有限公司对账单</h2>
           </div>
           <div style="margin:0 auto; width:100%;">
-            <div
-              style="margin-top:5px;margin-left:20px; auto; width:300px; float:left;"
-            >
+            <div style="margin-top:5px;margin-left:20px; auto; width:300px; float:left;">
               <h4 style="display:inline;margin:0;">
                 统计日期：{{ startDate | cutdate }}~{{ endDate | cutdate }}
               </h4>
@@ -202,14 +122,8 @@
             </tr>
           </table>
 
-          <el-table
-            :data="tableDetail"
-            :summary-method="getSummaries"
-            show-summary
-            border
-            :row-class-name="tableRowClassName"
-            style="width: 100%; margin:10px auto"
-          >
+          <el-table :data="tableDetail" :summary-method="getSummaries" show-summary border
+            :row-class-name="tableRowClassName" style="width: 100%; margin:10px auto">
             <el-table-column width="100" label="日期" align="center">
               <template slot-scope="scope1">
                 <span>{{ scope1.row.dateOutStock | datatrans }}</span>
@@ -218,12 +132,7 @@
             <el-table-column label="单据号" width="120" align="center">
               <template slot-scope="scope1">
                 <!-- <span>{{scope1.row.saleNo}}</span> -->
-                <el-button
-                  @click="openTHdia(scope1.row)"
-                  type="text"
-                  size="small"
-                  >{{ scope1.row.saleNo }}</el-button
-                >
+                <el-button @click="openTHdia(scope1.row)" type="text" size="small">{{ scope1.row.saleNo }}</el-button>
               </template>
             </el-table-column>
             <el-table-column label="类别" width="55" align="center">
@@ -231,30 +140,10 @@
                 <span>{{ scope1.row.billNo | stateChange }}</span>
               </template>
             </el-table-column>
-            <el-table-column
-              prop="money"
-              label="发货总额"
-              width="90"
-              align="center"
-            ></el-table-column>
-            <el-table-column
-              prop="qty"
-              label="发货数量"
-              width="90"
-              align="center"
-            ></el-table-column>
-            <el-table-column
-              prop="freight"
-              label="运费"
-              width="70"
-              align="center"
-            ></el-table-column>
-            <el-table-column
-              prop="gatherMoneyFax"
-              label="收款金额"
-              width="100"
-              align="center"
-            ></el-table-column>
+            <el-table-column prop="money" label="发货总额" width="90" align="center"></el-table-column>
+            <el-table-column prop="qty" label="发货数量" width="90" align="center"></el-table-column>
+            <el-table-column prop="freight" label="运费" width="70" align="center"></el-table-column>
+            <el-table-column prop="gatherMoneyFax" label="收款金额" width="100" align="center"></el-table-column>
             <el-table-column label="加收物流费" align="center">
               <template slot-scope="scope1">
                 <span>{{ scope1.row.transFlag | NYchange }}</span>
@@ -264,19 +153,9 @@
         </div>
       </el-dialog>
 
-      <el-dialog
-        title="客户反馈"
-        :visible.sync="dialogFormVisible"
-        :close-on-click-modal="false"
-      >
-        <el-input
-          type="textarea"
-          maxlength="200"
-          :autosize="{ minRows: 4, maxRow: 6 }"
-          resize="none"
-          v-model="customerCheckComment"
-          placeholder="请输入反馈内容(200字以内)"
-        ></el-input>
+      <el-dialog title="客户反馈" :visible.sync="dialogFormVisible" :close-on-click-modal="false">
+        <el-input type="textarea" maxlength="200" :autosize="{ minRows: 4, maxRow: 6 }" resize="none"
+          v-model="customerCheckComment" placeholder="请输入反馈内容(200字以内)"></el-input>
         <span style="color:#ccc">{{ customerCheckComment.length }}/200</span>
         <br />
         <div slot="footer" class="dialog-footer">
@@ -287,32 +166,13 @@
 
       <el-dialog :visible.sync="THdetail" :width="THwidth" :top="THtop">
         <div style="margin:0 auto;width:20%;" v-show="whatType">
-          <span style="font-weight:600;font-size:15px;"
-            >{{ THhead }}明细表</span
-          >
+          <span style="font-weight:600;font-size:15px;">{{ THhead }}明细表</span>
         </div>
-        <el-table
-          v-show="whatType"
-          :data="THtabledata"
-          border
-          :summary-method="getSummaries1"
-          :row-class-name="tableRowClassName"
-          show-summary
-          style="width: 100%; margin-top:10px"
-        >
-          <el-table-column
-            prop="itemNo"
-            width="110"
-            header-align="center"
-            align="center"
-            label="版本型号"
-          ></el-table-column>
-          <el-table-column
-            width="100"
-            align="center"
-            label="名称"
-            prop="itemNote"
-          >
+        <el-table v-show="whatType" :data="THtabledata" border :summary-method="getSummaries1"
+          :row-class-name="tableRowClassName" show-summary style="width: 100%; margin-top:10px">
+          <el-table-column prop="itemNo" width="110" header-align="center" align="center" label="版本型号">
+          </el-table-column>
+          <el-table-column width="100" align="center" label="名称" prop="itemNote">
             <!-- <template slot-scope="scope1">
               <el-button type="text">{{ scope1.row.itemNote }}</el-button>
             </template> -->
@@ -342,12 +202,7 @@
               <span>{{ scope.row.qtyDeliver }}</span>
             </template>
           </el-table-column>
-          <el-table-column
-            width="90"
-            prop="money"
-            label="金额"
-            header-align="center"
-          ></el-table-column>
+          <el-table-column width="90" prop="money" label="金额" header-align="center"></el-table-column>
         </el-table>
         <div class="TH" v-show="!whatType">
           <p>日期：{{ CZSK.dateOutStock | datatrans }}</p>
@@ -367,7 +222,7 @@ import {
   checkBill,
   billDetail,
   userReturn,
-  statementDetail
+  statementDetail,
 } from "@/api/orderList";
 import { GetBalancePeriod } from "@/api/orderListASP";
 import { mapMutations, mapActions } from "vuex";
@@ -408,9 +263,9 @@ export default {
       THhead: "",
       THtabledata: [
         {
-          STATUS_ID: 1
-        }
-      ]
+          STATUS_ID: 1,
+        },
+      ],
     };
   },
   methods: {
@@ -421,7 +276,7 @@ export default {
         type: "html",
         maxWidth: 1300,
         headerStyle: "margin: -2px;",
-        targetStyles: ["*"]
+        targetStyles: ["*"],
       });
     },
     getExplorer() {
@@ -493,7 +348,7 @@ export default {
       if (this.getExplorer() == "ie") {
         this.$alert("请换火狐或谷歌浏览器下载！", "提示", {
           confirmButtonText: "确定",
-          type: "danger"
+          type: "danger",
         });
         // var curTbl = document.getElementById("PrintDiv1");
         // var oXL = new ActiveXObject("Excel.Application");
@@ -548,9 +403,9 @@ export default {
       this.THhead = tab.saleNo;
       let url = "/customerBalance/getCustomerBalancePackDetail.do";
       let data = {
-        saleNO: this.THhead
+        saleNO: this.THhead,
       };
-      statementDetail(url, data).then(res => {
+      statementDetail(url, data).then((res) => {
         this.THtabledata = res.packDetailList;
       });
     },
@@ -595,19 +450,19 @@ export default {
         cid: Cookies.get("cid"),
         startDate: startDate,
         customerCheckState: this.customerCheckState,
-        customerCheckComment: this.customerCheckComment
+        customerCheckComment: this.customerCheckComment,
       };
       this.$confirm(decoration, "提示", {
         confirmButtonText: "是",
         cancelButtonText: "否",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
-          userReturn(url, data).then(res => {
+          userReturn(url, data).then((res) => {
             if (res.msg == "SUCCESS") {
               this.$alert("操作成功", "提示", {
                 confirmButtonText: "确定",
-                type: "success"
+                type: "success",
               });
               this.getBill();
               this.detailVisible = false;
@@ -615,7 +470,7 @@ export default {
             } else {
               this.$alert("操作失败，请稍后重试", "提示", {
                 confirmButtonText: "确定",
-                type: "danger"
+                type: "danger",
               });
             }
           });
@@ -631,10 +486,10 @@ export default {
         cid: Cookies.get("cid"),
         limit: this.outerlimit,
         page: this.outerCurrentPage,
-        status: ""
+        status: "",
       };
       //checkBill(url, data).then(res => {
-      GetBalancePeriod(data).then(res => {
+      GetBalancePeriod(data).then((res) => {
         console.log(res);
         this.tableData = res.data.customerBalancePeriodList;
         this.theHead = res.data.customerInfo;
@@ -650,9 +505,9 @@ export default {
         startDate: this.startDate, //开始日期
         endDate: this.endDate, //结束日期
         limit: 999, //10,
-        page: 1 //this.innerCurrentPage
+        page: 1, //this.innerCurrentPage
       };
-      billDetail(url, data).then(res => {
+      billDetail(url, data).then((res) => {
         this.tableDetail = res.customerBalancePeriodDetailList;
         this.innercount = res.customerBalancePeriodDetailList.length
           ? res.customerBalancePeriodDetailList[0].total
@@ -668,8 +523,8 @@ export default {
           sums[index] = "汇总";
           return;
         }
-        const values = data.map(item => Number(item[column.property]));
-        if (!values.every(value => isNaN(value))) {
+        const values = data.map((item) => Number(item[column.property]));
+        if (!values.every((value) => isNaN(value))) {
           sums[index] = values.reduce((prev, curr) => {
             const value = Number(curr);
             if (!isNaN(value)) {
@@ -699,8 +554,8 @@ export default {
           sums[index] = "汇总";
           return;
         }
-        const values = data.map(item => Number(item[column.property]));
-        if (!values.every(value => isNaN(value))) {
+        const values = data.map((item) => Number(item[column.property]));
+        if (!values.every((value) => isNaN(value))) {
           sums[index] = values.reduce((prev, curr) => {
             const value = Number(curr);
             if (!isNaN(value)) {
@@ -728,9 +583,9 @@ export default {
       return "";
     },
     ...mapMutations("navTabs", ["addTab"]),
-    ...mapActions("navTabs", ["closeTab", "closeToTab"])
+    ...mapActions("navTabs", ["closeTab", "closeToTab"]),
   },
-  created: function() {
+  created: function () {
     this.getBill();
   },
   filters: {
@@ -764,8 +619,8 @@ export default {
       if (value == "TH") return "退货";
       if (value == "CJ") return "冲减";
       return value;
-    }
-  }
+    },
+  },
 };
 </script>
 

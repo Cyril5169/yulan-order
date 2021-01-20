@@ -152,7 +152,7 @@
           <template slot-scope="scope">
             <span v-if="scope.row.itemType === 'lspb'">--</span>
             <span v-else-if="scope.row.modifyFlag === 'Y'">
-              <el-input v-if="scope.row.itemType != 'lt'" style="width: 70%;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
+              <!-- <el-input v-if="scope.row.itemType != 'lt'" style="width: 70%;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
                                 .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                                 .replace('.', '$#$').replace(/\./g, '')
                                 .replace('$#$', '.')
@@ -160,6 +160,13 @@
                 v-model="scope.row.dosage">
               </el-input>
               <el-input v-else style="width: 70%;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
+                                .replace(/^\./g, '').replace(/\.{2,}/g, '.')
+                                .replace('.', '$#$').replace(/\./g, '')
+                                .replace('$#$', '.')
+                                .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"
+                v-model="scope.row.dosage">
+              </el-input> -->
+              <el-input style="width: 70%;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
                                 .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                                 .replace('.', '$#$').replace(/\./g, '')
                                 .replace('$#$', '.')
@@ -621,6 +628,44 @@ export default {
         this.getDosage(obj, i);
       }
     },
+    //获取窗帘大类用量
+    getDosage(data, index) {
+      let val = data.itemType;
+      let pval = data.productType;
+      let _val;
+      if (pval === "GY" && data.itemNo === "GY-003") {
+        _val = this.allData.GY;
+      } else {
+        switch (val) {
+          case "lt":
+            if (pval === "XHB") _val = this.allData.XHBlt;
+            else _val = this.allData.lt;
+            break;
+          case "ls":
+            if (pval === "LCB") _val = this.allData.LCB;
+            else if (pval === "XHB") _val = this.allData.XHBls;
+            else _val = this.allData.ls;
+            break;
+          case "sha":
+            _val = this.allData.sha;
+            break;
+          case "pjb":
+            _val = this.allData.pjb;
+            break;
+          case "LCB":
+            _val = this.allData.LCB;
+            break;
+          default:
+            _val = "";
+        }
+      }
+      _val = Number(_val);
+      if (isNaN(_val)) _val = "";
+      // if (val == "lt")
+      //   this.curtainData[index].dosage = Math.round(_val * 100) / 100;
+      // else this.curtainData[index].dosage = Math.round(_val * 10) / 10;
+      this.curtainData[index].dosage = Math.round(_val * 100) / 100;
+    },
     getPrice(type, item) {
       var price = 0;
       if (item) {
@@ -771,9 +816,10 @@ export default {
             }
             let _data = this.curtainData[this.chooseIndex];
             let keys;
-            if (_data.itemType == "lt")
-              keys = Math.round(res.data[0].dosage * 100) / 100;
-            else keys = Math.round(res.data[0].dosage * 10) / 10;
+            // if (_data.itemType == "lt")
+            //   keys = Math.round(res.data[0].dosage * 100) / 100;
+            // else keys = Math.round(res.data[0].dosage * 10) / 10;
+            keys = Math.round(res.data[0].dosage * 100) / 100;
             //绣花边只需要修改自身，无需修改面料
             if (_data.productType === "XHB") {
               this.curtainData[this.chooseIndex].dosage = keys;
@@ -837,9 +883,10 @@ export default {
           }
           let _data = this.curtainData[index];
           let keys;
-          if (_data.itemType == "lt")
-            keys = Math.round(res.data[0].dosage * 100) / 100;
-          else keys = Math.round(res.data[0].dosage * 10) / 10;
+          // if (_data.itemType == "lt")
+          //   keys = Math.round(res.data[0].dosage * 100) / 100;
+          // else keys = Math.round(res.data[0].dosage * 10) / 10;
+          keys = Math.round(res.data[0].dosage * 100) / 100;
           //绣花边只需要修改自身，无需修改面料
           if (_data.productType === "XHB") {
             this.curtainData[index].dosage = keys;
@@ -899,43 +946,6 @@ export default {
         default:
           return "暂无名称";
       }
-    },
-    //获取窗帘大类用量
-    getDosage(data, index) {
-      let val = data.itemType;
-      let pval = data.productType;
-      let _val;
-      if (pval === "GY" && data.itemNo === "GY-003") {
-        _val = this.allData.GY;
-      } else {
-        switch (val) {
-          case "lt":
-            if (pval === "XHB") _val = this.allData.XHBlt;
-            else _val = this.allData.lt;
-            break;
-          case "ls":
-            if (pval === "LCB") _val = this.allData.LCB;
-            else if (pval === "XHB") _val = this.allData.XHBls;
-            else _val = this.allData.ls;
-            break;
-          case "sha":
-            _val = this.allData.sha;
-            break;
-          case "pjb":
-            _val = this.allData.pjb;
-            break;
-          case "LCB":
-            _val = this.allData.LCB;
-            break;
-          default:
-            _val = "";
-        }
-      }
-      _val = Number(_val);
-      if (isNaN(_val)) _val = "";
-      if (val == "lt")
-        this.curtainData[index].dosage = Math.round(_val * 100) / 100;
-      else this.curtainData[index].dosage = Math.round(_val * 10) / 10;
     },
     //动态修改大类的全部用量
     updateDosage(itemType, dosage) {

@@ -247,7 +247,7 @@
                       {{ scope1.row.dosage === "" ? "" : scope1.row.unit }}
                     </span>
                     <span v-else-if="customerType === '110'">
-                      <el-input v-if="scope1.row.itemType != 'lt'" style="width: 70%;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
+                      <!-- <el-input v-if="scope1.row.itemType != 'lt'" style="width: 70%;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
                                 .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                                 .replace('.', '$#$').replace(/\./g, '')
                                 .replace('$#$', '.')
@@ -255,6 +255,13 @@
                         v-model="scope1.row.dosage">
                       </el-input>
                       <el-input v-else style="width: 70%;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
+                                .replace(/^\./g, '').replace(/\.{2,}/g, '.')
+                                .replace('.', '$#$').replace(/\./g, '')
+                                .replace('$#$', '.')
+                                .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"
+                        v-model="scope1.row.dosage">
+                      </el-input> -->
+                      <el-input style="width: 70%;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
                                 .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                                 .replace('.', '$#$').replace(/\./g, '')
                                 .replace('$#$', '.')
@@ -1436,9 +1443,10 @@ export default {
               this.chooseIndex
             ];
             let keys;
-            if (_data.itemType == "lt")
-              keys = Math.round(res.data[0].dosage.mul(100)) / 100;
-            else keys = Math.round(res.data[0].dosage * 10) / 10;
+            // if (_data.itemType == "lt")
+            //   keys = Math.round(res.data[0].dosage * 100) / 100;
+            // else keys = Math.round(res.data[0].dosage * 10) / 10;
+            keys = Math.round(res.data[0].dosage * 100) / 100;
             //绣花边只需要修改自身，无需修改面料
             if (_data.productType === "XHB") {
               this.allCurtaindata[this.chooseRowIndex][
@@ -1476,7 +1484,7 @@ export default {
         ) {
           GetDosageByNo(obj).then((res) => {
             this.allCurtaindata[this.chooseRowIndex][this.chooseIndex].dosage =
-              Math.round(res.data[0].dosage * 10) / 10;
+              Math.round(res.data[0].dosage * 100) / 100;
           });
         } else {
           for (
@@ -1537,9 +1545,10 @@ export default {
           }
           let _data = this.allCurtaindata[rowIndex][index];
           let keys;
-          if (_data.itemType == "lt")
-            keys = Math.round(res.data[0].dosage.mul(100)) / 100;
-          else keys = Math.round(res.data[0].dosage * 10) / 10;
+          // if (_data.itemType == "lt")
+          //   keys = Math.round(res.data[0].dosage * 100) / 100;
+          // else keys = Math.round(res.data[0].dosage * 10) / 10;
+          keys = Math.round(res.data[0].dosage * 100) / 100;
           //绣花边只需要修改自身，无需修改面料
           if (_data.productType === "XHB") {
             this.allCurtaindata[rowIndex][index].dosage = keys;

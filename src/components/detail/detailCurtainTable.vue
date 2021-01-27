@@ -546,6 +546,7 @@ export default {
       }
       if (type == "ls") {
         this.chooseBig[2] = this.chooseBig[index];
+        //勾选掉帘身时也同时不要帘身配布
         this.changeLink("lspb", 2);
       }
       this.changeLinkTip(type, index);

@@ -3,8 +3,8 @@
     <el-container class="page">
       <el-aside :width="asideStatus?'60px':'200px'" style="overflow:hidden;background:white;">
         <el-scrollbar style="height:100%;">
-          <div id="aside-header">
-            <div id="aside-logo" :style="{display:asideStatus?'none':'block'}"></div>
+          <div class="aside-header">
+            <div class="aside-logo" :style="{display:asideStatus?'none':'block'}"></div>
             <span>玉兰B2B</span>
           </div>
           <el-menu style="margin-bottom:10px;" :default-openeds="['shops', 'design', 'shoppingCar', 'query']"
@@ -15,7 +15,7 @@
         </el-scrollbar>
       </el-aside>
       <el-container style="width:85%; min-width:1050px;">
-        <el-header height="40px">
+        <el-header class="first-header">
           <ul class="l">
             <li :title="asideStatus? '菜单展开' : '菜单收起'" @click="changeAside">
               <i class="iconfont headIcon2" v-if="!asideStatus">&#xe61e;</i>
@@ -63,9 +63,14 @@
               "账户：" + cid +" " + realName +(identity == "ECWEB" ? " " + (isManager == "1"? "管理员" : "操作员") : " ")
             }}</span>
         </el-header>
-        <el-main style="margin:0;padding:0;background:#ECF5EF;" class="backTop" id="mainBackTop">
+        <el-header class="second-header">
           <el-tabs class="tabs" v-model="activeTabName" @tab-click="getTab" @tab-remove="closeTab" type="border-card">
-            <div class="notice">
+            <el-tab-pane v-for="item in tabList" :key="item.name" :name="item.name" :label="item.label"
+              :closable="item.closable"></el-tab-pane>
+          </el-tabs>
+        </el-header>
+        <el-main class="backTop" id="mainBackTop">
+          <div class="notice">
               <i class="el-icon-bell ml10 mr10 f16" style="line-height:30px;color:gold;font-weight:bold;"></i>
               <span style="color:red;margin-right:5px;margin-top:5px;">最新公告：</span>
               <span v-if="newsTextArr.length == 0">{{ adminText }}</span>
@@ -83,122 +88,22 @@
                   @click="refreshUserMoney"></i>
               </span>
             </div>
-            <el-tab-pane v-for="item in tabList" :key="item.name" :name="item.name" :label="item.label"
-              :closable="item.closable"></el-tab-pane>
-            <div v-if="activeTabName == 'main'">
-              <el-card v-if="
-                  identity != 'SUPLY' &&
-                    (hotSaleVersion.length > 0 || hotSaleItem.length > 0)
-                ">
-                <div v-if="hotSaleVersion.length > 0" style="margin-bottom:20px;">
-                  <h2 style="text-align:center;margin:0 0 10px 0;">
-                    版本热销榜
-                  </h2>
-                  <div>
-                    <table style="margin:0 auto;">
-                      <tr v-for="(item, index) in hotSaleVersion" :key="index">
-                        <td style="height:30px;min-width:160px;" v-for="(n, indexx) in 5" :key="indexx">
-                          <span v-if="item[indexx].ITEM_NO != ''" class="numIndex hot-index-normal" :class="{
-                              'hot-index1': index == 0 && indexx == 0,
-                              'hot-index2':
-                                index == 0 && (indexx == 1 || indexx == 2),
-                              'hot-index3':
-                                index == 0 && (indexx == 3 || indexx == 4)
-                            }">{{ index * 5 + indexx + 1 }}</span>
-                          <a>{{ item[indexx].ITEM_NO }}</a>
-                          <img src="../assets/img/img/search-hot.gif" v-if="index == 0 && item[indexx].ITEM_NO != ''" />
-                        </td>
-                      </tr>
-                    </table>
-                  </div>
-                </div>
-                <div v-if="hotSaleItem.length > 0" style="margin-bottom:20px;">
-                  <h2 style="text-align:center;margin:0 0 10px 0;">
-                    型号热销榜
-                  </h2>
-                  <div>
-                    <table style="margin:0 auto;">
-                      <tr v-for="(item, index) in hotSaleItem" :key="index">
-                        <td style="height:30px;min-width:160px;" v-for="(n, indexx) in 5" :key="indexx">
-                          <span v-if="item[indexx].ITEM_NO != ''" class="numIndex hot-index-normal" :class="{
-                              'hot-index1': index == 0,
-                              'hot-index2': index == 1,
-                              'hot-index3': index == 2
-                            }">{{ index * 5 + indexx + 1 }}</span>
-                          <a class="hoverAlink" title="点击前往下单"
-                            @click="selectHot(item[indexx].ITEM_NO)">{{ item[indexx].ITEM_NO }}</a>
-                          <img src="../assets/img/img/search-hot.gif" v-if="
-                              (index == 0 || index == 1) &&
-                                item[indexx].ITEM_NO != ''
-                            " />
-                        </td>
-                      </tr>
-                    </table>
-                  </div>
-                </div>
-                <div v-if="hotSaleCurtain.length > 0" style="margin-bottom:20px;">
-                  <h2 style="text-align:center;margin:0 0 10px 0;">
-                    窗帘版本推荐
-                  </h2>
-                  <div>
-                    <table style="margin:0 auto;">
-                      <tr v-for="(item, index) in hotSaleCurtain" :key="index">
-                        <td style="height:30px;min-width:160px;" v-for="(n, indexx) in 5" :key="indexx">
-                          <span v-if="item[indexx].ITEM_NO != ''" class="numIndex hot-index-normal" :class="{
-                              'hot-index1': index == 0,
-                              'hot-index2': index == 1,
-                              'hot-index3': index == 2
-                            }">{{ index * 5 + indexx + 1 }}</span>
-                          <a>{{ item[indexx].ITEM_NO }}</a>
-                          <img src="../assets/img/img/search-hot.gif" v-if="
-                              (index == 0 || index == 1) &&
-                                item[indexx].ITEM_NO != ''
-                            " />
-                        </td>
-                      </tr>
-                    </table>
-                  </div>
-                </div>
-                <div v-if="hotSaleSoft.length > 0" style="margin-bottom:20px;">
-                  <h2 style="text-align:center;margin:0 0 10px 0;">
-                    面料热销榜
-                  </h2>
-                  <div>
-                    <table style="margin:0 auto;">
-                      <tr v-for="(item, index) in hotSaleSoft" :key="index">
-                        <td style="height:30px;min-width:160px;" v-for="(n, indexx) in 5" :key="indexx">
-                          <span v-if="item[indexx].ITEM_NO != ''" class="numIndex hot-index-normal" :class="{
-                              'hot-index1': index == 0,
-                              'hot-index2': index == 1,
-                              'hot-index3': index == 2
-                            }">{{ index * 5 + indexx + 1 }}</span>
-                          <a class="hoverAlink" title="点击前往下单"
-                            @click="selectHot(item[indexx].ITEM_NO)">{{ item[indexx].ITEM_NO }}</a>
-                          <img src="../assets/img/img/search-hot.gif" v-if="
-                              (index == 0 || index == 1) &&
-                                item[indexx].ITEM_NO != ''
-                            " />
-                        </td>
-                      </tr>
-                    </table>
-                  </div>
-                </div>
-              </el-card>
-            </div>
-            <keep-alive>
-              <router-view v-if="$route.meta.keepAlive === true" />
-            </keep-alive>
-            <router-view v-if="$route.meta.keepAlive !== true" />
-          </el-tabs>
+          <div v-if="activeTabName == 'main' && identity != 'SUPLY'">
+            <hot-sale />
+          </div>
+          <keep-alive>
+            <router-view v-if="$route.meta.keepAlive === true" />
+          </keep-alive>
+          <router-view v-if="$route.meta.keepAlive !== true" />
         </el-main>
       </el-container>
     </el-container>
+    <!-- 回到顶部 -->
     <el-backtop target=".backTop" :right="30" :visibility-height="20">
-      <div style="{height: 100%;width: 100%;background-color: #f2f5f6;box-shadow: 0 0 6px rgba(0,0,0, .12);
-                        text-align: center;line-height: 40px;color: #1989fa;}">
-        UP
-      </div>
+      <div class="up-class">UP</div>
     </el-backtop>
+
+    <!-- 公告 -->
     <el-dialog :show-close="true" :visible.sync="notificationVisible" width="1000px" top="5vh" :title="newsTitle"
       center>
       <div v-html="newsHtmlData"></div>
@@ -206,6 +111,8 @@
         <el-button type="primary" @click="notificationVisible = false">确 定</el-button>
       </span>
     </el-dialog>
+
+    <!-- 调查表 -->
     <el-dialog title="请填写完此调查表，才能继续操作！" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false"
       :visible.sync="studyVisible" width="900px" top="5vh" center>
       <keep-alive>
@@ -216,6 +123,8 @@
         <el-button type="primary" @click="submitStudy">提交调查表</el-button>
       </span>
     </el-dialog>
+
+    <!-- 修改密码 -->
     <el-dialog title="修改密码" :close-on-click-modal="false" :visible.sync="changePasswordVisible" width="450px">
       <el-form :model="passwordForm" :rules="passwordRules" ref="passwordForm" class="passwordForm">
         <el-form-item label="原密码" prop="pw">
@@ -240,6 +149,14 @@
 </template>
 
 <script>
+import Vue from "vue";
+import Axios from "axios";
+import Cookies from "js-cookie";
+import screenfull from "screenfull";
+import { mapMutations, mapActions, mapState } from "vuex";
+import menuTree from "./menuTree";
+import studyContextDetail from "./studyContext/studyContextDetail";
+import hotSale from "./shops/hotSale";
 import { getUserMoney } from "@/api/user";
 import { getAllRefund } from "@/api/refund";
 import { getIconNumber } from "@/api/painting";
@@ -248,33 +165,24 @@ import { GetNewNotification, InserFlag } from "@/api/notificationASP";
 import { GetCustomerMustWriteStudy } from "@/api/studyASP";
 import { QueryWebMenuByUserId } from "@/api/webMenuASP";
 import { getAllOrders, GetBalancePeriod } from "@/api/orderListASP";
-import { GetHotSales, GetItemDetailById } from "@/api/itemInfoASP";
 import { GetCartItemCount } from "@/api/shopASP";
-import screenfull from "screenfull";
-import { mapMutations, mapActions } from "vuex";
-import { mapState } from "vuex";
-import Vue from "vue";
-import Cookies from "js-cookie";
-import menuTree from "./menuTree";
-import studyContextDetail from "./studyContext/studyContextDetail";
 import { GetAllCompensationOld } from "@/api/paymentASP";
 import { ChangePassword } from "@/api/webUserASP";
-import payDelegationVue from "./supplierModule/payDelegation.vue";
 import { GetCurrentDelegation, GetAllDelegation } from "@/api/supplierASP";
 import { GetAllData, GetAllUserData } from "@/api/lanju";
 import { GetAllComplaint, GetAllUserComplaint } from "@/api/complaint";
 import {
   GetImageCustomer,
-  GetAllData as GetImageAll
+  GetAllData as GetImageAll,
 } from "@/api/imageStoreASP";
 import { GetAllCompensation, GetUserCompensation } from "@/api/paymentASP";
-import Axios from "axios";
 
 export default {
   name: "Main",
   components: {
     menuTree,
-    studyContextDetail
+    studyContextDetail,
+    hotSale,
   },
   data() {
     return {
@@ -314,8 +222,8 @@ export default {
                 callback();
               }
             },
-            trigger: "change"
-          }
+            trigger: "change",
+          },
         ],
         npw: [
           {
@@ -328,8 +236,8 @@ export default {
                 callback();
               }
             },
-            trigger: "change"
-          }
+            trigger: "change",
+          },
         ],
         npw1: [
           {
@@ -342,15 +250,10 @@ export default {
                 callback();
               }
             },
-            trigger: "change"
-          }
-        ]
+            trigger: "change",
+          },
+        ],
       },
-      hotSaleData: [],
-      hotSaleVersion: [],
-      hotSaleItem: [],
-      hotSaleCurtain: [],
-      hotSaleSoft: []
     };
   },
   methods: {
@@ -368,13 +271,13 @@ export default {
             number: 10000,
             startDate: "0001/1/1",
             endDate: "9999/12/31",
-            state: "CUSTOMERAFFIRM"
+            state: "CUSTOMERAFFIRM",
           },
           { loading: false }
         );
         this.changeBadge({
           name: "refund",
-          index: _refund.count
+          index: _refund.count,
         });
       }
     },
@@ -388,13 +291,13 @@ export default {
             limit: 999,
             startDate: "",
             endDate: "",
-            state: "CUSTOMERAFFIRM"
+            state: "CUSTOMERAFFIRM",
           },
           { loading: false }
         );
         this.changeBadge({
           name: "painting",
-          index: _refund.airbrushDesignerAssureList.length
+          index: _refund.airbrushDesignerAssureList.length,
         });
       }
     },
@@ -411,13 +314,13 @@ export default {
             find: "",
             beginTime: "0001/1/1",
             finishTime: "9999/12/31",
-            orderType: ""
+            orderType: "",
           },
           { loading: false }
         );
         this.changeBadge({
           name: "orderDeal",
-          index: order.count
+          index: order.count,
         });
       }
     },
@@ -429,13 +332,13 @@ export default {
           cid: Cookies.get("cid"),
           limit: 9999,
           page: 1,
-          status: "待确认"
+          status: "待确认",
         };
         //let statement = await checkBill(url, data, { loading: false });
         let statement = await GetBalancePeriod(data, { loading: false });
         this.changeBadge({
           name: "statement",
-          index: statement.count
+          index: statement.count,
         });
       }
     },
@@ -450,7 +353,7 @@ export default {
             CID: Cookies.get("cid"),
             beginTime: "0001/1/1",
             finishTime: "9999/12/31",
-            STATUS: "1"
+            STATUS: "1",
           },
           { loading: false }
         );
@@ -462,13 +365,13 @@ export default {
             CID: Cookies.get("cid"),
             beginTime: "0001/1/1",
             finishTime: "9999/12/31",
-            STATUS: "4"
+            STATUS: "4",
           },
           { loading: false }
         );
         this.changeBadge({
           name: "payDelegation1",
-          index: payDelegation1.count + payDelegation2.count
+          index: payDelegation1.count + payDelegation2.count,
         });
       }
     },
@@ -483,13 +386,13 @@ export default {
             CID: Cookies.get("cid"),
             beginTime: "0001/1/1",
             finishTime: "9999/12/31",
-            STATUS: "2"
+            STATUS: "2",
           },
           { loading: false }
         );
         this.changeBadge({
           name: "payDelegation2",
-          index: payDelegation1.count
+          index: payDelegation1.count,
         });
       }
     },
@@ -504,13 +407,13 @@ export default {
             CID: Cookies.get("cid"),
             beginTime: "0001/1/1",
             finishTime: "9999/12/31",
-            STATUS: "2"
+            STATUS: "2",
           },
           { loading: false }
         );
         this.changeBadge({
           name: "lanju1",
-          index: lanju1.count
+          index: lanju1.count,
         });
       }
     },
@@ -526,13 +429,13 @@ export default {
             beginTime: "0001/1/1",
             finishTime: "9999/12/31",
             STATUS: "1",
-            type: 1
+            type: 1,
           },
           { loading: false }
         );
         this.changeBadge({
           name: "lanju2",
-          index: lanju1.count
+          index: lanju1.count,
         });
       }
     },
@@ -548,13 +451,13 @@ export default {
             beginTime: "0001/1/1",
             finishTime: "9999/12/31",
             STATUS: "8",
-            type: 2
+            type: 2,
           },
           { loading: false }
         );
         this.changeBadge({
           name: "lanju3",
-          index: lanju1.count
+          index: lanju1.count,
         });
       }
     },
@@ -570,13 +473,13 @@ export default {
             beginTime: "0001/1/1",
             finishTime: "9999/12/31",
             STATUS: "3",
-            type: 1
+            type: 1,
           },
           { loading: false }
         );
         this.changeBadge({
           name: "lanju4",
-          index: lanju1.count
+          index: lanju1.count,
         });
       }
     },
@@ -591,13 +494,13 @@ export default {
             CID: Cookies.get("cid"),
             beginTime: "0001/1/1",
             finishTime: "9999/12/31",
-            STATUS: 2
+            STATUS: 2,
           },
           { loading: false }
         );
         this.changeBadge({
           name: "complaint1",
-          index: complaint.count
+          index: complaint.count,
         });
       }
     },
@@ -612,13 +515,13 @@ export default {
             CID: Cookies.get("cid"),
             beginTime: "0001/1/1",
             finishTime: "9999/12/31",
-            STATUS: 1
+            STATUS: 1,
           },
           { loading: false }
         );
         this.changeBadge({
           name: "complaint2",
-          index: complaint.count
+          index: complaint.count,
         });
       }
     },
@@ -633,7 +536,7 @@ export default {
             CID: Cookies.get("cid"),
             beginTime: "0001/1/1",
             finishTime: "9999/12/31",
-            STATUS: 4
+            STATUS: 4,
           },
           { loading: false }
         );
@@ -645,13 +548,13 @@ export default {
             CID: Cookies.get("cid"),
             beginTime: "0001/1/1",
             finishTime: "9999/12/31",
-            STATUS: 5
+            STATUS: 5,
           },
           { loading: false }
         );
         this.changeBadge({
           name: "imageShop1",
-          index: imageShop1.count + imageShop2.count
+          index: imageShop1.count + imageShop2.count,
         });
       }
     },
@@ -666,13 +569,13 @@ export default {
             CID: Cookies.get("cid"),
             beginTime: "0001/1/1",
             finishTime: "9999/12/31",
-            STATUS: 1
+            STATUS: 1,
           },
           { loading: false }
         );
         this.changeBadge({
           name: "imageShop2",
-          index: imageShop1.count
+          index: imageShop1.count,
         });
       }
     },
@@ -687,13 +590,13 @@ export default {
             CID: Cookies.get("cid"),
             beginTime: "0001/1/1",
             finishTime: "9999/12/31",
-            STATUS: 2
+            STATUS: 2,
           },
           { loading: false }
         );
         this.changeBadge({
           name: "imageShop3",
-          index: imageShop1.count
+          index: imageShop1.count,
         });
       }
     },
@@ -703,13 +606,13 @@ export default {
         let wallpaper = await GetCartItemCount(
           {
             cid: Cookies.get("cid"),
-            commodityType: "wallpaper"
+            commodityType: "wallpaper",
           },
           { loading: false }
         );
         this.changeBadge({
           name: "wallCount",
-          index: wallpaper.count
+          index: wallpaper.count,
         });
       }
     },
@@ -719,13 +622,13 @@ export default {
         let curtain = await GetCartItemCount(
           {
             cid: Cookies.get("cid"),
-            commodityType: "curtain"
+            commodityType: "curtain",
           },
           { loading: false }
         );
         this.changeBadge({
           name: "curtainCount",
-          index: curtain.count
+          index: curtain.count,
         });
       }
     },
@@ -735,13 +638,13 @@ export default {
         let soft = await GetCartItemCount(
           {
             cid: Cookies.get("cid"),
-            commodityType: "soft"
+            commodityType: "soft",
           },
           { loading: false }
         );
         this.changeBadge({
           name: "softCount",
-          index: soft.count
+          index: soft.count,
         });
       }
     },
@@ -755,13 +658,13 @@ export default {
             page: 1,
             startDate: "0001/1/1",
             endDate: "9999/12/31",
-            state: "NEEDPROCESSING"
+            state: "NEEDPROCESSING",
           },
           { loading: false }
         );
         this.changeBadge({
           name: "newRefund1",
-          index: newRefund.count
+          index: newRefund.count,
         });
       }
     },
@@ -774,13 +677,13 @@ export default {
             page: 1,
             startDate: "0001/1/1",
             endDate: "9999/12/31",
-            state: "NEEDPROCESSING"
+            state: "NEEDPROCESSING",
           },
           { loading: false }
         );
         this.changeBadge({
           name: "newRefund2",
-          index: newRefundExamine1.count
+          index: newRefundExamine1.count,
         });
       }
     },
@@ -794,7 +697,7 @@ export default {
           let cardsCount = await Axios.post(
             this.Global.wangqianUrl + "/yulan/customerInfo/getCustomerInfo.do",
             {
-              CID: Cookies.get("companyId")
+              CID: Cookies.get("companyId"),
             },
             { loading: false }
           );
@@ -814,7 +717,7 @@ export default {
               "/yulan/infoState/getYLcontractentryState.do",
             {
               cid: Cookies.get("cid"),
-              cyear: new Date().getFullYear()
+              cyear: new Date().getFullYear(),
             },
             { loading: false }
           );
@@ -872,7 +775,7 @@ export default {
                       area_2: "",
                       cid: Cookies.get("cid"),
                       position: pos,
-                      ylcstate: ""
+                      ylcstate: "",
                     },
                     { loading: false }
                   );
@@ -898,7 +801,7 @@ export default {
                         area_2: "",
                         cid: Cookies.get("cid"),
                         position: pos,
-                        ylcstate: "SALEMANFILLING"
+                        ylcstate: "SALEMANFILLING",
                       },
                       { loading: false }
                     );
@@ -919,7 +822,7 @@ export default {
                         area_2: "",
                         cid: Cookies.get("cid"),
                         position: pos,
-                        ylcstate: "SALEMANMODIFYING"
+                        ylcstate: "SALEMANMODIFYING",
                       },
                       { loading: false }
                     );
@@ -940,7 +843,7 @@ export default {
                         find: "",
                         need: "checking",
                         cid: Cookies.get("cid"),
-                        position: pos
+                        position: pos,
                       },
                       { loading: false }
                     );
@@ -955,7 +858,7 @@ export default {
         }
         this.changeBadge({
           name: "wangqian",
-          index: allCount
+          index: allCount,
         });
       }
     },
@@ -966,11 +869,11 @@ export default {
       getUserMoney(
         {
           cid: this.cid,
-          companyId: Cookies.get("companyId")
+          companyId: Cookies.get("companyId"),
         },
         { loading: false } //传入参数控制页面是否loading
       )
-        .then(res => {
+        .then((res) => {
           if (this.isManager != "1") {
             if (res.data < 0) {
               this.moneySituation = "当前余额不足，请尽快打款";
@@ -982,7 +885,7 @@ export default {
           }
           this.refreshMoneyClass = "el-icon-refresh-left";
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     },
@@ -1002,7 +905,7 @@ export default {
       if (!screenfull.enabled) {
         this.$message({
           message: "您的浏览器不支持全屏!!!",
-          type: "warning"
+          type: "warning",
         });
         return false;
       }
@@ -1039,8 +942,8 @@ export default {
       this.$router.push({
         name: "login",
         params: {
-          autoSign: false
-        }
+          autoSign: false,
+        },
       });
       //this.$router.go(0);//刷新页面
     },
@@ -1048,8 +951,8 @@ export default {
     async getMenuTree() {
       this.$store.commit("navTabs/emptyMenuTreeList");
       await QueryWebMenuByUserId({
-        userid: JSON.parse(Cookies.get("userInfo")).userId
-      }).then(res => {
+        userid: JSON.parse(Cookies.get("userInfo")).userId,
+      }).then((res) => {
         if (res.data.children.length > 0) {
           this.setMenuTreeList(res.data.children);
           if (res.data.children.length == 1) {
@@ -1068,7 +971,7 @@ export default {
         } else {
           this.$alert("没有菜单权限，请联系管理员配置", "提示", {
             confirmButtonText: "确定",
-            type: "success"
+            type: "success",
           });
         }
       });
@@ -1076,8 +979,8 @@ export default {
     isContainAttr(attr) {
       //是否包含权限
       return (
-        this.menuTreeListFlatten.filter(item => item.MENU_LINK == attr).length >
-        0
+        this.menuTreeListFlatten.filter((item) => item.MENU_LINK == attr)
+          .length > 0
       );
     },
     startMove() {
@@ -1092,7 +995,7 @@ export default {
     },
     getNews() {
       //获得最新的生效公告
-      GetNewNotification({ cid: this.cid }).then(res => {
+      GetNewNotification({ cid: this.cid }).then((res) => {
         this.newsTextArr = res.data;
         if (this.newsTextArr.length > 0) {
           this.startMove();
@@ -1116,7 +1019,7 @@ export default {
                 InserFlag({
                   nid: this.newsTextArr[i].ID,
                   cid: this.cid,
-                  accept: 1
+                  accept: 1,
                 }); //标记为已显示
             }
           }
@@ -1129,7 +1032,7 @@ export default {
       this.notificationVisible = true;
     },
     getStudy() {
-      GetCustomerMustWriteStudy({ cid: this.cid }).then(res => {
+      GetCustomerMustWriteStudy({ cid: this.cid }).then((res) => {
         if (res.data.length > 0) {
           this.studySelectData = res.data[0];
           this.studyVisible = true;
@@ -1147,198 +1050,27 @@ export default {
       this.$refs[formName].resetFields();
     },
     changePassWord(formName) {
-      this.$refs[formName].validate(valid => {
+      this.$refs[formName].validate((valid) => {
         if (valid) {
           ChangePassword({
             loginName: this.cid,
             password: this.passwordForm.pw,
-            newPassword: this.passwordForm.npw
+            newPassword: this.passwordForm.npw,
           })
-            .then(res => {
+            .then((res) => {
               this.changePasswordVisible = false;
               this.resetForm(formName);
               this.$alert("修改成功", "提示", {
                 confirmButtonText: "确定",
-                type: "success"
+                type: "success",
               });
             })
-            .catch(res => {
+            .catch((res) => {
               this.$alert(res.msg ? res.msg : "修改失败", "提示", {
                 confirmButtonText: "确定",
-                type: "success"
+                type: "success",
               });
             });
-        }
-      });
-    },
-    getHotSale() {
-      this.hotSaleData = {};
-      this.hotSaleVersion = {};
-      this.hotSaleItem = {};
-      GetHotSales().then(res => {
-        if (res.data.length > 0) {
-          var itemData = res.data.filter(item => item.TYPE == "A"); //型号热销
-          var versionData = res.data.filter(item => item.TYPE == "B"); //版本热销
-          var curtainData = res.data.filter(item => item.TYPE == "C"); //窗帘版本推荐
-          var softData = res.data.filter(item => item.TYPE == "D"); //面料热销
-          var data = [];
-          var data2 = [];
-          var data3 = [];
-          var data4 = [];
-          var index = 0;
-          var indexx = 0;
-          //分成每行5个的数据
-          //版本
-          for (var i = 0; i < versionData.length; i++) {
-            if (i >= 5 * (index + 1)) {
-              index++;
-              indexx = 0;
-            }
-            if (i == 5 * index) {
-              data[index] = new Array();
-            }
-            data[index][indexx] = versionData[i];
-            indexx++;
-          }
-          if (data[index].length < 5) {
-            var len = 5 - data[index].length;
-            for (var i = 0; i < len; i++) {
-              data[index].push({
-                ITEM_NO: ""
-              });
-            }
-          }
-          this.hotSaleVersion = data;
-          //型号
-          index = 0;
-          indexx = 0;
-          for (var i = 0; i < itemData.length; i++) {
-            if (i >= 5 * (index + 1)) {
-              index++;
-              indexx = 0;
-            }
-            if (i == 5 * index) {
-              data2[index] = new Array();
-            }
-            data2[index][indexx] = itemData[i];
-            indexx++;
-          }
-          if (data2[index].length < 5) {
-            var len = 5 - data2[index].length;
-            for (var i = 0; i < len; i++) {
-              data2[index].push({
-                ITEM_NO: ""
-              });
-            }
-          }
-          this.hotSaleItem = data2;
-          //窗帘
-          index = 0;
-          indexx = 0;
-          for (var i = 0; i < curtainData.length; i++) {
-            if (i >= 5 * (index + 1)) {
-              index++;
-              indexx = 0;
-            }
-            if (i == 5 * index) {
-              data3[index] = new Array();
-            }
-            data3[index][indexx] = curtainData[i];
-            indexx++;
-          }
-          if (data3[index].length < 5) {
-            var len = 5 - data3[index].length;
-            for (var i = 0; i < len; i++) {
-              data3[index].push({
-                ITEM_NO: ""
-              });
-            }
-          }
-          this.hotSaleCurtain = data3;
-          //面料
-          index = 0;
-          indexx = 0;
-          for (var i = 0; i < softData.length; i++) {
-            if (i >= 5 * (index + 1)) {
-              index++;
-              indexx = 0;
-            }
-            if (i == 5 * index) {
-              data4[index] = new Array();
-            }
-            data4[index][indexx] = softData[i];
-            indexx++;
-          }
-          if (data4[index].length < 5) {
-            var len = 5 - data4[index].length;
-            for (var i = 0; i < len; i++) {
-              data4[index].push({
-                ITEM_NO: ""
-              });
-            }
-          }
-          this.hotSaleSoft = data4;
-        }
-      });
-    },
-    selectHot(itemNo) {
-      GetItemDetailById({ itemNo: itemNo }, { loading: false }).then(res => {
-        if (res.data) {
-          switch (res.data[0].PRODUCT_TYPE) {
-            case "KS": //窗帘
-              if (this.isContainAttr("shops/curtain")) {
-                this.addTab("shops/curtain");
-                this.$router.push({
-                  name: "curtain",
-                  params: {
-                    selectNo: itemNo
-                  }
-                });
-              } else {
-                console.log("没有该菜单");
-              }
-              break;
-            case "ML":
-            case "XHB":
-            case "PJB":
-            case "BZ":
-            case "GH":
-            case "TC":
-            case "OTHER":
-              if (this.isContainAttr("shops/softSuit")) {
-                this.addTab("shops/softSuit");
-                Cookies.set("activeNameSoftSuit", res.data[0].PRODUCT_TYPE);
-                this.$router.push({
-                  name: "softSuit",
-                  params: {
-                    selectNo: itemNo,
-                    selectType: res.data[0].PRODUCT_TYPE
-                  }
-                });
-              } else {
-                console.log("没有该菜单");
-              }
-              break;
-            default:
-              if (
-                res.data[0].PRO_TYPE == "qiang" ||
-                res.data[0].PRO_TYPE == "support" ||
-                res.data[0].PRO_TYPE == "other"
-              ) {
-                if (this.isContainAttr("shops/wallPaper")) {
-                  this.addTab("shops/wallPaper");
-                  this.$router.push({
-                    name: "wallPaper",
-                    params: {
-                      selectNo: itemNo
-                    }
-                  });
-                } else {
-                  console.log("没有该菜单");
-                }
-              }
-              break;
-          }
         }
       });
     },
@@ -1365,7 +1097,7 @@ export default {
       this.newRefundUserIcon();
       this.newRefundExamineIcon();
       this.getWangQianIcon();
-    }
+    },
   },
   computed: {
     ...mapState("navTabs", ["tabList", "menuTreeList", "menuTreeListFlatten"]),
@@ -1394,10 +1126,10 @@ export default {
       set(value) {
         this.$store.commit("navTabs/setActiveUrlName", value);
         this.$router.push({
-          path: "/" + this.$store.state.navTabs.activeUrlName
+          path: "/" + this.$store.state.navTabs.activeUrlName,
         });
-      }
-    }
+      },
+    },
   },
   mounted() {
     window.onresize = () => {
@@ -1419,7 +1151,7 @@ export default {
         this.logout();
         this.$alert("长时间未操作，自动退出", "提示", {
           confirmButtonText: "确定",
-          type: "info"
+          type: "info",
         });
       } else if (
         new Date().getTime() - this.lastClickTime >=
@@ -1432,7 +1164,7 @@ export default {
           message: `长时间未操作，将在${Math.ceil(
             (interval - (new Date().getTime() - this.lastClickTime)) / 1000
           )}秒后自动退出(点击任意位置可继续操作)`,
-          type: "warning"
+          type: "warning",
         });
       }
     }, 1000);
@@ -1457,7 +1189,7 @@ export default {
     if (this.customerType != "110") this.getNews();
     if (this.identity == "ECWEB") this.userMoney(); //获得用户余额
     //触发角标刷新
-    this.$root.$on("refreshBadgeIcon", value => {
+    this.$root.$on("refreshBadgeIcon", (value) => {
       switch (value) {
         case "painting":
           this.PaintingIcon();
@@ -1521,7 +1253,7 @@ export default {
           break;
       }
     });
-    document.onkeydown = function(event) {
+    document.onkeydown = function (event) {
       var key = window.event.keyCode;
       if (key == 27) {
         if (this.fullscreen == true) {
@@ -1533,13 +1265,11 @@ export default {
     this.$root.$on("refreshMoneyEvent", () => {
       this.userMoney();
     });
-    this.getHotSale(); //获得热销榜
   },
   beforeDestroy() {
     clearInterval(this.newsTimer);
     clearInterval(this.timeOutTimer);
   },
-  watch: {}
 };
 </script>
 
@@ -1548,8 +1278,8 @@ export default {
   width: 99.5%;
   margin: 0 auto;
 }
-/*侧边栏样式*/
-#aside-header {
+/*侧边栏顶部图标*/
+.aside-header {
   width: 100%;
   height: 60px;
   display: flex;
@@ -1560,7 +1290,7 @@ export default {
   font-size: 20px;
   font-weight: bold;
 }
-#aside-logo {
+.aside-logo {
   width: 42px;
   height: 42px;
   margin-right: 15px;
@@ -1572,18 +1302,19 @@ export default {
 }
 
 /*顶部导航样式*/
-.el-header {
+.first-header {
+  height: 40px !important;
   background: #8bc34a;
   padding: 0;
 }
-.el-header li {
+.first-header li {
   float: left;
 }
-.el-header li:hover {
+.first-header li:hover {
   cursor: pointer;
   background: #86b450;
 }
-.el-header ul {
+.first-header ul {
   margin: 0 10px;
 }
 .headIcon {
@@ -1613,8 +1344,11 @@ export default {
   color: #606266;
   background: #eee;
 }
+.second-header {
+  height: 41px !important;
+  padding: 0 2px 0 0;
+}
 .tabs {
-  margin: 0 -4px;
   padding: 0;
   width: 100%;
   height: 40px;
@@ -1627,50 +1361,19 @@ export default {
   vertical-align: middle;
   font-size: 12px;
 }
-.vertically {
-  position: fixed;
-  top: 50%;
-  color: #300112;
-}
-.slide-enter-active {
-  transition: all 0.5s linear;
-}
-.slide-leave-active {
-  opacity: 0;
-}
-.slide-enter {
-  opacity: 0;
-}
-.slide-leave-to {
-  opacity: 0;
-}
-.numIndex {
-  display: inline-block;
-  padding: 1px 0;
-  color: #fff;
-  min-width: 15px;
-  line-height: 100%;
-  font-size: 12px;
+.up-class {
+  height: 100%;
+  width: 100%;
+  background-color: #f2f5f6;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.12);
   text-align: center;
-  margin-right: 5px;
+  line-height: 40px;
+  color: #1989fa;
 }
-.hot-index1 {
-  background-color: #f54545 !important;
-}
-.hot-index2 {
-  background-color: #ff8547 !important;
-}
-.hot-index3 {
-  background-color: #ffac38 !important;
-}
-.hot-index-normal {
-  background-color: #8eb9f5;
-}
-.hoverAlink {
-  cursor: pointer;
-}
-.hoverAlink:hover {
-  text-decoration: underline !important;
+.backTop {
+  margin: 0;
+  padding: 10px;
+  background: #ecf5ef;
 }
 </style>
 
@@ -1682,7 +1385,7 @@ export default {
   padding: 10px 15px !important;
 }
 .el-card__body {
-  padding: 10px
+  padding: 10px;
 }
 .el-dialog__body {
   padding: 20px;
@@ -1706,19 +1409,19 @@ export default {
 .el-table .success-row {
   background: #f0f9eb;
 }
-.el-tabs--border-card>.el-tabs__content{
+.el-tabs--border-card > .el-tabs__content {
   padding: 10px !important;
 }
-.el-input.is-disabled .el-input__inner{
+.el-input.is-disabled .el-input__inner {
   color: #606266 !important;
 }
-.el-textarea.is-disabled .el-textarea__inner{
+.el-textarea.is-disabled .el-textarea__inner {
   color: #606266 !important;
 }
-.el-radio__input.is-disabled+span.el-radio__label{
+.el-radio__input.is-disabled + span.el-radio__label {
   color: #606266;
 }
-.el-radio__input.is-checked+.el-radio__label{
-  color: #409EFF !important;
+.el-radio__input.is-checked + .el-radio__label {
+  color: #409eff !important;
 }
 </style>

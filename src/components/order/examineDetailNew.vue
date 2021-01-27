@@ -1062,6 +1062,7 @@ export default {
       }
       if (type == "ls") {
         this.chooseBig[rowIndex][2] = this.chooseBig[rowIndex][index];
+        //勾选掉帘身时也同时不要帘身配布
         this.changeLink("lspb", 2, rowIndex);
       }
       this.changeLinkTip(type, index, rowIndex);
@@ -2162,7 +2163,7 @@ export default {
 }
 .fixHead {
   position: fixed;
-  top: 41px;
+  top: 81px;
   z-index: 100;
   background: white;
   width: 100%;

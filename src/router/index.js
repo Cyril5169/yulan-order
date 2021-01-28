@@ -7,6 +7,7 @@ import WallPaper from '@/components/shops/wallPaper'
 import Curtain from '@/components/shops/curtain'
 import SoftSuit from '@/components/shops/softSuit'
 import fixPriceShops from '@/components/shops/fixPriceShops'
+import newCurtainShops from '@/components/shops/newCurtainShops'
 import BankProof from '@/components/bankProof'
 import painting from '@/components/painting'
 import yulanPainting from '@/components/yulanPainting'
@@ -107,6 +108,11 @@ const router = new Router({
           path: '/shops/fixPriceShops',
           name: 'fixPriceShops',
           component: fixPriceShops
+        },
+        {
+          path: '/shops/newCurtainShops',
+          name: 'newCurtainShops',
+          component: newCurtainShops
         },
         {
           path: '/shops/shoppingCurtainDetail',

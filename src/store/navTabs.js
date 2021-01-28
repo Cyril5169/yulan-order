@@ -1,9 +1,3 @@
-import Vuex from 'vuex'
-import { tabsName } from './util'
-import store from '.';
-//默认主页
-// const Home = resolve => require(['../views/Home'], resolve)
-
 const state = {
     activeTabName: 'home',  //当前页面(去参)
     activeUrlName: 'home',  //当前页面(带参)
@@ -45,12 +39,9 @@ const mutations = {
             else isClose = true;
             let tabName = '';
             var mapTab = state.menuTreeListFlatten.filter(item => item.MENU_LINK == oldIndex);
-            if (mapTab.length > 0)
-                tabName = mapTab[0].MENU_TEXT;
-            else
-                tabName = tabsName(index);
+            if (mapTab.length > 0) tabName = mapTab[0].MENU_TEXT;
+            else if(index == 'main') tabName = '主页'
             state.tabList.push({
-                //label: tabsName(index),     //选项卡标题
                 label: tabName,     //选项卡标题
                 name: index,                //唯一标识id，指向组件
                 disabled: false,            //是否禁用  （默认false）

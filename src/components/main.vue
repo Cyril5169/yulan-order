@@ -203,7 +203,6 @@ export default {
       asideStatus:
         window.localStorage.getItem("asideStatus") &&
         window.localStorage.getItem("asideStatus") == "true", //false:菜单栏处于展开状态； true：菜单栏处于收起状态
-      defaultUrl: "",
       isFullscreen: false,
       adminText: "无新公告发布!",
       moneySituation: "",
@@ -863,7 +862,7 @@ export default {
       }
     },
     //获取用户余额情况
-    async userMoney() {
+    async refreshUserMoney() {
       this.refreshMoneyClass = "el-icon-loading";
       this.moneySituation = "";
       getUserMoney(
@@ -888,9 +887,6 @@ export default {
         .catch((err) => {
           console.log(err);
         });
-    },
-    refreshUserMoney() {
-      this.userMoney();
     },
     lastClick() {
       this.lastClickTime = new Date().getTime();
@@ -924,10 +920,6 @@ export default {
       }
       return isFull;
     },
-    //获取当前路径
-    getPath() {
-      this.defaultUrl = window.location.href.split("#/")[1];
-    },
     //点击标签页触发的事件
     getTab(val) {
       this.$store.commit("navTabs/setActiveUrlName", val.name);
@@ -955,6 +947,11 @@ export default {
       }).then((res) => {
         if (res.data.children.length > 0) {
           this.setMenuTreeList(res.data.children);
+          //加载主页和刷新之前的菜单
+          this.addTab("main");
+          var defaultUrl = window.location.href.split("#/")[1];
+          this.addTab(defaultUrl); //刷新之后添加的
+          //只有一个菜单，默认加载
           if (res.data.children.length == 1) {
             if (
               res.data.children[0].MENU_TYPE == "menu" &&
@@ -967,7 +964,7 @@ export default {
           if (this.isContainAttr("marketInfo")) {
             this.getStudy(); //有权限才加载调查表
           }
-          this.getIconAll();
+          this.getAllBadge();
         } else {
           this.$alert("没有菜单权限，请联系管理员配置", "提示", {
             confirmButtonText: "确定",
@@ -1075,7 +1072,7 @@ export default {
       });
     },
     //获取角标在获取权限之后
-    getIconAll() {
+    getAllBadge() {
       this.addBadgeIcon();
       this.PaintingIcon();
       this.OrderDealIcon();
@@ -1098,98 +1095,8 @@ export default {
       this.newRefundExamineIcon();
       this.getWangQianIcon();
     },
-  },
-  computed: {
-    ...mapState("navTabs", ["tabList", "menuTreeList", "menuTreeListFlatten"]),
-    ...mapState("badge", ["wangqian"]),
-    key() {
-      return this.$route.name !== undefined ? this.$route.name : this.$route;
-    },
-    //切换标签页时导航菜单的变换,用来满足奇怪需求
-    url() {
-      let index = this.$store.state.navTabs.activeUrlName;
-      if (index === "detail/detailWallPaper") {
-        return "shoppingCar/shopping?wallPaper";
-      }
-      if (index === "detail/detailSoftSuit") {
-        return "shoppingCar/shopping?softSuit";
-      }
-      if (index === "detail/detailCurtain") {
-        return "shoppingCar/shopping?curtain";
-      }
-      return index;
-    },
-    activeTabName: {
-      get() {
-        return this.$store.state.navTabs.activeTabName;
-      },
-      set(value) {
-        this.$store.commit("navTabs/setActiveUrlName", value);
-        this.$router.push({
-          path: "/" + this.$store.state.navTabs.activeUrlName,
-        });
-      },
-    },
-  },
-  mounted() {
-    window.onresize = () => {
-      // 全屏下监控是否按键了ESC
-      if (!this.checkFull()) {
-        // 全屏下按键esc后要执行的动作
-        this.isFullscreen = false;
-      }
-    };
-    window.onkeydown = () => {
-      this.lastClickTime = new Date().getTime();
-    };
-    this.timeOutTimer = setInterval(() => {
-      var interval = 15 * 60 * 1000;
-      if (new Date().getTime() - this.lastClickTime >= interval) {
-        //15分钟不操作自动退出
-        this.$message.close();
-        clearInterval(this.timeOutTimer);
-        this.logout();
-        this.$alert("长时间未操作，自动退出", "提示", {
-          confirmButtonText: "确定",
-          type: "info",
-        });
-      } else if (
-        new Date().getTime() - this.lastClickTime >=
-        interval - 10 * 1000
-      ) {
-        //10秒提醒
-        this.$message.close();
-        this.$message({
-          duration: 1000,
-          message: `长时间未操作，将在${Math.ceil(
-            (interval - (new Date().getTime() - this.lastClickTime)) / 1000
-          )}秒后自动退出(点击任意位置可继续操作)`,
-          type: "warning",
-        });
-      }
-    }, 1000);
-  },
-  beforeCreate() {
-    if (Cookies.get("cid") === null || Cookies.get("cid") === undefined) {
-      Cookies.set("cid", "C01613");
-    }
-    if (
-      Cookies.get("customerType") === null ||
-      Cookies.get("customerType") === undefined
-    ) {
-      Cookies.set("customerType", "02");
-    }
-  },
-  created() {
-    this.getMenuTree(); //获得菜单权限树,获取角标在后去权限之后
-    this.getPath();
-    this.addTab("main");
-    this.addTab(this.defaultUrl); //刷新之后添加的
-    //获得最新公告
-    if (this.customerType != "110") this.getNews();
-    if (this.identity == "ECWEB") this.userMoney(); //获得用户余额
-    //触发角标刷新
-    this.$root.$on("refreshBadgeIcon", (value) => {
+    //根据名称判断刷新哪个角标
+    refreshBadgeCount(value) {
       switch (value) {
         case "painting":
           this.PaintingIcon();
@@ -1252,7 +1159,63 @@ export default {
           this.newRefundExamineIcon();
           break;
       }
+    },
+  },
+  computed: {
+    ...mapState("navTabs", ["tabList", "menuTreeList", "menuTreeListFlatten"]),
+    ...mapState("badge", ["wangqian"]),
+    key() {
+      return this.$route.name !== undefined ? this.$route.name : this.$route;
+    },
+    //切换标签页时导航菜单的变换,用来满足奇怪需求
+    url() {
+      let index = this.$store.state.navTabs.activeUrlName;
+      if (index === "detail/detailWallPaper") {
+        return "shoppingCar/shopping?wallPaper";
+      }
+      if (index === "detail/detailSoftSuit") {
+        return "shoppingCar/shopping?softSuit";
+      }
+      if (index === "detail/detailCurtain") {
+        return "shoppingCar/shopping?curtain";
+      }
+      return index;
+    },
+    activeTabName: {
+      get() {
+        return this.$store.state.navTabs.activeTabName;
+      },
+      set(value) {
+        this.$store.commit("navTabs/setActiveUrlName", value);
+        this.$router.push({
+          path: "/" + this.$store.state.navTabs.activeUrlName,
+        });
+      },
+    },
+  },
+  mounted() {
+    this.getMenuTree(); //获得菜单权限树,获取角标在后去权限之后
+
+    //获得最新公告
+    if (this.customerType != "110") this.getNews();
+    if (this.identity == "ECWEB") this.refreshUserMoney(); //获得用户余额
+
+    //触发角标刷新
+    this.$root.$on("refreshBadgeIcon", (value) => {
+      this.refreshBadgeCount(value);
     });
+    //可以从其他页面触发刷新余额
+    this.$root.$on("refreshMoneyEvent", () => {
+      this.refreshUserMoney();
+    });
+
+    window.onresize = () => {
+      // 全屏下监控是否按键了ESC
+      if (!this.checkFull()) {
+        // 全屏下按键esc后要执行的动作
+        this.isFullscreen = false;
+      }
+    };
     document.onkeydown = function (event) {
       var key = window.event.keyCode;
       if (key == 27) {
@@ -1261,10 +1224,47 @@ export default {
         }
       }
     };
-    //可以从其他页面触发刷新余额
-    this.$root.$on("refreshMoneyEvent", () => {
-      this.userMoney();
-    });
+    //点击页面，重置自动退出时间判断
+    window.onkeydown = () => {
+      this.lastClickTime = new Date().getTime();
+    };
+    this.timeOutTimer = setInterval(() => {
+      var interval = 15 * 60 * 1000;
+      if (new Date().getTime() - this.lastClickTime >= interval) {
+        //15分钟不操作自动退出
+        this.$message.close();
+        clearInterval(this.timeOutTimer);
+        this.logout();
+        this.$alert("长时间未操作，自动退出", "提示", {
+          confirmButtonText: "确定",
+          type: "info",
+        });
+      } else if (
+        new Date().getTime() - this.lastClickTime >=
+        interval - 10 * 1000
+      ) {
+        //10秒提醒
+        this.$message.close();
+        this.$message({
+          duration: 1000,
+          message: `长时间未操作，将在${Math.ceil(
+            (interval - (new Date().getTime() - this.lastClickTime)) / 1000
+          )}秒后自动退出(点击任意位置可继续操作)`,
+          type: "warning",
+        });
+      }
+    }, 1000);
+  },
+  beforeCreate() {
+    if (Cookies.get("cid") === null || Cookies.get("cid") === undefined) {
+      Cookies.set("cid", "C01613");
+    }
+    if (
+      Cookies.get("customerType") === null ||
+      Cookies.get("customerType") === undefined
+    ) {
+      Cookies.set("customerType", "02");
+    }
   },
   beforeDestroy() {
     clearInterval(this.newsTimer);

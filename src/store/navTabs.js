@@ -1,3 +1,5 @@
+import { tabsName } from './util'
+
 const state = {
     activeTabName: 'home',  //当前页面(去参)
     activeUrlName: 'home',  //当前页面(带参)
@@ -39,8 +41,10 @@ const mutations = {
             else isClose = true;
             let tabName = '';
             var mapTab = state.menuTreeListFlatten.filter(item => item.MENU_LINK == oldIndex);
-            if (mapTab.length > 0) tabName = mapTab[0].MENU_TEXT;
-            else if(index == 'main') tabName = '主页'
+            if (mapTab.length > 0)
+                tabName = mapTab[0].MENU_TEXT;
+            else
+                tabName = tabsName(index);
             state.tabList.push({
                 label: tabName,     //选项卡标题
                 name: index,                //唯一标识id，指向组件

@@ -715,12 +715,6 @@ p {
 .p20 {
   padding: 10px 0;
 }
-.mb10 {
-  margin-bottom: 10px;
-}
-.mr40 {
-  margin-right: 40px;
-}
 .p-click {
   position: relative;
   bottom: 3px;

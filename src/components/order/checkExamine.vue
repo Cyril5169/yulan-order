@@ -764,7 +764,7 @@ export default {
     //隔行变色
     tableRowClassName({ row, rowIndex }) {
       if (row.STATUS_ID == "3") {
-        return "fuck-row";
+        return "delete-row";
       }
       if (rowIndex % 2 == 0) {
         return "success-row";
@@ -826,7 +826,7 @@ export default {
 .el-table .success-row {
   background: #f0f9eb;
 }
-.el-table .fuck-row {
+.el-table .delete-row {
   background: #f0f9eb;
   color: tomato;
   text-decoration: line-through;

@@ -71,23 +71,23 @@
         </el-header>
         <el-main class="backTop" id="mainBackTop">
           <div class="notice">
-              <i class="el-icon-bell ml10 mr10 f16" style="line-height:30px;color:gold;font-weight:bold;"></i>
-              <span style="color:red;margin-right:5px;margin-top:5px;">最新公告：</span>
-              <span v-if="newsTextArr.length == 0">{{ adminText }}</span>
-              <span v-else style="line-height:30px;">
-                <transition name="slide">
-                  <a style="cursor:pointer;text-decoration:underline" :key="newsTextArr[newsIndex].ID"
-                    @click="showNotification(newsTextArr[newsIndex])">{{ newsTextArr[newsIndex].TITLE }}</a>
-                </transition>
-              </span>
-              <span v-if="identity == 'ECWEB'" class="r f14 mr10" style="line-height:30px;color:red;">
-                <strong>
-                  <i>{{ moneySituation }}</i>
-                </strong>
-                <i title="刷新余额" :class="refreshMoneyClass" style="color:black;cursor:pointer;"
-                  @click="refreshUserMoney"></i>
-              </span>
-            </div>
+            <i class="el-icon-bell ml10 mr10 f16" style="line-height:30px;color:gold;font-weight:bold;"></i>
+            <span style="color:red;margin-right:5px;margin-top:5px;">最新公告：</span>
+            <span v-if="newsTextArr.length == 0">{{ adminText }}</span>
+            <span v-else style="line-height:30px;">
+              <transition name="slide">
+                <a style="cursor:pointer;text-decoration:underline" :key="newsTextArr[newsIndex].ID"
+                  @click="showNotification(newsTextArr[newsIndex])">{{ newsTextArr[newsIndex].TITLE }}</a>
+              </transition>
+            </span>
+            <span v-if="identity == 'ECWEB'" class="r f14 mr10" style="line-height:30px;color:red;">
+              <strong>
+                <i>{{ moneySituation }}</i>
+              </strong>
+              <i title="刷新余额" :class="refreshMoneyClass" style="color:black;cursor:pointer;"
+                @click="refreshUserMoney"></i>
+            </span>
+          </div>
           <div v-if="activeTabName == 'main' && identity != 'SUPLY'">
             <hot-sale />
           </div>
@@ -126,7 +126,7 @@
 
     <!-- 修改密码 -->
     <el-dialog title="修改密码" :close-on-click-modal="false" :visible.sync="changePasswordVisible" width="450px">
-      <el-form :model="passwordForm" :rules="passwordRules" ref="passwordForm" class="passwordForm">
+      <el-form :model="passwordForm" :rules="passwordRules" ref="passwordForm" class="passwordForm" label-width="80px">
         <el-form-item label="原密码" prop="pw">
           <el-input style="width:300px;" type="password" v-model="passwordForm.pw" placeholder="填写原密码"
             autocomplete="off"></el-input>
@@ -1278,6 +1278,10 @@ export default {
   width: 99.5%;
   margin: 0 auto;
 }
+.page {
+  box-sizing: border-box;
+  height: 100vh;
+}
 /*侧边栏顶部图标*/
 .aside-header {
   width: 100%;
@@ -1378,17 +1382,14 @@ export default {
 </style>
 
 <style>
-.passwordForm .el-form-item__label {
-  width: 80px;
-}
 .el-card__header {
   padding: 10px 15px !important;
 }
 .el-card__body {
-  padding: 10px;
+  padding: 10px !important;
 }
 .el-dialog__body {
-  padding: 20px;
+  padding: 20px !important;
 }
 .el-table td,
 .el-table th {
@@ -1411,6 +1412,9 @@ export default {
 }
 .el-tabs--border-card > .el-tabs__content {
   padding: 10px !important;
+}
+.el-scrollbar .el-scrollbar__wrap {
+  overflow-x: hidden;
 }
 .el-input.is-disabled .el-input__inner {
   color: #606266 !important;

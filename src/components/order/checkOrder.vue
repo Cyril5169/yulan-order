@@ -38,14 +38,14 @@
             </el-option>
           </el-select>
           <div>
-            <el-form :model="form" ref="form" class="demo-ruleForm" :rules="formRules">
-              <el-form-item label="详细地址" :label-width="formLabelWidth" prop="address">
+            <el-form :model="form" ref="form" class="demo-ruleForm" :rules="formRules" label-width="80px">
+              <el-form-item label="详细地址" prop="address">
                 <el-input style="width:90%;" v-model="form.address" autocomplete="off" placeholder="请输入详细地址"></el-input>
               </el-form-item>
-              <el-form-item label="收货人" :label-width="formLabelWidth" prop="name">
+              <el-form-item label="收货人" prop="name">
                 <el-input style="width:90%;" v-model="form.name" autocomplete="off" placeholder="请输入收货人姓名"></el-input>
               </el-form-item>
-              <el-form-item label="联系电话" :label-width="formLabelWidth" prop="telephone">
+              <el-form-item label="联系电话" prop="telephone">
                 <el-input style="width:90%;" v-model="form.telephone" autocomplete="off" placeholder="请输入联系电话">
                 </el-input>
               </el-form-item>
@@ -466,7 +466,6 @@ export default {
         },
       ],
       packingShow: false,
-      formLabelWidth: "80px",
       addressAppear: "更多地址⇣",
       overflow: "",
       addressIt: false,

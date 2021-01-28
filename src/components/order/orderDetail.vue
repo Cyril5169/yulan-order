@@ -347,7 +347,7 @@ export default {
     //隔行变色
     tableRowClassName({ row, rowIndex }) {
       if (row.STATUS_ID == "3") {
-        return "fuck-row";
+        return "delete-row";
       }
       if (rowIndex % 2 == 0) {
         return "success-row";

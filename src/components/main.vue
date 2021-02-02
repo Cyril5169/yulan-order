@@ -1229,9 +1229,9 @@ export default {
       this.lastClickTime = new Date().getTime();
     };
     this.timeOutTimer = setInterval(() => {
-      var interval = 15 * 60 * 1000;
+      var interval = 30 * 60 * 1000;
       if (new Date().getTime() - this.lastClickTime >= interval) {
-        //15分钟不操作自动退出
+        //30分钟不操作自动退出
         this.$message.close();
         clearInterval(this.timeOutTimer);
         this.logout();

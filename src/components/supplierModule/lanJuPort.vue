@@ -1241,7 +1241,6 @@ import {
 import { downLoadFile } from "@/common/js/downLoadFile";
 import Cookies from "js-cookie";
 import Axios from "axios";
-import Vue from "vue";
 
 export default {
   name: "supplyJuPort",

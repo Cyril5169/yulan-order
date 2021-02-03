@@ -1563,7 +1563,7 @@ export default {
       return false;
     },
     oneTotal(row) {
-      var price = this.dosageFilter(this.calculatePromotionPrice(row));
+      var price = this.calculatePromotionPrice(row);
       if(row.dosage == undefined) row.dosage = 0;
       return price.mul(row.dosage);
     },

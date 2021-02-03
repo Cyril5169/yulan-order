@@ -2,7 +2,7 @@
   <el-card shadow="never" style="min-height:500px;">
     <div>
       <el-input clearable v-model.trim="searchKey" @clear="searchCurtain" @keyup.enter.native="searchCurtain"
-        placeholder="输入帘款查找窗帘" style="width:300px;">
+        placeholder="请输入帘款查找窗帘" style="width:300px;">
         <el-button @click="searchCurtain" slot="append" icon="el-icon-search">搜索</el-button>
       </el-input>
     </div>
@@ -14,20 +14,30 @@
       <!-- 帘款参数 -->
       <div class="curtain-params">
         <span>成品宽：</span>
-        <el-input style="width:60px;" size="mini" v-model="curtainHeadData.width"></el-input>
+        <el-input style="width:60px;" size="mini" v-model="curtainHeadData.width" @input="changeHeadWidth" oninput="value=value.replace(/[^\d.]/g,'')
+                           .replace(/^\./g, '').replace(/\.{2,}/g, '.')
+                           .replace('.', '$#$').replace(/\./g, '')
+                           .replace('$#$', '.')
+                           .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
         <span style="margin-left:20px;">成品高：</span>
-        <el-input style="width:60px;" size="mini" v-model="curtainHeadData.height"></el-input>
+        <el-input style="width:60px;" size="mini" v-model="curtainHeadData.height" @input="changeHeadHeight" oninput="value=value.replace(/[^\d.]/g,'')
+                           .replace(/^\./g, '').replace(/\.{2,}/g, '.')
+                           .replace('.', '$#$').replace(/\./g, '')
+                           .replace('$#$', '.')
+                           .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
         <span style="margin-left:20px;">活动：</span>
-        <el-select size="mini" style="width:250px" :disabled="activityOptions.length == 1"
+        <el-select size="mini" style="width:220px" :disabled="activityOptions.length == 1"
           v-model="curtainHeadData.activityId" :placeholder="activityOptions.length == 1? '无可选活动': '请选择活动'">
           <el-option v-for="item in activityOptions" :key="item.P_ID"
             :label="item.ORDER_TYPE? item.ORDER_TYPE + ' -- ' + item.ORDER_NAME : item.ORDER_NAME" :value="item.P_ID">
           </el-option>
         </el-select>
+        <span style="margin-left:20px;">位置：</span>
+        <el-input style="width:100px;" v-model="curtainHeadData.location" size="mini"></el-input>
       </div>
       <!-- 窗帘部件 -->
       <div class="curtain-list">
-        <el-table :data="curtainData" class="curtain-table" size="small" border :span-method="cellMerge">
+        <el-table :data="curtainData" class="curtain-table" border :span-method="cellMerge">
           <el-table-column label="预览" width="150" align="center">
             <template slot-scope="scope">
               <!-- 显示图片预览 -->
@@ -46,42 +56,86 @@
                 :style="{'font-weight': scope.row.curtain_level==0?'bold':''}">{{transPartTypeCode(scope.row.NC_PART_TYPECODE)}}</span>
             </template>
           </el-table-column>
-          <el-table-column label="编码" width="130" header-align="center" prop="ITEM_NO">
+          <el-table-column label="编码" width="170" header-align="center" prop="ITEM_NO">
             <template slot-scope="scope">
               <!-- 是否可替换 -->
-              <a v-if="scope.row.NCM_CHANGE == 'Y'" class="a-link"
+              <a v-if="scope.row.NCT_CHANGE == 1 && scope.row.NCM_CHANGE == 1" class="a-link"
                 :class="{'delete-cls': !scope.row.curtain_choose}">{{scope.row.ITEM_NO}}</a>
               <span v-else :class="{'delete-cls': !scope.row.curtain_choose}">{{scope.row.ITEM_NO}}</span>
-              <!-- 是否可删 -->
-              <el-checkbox v-if="scope.row.NCM_DELETE == 'Y'" v-model="scope.row.curtain_choose"></el-checkbox>
+              <!-- 是否可删/是否默认勾选 -->
+              <el-checkbox v-if="scope.row.NCT_DELETE > 0 && scope.row.NCM_DELETE > 0"
+                v-model="scope.row.curtain_choose"></el-checkbox>
             </template>
           </el-table-column>
-          <el-table-column label="名称" width="80" header-align="center" prop="NOTE">
+          <el-table-column label="名称" width="100" header-align="center" prop="NOTE">
           </el-table-column>
-          <el-table-column label="制造说明" width="180" align="center">
+          <el-table-column label="制造说明" width="220" header-align="center">
             <template slot-scope="scope">
-
+              <!-- N个配置项逐个检测 -->
+              <!-- 宽，高 -->
+              <div class="manufacturing-ct">
+                <template v-if="scope.row.WIDTH_ENABLE == 1">
+                  <span class="manufacturing-item">【宽】:{{ scope.row.curtain_width }}</span>
+                </template>
+                <template v-if="scope.row.WIDTH_ENABLE == 2">
+                  <span class="manufacturing-item">【宽】: <el-input v-model="scope.row.curtain_width" style="width:40px;"
+                      size="mini" @input="changeOneWidthOrHeight($event, scope.$index)" oninput="value=value.replace(/[^\d.]/g,'')
+                           .replace(/^\./g, '').replace(/\.{2,}/g, '.')
+                           .replace('.', '$#$').replace(/\./g, '')
+                           .replace('$#$', '.')
+                           .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
+                  </span>
+                </template>
+                <template v-if="scope.row.HEIGHT_ENABLE == 1">
+                  <span class="manufacturing-item">【高】:{{ scope.row.curtain_height }}</span>
+                </template>
+                <template v-if="scope.row.HEIGHT_ENABLE == 2">
+                  <span class="manufacturing-item">【高】: <el-input v-model="scope.row.curtain_height" style="width:40px;"
+                      size="mini" @input="changeOneWidthOrHeight($event, scope.$index)" oninput="value=value.replace(/[^\d.]/g,'')
+                           .replace(/^\./g, '').replace(/\.{2,}/g, '.')
+                           .replace('.', '$#$').replace(/\./g, '')
+                           .replace('$#$', '.')
+                           .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
+                  </span>
+                </template>
+              </div>
             </template>
           </el-table-column>
-          <el-table-column label="数量" width="50" align="center"></el-table-column>
-          <el-table-column label="单位" width="50" align="center" prop="UNIT_NAME"></el-table-column>
-          <el-table-column label="库存" width="50" align="center"></el-table-column>
-          <el-table-column label="单价" width="50" align="center" prop="curtain_price" v-if="isManager != '0'">
+          <el-table-column label="数量" width="60" align="center" prop="curtain_area">
+            <template slot-scope="scope">
+              <!-- 只有部件显示数量 -->
+              <span v-if="scope.row.curtain_level == 0">{{scope.row.curtain_area}}</span>
+              <span v-else>-</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="单位" width="70" align="center" prop="UNIT_NAME"></el-table-column>
+          <el-table-column label="库存" width="60" align="center" prop="curtain_store"></el-table-column>
+          <el-table-column label="单价" width="60" align="center" prop="curtain_price" v-if="isManager != '0'">
             <template slot-scope="scope">
               <!-- 只有部件算钱 -->
               <span v-if="scope.row.curtain_level == 0">{{scope.row.curtain_price}}</span>
               <span v-else>-</span>
             </template>
           </el-table-column>
-          <el-table-column label="折后" width="50" align="center" v-if="isManager != '0'">
+          <el-table-column label="折后" width="60" align="center" v-if="isManager != '0'">
             <template slot-scope="scope">
+              <!-- 只有部件算钱 -->
               <span v-if="scope.row.curtain_level == 0">{{ calculatePromotionPrice(scope.row) }}</span>
               <span v-else>-</span>
             </template>
           </el-table-column>
-          <el-table-column label="总价" width="50" align="center"></el-table-column>
+          <el-table-column label="总价" width="60" align="center" v-if="isManager != '0'">
+            <template slot-scope="scope">
+              <!-- 只有部件算钱 -->
+              <span v-if="scope.row.curtain_level == 0">{{ oneTotal(scope.row) }}</span>
+              <span v-else>-</span>
+            </template>
+          </el-table-column>
           <el-table-column label="说明" align="center"></el-table-column>
         </el-table>
+        <div v-if="isManager != '0'" style="font-size:16px;margin-top:10px;margin-left: 985px;">
+          <span>总计：<span style="color:red;">￥{{ allTotal | dosageFilter }}</span></span>
+        </div>
       </div>
     </div>
   </el-card>
@@ -127,6 +181,16 @@ export default {
         return {};
       }
     },
+    allTotal() {
+      var totalMoney = 0;
+      //找到勾选的
+      for (var i = 0; i < this.curtainData.length; i++) {
+        if (this.curtainData[i].curtain_choose == true) {
+          totalMoney = totalMoney.add(this.oneTotal(this.curtainData[i]));
+        }
+      }
+      return totalMoney;
+    },
   },
   methods: {
     //PartType字典
@@ -164,9 +228,10 @@ export default {
           if (headData.length) {
             this.curtainHeadData = headData[0];
             //宽高，活动
-            this.$set(this.curtainHeadData, "width", "");
-            this.$set(this.curtainHeadData, "height", "");
+            this.$set(this.curtainHeadData, "width", 0);
+            this.$set(this.curtainHeadData, "height", 0);
             this.$set(this.curtainHeadData, "activityId", "");
+            this.$set(this.curtainHeadData, "location", "");
             //加载活动
             this.getActivity();
           }
@@ -227,7 +292,8 @@ export default {
         }
       });
     },
-    getCurtainOtherMsg() {
+    //添加其他没有的字段
+    async getCurtainOtherMsg() {
       //除了后台查出来的数据以外前端需要的数据
       for (var i = 0; i < this.curtainData.length; i++) {
         //窗帘层级
@@ -243,15 +309,50 @@ export default {
           }
         }
         this.$set(this.curtainData[i], "curtain_level", level);
-        //选中标识
+        //选中标识(父节点以部件为准，子节点综合父节点考虑)
+        var defaultChose =
+          this.curtainData[i].NCT_DELETE < 2 &&
+          this.curtainData[i].NCM_DELETE < 2;
         this.$set(this.curtainData[i], "curtain_choose", true);
         //单价
         var price = this.getPrice(this.customerType, this.curtainData[i]);
         this.$set(this.curtainData[i], "curtain_price", price);
-        //库存
-        //Axios.post("http://ljsp.ubxiu.com:8098")
+        //宽
+        this.$set(this.curtainData[i], "curtain_width", 0);
+        //高
+        this.$set(this.curtainData[i], "curtain_height", 0);
+        //总数（面积）
+        var area = 0;
+        if (this.curtainData[i].NC_PART_TYPECODE == "GBD") area = 1; //挂绑带默认为1
+        this.$set(this.curtainData[i], "curtain_area", area);
       }
+      //库存另外循环，防止阻塞出现数据错误
+      for (var i = 0; i < this.curtainData.length; i++) {
+        //库存
+        var postData = {
+          token: "兰居尚品",
+          code: this.curtainData[i].ITEM_NO,
+        };
+        try {
+          var resStore = await Axios.post(
+            "http://ljsp.ubxiu.com:8098/api/getXXDMX",
+            postData,
+            { params: postData, loading: false }
+          );
+          if (resStore.data && resStore.data.data) {
+            this.$set(
+              this.curtainData[i],
+              "curtain_store",
+              resStore.data.data.kucun
+            );
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      }
+      console.log("窗帘", this.curtainData);
     },
+    //根据客户类型获取价格
     getPrice(type, item) {
       var price = 0;
       if (item) {
@@ -268,6 +369,46 @@ export default {
       }
       return price;
     },
+    //改变成品宽
+    changeHeadWidth(val) {
+      for (var i = 0; i < this.curtainData.length; i++) {
+        if (this.curtainData[i].WIDTH_ENABLE > 0) {
+          this.curtainData[i].curtain_width = this.dosageFilter(
+            val * this.curtainData[i].NCM_WIDTH_RATIO
+          );
+          this.changeOneWidthOrHeight(val, i);
+        }
+      }
+    },
+    //改变成品高
+    changeHeadHeight(val) {
+      for (var i = 0; i < this.curtainData.length; i++) {
+        if (this.curtainData[i].WIDTH_ENABLE > 0) {
+          this.curtainData[i].curtain_height = this.dosageFilter(
+            val * this.curtainData[i].NCM_HEIGHT_RATIO
+          );
+          this.changeOneWidthOrHeight(val, i);
+        }
+      }
+    },
+    //改变单个宽或者高
+    changeOneWidthOrHeight(val, index) {
+      this.curtainData[index].curtain_area = this.dosageFilter(
+        this.curtainData[index].curtain_width *
+          this.curtainData[index].curtain_height
+      );
+      if (this.curtainData[index].NC_PART_TYPECODE == "LS") {
+        //改变里衬布的
+        var LCBITEM = this.curtainData.filter(
+          (item) => item.NC_PART_TYPECODE == "LCB"
+        );
+        for (var i = 0; i < LCBITEM.length; i++) {
+          //假设有多个里衬布的情况
+          LCBITEM[i].curtain_area = this.curtainData[index].curtain_area;
+        }
+      }
+    },
+    //计算折后价格
     calculatePromotionPrice(data) {
       var price = 0;
       //首先判断TYPE,1折扣，2定价
@@ -285,6 +426,10 @@ export default {
         price = data.curtain_price;
       }
       return this.dosageFilter(price);
+    },
+    oneTotal(row) {
+      var price = this.calculatePromotionPrice(row);
+      return price.mul(row.curtain_area);
     },
     //合并第一列显示预览
     cellMerge({ row, column, rowIndex, columnIndex }) {
@@ -341,5 +486,17 @@ export default {
   color: tomato;
   text-decoration: line-through;
   cursor: unset;
+}
+.manufacturing-ct {
+  padding: 3px;
+}
+.manufacturing-item {
+  margin-right: 5px;
+}
+</style>
+<style>
+.curtain-table .el-input__inner {
+  padding: 0 5px;
+  height: 20px;
 }
 </style>

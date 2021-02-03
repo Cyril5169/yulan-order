@@ -37,16 +37,16 @@
       </div>
       <!-- 窗帘部件 -->
       <div class="curtain-list">
-        <el-table :data="curtainData" class="curtain-table" border :span-method="cellMerge">
-          <el-table-column label="预览" width="150" align="center">
+        <el-table :data="curtainData" class="curtain-table" border size="medium" :span-method="cellMerge">
+          <el-table-column label="预览" width="130" align="center">
             <template slot-scope="scope">
               <!-- 显示图片预览 -->
               <div v-if="scope.$index == 0">
-                <img class="curtain-preview" :src="previewUrl" :onerror="defaultUrl" />
+                <img class="curtain-preview" :src="previewUrl" @error="showDefaultImg" />
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="部件" width="100" header-align="center" prop="NC_PART_TYPECODE">
+          <el-table-column label="部件" width="80" header-align="center" prop="NC_PART_TYPECODE">
             <template slot-scope="scope">
               <!-- 树缩进 -->
               <span v-if="scope.row.curtain_level > 0">
@@ -67,48 +67,168 @@
                 v-model="scope.row.curtain_choose"></el-checkbox>
             </template>
           </el-table-column>
-          <el-table-column label="名称" width="100" header-align="center" prop="NOTE">
+          <el-table-column label="名称" width="80" header-align="center" prop="NOTE">
           </el-table-column>
-          <el-table-column label="制造说明" width="220" header-align="center">
+          <el-table-column label="制造说明" width="280" header-align="center">
             <template slot-scope="scope">
               <!-- N个配置项逐个检测 -->
               <!-- 宽，高 -->
-              <div class="manufacturing-ct">
+              <div class="manufacturing-ct" v-if="scope.row.WIDTH_ENABLE > 0 || scope.row.HEIGHT_ENABLE > 0">
                 <template v-if="scope.row.WIDTH_ENABLE == 1">
-                  <span class="manufacturing-item">【宽】:{{ scope.row.curtain_width }}</span>
+                  <span>【宽】:{{ scope.row.curtain_width }}m</span>
                 </template>
                 <template v-if="scope.row.WIDTH_ENABLE == 2">
-                  <span class="manufacturing-item">【宽】: <el-input v-model="scope.row.curtain_width" style="width:40px;"
-                      size="mini" @input="changeOneWidthOrHeight($event, scope.$index)" oninput="value=value.replace(/[^\d.]/g,'')
+                  <span>【宽】: <el-input v-model="scope.row.curtain_width" style="width:40px;" size="mini"
+                      @input="changeOneWidthOrHeight($event, scope.$index)" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
-                           .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
+                           .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>m
                   </span>
                 </template>
                 <template v-if="scope.row.HEIGHT_ENABLE == 1">
-                  <span class="manufacturing-item">【高】:{{ scope.row.curtain_height }}</span>
+                  <span>【高】:{{ scope.row.curtain_height }}m</span>
                 </template>
                 <template v-if="scope.row.HEIGHT_ENABLE == 2">
-                  <span class="manufacturing-item">【高】: <el-input v-model="scope.row.curtain_height" style="width:40px;"
-                      size="mini" @input="changeOneWidthOrHeight($event, scope.$index)" oninput="value=value.replace(/[^\d.]/g,'')
+                  <span>【高】: <el-input v-model="scope.row.curtain_height" style="width:40px;" size="mini"
+                      @input="changeOneWidthOrHeight($event, scope.$index)" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
-                           .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
+                           .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>m
                   </span>
                 </template>
+              </div>
+              <!-- 左右圆角 -->
+              <div class="manufacturing-ct" v-if="scope.row.LEFT_ENABLE > 0 || scope.row.RIGHT_ENABLE > 0">
+                <template v-if="scope.row.LEFT_ENABLE == 1">
+                  <span>【左转角】:{{ scope.row.curtain_left_filet }}m</span>
+                </template>
+                <template v-if="scope.row.LEFT_ENABLE == 2">
+                  <span>【左转角】: <el-input v-model="scope.row.curtain_left_filet" style="width:40px;" size="mini"
+                      @input="changeOneWidthOrHeight($event, scope.$index)" oninput="value=value.replace(/[^\d.]/g,'')
+                           .replace(/^\./g, '').replace(/\.{2,}/g, '.')
+                           .replace('.', '$#$').replace(/\./g, '')
+                           .replace('$#$', '.')
+                           .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>m
+                  </span>
+                </template>
+                <template v-if="scope.row.RIGHT_ENABLE == 1">
+                  <span>【右转角】:{{ scope.row.curtain_right_filet }}m</span>
+                </template>
+                <template v-if="scope.row.RIGHT_ENABLE == 2">
+                  <span>【右转角】: <el-input v-model="scope.row.curtain_right_filet" style="width:40px;" size="mini"
+                      @input="changeOneWidthOrHeight($event, scope.$index)" oninput="value=value.replace(/[^\d.]/g,'')
+                           .replace(/^\./g, '').replace(/\.{2,}/g, '.')
+                           .replace('.', '$#$').replace(/\./g, '')
+                           .replace('$#$', '.')
+                           .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>m
+                  </span>
+                </template>
+              </div>
+              <!-- 么术贴 -->
+              <div class="manufacturing-ct" v-if="scope.row.TIE_ENABLE > 0">
+                <template v-if="scope.row.TIE_ENABLE == 1">
+                  <span>【么术贴】:{{ scope.row.NCM_MESUTIE | meshutie_filter}}</span>
+                </template>
+                <template v-if="scope.row.TIE_ENABLE == 2">
+                  <el-dropdown trigger="click">
+                    <span>【么术贴】:<a
+                        class="a-userset">{{ scope.row.NCM_MESUTIE? scope.row.NCM_MESUTIE : '请选择' | meshutie_filter}}</a></span>
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item @click.native="scope.row.NCM_MESUTIE = 'ZC'">正车</el-dropdown-item>
+                      <el-dropdown-item @click.native="scope.row.NCM_MESUTIE = 'FC'">反车</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                </template>
+              </div>
+              <!-- 打开方式 -->
+              <div class="manufacturing-ct" v-if="scope.row.KAIKOU_ENABLE > 0">
+                <template v-if="scope.row.KAIKOU_ENABLE == 1">
+                  <span>【打开方式】:{{ scope.row.NCM_KAIKOU | kaikou_filter }}</span>
+                </template>
+                <template v-if="scope.row.KAIKOU_ENABLE == 2">
+                  <el-dropdown trigger="click">
+                    <span>【打开方式】:<a
+                        class="a-userset">{{ scope.row.NCM_KAIKOU? scope.row.NCM_KAIKOU : '请选择' | kaikou_filter}}</a></span>
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item @click.native="scope.row.NCM_KAIKOU = 'TK'">对开</el-dropdown-item>
+                      <el-dropdown-item @click.native="scope.row.NCM_KAIKOU = 'DK'">单开</el-dropdown-item>
+                      <el-dropdown-item @click.native="scope.row.NCM_KAIKOU = 'SK'">特殊开</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                </template>
+              </div>
+              <!-- 工艺方式 -->
+              <div class="manufacturing-ct" v-if="scope.row.OPERATION_ENABLE > 0">
+                <template v-if="scope.row.OPERATION_ENABLE == 1">
+                  <span>【工艺方式】:{{ scope.row.NCM_OPERATION | operation_filter }}</span>
+                </template>
+                <template v-if="scope.row.OPERATION_ENABLE == 2">
+                  <el-dropdown trigger="click">
+                    <span>【工艺方式】:<a
+                        class="a-userset">{{ scope.row.NCM_OPERATION? scope.row.NCM_OPERATION : '请选择' | operation_filter}}</a></span>
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item @click.native="scope.row.NCM_OPERATION = 'GDZ'">固定褶</el-dropdown-item>
+                      <el-dropdown-item @click.native="scope.row.NCM_OPERATION = 'DQ'">打圈</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                </template>
+              </div>
+              <!-- 包边方式 -->
+              <div class="manufacturing-ct" v-if="scope.row.BIAN_ENABLE > 0">
+                <template v-if="scope.row.BIAN_ENABLE == 1">
+                  <span>【包边方式】:{{ scope.row.NCM_BIAN | bian_filter }}</span>
+                </template>
+                <template v-if="scope.row.BIAN_ENABLE == 2">
+                  <el-dropdown trigger="click">
+                    <span>【包边方式】:<a
+                        class="a-userset">{{ scope.row.NCM_BIAN? scope.row.NCM_BIAN : '请选择' | bian_filter}}</a></span>
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item @click.native="scope.row.NCM_BIAN = '4B'">4S边</el-dropdown-item>
+                      <el-dropdown-item @click.native="scope.row.NCM_BIAN = '3B'">3.0边</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                </template>
+              </div>
+              <!-- 备注 -->
+              <div class="manufacturing-ct"
+                v-if="scope.row.NCM_NOTE || scope.row.NCM_JOINT || scope.row.NCM_WRINKLE || scope.row.NCM_MAKETYPE ">
+                <span>【备注】:
+                  <template v-if="scope.row.NCM_MAKETYPE">
+                    {{scope.row.NCM_MAKETYPE | makeType_filter}}
+                    <template v-if="scope.row.NCM_JOINT || scope.row.NCM_WRINKLE || scope.row.NCM_MAKETYPE">、</template>
+                  </template>
+                  <template v-if="scope.row.NCM_JOINT">
+                    {{scope.row.NCM_JOINT | joint_filter}}
+                    <template v-if="scope.row.NCM_WRINKLE || scope.row.NCM_MAKETYPE">、</template>
+                  </template>
+                  <template v-if="scope.row.NCM_WRINKLE">
+                    {{scope.row.NCM_WRINKLE }}褶
+                    <template v-if="scope.row.NCM_MAKETYPE">、</template>
+                  </template>
+                  <template v-if="scope.row.NCM_NOTE">
+                    {{scope.row.NCM_NOTE }}
+                  </template>
+                </span>
               </div>
             </template>
           </el-table-column>
           <el-table-column label="数量" width="60" align="center" prop="curtain_area">
             <template slot-scope="scope">
               <!-- 只有部件显示数量 -->
-              <span v-if="scope.row.curtain_level == 0">{{scope.row.curtain_area}}</span>
+              <span v-if="scope.row.curtain_level == 0 && scope.row.TOTAL_ENABLE == 1">{{scope.row.curtain_area}}</span>
+              <span v-else-if="scope.row.TOTAL_ENABLE == 2">
+                <el-input v-model="scope.row.curtain_area" style="width:40px;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
+                           .replace(/^\./g, '').replace(/\.{2,}/g, '.')
+                           .replace('.', '$#$').replace(/\./g, '')
+                           .replace('$#$', '.')
+                           .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
+              </span>
               <span v-else>-</span>
             </template>
           </el-table-column>
-          <el-table-column label="单位" width="70" align="center" prop="UNIT_NAME"></el-table-column>
+          <el-table-column label="单位" width="60" align="center" prop="UNIT_NAME"></el-table-column>
           <el-table-column label="库存" width="60" align="center" prop="curtain_store"></el-table-column>
           <el-table-column label="单价" width="60" align="center" prop="curtain_price" v-if="isManager != '0'">
             <template slot-scope="scope">
@@ -162,8 +282,7 @@ export default {
       curtainDataOrigin: [], //拼接好的原始数据
       curtainData: [], //显示的窗帘数据
       curtainPartTypeData: [], //类型字典
-      previewUrl:
-        "http://www.luxlano.com/ddkc/ckfinder/userfiles/images/pimg/J370010.jpg",
+      previewUrl: "",
       defaultUrl:
         "http://www.luxlano.com/ddkc/ckfinder/userfiles/images/pimg/J370010.jpg",
       activityOptions: [], //活动集合
@@ -190,6 +309,83 @@ export default {
         }
       }
       return totalMoney;
+    },
+  },
+  filters: {
+    meshutie_filter(value) {
+      switch (value) {
+        case "ZC":
+          return "正车";
+          break;
+        case "FC":
+          return "反车";
+          break;
+        default:
+          return value;
+          break;
+      }
+    },
+    kaikou_filter(value) {
+      switch (value) {
+        case "TK":
+          return "对开";
+          break;
+        case "DK":
+          return "单开";
+          break;
+        case "SK":
+          return "特殊开";
+          break;
+        default:
+          return value;
+          break;
+      }
+    },
+    operation_filter(value) {
+      switch (value) {
+        case "GDZ":
+          return "固定褶";
+          break;
+        case "DQ":
+          return "打圈";
+          break;
+        default:
+          return value;
+          break;
+      }
+    },
+    bian_filter(value) {
+      switch (value) {
+        case "4B":
+          return "4S边";
+          break;
+        case "3B":
+          return "3.0边";
+          break;
+        default:
+          return value;
+          break;
+      }
+    },
+    makeType_filter(value) {
+      switch (value) {
+        case "01":
+          return "定宽制作";
+          break;
+        case "02":
+          return "定高制作";
+          break;
+      }
+    },
+    joint_filter(value) {
+      switch (value) {
+        case "SP":
+          return "竖拼接";
+          break;
+        case "HP":
+          return "横拼接";
+          break;
+      }
     },
   },
   methods: {
@@ -220,8 +416,8 @@ export default {
       GetCurtainTemplateAndModel({ item_no: this.searchKey }).then((res) => {
         console.log("模板", res);
         this.templateData = res.data;
-        //帘款
         if (this.templateData.length) {
+          //帘款
           var headData = this.templateData.filter(
             (item) => item.NC_PART_TYPECODE == "LK"
           );
@@ -235,23 +431,25 @@ export default {
             //加载活动
             this.getActivity();
           }
-        }
-        //拼接出窗帘
-        for (var i = 0; i < this.templateData.length; i++) {
-          var oneTemplate = this.templateData[i];
-          if (oneTemplate.NC_PART_TYPECODE == "LK") continue;
-          if (oneTemplate.curtain_model == null) {
-            //没有选择结构的，只保留机构，其他用未选择
-            var tempData = {
-              NC_PART_TYPECODE: oneTemplate.NC_PART_TYPECODE,
-              //其他属性不需要吧
-            };
-          } else {
-            //其他直接拼接上去
-            this.curtainData.push(...oneTemplate.curtain_model);
+          //预览图片
+          this.previewUrl = `http://www.luxlano.com/ddkc/ckfinder/userfiles/images/pimg/${this.curtainHeadData.ITEM_NO}.jpg`;
+          //拼接出窗帘
+          for (var i = 0; i < this.templateData.length; i++) {
+            var oneTemplate = this.templateData[i];
+            if (oneTemplate.NC_PART_TYPECODE == "LK") continue;
+            if (oneTemplate.curtain_model == null) {
+              //没有选择结构的，只保留机构，其他用未选择
+              var tempData = {
+                NC_PART_TYPECODE: oneTemplate.NC_PART_TYPECODE,
+                //其他属性不需要吧
+              };
+            } else {
+              //其他直接拼接上去
+              this.curtainData.push(...oneTemplate.curtain_model);
+            }
           }
+          this.getCurtainOtherMsg();
         }
-        this.getCurtainOtherMsg();
       });
     },
     getActivity() {
@@ -325,6 +523,10 @@ export default {
         var area = 0;
         if (this.curtainData[i].NC_PART_TYPECODE == "GBD") area = 1; //挂绑带默认为1
         this.$set(this.curtainData[i], "curtain_area", area);
+        //左转角
+        this.$set(this.curtainData[i], "curtain_left_filet", 0);
+        //右转角
+        this.$set(this.curtainData[i], "curtain_right_filet", 0);
       }
       //库存另外循环，防止阻塞出现数据错误
       for (var i = 0; i < this.curtainData.length; i++) {
@@ -447,6 +649,10 @@ export default {
         }
       }
     },
+    //显示默认图片
+    showDefaultImg(e) {
+      this.previewUrl = this.defaultUrl;
+    },
   },
   mounted() {
     this.getPartTypeData();
@@ -482,16 +688,21 @@ export default {
   text-decoration: underline;
   cursor: pointer;
 }
+.a-userset {
+  color: #409eff;
+  background: 0 0;
+  text-decoration: none;
+  outline: 0;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
 .delete-cls {
   color: tomato;
   text-decoration: line-through;
   cursor: unset;
 }
 .manufacturing-ct {
-  padding: 3px;
-}
-.manufacturing-item {
-  margin-right: 5px;
+  padding: 2px;
 }
 </style>
 <style>

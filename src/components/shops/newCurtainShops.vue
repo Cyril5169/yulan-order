@@ -37,8 +37,8 @@
       </div>
       <!-- 窗帘部件 -->
       <div class="curtain-list">
-        <el-table :data="curtainData" class="curtain-table" border size="medium" :span-method="cellMerge">
-          <el-table-column label="预览" width="130" align="center">
+        <el-table :data="curtainData" class="curtain-table" border :span-method="cellMerge">
+          <el-table-column label="预览" width="140" align="center">
             <template slot-scope="scope">
               <!-- 显示图片预览 -->
               <div v-if="scope.$index == 0">
@@ -75,7 +75,7 @@
               <!-- 宽，高 -->
               <div class="manufacturing-ct" v-if="scope.row.WIDTH_ENABLE > 0 || scope.row.HEIGHT_ENABLE > 0">
                 <template v-if="scope.row.WIDTH_ENABLE == 1">
-                  <span>【宽】:{{ scope.row.curtain_width }}m</span>
+                  <span>【宽】: {{ scope.row.curtain_width }}m</span>
                 </template>
                 <template v-if="scope.row.WIDTH_ENABLE == 2">
                   <span>【宽】: <el-input v-model="scope.row.curtain_width" style="width:40px;" size="mini"
@@ -87,7 +87,7 @@
                   </span>
                 </template>
                 <template v-if="scope.row.HEIGHT_ENABLE == 1">
-                  <span>【高】:{{ scope.row.curtain_height }}m</span>
+                  <span>【高】: {{ scope.row.curtain_height }}m</span>
                 </template>
                 <template v-if="scope.row.HEIGHT_ENABLE == 2">
                   <span>【高】: <el-input v-model="scope.row.curtain_height" style="width:40px;" size="mini"
@@ -102,7 +102,7 @@
               <!-- 左右圆角 -->
               <div class="manufacturing-ct" v-if="scope.row.LEFT_ENABLE > 0 || scope.row.RIGHT_ENABLE > 0">
                 <template v-if="scope.row.LEFT_ENABLE == 1">
-                  <span>【左转角】:{{ scope.row.curtain_left_filet }}m</span>
+                  <span>【左转角】: {{ scope.row.curtain_left_filet }}m</span>
                 </template>
                 <template v-if="scope.row.LEFT_ENABLE == 2">
                   <span>【左转角】: <el-input v-model="scope.row.curtain_left_filet" style="width:40px;" size="mini"
@@ -114,7 +114,7 @@
                   </span>
                 </template>
                 <template v-if="scope.row.RIGHT_ENABLE == 1">
-                  <span>【右转角】:{{ scope.row.curtain_right_filet }}m</span>
+                  <span>【右转角】: {{ scope.row.curtain_right_filet }}m</span>
                 </template>
                 <template v-if="scope.row.RIGHT_ENABLE == 2">
                   <span>【右转角】: <el-input v-model="scope.row.curtain_right_filet" style="width:40px;" size="mini"
@@ -129,11 +129,11 @@
               <!-- 么术贴 -->
               <div class="manufacturing-ct" v-if="scope.row.TIE_ENABLE > 0">
                 <template v-if="scope.row.TIE_ENABLE == 1">
-                  <span>【么术贴】:{{ scope.row.NCM_MESUTIE | meshutie_filter}}</span>
+                  <span>【么术贴】: {{ scope.row.NCM_MESUTIE | meshutie_filter}}</span>
                 </template>
                 <template v-if="scope.row.TIE_ENABLE == 2">
                   <el-dropdown trigger="click">
-                    <span>【么术贴】:<a
+                    <span>【么术贴】: <a
                         class="a-userset">{{ scope.row.NCM_MESUTIE? scope.row.NCM_MESUTIE : '请选择' | meshutie_filter}}</a></span>
                     <el-dropdown-menu slot="dropdown">
                       <el-dropdown-item @click.native="scope.row.NCM_MESUTIE = 'ZC'">正车</el-dropdown-item>
@@ -145,11 +145,11 @@
               <!-- 打开方式 -->
               <div class="manufacturing-ct" v-if="scope.row.KAIKOU_ENABLE > 0">
                 <template v-if="scope.row.KAIKOU_ENABLE == 1">
-                  <span>【打开方式】:{{ scope.row.NCM_KAIKOU | kaikou_filter }}</span>
+                  <span>【打开方式】: {{ scope.row.NCM_KAIKOU | kaikou_filter }}</span>
                 </template>
                 <template v-if="scope.row.KAIKOU_ENABLE == 2">
                   <el-dropdown trigger="click">
-                    <span>【打开方式】:<a
+                    <span>【打开方式】: <a
                         class="a-userset">{{ scope.row.NCM_KAIKOU? scope.row.NCM_KAIKOU : '请选择' | kaikou_filter}}</a></span>
                     <el-dropdown-menu slot="dropdown">
                       <el-dropdown-item @click.native="scope.row.NCM_KAIKOU = 'TK'">对开</el-dropdown-item>
@@ -162,11 +162,11 @@
               <!-- 工艺方式 -->
               <div class="manufacturing-ct" v-if="scope.row.OPERATION_ENABLE > 0">
                 <template v-if="scope.row.OPERATION_ENABLE == 1">
-                  <span>【工艺方式】:{{ scope.row.NCM_OPERATION | operation_filter }}</span>
+                  <span>【工艺方式】: {{ scope.row.NCM_OPERATION | operation_filter }}</span>
                 </template>
                 <template v-if="scope.row.OPERATION_ENABLE == 2">
                   <el-dropdown trigger="click">
-                    <span>【工艺方式】:<a
+                    <span>【工艺方式】: <a
                         class="a-userset">{{ scope.row.NCM_OPERATION? scope.row.NCM_OPERATION : '请选择' | operation_filter}}</a></span>
                     <el-dropdown-menu slot="dropdown">
                       <el-dropdown-item @click.native="scope.row.NCM_OPERATION = 'GDZ'">固定褶</el-dropdown-item>
@@ -178,11 +178,11 @@
               <!-- 包边方式 -->
               <div class="manufacturing-ct" v-if="scope.row.BIAN_ENABLE > 0">
                 <template v-if="scope.row.BIAN_ENABLE == 1">
-                  <span>【包边方式】:{{ scope.row.NCM_BIAN | bian_filter }}</span>
+                  <span>【包边方式】: {{ scope.row.NCM_BIAN | bian_filter }}</span>
                 </template>
                 <template v-if="scope.row.BIAN_ENABLE == 2">
                   <el-dropdown trigger="click">
-                    <span>【包边方式】:<a
+                    <span>【包边方式】: <a
                         class="a-userset">{{ scope.row.NCM_BIAN? scope.row.NCM_BIAN : '请选择' | bian_filter}}</a></span>
                     <el-dropdown-menu slot="dropdown">
                       <el-dropdown-item @click.native="scope.row.NCM_BIAN = '4B'">4S边</el-dropdown-item>
@@ -194,23 +194,14 @@
               <!-- 备注 -->
               <div class="manufacturing-ct"
                 v-if="scope.row.NCM_NOTE || scope.row.NCM_JOINT || scope.row.NCM_WRINKLE || scope.row.NCM_MAKETYPE ">
-                <span>【备注】:
-                  <template v-if="scope.row.NCM_MAKETYPE">
-                    {{scope.row.NCM_MAKETYPE | makeType_filter}}
-                    <template v-if="scope.row.NCM_JOINT || scope.row.NCM_WRINKLE || scope.row.NCM_MAKETYPE">、</template>
-                  </template>
-                  <template v-if="scope.row.NCM_JOINT">
-                    {{scope.row.NCM_JOINT | joint_filter}}
-                    <template v-if="scope.row.NCM_WRINKLE || scope.row.NCM_MAKETYPE">、</template>
-                  </template>
-                  <template v-if="scope.row.NCM_WRINKLE">
-                    {{scope.row.NCM_WRINKLE }}褶
-                    <template v-if="scope.row.NCM_MAKETYPE">、</template>
-                  </template>
-                  <template v-if="scope.row.NCM_NOTE">
-                    {{scope.row.NCM_NOTE }}
-                  </template>
-                </span>
+                <span>【备注】: <template
+                    v-if="scope.row.NCM_MAKETYPE">{{scope.row.NCM_MAKETYPE | makeType_filter}}<template
+                      v-if="scope.row.NCM_JOINT || scope.row.NCM_WRINKLE || scope.row.NCM_MAKETYPE">、</template></template>
+                  <template v-if="scope.row.NCM_JOINT">{{scope.row.NCM_JOINT | joint_filter}}<template
+                      v-if="scope.row.NCM_WRINKLE || scope.row.NCM_MAKETYPE">、</template></template>
+                  <template v-if="scope.row.NCM_WRINKLE">{{scope.row.NCM_WRINKLE }}褶<template
+                      v-if="scope.row.NCM_MAKETYPE">、</template></template>
+                  <template v-if="scope.row.NCM_NOTE">{{scope.row.NCM_NOTE }}</template></span>
               </div>
             </template>
           </el-table-column>
@@ -253,7 +244,7 @@
           </el-table-column>
           <el-table-column label="说明" align="center"></el-table-column>
         </el-table>
-        <div v-if="isManager != '0'" style="font-size:16px;margin-top:10px;margin-left: 985px;">
+        <div v-if="isManager != '0'" style="font-size:16px;margin-top:10px;margin-left: 1010px;">
           <span>总计：<span style="color:red;">￥{{ allTotal | dosageFilter }}</span></span>
         </div>
       </div>
@@ -511,7 +502,7 @@ export default {
         var defaultChose =
           this.curtainData[i].NCT_DELETE < 2 &&
           this.curtainData[i].NCM_DELETE < 2;
-        this.$set(this.curtainData[i], "curtain_choose", true);
+        this.$set(this.curtainData[i], "curtain_choose", defaultChose);
         //单价
         var price = this.getPrice(this.customerType, this.curtainData[i]);
         this.$set(this.curtainData[i], "curtain_price", price);
@@ -663,7 +654,7 @@ export default {
 <style scoped>
 .curtain-contain {
   margin-top: 10px;
-  padding: 5px 10px;
+  padding: 5px 0;
   border: 1px solid #eee;
 }
 .curtain-parent-item {
@@ -702,7 +693,7 @@ export default {
   cursor: unset;
 }
 .manufacturing-ct {
-  padding: 2px;
+  margin-bottom: 1px;
 }
 </style>
 <style>

@@ -189,11 +189,11 @@
                   </template>
                   <template v-if="scope.row.BIAN_ENABLE == 2">
                     <span>【包边方式】: </span>
-                    <el-dropdown trigger="click">
+                    <el-dropdown trigger="click" @command="handleBianCommand($event, scope.row)">
                       <a class="a-userset">{{ scope.row.NCM_BIAN? scope.row.NCM_BIAN : '请选择' | bian_filter}}</a>
                       <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item @click.native="scope.row.NCM_BIAN = '4B'">4S边</el-dropdown-item>
-                        <el-dropdown-item @click.native="scope.row.NCM_BIAN = '3B'">3.0边</el-dropdown-item>
+                        <el-dropdown-item @click.native="scope.row.NCM_BIAN = '4B'" command="4B">4S边</el-dropdown-item>
+                        <el-dropdown-item @click.native="scope.row.NCM_BIAN = '3B'" command="3B">3.0边</el-dropdown-item>
                       </el-dropdown-menu>
                     </el-dropdown>
                   </template>
@@ -397,7 +397,6 @@ export default {
     //PartType字典
     getPartTypeData() {
       GetPartTypeDataTabale().then((res) => {
-        console.log("字典", res);
         this.curtainPartTypeData = res.data;
       });
     },
@@ -433,7 +432,6 @@ export default {
       this.curtainData = [];
       this.curtainDataOrigin = [];
       GetCurtainTemplateAndModel({ item_no: this.searchKey }).then((res) => {
-        console.log("模板", res);
         this.templateData = res.data;
         if (this.templateData.length) {
           this.noData = false;
@@ -455,6 +453,7 @@ export default {
           //预览图片
           this.previewUrl = `http://www.luxlano.com/ddkc/ckfinder/userfiles/images/pimg/${this.curtainHeadData.ITEM_NO}.jpg`;
           //拼接出窗帘
+          var curtain_temp = [];
           for (var i = 0; i < this.templateData.length; i++) {
             var oneTemplate = this.templateData[i];
             if (oneTemplate.NC_PART_TYPECODE == "LK") continue;
@@ -464,13 +463,45 @@ export default {
                 NC_PART_TYPECODE: oneTemplate.NC_PART_TYPECODE,
                 //其他属性不需要吧
               };
-              this.curtainData.push(tempData);
+              curtain_temp.push(tempData);
             } else {
               //其他直接拼接上去
-              this.curtainData.push(...oneTemplate.curtain_model);
+              curtain_temp.push(...oneTemplate.curtain_model);
             }
           }
-          this.getCurtainOtherMsg();
+          this.curtainDataOrigin = this.getCurtainOtherMsg(curtain_temp);
+          this.curtainDataOrigin = this.getStoreData(this.curtainDataOrigin);
+          //处理拉边条数据
+          for (var i = 0; i < this.curtainDataOrigin.length; i++) {
+            var oneCurtain = this.curtainDataOrigin[i];
+            if (oneCurtain.NC_PART_TYPECODE == "LBT") {
+              //先看父节点需不需要加载出拉边条
+              var fatherCurtain = this.curtainDataOrigin.filter(
+                (item) =>
+                  item.NC_MODEL_ID == oneCurtain.NCM_PID &&
+                  item.BIAN_ENABLE > 0 &&
+                  item.NCM_BIAN == "4B"
+              );
+              if (fatherCurtain.length) {
+                //如果需要加载，看排序最大的面料对应的拉边条
+                var mlList = this.curtainDataOrigin.filter(
+                  (item) =>
+                    item.NCM_PID == oneCurtain.NCM_PID &&
+                    item.NC_PART_TYPECODE != "LBT"
+                );
+                if (
+                  mlList.length &&
+                  mlList[mlList.length - 1].MATERIAL_NO == oneCurtain.ITEM_NO
+                ) {
+                  this.curtainData.push(oneCurtain);
+                }
+              }
+            } else {
+              this.curtainData.push(oneCurtain);
+            }
+          }
+          this.curtainData = this.getStoreData(this.curtainData);
+          console.log("窗帘", this.curtainData);
         } else {
           this.noData = true;
         }
@@ -479,14 +510,17 @@ export default {
     //获得活动
     getActivity() {
       this.activityOptions = [];
-      GetPromotionByItem({
-        cid: this.cid,
-        customerType: this.customerType,
-        itemNo: this.curtainHeadData.ITEM_NO,
-        itemVersion: this.curtainHeadData.ITEM_VERSION,
-        productType: this.curtainHeadData.PRODUCT_TYPE,
-        productBrand: this.curtainHeadData.PRODUCT_BRAND,
-      }).then((res) => {
+      GetPromotionByItem(
+        {
+          cid: this.cid,
+          customerType: this.customerType,
+          itemNo: this.curtainHeadData.ITEM_NO,
+          itemVersion: this.curtainHeadData.ITEM_VERSION,
+          productType: this.curtainHeadData.PRODUCT_TYPE,
+          productBrand: this.curtainHeadData.PRODUCT_BRAND,
+        },
+        { loading: false }
+      ).then((res) => {
         this.activityOptions = res.data;
         this.activityOptions.push({
           ORDER_TYPE: "",
@@ -516,68 +550,69 @@ export default {
       });
     },
     //添加其他没有的字段
-    async getCurtainOtherMsg() {
+    getCurtainOtherMsg(originData, originLevel) {
       //除了后台查出来的数据以外前端需要的数据
-      for (var i = 0; i < this.curtainData.length; i++) {
+      for (var i = 0; i < originData.length; i++) {
         //窗帘层级
         var level = 0;
-        var NCM_PID = this.curtainData[i].NCM_PID;
-        while (NCM_PID != 0) {
-          var temp = this.curtainData.filter(
-            (item) => item.NC_MODEL_ID == NCM_PID
-          );
-          if (temp.length) {
-            NCM_PID = temp[0].NCM_PID;
-            level++;
+        if (originLevel != undefined) level = originLevel;
+        else {
+          var NCM_PID = originData[i].NCM_PID;
+          while (NCM_PID != 0) {
+            var temp = originData.filter((item) => item.NC_MODEL_ID == NCM_PID);
+            if (temp.length) {
+              NCM_PID = temp[0].NCM_PID;
+              level++;
+            }
           }
         }
-        this.$set(this.curtainData[i], "curtain_level", level);
+        this.$set(originData[i], "curtain_level", level);
         //选中标识(父节点以部件为准，子节点综合父节点考虑)
         var defaultChose =
-          this.curtainData[i].NCT_DELETE < 2 &&
-          this.curtainData[i].NCM_DELETE < 2;
-        this.$set(this.curtainData[i], "curtain_choose", defaultChose);
+          originData[i].NCT_DELETE < 2 && originData[i].NCM_DELETE < 2;
+        this.$set(originData[i], "curtain_choose", defaultChose);
         //单价
-        var price = this.getPrice(this.customerType, this.curtainData[i]);
-        this.$set(this.curtainData[i], "curtain_price", price);
+        var price = this.getPrice(this.customerType, originData[i]);
+        this.$set(originData[i], "curtain_price", price);
         //宽
-        this.$set(this.curtainData[i], "curtain_width", 0);
+        this.$set(originData[i], "curtain_width", 0);
         //高
-        this.$set(this.curtainData[i], "curtain_height", 0);
+        this.$set(originData[i], "curtain_height", 0);
         //总数（面积）
         var area = 0;
-        if (this.curtainData[i].NC_PART_TYPECODE == "GBD") area = 1; //挂绑带默认为1
-        this.$set(this.curtainData[i], "curtain_area", area);
+        if (originData[i].NC_PART_TYPECODE == "GBD") area = 1; //挂绑带默认为1
+        this.$set(originData[i], "curtain_area", area);
         //左转角
-        this.$set(this.curtainData[i], "curtain_left_filet", 0);
+        this.$set(originData[i], "curtain_left_filet", 0);
         //右转角
-        this.$set(this.curtainData[i], "curtain_right_filet", 0);
+        this.$set(originData[i], "curtain_right_filet", 0);
+        //库存
+        this.$set(originData[i], "curtain_store", "");
       }
-      //库存另外循环，防止阻塞出现数据错误
-      for (var i = 0; i < this.curtainData.length; i++) {
+      return originData;
+    },
+    getStoreData(originData) {
+      for (var i = 0; i < originData.length; i++) {
         //库存
         var postData = {
           token: "兰居尚品",
-          code: this.curtainData[i].ITEM_NO,
+          code: originData[i].ITEM_NO,
         };
-        try {
-          var resStore = await Axios.post(
-            "http://ljsp.ubxiu.com:8098/api/getXXDMX",
-            postData,
-            { params: postData, loading: false }
-          );
-          if (resStore.data && resStore.data.data) {
-            this.$set(
-              this.curtainData[i],
-              "curtain_store",
-              resStore.data.data.kucun
+        Axios.post("http://ljsp.ubxiu.com:8098/api/getXXDMX", postData, {
+          params: postData,
+          loading: false,
+        }).then((res) => {
+          if (res.data && res.data.data) {
+            var data = originData.filter(
+              (item) => item.ITEM_NO == res.data.data.code
             );
+            if (data.length) {
+              data[0].curtain_store = res.data.data.kucun;
+            }
           }
-        } catch (err) {
-          console.log(err);
-        }
+        });
       }
-      console.log("窗帘", this.curtainData);
+      return originData;
     },
     //根据客户类型获取价格
     getPrice(type, item) {
@@ -654,9 +689,52 @@ export default {
       }
       return this.dosageFilter(price);
     },
+    //一个子件的总价
     oneTotal(row) {
       var price = this.calculatePromotionPrice(row);
       return price.mul(row.curtain_area);
+    },
+    handleBianCommand(common, row) {
+      if (common == "4B" && row.NCM_BIAN != "4B") {
+        //显示拉边条
+        //找到最大序号的面料,并且是要勾选的
+        var mlList = this.curtainData.filter(
+          (item) =>
+            item.NCM_PID == row.NC_MODEL_ID &&
+            item.NC_PART_TYPECODE != "LBT" &&
+            item.curtain_choose
+        );
+        if (mlList.length) {
+          var material_no = mlList[mlList.length - 1].MATERIAL_NO;
+          //在原始数据中找到这个拉边条并push进去
+          var lbtItem = this.curtainDataOrigin.filter(
+            (item) =>
+              item.NCM_PID == row.NC_MODEL_ID && item.ITEM_NO == material_no
+          );
+          if (lbtItem.length) {
+            lbtItem = lbtItem[0];
+            this.curtainData.push(lbtItem);
+            //排序
+            this.curtainData.sort((a, b) => {
+              if (a.NCT_SORTNO == b.NCT_SORTNO) {
+                return a.NCM_SORTNO > b.NCM_SORTNO ? 1 : -1;
+              }
+              return a.NCT_SORTNO > b.NCT_SORTNO ? 1 : -1;
+            });
+            console.log(this.curtainData);
+          }
+        }
+      } else if (common == "3B" && row.NCM_BIAN == "4B") {
+        //去掉包边条
+        //找到有没有拉边条
+        var lbtItem = this.curtainData.filter(
+          (item) =>
+            item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT"
+        );
+        for (var i = 0; i < lbtItem.length; i++) {
+          this.curtainData.splice(this.curtainData.indexOf(lbtItem[i]), 1);
+        }
+      }
     },
     //合并第一列显示预览
     cellMerge({ row, column, rowIndex, columnIndex }) {

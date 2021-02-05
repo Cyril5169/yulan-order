@@ -1428,4 +1428,7 @@ export default {
 .el-radio__input.is-checked + .el-radio__label {
   color: #409eff !important;
 }
+.el-drawer__header {
+  margin-bottom: 15px;
+}
 </style>

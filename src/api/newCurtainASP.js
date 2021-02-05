@@ -16,9 +16,17 @@ export function GetCurtainTemplateAndModel(data, config = {}) {
       return Promise.reject(err);
   })
 }
-//获得远程搜索的数据
+//获得远程搜索的帘款数据
 export function GetAsyncItemData(data, config = {}) {
   return post('/NEWCURTAIN_TEMPLATE/GetAsyncItemData', data, config).then((res) => {
+      return Promise.resolve(res);
+  }).catch((err) => {
+      return Promise.reject(err);
+  })
+}
+//获得替换的组件数据
+export function GetExchangeModel(data, config = {}) {
+  return post('/NEWCURTAIN_TEMPLATE_MODEL/GetExchangeModel', data, config).then((res) => {
       return Promise.resolve(res);
   }).catch((err) => {
       return Promise.reject(err);

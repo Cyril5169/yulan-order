@@ -32,3 +32,11 @@ export function GetExchangeModel(data, config = {}) {
       return Promise.reject(err);
   })
 }
+//获得替换的子件数据
+export function GetExchangeModelItem(data, config = {}) {
+  return post('/NEWCURTAIN_MODEL_ITEM/GetExchangeModelItem', data, config).then((res) => {
+      return Promise.resolve(res);
+  }).catch((err) => {
+      return Promise.reject(err);
+  })
+}

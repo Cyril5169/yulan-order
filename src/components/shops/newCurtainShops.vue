@@ -63,14 +63,23 @@
             </el-table-column>
             <el-table-column label="编码" width="170" header-align="center" prop="ITEM_NO">
               <template slot-scope="scope">
-                <!-- 是否可替换 -->
-                <a v-if="scope.row.NCT_CHANGE == 1 && scope.row.NCM_CHANGE == 1" class="a-link"
-                  :class="{'delete-cls': !scope.row.curtain_choose}"
-                  @click="exchangeModelOrItem(scope.row)">{{scope.row.ITEM_NO}}</a>
-                <span v-else :class="{'delete-cls': !scope.row.curtain_choose}">{{scope.row.ITEM_NO}}</span>
-                <!-- 是否可删/是否默认勾选 -->
-                <el-checkbox v-if="scope.row.NCT_DELETE > 0 && scope.row.NCM_DELETE > 0"
-                  v-model="scope.row.curtain_choose" @change="onCheckChange($event, scope.row)"></el-checkbox>
+                <template v-if="scope.row.ITEM_NO">
+                  <!-- 是否可替换 -->
+                  <a v-if="scope.row.NCT_CHANGE == 1 && scope.row.NCM_CHANGE == 1" class="a-link"
+                    :class="{'delete-cls': !scope.row.curtain_choose}"
+                    @click="exchangeModelOrItem(scope.row)">{{scope.row.ITEM_NO}}</a>
+                  <span v-else :class="{'delete-cls': !scope.row.curtain_choose}">{{scope.row.ITEM_NO}}</span>
+                  <!-- 是否可删/是否默认勾选 -->
+                  <el-checkbox v-if="scope.row.NCT_DELETE > 0 && scope.row.NCM_DELETE > 0"
+                    v-model="scope.row.curtain_choose" @change="onCheckChange($event, scope.row)"></el-checkbox>
+                </template>
+                <!-- 没有模板，非标定 -->
+                <template v-else>
+                  <a class="a-link" :class="{'delete-cls': !scope.row.curtain_choose}"
+                    @click="exchangeModelOrItem(scope.row)">请选择</a>
+                  <el-checkbox v-model="scope.row.curtain_choose" @change="onCheckChange($event, scope.row)">
+                  </el-checkbox>
+                </template>
               </template>
             </el-table-column>
             <el-table-column label="名称" width="80" header-align="center" prop="NOTE">
@@ -233,21 +242,22 @@
             <el-table-column label="单价" width="60" align="center" prop="curtain_price" v-if="isManager != '0'">
               <template slot-scope="scope">
                 <!-- 只有部件算钱 -->
-                <span v-if="scope.row.curtain_level == 0">{{scope.row.curtain_price}}</span>
+                <span v-if="scope.row.ITEM_NO && scope.row.curtain_level == 0">{{scope.row.curtain_price}}</span>
                 <span v-else>-</span>
               </template>
             </el-table-column>
             <el-table-column label="折后" width="60" align="center" v-if="isManager != '0'">
               <template slot-scope="scope">
                 <!-- 只有部件算钱 -->
-                <span v-if="scope.row.curtain_level == 0">{{ calculatePromotionPrice(scope.row) }}</span>
+                <span
+                  v-if="scope.row.ITEM_NO && scope.row.curtain_level == 0">{{ calculatePromotionPrice(scope.row) }}</span>
                 <span v-else>-</span>
               </template>
             </el-table-column>
             <el-table-column label="总价" width="60" align="center" v-if="isManager != '0'">
               <template slot-scope="scope">
                 <!-- 只有部件算钱 -->
-                <span v-if="scope.row.curtain_level == 0">{{ oneTotal(scope.row) }}</span>
+                <span v-if="scope.row.ITEM_NO && scope.row.curtain_level == 0">{{ oneTotal(scope.row) }}</span>
                 <span v-else>-</span>
               </template>
             </el-table-column>
@@ -255,6 +265,10 @@
           </el-table>
           <div v-if="isManager != '0'" style="font-size:16px;margin-top:10px;margin-left: 1010px;">
             <span>总计：<span style="color:red;">￥{{ allTotal | dosageFilter }}</span></span>
+          </div>
+          <div style="text-align: center;margin-bottom:10px;">
+            <el-button type="danger" width="130px" @click="addCurtainToShoppingCar">保存至购物车</el-button>
+            <el-button type="info" width="130px">返回</el-button>
           </div>
         </div>
       </div>
@@ -411,6 +425,9 @@ export default {
       }
       return totalMoney * this.curtainHeadData.setNum;
     },
+    chooseCurtainData() {
+      return this.curtainData.filter((item) => item.curtain_choose);
+    },
   },
   filters: {
     meshutie_filter(value) {
@@ -557,7 +574,9 @@ export default {
             if (oneTemplate.curtain_model == null) {
               //没有选择结构的，只保留机构，其他用未选择
               var tempData = {
-                NC_PART_TYPECODE: oneTemplate.NC_PART_TYPECODE,
+                ...oneTemplate,
+                curtain_choose: true,
+                curtain_level: 0,
                 //其他属性不需要吧
               };
               curtain_temp.push(tempData);
@@ -654,6 +673,7 @@ export default {
     getCurtainOtherMsg(originData, originLevel) {
       //除了后台查出来的数据以外前端需要的数据
       for (var i = 0; i < originData.length; i++) {
+        if (!originData[i].ITEM_NO) continue;
         //窗帘层级
         var level = 0;
         if (originLevel != undefined) level = originLevel;
@@ -694,6 +714,7 @@ export default {
     },
     getStoreData(originData) {
       for (var i = 0; i < originData.length; i++) {
+        if (!originData[i].ITEM_NO) continue;
         //库存
         var postData = {
           token: "兰居尚品",
@@ -774,19 +795,21 @@ export default {
     //计算折后价格
     calculatePromotionPrice(data) {
       var price = 0;
-      //首先判断TYPE,1折扣，2定价
-      if (this.salPromotion && this.salPromotion.P_ID) {
-        switch (this.salPromotion.TYPE) {
-          case "1":
-            //折扣
-            price = data.curtain_price.mul(this.salPromotion.DISCOUNT);
-            break;
-          case "2":
-            //定价
-            price = this.salPromotion.PRICE;
+      if (data && data.curtain_price) {
+        //首先判断TYPE,1折扣，2定价
+        if (this.salPromotion && this.salPromotion.P_ID) {
+          switch (this.salPromotion.TYPE) {
+            case "1":
+              //折扣
+              price = data.curtain_price.mul(this.salPromotion.DISCOUNT);
+              break;
+            case "2":
+              //定价
+              price = this.salPromotion.PRICE;
+          }
+        } else {
+          price = data.curtain_price;
         }
-      } else {
-        price = data.curtain_price;
       }
       return this.dosageFilter(price);
     },
@@ -849,7 +872,7 @@ export default {
     },
     //勾选的联动处理
     onCheckChange(checked, row) {
-      console.log(row);
+      if (!row.ITEM_NO) return;
       var childrenCurtain = this.curtainData.filter(
         (item) => item.NCM_PID == row.NC_MODEL_ID
       );
@@ -1028,24 +1051,26 @@ export default {
       );
       if (selectModel.length) {
         selectModel = selectModel[0];
-        this.$confirm(
-          `确认使用【${selectModel.ITEM_NO}】替换当前【${this.exchangeModelNow.ITEM_NO}】？`,
-          "提示",
-          {
-            confirmButtonText: "是",
-            cancelButtonText: "否",
-            type: "warning",
-          }
-        )
+        var msg = "";
+        if (this.exchangeModelNow.ITEM_NO) {
+          msg = `确认使用【${selectModel.ITEM_NO}】替换当前【${this.exchangeModelNow.ITEM_NO}】？`;
+        } else {
+          msg = `确认使用【${selectModel.ITEM_NO}】作为当前组件？`;
+        }
+        this.$confirm(msg, "提示", {
+          confirmButtonText: "是",
+          cancelButtonText: "否",
+          type: "warning",
+        })
           .then(() => {
             //替换当前，第一步，把当前的删掉
-            this.curtainData = this.recrusionDelete(
-              this.curtainData,
-              this.exchangeModelNow.NC_MODEL_ID
+            this.curtainData = this.curtainData.filter(
+              (item) =>
+                item.NC_TEMPLATE_ID != this.exchangeModelNow.NC_TEMPLATE_ID
             );
-            this.curtainDataChange = this.recrusionDelete(
-              this.curtainDataChange,
-              this.exchangeModelNow.NC_MODEL_ID
+            this.curtainDataChange = this.curtainDataChange.filter(
+              (item) =>
+                item.NC_TEMPLATE_ID != this.exchangeModelNow.NC_TEMPLATE_ID
             );
             //第二步，把当前选中的push进去
             var curtain_temp = this.getOtherCurtainMsgForExchange(
@@ -1094,18 +1119,6 @@ export default {
           })
           .catch(() => {});
       }
-    },
-    //递归删除
-    recrusionDelete(list, id) {
-      list = list.filter((item) => item.NC_MODEL_ID != id);
-      //找子节点
-      var childrenNode = list.filter((item) => item.NCM_PID == id);
-      if (childrenNode.length) {
-        for (var i = 0; i < childrenNode.length; i++) {
-          list = this.recrusionDelete(list, childrenNode[i].NC_MODEL_ID);
-        }
-      }
-      return list;
     },
     //添加其他没有的数据
     getOtherCurtainMsgForExchange(originData, originLevel) {
@@ -1195,7 +1208,7 @@ export default {
         }
       )
         .then(() => {
-          //替换只是更换item，现在只需要把ITEM_NO和拉边条MATERIAL_NO
+          //替换只是更换item，现在只需要替换字段ITEM_NO，NOTE和拉边条MATERIAL_NO
           var originItem = this.curtainData.filter(
             (item) => item.NC_MODEL_ID == this.exchangeItemNow.NC_MODEL_ID
           );
@@ -1206,34 +1219,25 @@ export default {
             originItem.MATERIAL_NO = item.MATERIAL_NO;
           }
           //替换拉边条
-          //看父节点需不需要显示
-          var fatherCurtain = this.curtainData.filter(
+          //如果需要加载，看自身是不是勾选中排序最大的
+          var mlList = this.curtainData.filter(
             (item) =>
-              item.NC_MODEL_ID == originItem.NCM_PID &&
-              item.BIAN_ENABLE > 0 &&
-              item.NCM_BIAN == "4B"
+              item.NCM_PID == originItem.NCM_PID &&
+              item.NC_PART_TYPECODE != "LBT" &&
+              item.curtain_choose
           );
-          if (fatherCurtain.length) {
-            //如果需要加载，看自身是不是勾选中排序最大的
-            var mlList = this.curtainData.filter(
+          if (
+            mlList.length &&
+            mlList[mlList.length - 1].ITEM_NO == originItem.ITEM_NO
+          ) {
+            //改变拉边条数据
+            var lbtItem = this.curtainData.filter(
               (item) =>
                 item.NCM_PID == originItem.NCM_PID &&
-                item.NC_PART_TYPECODE != "LBT" &&
-                item.curtain_choose
+                item.NC_PART_TYPECODE == "LBT"
             );
-            if (
-              mlList.length &&
-              mlList[mlList.length - 1].ITEM_NO == originItem.ITEM_NO
-            ) {
-              //改变拉边条数据
-              var lbtItem = this.curtainData.filter(
-                (item) =>
-                  item.NCM_PID == originItem.NCM_PID &&
-                  item.NC_PART_TYPECODE == "LBT"
-              );
-              if (lbtItem.length) {
-                lbtItem[0].ITEM_NO = originItem.MATERIAL_NO;
-              }
+            if (lbtItem.length) {
+              lbtItem[0].ITEM_NO = originItem.MATERIAL_NO;
             }
           }
           //更新库存
@@ -1262,6 +1266,34 @@ export default {
     //显示默认图片
     showDefaultImg(e) {
       this.previewUrl = this.defaultUrl;
+    },
+    beforeAddCar() {
+      //表头
+      if (!this.curtainHeadData.width) {
+        this.$alert("请填写帘款【成品宽】", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
+        return;
+      }
+      if (!this.curtainHeadData.height) {
+        this.$alert("请填写帘款【成品高】", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
+        return;
+      }
+      if (!this.curtainHeadData.setNum) {
+        this.$alert("请填写帘款【套数】", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
+        return;
+      }
+    },
+    addCurtainToShoppingCar() {
+      //添加之前的验证
+      this.beforeAddCar();
     },
   },
   mounted() {

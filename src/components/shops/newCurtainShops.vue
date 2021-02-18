@@ -63,6 +63,7 @@
             </el-table-column>
             <el-table-column label="编码" width="170" header-align="center" prop="ITEM_NO">
               <template slot-scope="scope">
+                <!-- 标定 -->
                 <template v-if="scope.row.ITEM_NO">
                   <!-- 是否可替换 -->
                   <a v-if="scope.row.NCT_CHANGE == 1 && scope.row.NCM_CHANGE == 1" class="a-link"
@@ -74,11 +75,14 @@
                     v-model="scope.row.curtain_choose" @change="onCheckChange($event, scope.row)"></el-checkbox>
                 </template>
                 <!-- 没有模板，非标定 -->
-                <template v-else>
+                <template v-else-if="scope.row.curtain_level == 0">
                   <a class="a-link" :class="{'delete-cls': !scope.row.curtain_choose}"
                     @click="exchangeModelOrItem(scope.row)">请选择</a>
                   <el-checkbox v-model="scope.row.curtain_choose" @change="onCheckChange($event, scope.row)">
                   </el-checkbox>
+                </template>
+                <template v-else>
+                  <span style="color:red;">未维护数据!</span>
                 </template>
               </template>
             </el-table-column>
@@ -1269,31 +1273,170 @@ export default {
     },
     beforeAddCar() {
       //表头
-      if (!this.curtainHeadData.width) {
+      if (
+        !this.curtainHeadData.width ||
+        Number(this.curtainHeadData.width == 0)
+      ) {
         this.$alert("请填写帘款【成品宽】", "提示", {
           confirmButtonText: "确定",
           type: "warning",
         });
         return;
       }
-      if (!this.curtainHeadData.height) {
+      if (
+        !this.curtainHeadData.height ||
+        Number(this.curtainHeadData.height == 0)
+      ) {
         this.$alert("请填写帘款【成品高】", "提示", {
           confirmButtonText: "确定",
           type: "warning",
         });
         return;
       }
-      if (!this.curtainHeadData.setNum) {
+      if (
+        !this.curtainHeadData.setNum ||
+        Number(this.curtainHeadData.setNum == 0)
+      ) {
         this.$alert("请填写帘款【套数】", "提示", {
           confirmButtonText: "确定",
           type: "warning",
         });
         return;
       }
+      //只看选中的
+      for (var i = 0; i < this.chooseCurtainData.length; i++) {
+        var oneCurtain = this.chooseCurtainData[i];
+        //宽高
+        if (
+          oneCurtain.WIDTH_ENABLE == 2 &&
+          (!oneCurtain.curtain_width || Number(oneCurtain.curtain_width == 0))
+        ) {
+          this.$alert(
+            `请填写${this.transPartTypeCode(
+              oneCurtain.NC_PART_TYPECODE
+            )}【宽】`,
+            "提示",
+            {
+              confirmButtonText: "确定",
+              type: "warning",
+            }
+          );
+          return;
+        }
+        if (
+          oneCurtain.HEIGHT_ENABLE == 2 &&
+          (!oneCurtain.curtain_height || Number(oneCurtain.curtain_height == 0))
+        ) {
+          this.$alert(
+            `请填写${this.transPartTypeCode(
+              oneCurtain.NC_PART_TYPECODE
+            )}【高】`,
+            "提示",
+            {
+              confirmButtonText: "确定",
+              type: "warning",
+            }
+          );
+          return;
+        }
+        //左右圆角
+        if (
+          oneCurtain.LEFT_ENABLE == 2 &&
+          (!oneCurtain.curtain_left_filet ||
+            Number(oneCurtain.curtain_left_filet == 0))
+        ) {
+          this.$alert(
+            `请填写${this.transPartTypeCode(
+              oneCurtain.NC_PART_TYPECODE
+            )}【左圆角】`,
+            "提示",
+            {
+              confirmButtonText: "确定",
+              type: "warning",
+            }
+          );
+          return;
+        }
+        if (
+          oneCurtain.RIGHT_ENABLE == 2 &&
+          (!oneCurtain.curtain_right_filet ||
+            Number(oneCurtain.curtain_right_filet == 0))
+        ) {
+          this.$alert(
+            `请填写${this.transPartTypeCode(
+              oneCurtain.NC_PART_TYPECODE
+            )}【右圆角】`,
+            "提示",
+            {
+              confirmButtonText: "确定",
+              type: "warning",
+            }
+          );
+          return;
+        }
+        //么术贴
+        if (oneCurtain.TIE_ENABLE == 2 && !oneCurtain.NCM_MESUTIE) {
+          this.$alert(
+            `请选择${this.transPartTypeCode(
+              oneCurtain.NC_PART_TYPECODE
+            )}【么术贴】`,
+            "提示",
+            {
+              confirmButtonText: "确定",
+              type: "warning",
+            }
+          );
+          return;
+        }
+        //打开方式
+        if (oneCurtain.KAIKOU_ENABLE == 2 && !oneCurtain.NCM_KAIKOU) {
+          this.$alert(
+            `请选择${this.transPartTypeCode(
+              oneCurtain.NC_PART_TYPECODE
+            )}【打开方式】`,
+            "提示",
+            {
+              confirmButtonText: "确定",
+              type: "warning",
+            }
+          );
+          return;
+        }
+        //工艺方式
+        if (oneCurtain.OPERATION_ENABLE == 2 && !oneCurtain.NCM_OPERATION) {
+          this.$alert(
+            `请选择${this.transPartTypeCode(
+              oneCurtain.NC_PART_TYPECODE
+            )}【工艺方式】`,
+            "提示",
+            {
+              confirmButtonText: "确定",
+              type: "warning",
+            }
+          );
+          return;
+        }
+        //包边方式
+        if (oneCurtain.BIAN_ENABLE == 2 && !oneCurtain.NCM_BIAN) {
+          this.$alert(
+            `请选择${this.transPartTypeCode(
+              oneCurtain.NC_PART_TYPECODE
+            )}【包边方式】`,
+            "提示",
+            {
+              confirmButtonText: "确定",
+              type: "warning",
+            }
+          );
+          return;
+        }
+      }
     },
     addCurtainToShoppingCar() {
       //添加之前的验证
       this.beforeAddCar();
+      //加入购物车
+      
     },
   },
   mounted() {

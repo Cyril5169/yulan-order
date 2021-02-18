@@ -40,3 +40,11 @@ export function GetExchangeModelItem(data, config = {}) {
       return Promise.reject(err);
   })
 }
+//加入购物车
+export function AddNewCurtainToCart(data, config = {}) {
+  return post('/CART_ITEM/AddNewCurtainToCart', data, config).then((res) => {
+      return Promise.resolve(res);
+  }).catch((err) => {
+      return Promise.reject(err);
+  })
+}

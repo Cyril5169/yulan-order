@@ -1,9 +1,9 @@
 <template>
   <el-card shadow="never">
     <div>
-      <el-autocomplete :trigger-on-focus="false" clearable v-model.trim="searchKey"
-        :fetch-suggestions="querySearchAsync" @select="searchCurtain" @clear="searchCurtain"
-        @keyup.enter.native="searchCurtain" placeholder="请输入帘款查找窗帘" style="width:300px;">
+      <el-autocomplete :trigger-on-focus="false" clearable v-model.trim="searchKey" :fetch-suggestions="querySearchAsync"
+        @select="searchCurtain" @clear="searchCurtain" @keyup.enter.native="searchCurtain" placeholder="请输入帘款查找窗帘"
+        style="width:300px;">
         <el-button @click="searchCurtain" slot="append" icon="el-icon-search">搜索</el-button>
       </el-autocomplete>
     </div>
@@ -28,8 +28,8 @@
                            .replace('$#$', '.')
                            .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
           <span style="margin-left:20px;">活动：</span>
-          <el-select size="mini" style="width:220px" :disabled="activityOptions.length == 1"
-            v-model="curtainHeadData.activityId" :placeholder="activityOptions.length == 1? '无可选活动': '请选择活动'">
+          <el-select size="mini" style="width:220px" :disabled="activityOptions.length == 1" v-model="curtainHeadData.activityId"
+            :placeholder="activityOptions.length == 1? '无可选活动': '请选择活动'">
             <el-option v-for="item in activityOptions" :key="item.P_ID"
               :label="item.ORDER_TYPE? item.ORDER_TYPE + ' -- ' + item.ORDER_NAME : item.ORDER_NAME" :value="item.P_ID">
             </el-option>
@@ -37,8 +37,8 @@
           <span style="margin-left:20px;">位置：</span>
           <el-input style="width:80px;" v-model="curtainHeadData.location" size="mini"></el-input>
           <span style="margin-left:20px;">套数：</span>
-          <el-input style="width:50px;" v-model="curtainHeadData.setNum" size="mini"
-            oninput="value=value.replace(/[^\d]/g,'')"></el-input>
+          <el-input style="width:50px;" v-model="curtainHeadData.setNum" size="mini" oninput="value=value.replace(/[^\d]/g,'')">
+          </el-input>
         </div>
         <!-- 窗帘部件 -->
         <div class="curtain-list">
@@ -71,8 +71,8 @@
                     @click="exchangeModelOrItem(scope.row)">{{scope.row.ITEM_NO}}</a>
                   <span v-else :class="{'delete-cls': !scope.row.curtain_choose}">{{scope.row.ITEM_NO}}</span>
                   <!-- 是否可删/是否默认勾选 -->
-                  <el-checkbox v-if="scope.row.NCT_DELETE > 0 && scope.row.NCM_DELETE > 0"
-                    v-model="scope.row.curtain_choose" @change="onCheckChange($event, scope.row)"></el-checkbox>
+                  <el-checkbox v-if="scope.row.NCT_DELETE > 0 && scope.row.NCM_DELETE > 0" v-model="scope.row.curtain_choose"
+                    @change="onCheckChange($event, scope.row)"></el-checkbox>
                 </template>
                 <!-- 没有模板，非标定 -->
                 <template v-else-if="scope.row.curtain_level == 0">
@@ -153,8 +153,7 @@
                   <template v-if="scope.row.TIE_ENABLE == 2">
                     <span>【么术贴】: </span>
                     <el-dropdown trigger="click">
-                      <a
-                        class="a-userset">{{ scope.row.NCM_MESUTIE? scope.row.NCM_MESUTIE : '请选择' | meshutie_filter}}</a>
+                      <a class="a-userset">{{ scope.row.NCM_MESUTIE? scope.row.NCM_MESUTIE : '请选择' | meshutie_filter}}</a>
                       <el-dropdown-menu slot="dropdown">
                         <el-dropdown-item @click.native="scope.row.NCM_MESUTIE = 'ZC'">正车</el-dropdown-item>
                         <el-dropdown-item @click.native="scope.row.NCM_MESUTIE = 'FC'">反车</el-dropdown-item>
@@ -187,8 +186,7 @@
                   <template v-if="scope.row.OPERATION_ENABLE == 2">
                     <span>【工艺方式】: </span>
                     <el-dropdown trigger="click">
-                      <a
-                        class="a-userset">{{ scope.row.NCM_OPERATION? scope.row.NCM_OPERATION : '请选择' | operation_filter}}</a>
+                      <a class="a-userset">{{ scope.row.NCM_OPERATION? scope.row.NCM_OPERATION : '请选择' | operation_filter}}</a>
                       <el-dropdown-menu slot="dropdown">
                         <el-dropdown-item @click.native="scope.row.NCM_OPERATION = 'GDZ'">固定褶</el-dropdown-item>
                         <el-dropdown-item @click.native="scope.row.NCM_OPERATION = 'DQ'">打圈</el-dropdown-item>
@@ -215,8 +213,7 @@
                 <!-- 备注 -->
                 <div class="manufacturing-ct"
                   v-if="scope.row.NCM_NOTE || scope.row.NCM_JOINT || scope.row.NCM_WRINKLE || scope.row.NCM_MAKETYPE ">
-                  <span>【备注】: <template
-                      v-if="scope.row.NCM_MAKETYPE">{{scope.row.NCM_MAKETYPE | makeType_filter}}<template
+                  <span>【备注】: <template v-if="scope.row.NCM_MAKETYPE">{{scope.row.NCM_MAKETYPE | makeType_filter}}<template
                         v-if="scope.row.NCM_JOINT || scope.row.NCM_WRINKLE || scope.row.NCM_MAKETYPE">、</template></template>
                     <template v-if="scope.row.NCM_JOINT">{{scope.row.NCM_JOINT | joint_filter}}<template
                         v-if="scope.row.NCM_WRINKLE || scope.row.NCM_MAKETYPE">、</template></template>
@@ -229,8 +226,7 @@
             <el-table-column label="数量" width="60" align="center" prop="curtain_area">
               <template slot-scope="scope">
                 <!-- 只有部件显示数量 -->
-                <span
-                  v-if="scope.row.curtain_level == 0 && scope.row.TOTAL_ENABLE == 1">{{scope.row.curtain_area}}</span>
+                <span v-if="scope.row.curtain_level == 0 && scope.row.TOTAL_ENABLE == 1">{{scope.row.curtain_area}}</span>
                 <span v-else-if="scope.row.TOTAL_ENABLE == 2">
                   <el-input v-model="scope.row.curtain_area" style="width:40px;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
@@ -253,8 +249,7 @@
             <el-table-column label="折后" width="60" align="center" v-if="isManager != '0'">
               <template slot-scope="scope">
                 <!-- 只有部件算钱 -->
-                <span
-                  v-if="scope.row.ITEM_NO && scope.row.curtain_level == 0">{{ calculatePromotionPrice(scope.row) }}</span>
+                <span v-if="scope.row.ITEM_NO && scope.row.curtain_level == 0">{{ calculatePromotionPrice(scope.row) }}</span>
                 <span v-else>-</span>
               </template>
             </el-table-column>
@@ -281,14 +276,13 @@
       </div>
     </div>
     <!-- 替换组件 -->
-    <el-drawer :title='"【" + transPartTypeCode(exchangeModelTemplate.NC_PART_TYPECODE) + "】" + "可替换列表"'
-      :visible.sync="drawerShow" :with-header="false" :size="isManager!='0'?'730px':'670px'">
+    <el-drawer :title='"【" + transPartTypeCode(exchangeModelTemplate.NC_PART_TYPECODE) + "】" + "可替换列表"' :visible.sync="drawerShow"
+      :with-header="false" :size="isManager!='0'?'730px':'670px'">
       <span style="color:grey;margin-left:10px;">*单击选择</span>
       <div class="model-exchange-list">
         <div class="model-exchange-list-ct">
           <div v-for="(item, index) in exchangeModelList" :key="index" class="model-exchange-ct"
-            :class="{'model-exchange-now': item.NC_MODEL_ID == exchangeModelNow.NC_MODEL_ID }"
-            @click="onChangeModelClick(item)">
+            :class="{'model-exchange-now': item.NC_MODEL_ID == exchangeModelNow.NC_MODEL_ID }" @click="onChangeModelClick(item)">
             <div class="model-exchange-inner">
               <el-table :data="item.curtain_model" border :style="{width: isManager!='0'?'670px':'610px'}">
                 <el-table-column label="部件" width="80" header-align="center" prop="NC_PART_TYPECODE">
@@ -325,8 +319,7 @@
                   </template>
                 </el-table-column>
               </el-table>
-              <label class="default-model-label"
-                v-if="item.NC_MODEL_ID == exchangeModelTemplate.NC_MODEL_ID">默认组件</label>
+              <label class="default-model-label" v-if="item.NC_MODEL_ID == exchangeModelTemplate.NC_MODEL_ID">默认组件</label>
               <!-- 序号 -->
               <el-badge class="index-badge" :value="index+1" />
             </div>
@@ -335,8 +328,8 @@
       </div>
     </el-drawer>
     <!-- 替换子件 -->
-    <el-drawer :title='"【" + exchangeItemNow.ITEM_NO + " " + exchangeItemNow.NOTE + "】" +  "可替换列表"'
-      :visible.sync="drawerShow2" :with-header="false" size="530px">
+    <el-drawer :title='"【" + exchangeItemNow.ITEM_NO + " " + exchangeItemNow.NOTE + "】" +  "可替换列表"' :visible.sync="drawerShow2"
+      :with-header="false" size="530px">
       <div style="padding:0 10px;margin-bottom:10px;">
         <el-input clearable v-model.trim="itemCondition" @clear="getExangeItemList" size="small"
           @keyup.enter.native="getExangeItemList" placeholder="请输入物料号" style="width:300px;">
@@ -353,8 +346,8 @@
           </div>
         </div>
       </div>
-      <el-pagination class="tc mt10" @current-change="getExangeItemList" :current-page.sync="currentPage"
-        :page-size="limit" layout="total, prev, pager, next, jumper" :total="totalNumber">
+      <el-pagination class="tc mt10" @current-change="getExangeItemList" :current-page.sync="currentPage" :page-size="limit"
+        layout="total, prev, pager, next, jumper" :total="totalNumber">
       </el-pagination>
     </el-drawer>
   </el-card>
@@ -407,9 +400,7 @@ export default {
   computed: {
     //当前选择的活动
     salPromotion() {
-      var selectActivity = this.activityOptions.filter(
-        (item) => item.P_ID == this.curtainHeadData.activityId
-      );
+      var selectActivity = this.activityOptions.filter((item) => item.P_ID == this.curtainHeadData.activityId);
       if (selectActivity.length) {
         return selectActivity[0];
       } else {
@@ -420,10 +411,7 @@ export default {
       var totalMoney = 0;
       //找到勾选的
       for (var i = 0; i < this.curtainData.length; i++) {
-        if (
-          this.curtainData[i].curtain_choose == true &&
-          this.curtainData[i].curtain_level == 0
-        ) {
+        if (this.curtainData[i].curtain_choose == true && this.curtainData[i].curtain_level == 0) {
           totalMoney = totalMoney.add(this.oneTotal(this.curtainData[i]));
         }
       }
@@ -520,9 +508,7 @@ export default {
     //PartType字典Filter
     transPartTypeCode(val) {
       var name = val;
-      var typeCode = this.curtainPartTypeData.filter(
-        (item) => item.NC_PART_TYPECODE == val
-      );
+      var typeCode = this.curtainPartTypeData.filter((item) => item.NC_PART_TYPECODE == val);
       if (typeCode.length) {
         name = typeCode[0].NC_PART_NAME;
       }
@@ -596,26 +582,23 @@ export default {
             var oneCurtain = this.curtainDataOrigin[i];
             if (oneCurtain.NC_PART_TYPECODE == "LBT") {
               //先看父节点需不需要加载出拉边条
-              var fatherCurtain = this.curtainDataOrigin.filter(
-                (item) =>
-                  item.NC_MODEL_ID == oneCurtain.NCM_PID &&
-                  item.BIAN_ENABLE > 0 &&
-                  item.NCM_BIAN == "4B"
+              var fatherCurtain = this.curtainDataOrigin.filter((item) =>
+                item.NC_MODEL_ID == oneCurtain.NCM_PID &&
+                item.BIAN_ENABLE > 0 &&
+                item.NCM_BIAN == "4B"
               );
               if (fatherCurtain.length) {
                 //如果需要加载，看排序最大的面料对应的拉边条,并且是要勾选的
-                var mlList = this.curtainData.filter(
-                  (item) =>
-                    item.NCM_PID == oneCurtain.NCM_PID &&
-                    item.NC_PART_TYPECODE != "LBT" &&
-                    item.curtain_choose
+                var mlList = this.curtainData.filter((item) =>
+                  item.NCM_PID == oneCurtain.NCM_PID &&
+                  item.NC_PART_TYPECODE != "LBT" &&
+                  item.curtain_choose
                 );
                 //最大排序的那个model对应的拉边条需要显示（这里处理一下，有可能模板维护的不对应，强制改成对应的）
                 if (mlList.length) {
                   this.curtainData.push({ ...oneCurtain });
                   //强制改成对应的ITEM_NO
-                  this.curtainData[this.curtainData.length - 1].ITEM_NO =
-                    mlList[mlList.length - 1].MATERIAL_NO;
+                  this.curtainData[this.curtainData.length - 1].ITEM_NO = mlList[mlList.length - 1].MATERIAL_NO;
                 }
               }
             } else {
@@ -623,9 +606,7 @@ export default {
             }
           }
           this.curtainData = this.getStoreData(this.curtainData);
-          this.curtainDataChange = JSON.parse(
-            JSON.stringify(this.curtainDataOrigin)
-          );
+          this.curtainDataChange = JSON.parse(JSON.stringify(this.curtainDataOrigin));
         } else {
           this.noData = true;
         }
@@ -693,8 +674,7 @@ export default {
         }
         this.$set(originData[i], "curtain_level", level);
         //选中标识(父节点以部件为准，子节点综合父节点考虑)
-        var defaultChose =
-          originData[i].NCT_DELETE < 2 && originData[i].NCM_DELETE < 2;
+        var defaultChose = originData[i].NCT_DELETE < 2 && originData[i].NCM_DELETE < 2;
         this.$set(originData[i], "curtain_choose", defaultChose);
         //单价
         var price = this.getPrice(this.customerType, originData[i]);
@@ -729,9 +709,7 @@ export default {
           loading: false,
         }).then((res) => {
           if (res.data && res.data.data) {
-            var data = originData.filter(
-              (item) => item.ITEM_NO == res.data.data.code
-            );
+            var data = originData.filter((item) => item.ITEM_NO == res.data.data.code);
             if (data.length) {
               data[0].curtain_store = res.data.data.kucun;
             }
@@ -761,9 +739,7 @@ export default {
     changeHeadWidth(val) {
       for (var i = 0; i < this.curtainData.length; i++) {
         if (this.curtainData[i].WIDTH_ENABLE > 0) {
-          this.curtainData[i].curtain_width = this.dosageFilter(
-            val * this.curtainData[i].NCM_WIDTH_RATIO
-          );
+          this.curtainData[i].curtain_width = this.dosageFilter(val * this.curtainData[i].NCM_WIDTH_RATIO);
           this.changeOneWidthOrHeight(val, i);
         }
       }
@@ -772,24 +748,17 @@ export default {
     changeHeadHeight(val) {
       for (var i = 0; i < this.curtainData.length; i++) {
         if (this.curtainData[i].WIDTH_ENABLE > 0) {
-          this.curtainData[i].curtain_height = this.dosageFilter(
-            val * this.curtainData[i].NCM_HEIGHT_RATIO
-          );
+          this.curtainData[i].curtain_height = this.dosageFilter(val * this.curtainData[i].NCM_HEIGHT_RATIO);
           this.changeOneWidthOrHeight(val, i);
         }
       }
     },
     //改变单个宽或者高
     changeOneWidthOrHeight(val, index) {
-      this.curtainData[index].curtain_area = this.dosageFilter(
-        this.curtainData[index].curtain_width *
-          this.curtainData[index].curtain_height
-      );
+      this.curtainData[index].curtain_area = this.dosageFilter(this.curtainData[index].curtain_width * this.curtainData[index].curtain_height);
       if (this.curtainData[index].NC_PART_TYPECODE == "LS") {
         //改变里衬布的
-        var LCBITEM = this.curtainData.filter(
-          (item) => item.NC_PART_TYPECODE == "LCB"
-        );
+        var LCBITEM = this.curtainData.filter((item) => item.NC_PART_TYPECODE == "LCB");
         for (var i = 0; i < LCBITEM.length; i++) {
           //假设有多个里衬布的情况
           LCBITEM[i].curtain_area = this.curtainData[index].curtain_area;
@@ -827,10 +796,7 @@ export default {
       if (common == "4B" && row.NCM_BIAN != "4B") {
         //显示拉边条
         //先看看当前数据有没有这个拉边条，有的话应该是bug
-        var lbtItemNow = this.curtainData.filter(
-          (item) =>
-            item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT"
-        );
+        var lbtItemNow = this.curtainData.filter((item) => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
         if (lbtItemNow.length) return;
         //找到最大序号的面料,并且是要勾选的
         var mlList = this.curtainData.filter(
@@ -841,16 +807,12 @@ export default {
         );
         if (mlList.length) {
           //在原始数据中找到拉边条数据并push进去
-          var lbtItem = this.curtainDataOrigin.filter(
-            (item) =>
-              item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT"
-          );
+          var lbtItem = this.curtainDataOrigin.filter((item) => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
           if (lbtItem.length) {
             lbtItem = lbtItem[0]; //只取第一个拉边条（按理应该只有一个）
             this.curtainData.push({ ...lbtItem });
             //强制改成对应的ITEM_NO
-            this.curtainData[this.curtainData.length - 1].ITEM_NO =
-              mlList[mlList.length - 1].MATERIAL_NO;
+            this.curtainData[this.curtainData.length - 1].ITEM_NO = mlList[mlList.length - 1].MATERIAL_NO;
             //排序
             this.curtainData.sort((a, b) => {
               if (a.NCT_SORTNO == b.NCT_SORTNO) {
@@ -858,16 +820,12 @@ export default {
               }
               return a.NCT_SORTNO > b.NCT_SORTNO ? 1 : -1;
             });
-            console.log(this.curtainData);
           }
         }
       } else if (common == "3B" && row.NCM_BIAN == "4B") {
         //去掉拉边条
         //找到有没有拉边条
-        var lbtItem = this.curtainData.filter(
-          (item) =>
-            item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT"
-        );
+        var lbtItem = this.curtainData.filter((item) => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
         //应该只有一个拉边条，但是循环一下，保险
         for (var i = 0; i < lbtItem.length; i++) {
           this.curtainData.splice(this.curtainData.indexOf(lbtItem[i]), 1);
@@ -877,12 +835,8 @@ export default {
     //勾选的联动处理
     onCheckChange(checked, row) {
       if (!row.ITEM_NO) return;
-      var childrenCurtain = this.curtainData.filter(
-        (item) => item.NCM_PID == row.NC_MODEL_ID
-      );
-      var fatherCurtain = this.curtainData.filter(
-        (item) => item.NC_MODEL_ID == row.NCM_PID
-      );
+      var childrenCurtain = this.curtainData.filter((item) => item.NCM_PID == row.NC_MODEL_ID);
+      var fatherCurtain = this.curtainData.filter((item) => item.NC_MODEL_ID == row.NCM_PID);
       if (childrenCurtain.length) {
         //自身作为父节点，勾选或者取消，子节点应该同步
         for (var i = 0; i < childrenCurtain.length; i++) {
@@ -900,34 +854,25 @@ export default {
           //勾选上的时候看需不需要加载自己的拉边条，看自己是不是最大排序的那个
           //从父节点看是否需要加载
           if (fatherCurtain.BIAN_ENABLE > 0 && fatherCurtain.NCM_BIAN == "4B") {
-            var mlList = this.curtainData.filter(
-              (item) =>
-                item.NCM_PID == row.NCM_PID &&
-                item.NC_PART_TYPECODE != "LBT" &&
-                item.curtain_choose
+            var mlList = this.curtainData.filter((item) =>
+              item.NCM_PID == row.NCM_PID &&
+              item.NC_PART_TYPECODE != "LBT" &&
+              item.curtain_choose
             );
-            if (
-              mlList.length &&
-              mlList[mlList.length - 1].ITEM_NO == row.ITEM_NO
-            ) {
+            if (mlList.length && mlList[mlList.length - 1].ITEM_NO == row.ITEM_NO) {
               //先看看当前数据有没有拉边条，有的话应该是全选的时候这一条还没勾选上的时候上一条数据加载的
-              var lbtItemNow = this.curtainData.filter(
-                (item) =>
-                  item.NCM_PID == row.NCM_PID && item.NC_PART_TYPECODE == "LBT"
-              );
+              var lbtItemNow = this.curtainData.filter((item) => item.NCM_PID == row.NCM_PID && item.NC_PART_TYPECODE == "LBT");
               if (lbtItemNow.length == 0) {
                 //在原始数据中找到拉边条数据并push进去
-                var lbtItem = this.curtainDataOrigin.filter(
-                  (item) =>
-                    item.NCM_PID == row.NCM_PID &&
-                    item.NC_PART_TYPECODE == "LBT"
+                var lbtItem = this.curtainDataOrigin.filter((item) =>
+                  item.NCM_PID == row.NCM_PID &&
+                  item.NC_PART_TYPECODE == "LBT"
                 );
                 if (lbtItem.length) {
                   lbtItem = lbtItem[0]; //只取第一个拉边条（按理应该只有一个）
                   this.curtainData.push({ ...lbtItem });
                   //强制改成对应的ITEM_NO
-                  this.curtainData[this.curtainData.length - 1].ITEM_NO =
-                    mlList[mlList.length - 1].MATERIAL_NO;
+                  this.curtainData[this.curtainData.length - 1].ITEM_NO = mlList[mlList.length - 1].MATERIAL_NO;
                   //排序
                   this.curtainData.sort((a, b) => {
                     if (a.NCT_SORTNO == b.NCT_SORTNO) {
@@ -946,17 +891,13 @@ export default {
           //取消勾选删掉对应的拉边条，并找有没有其他
           //从父节点看是否需要删除
           if (fatherCurtain.BIAN_ENABLE > 0 && fatherCurtain.NCM_BIAN == "4B") {
-            var lbtItem = this.curtainData.filter(
-              (item) =>
-                item.NCM_PID == row.NCM_PID && item.NC_PART_TYPECODE == "LBT"
-            );
+            var lbtItem = this.curtainData.filter((item) => item.NCM_PID == row.NCM_PID && item.NC_PART_TYPECODE == "LBT");
             if (lbtItem.length) {
               //继续找到最大的面料对应的拉边条
-              var mlList = this.curtainData.filter(
-                (item) =>
-                  item.NCM_PID == row.NCM_PID &&
-                  item.NC_PART_TYPECODE != "LBT" &&
-                  item.curtain_choose
+              var mlList = this.curtainData.filter((item) =>
+                item.NCM_PID == row.NCM_PID &&
+                item.NC_PART_TYPECODE != "LBT" &&
+                item.curtain_choose
               );
               if (mlList.length) {
                 //有的话更新拉边条
@@ -973,9 +914,7 @@ export default {
             }
           }
           //子节点取消勾选，如果同级没有其他勾选了，父节点取消勾选
-          var brotherCurtain = this.curtainData.filter(
-            (item) => item.NCM_PID == row.NCM_PID && item.curtain_choose
-          );
+          var brotherCurtain = this.curtainData.filter((item) => item.NCM_PID == row.NCM_PID && item.curtain_choose);
           if (brotherCurtain.length == 0)
             fatherCurtain.curtain_choose = checked;
         }
@@ -1000,17 +939,10 @@ export default {
       GetExchangeModel({
         NC_TEMPLATE_ID: this.exchangeModelNow.NC_TEMPLATE_ID,
       }).then((res) => {
-        if (
-          res.data.length > 0 ||
-          (res.data.length == 1 &&
-            res.data[0].NC_MODEL_ID != this.exchangeModelNow.NC_MODEL_ID)
-        ) {
+        if (res.data.length > 0 || (res.data.length == 1 && res.data[0].NC_MODEL_ID != this.exchangeModelNow.NC_MODEL_ID)) {
           this.exchangeModelList = res.data;
           //默认数据
-          var defaultModel = this.templateData.filter(
-            (item) =>
-              item.NC_TEMPLATE_ID == this.exchangeModelNow.NC_TEMPLATE_ID
-          );
+          var defaultModel = this.templateData.filter((item) => item.NC_TEMPLATE_ID == this.exchangeModelNow.NC_TEMPLATE_ID);
           if (defaultModel.length) {
             this.exchangeModelTemplate = defaultModel[0];
           }
@@ -1021,9 +953,7 @@ export default {
               var level = 0;
               var NCM_PID = curtain_list[j].NCM_PID;
               while (NCM_PID != 0) {
-                var temp = curtain_list.filter(
-                  (item) => item.NC_MODEL_ID == NCM_PID
-                );
+                var temp = curtain_list.filter((item) => item.NC_MODEL_ID == NCM_PID);
                 if (temp.length) {
                   NCM_PID = temp[0].NCM_PID;
                   level++;
@@ -1050,9 +980,7 @@ export default {
     //点击替换
     onChangeModelClick(model) {
       if (model.NC_MODEL_ID == this.exchangeModelNow.NC_MODEL_ID) return;
-      var selectModel = model.curtain_model.filter(
-        (item) => item.NC_MODEL_ID == model.NC_MODEL_ID
-      );
+      var selectModel = model.curtain_model.filter((item) => item.NC_MODEL_ID == model.NC_MODEL_ID);
       if (selectModel.length) {
         selectModel = selectModel[0];
         var msg = "";
@@ -1068,40 +996,29 @@ export default {
         })
           .then(() => {
             //替换当前，第一步，把当前的删掉
-            this.curtainData = this.curtainData.filter(
-              (item) =>
-                item.NC_TEMPLATE_ID != this.exchangeModelNow.NC_TEMPLATE_ID
-            );
-            this.curtainDataChange = this.curtainDataChange.filter(
-              (item) =>
-                item.NC_TEMPLATE_ID != this.exchangeModelNow.NC_TEMPLATE_ID
-            );
+            this.curtainData = this.curtainData.filter((item) => item.NC_TEMPLATE_ID != this.exchangeModelNow.NC_TEMPLATE_ID);
+            this.curtainDataChange = this.curtainDataChange.filter((item) => item.NC_TEMPLATE_ID != this.exchangeModelNow.NC_TEMPLATE_ID);
             //第二步，把当前选中的push进去
-            var curtain_temp = this.getOtherCurtainMsgForExchange(
-              model.curtain_model
-            );
+            var curtain_temp = this.getOtherCurtainMsgForExchange(model.curtain_model);
             for (var i = 0; i < curtain_temp.length; i++) {
               var oneCurtain = curtain_temp[i];
               if (oneCurtain.NC_PART_TYPECODE == "LBT") {
                 //先看父节点需不需要加载出拉边条
-                var fatherCurtain = curtain_temp.filter(
-                  (item) =>
-                    item.NC_MODEL_ID == oneCurtain.NCM_PID &&
-                    item.BIAN_ENABLE > 0 &&
-                    item.NCM_BIAN == "4B"
+                var fatherCurtain = curtain_temp.filter((item) =>
+                  item.NC_MODEL_ID == oneCurtain.NCM_PID &&
+                  item.BIAN_ENABLE > 0 &&
+                  item.NCM_BIAN == "4B"
                 );
                 if (fatherCurtain.length) {
                   //如果需要加载，看排序最大的面料对应的拉边条,并且是要勾选的
-                  var mlList = this.curtainData.filter(
-                    (item) =>
-                      item.NCM_PID == oneCurtain.NCM_PID &&
-                      item.NC_PART_TYPECODE != "LBT" &&
-                      item.curtain_choose
+                  var mlList = this.curtainData.filter((item) =>
+                    item.NCM_PID == oneCurtain.NCM_PID &&
+                    item.NC_PART_TYPECODE != "LBT" &&
+                    item.curtain_choose
                   );
                   if (mlList.length) {
                     this.curtainData.push({ ...oneCurtain });
-                    this.curtainData[this.curtainData.length - 1].ITEM_NO =
-                      mlList[mlList.length - 1].MATERIAL_NO;
+                    this.curtainData[this.curtainData.length - 1].ITEM_NO = mlList[mlList.length - 1].MATERIAL_NO;
                   }
                 }
               } else {
@@ -1121,28 +1038,23 @@ export default {
               this.$refs.curtainTable.doLayout();
             });
           })
-          .catch(() => {});
+          .catch(() => { });
       }
     },
     //添加其他没有的数据
     getOtherCurtainMsgForExchange(originData, originLevel) {
       for (var i = 0; i < originData.length; i++) {
         //选中标识(父节点以部件为准，子节点综合父节点考虑)
-        var defaultChose =
-          originData[i].NCT_DELETE < 2 && originData[i].NCM_DELETE < 2;
+        var defaultChose = originData[i].NCT_DELETE < 2 && originData[i].NCM_DELETE < 2;
         this.$set(originData[i], "curtain_choose", defaultChose);
         //单价
         //var price = this.getPrice(this.customerType, originData[i]);
         //this.$set(originData[i], "curtain_price", price);
         //宽
-        var curtain_width = this.dosageFilter(
-          this.curtainHeadData.width * originData[i].NCM_WIDTH_RATIO
-        );
+        var curtain_width = this.dosageFilter(this.curtainHeadData.width * originData[i].NCM_WIDTH_RATIO);
         this.$set(originData[i], "curtain_width", curtain_width);
         //高
-        var curtain_height = this.dosageFilter(
-          this.curtainHeadData.height * originData[i].NCM_HEIGHT_RATIO
-        );
+        var curtain_height = this.dosageFilter(this.curtainHeadData.height * originData[i].NCM_HEIGHT_RATIO);
         this.$set(originData[i], "curtain_height", curtain_height);
         //总数（面积）
         var area = this.dosageFilter(curtain_width * curtain_height);
@@ -1150,9 +1062,7 @@ export default {
         this.$set(originData[i], "curtain_area", area);
         if (originData[i].NC_PART_TYPECODE == "LS") {
           //改变里衬布的
-          var LCBITEM = this.curtainData.filter(
-            (item) => item.NC_PART_TYPECODE == "LCB"
-          );
+          var LCBITEM = this.curtainData.filter((item) => item.NC_PART_TYPECODE == "LCB");
           for (var j = 0; j < LCBITEM.length; j++) {
             //假设有多个里衬布的情况
             LCBITEM[j].curtain_area = area;
@@ -1176,17 +1086,11 @@ export default {
         page: this.currentPage,
         limit: this.limit,
       }).then((res) => {
-        if (
-          res.data.length > 0 ||
-          (res.data.length == 1 &&
-            res.data[0].ITEM_NO != this.exchangeItemNow.ITEM_NO)
-        ) {
+        if (res.data.length > 0 || (res.data.length == 1 && res.data[0].ITEM_NO != this.exchangeItemNow.ITEM_NO)) {
           this.exchangeItemList = res.data;
           this.totalNumber = res.count;
           //默认物料(从替换后的找)
-          var defaultItem = this.curtainDataChange.filter(
-            (item) => item.NC_MODEL_ID == this.exchangeItemNow.NC_MODEL_ID
-          );
+          var defaultItem = this.curtainDataChange.filter((item) => item.NC_MODEL_ID == this.exchangeItemNow.NC_MODEL_ID);
           if (defaultItem.length) {
             this.exchangeItemDefault = defaultItem[0];
           }
@@ -1202,20 +1106,15 @@ export default {
     },
     onChangeItemClick(item) {
       if (item.ITEM_NO == this.exchangeItemNow.ITEM_NO) return;
-      this.$confirm(
-        `确认使用【${item.ITEM_NO}】替换当前【${this.exchangeItemNow.ITEM_NO}】？`,
-        "提示",
-        {
-          confirmButtonText: "是",
-          cancelButtonText: "否",
-          type: "warning",
-        }
+      this.$confirm(`确认使用【${item.ITEM_NO}】替换当前【${this.exchangeItemNow.ITEM_NO}】？`, "提示", {
+        confirmButtonText: "是",
+        cancelButtonText: "否",
+        type: "warning",
+      }
       )
         .then(() => {
           //替换只是更换item，现在只需要替换字段ITEM_NO，NOTE和拉边条MATERIAL_NO
-          var originItem = this.curtainData.filter(
-            (item) => item.NC_MODEL_ID == this.exchangeItemNow.NC_MODEL_ID
-          );
+          var originItem = this.curtainData.filter((item) => item.NC_MODEL_ID == this.exchangeItemNow.NC_MODEL_ID);
           if (originItem.length) {
             originItem = originItem[0];
             originItem.ITEM_NO = item.ITEM_NO;
@@ -1224,21 +1123,16 @@ export default {
           }
           //替换拉边条
           //如果需要加载，看自身是不是勾选中排序最大的
-          var mlList = this.curtainData.filter(
-            (item) =>
-              item.NCM_PID == originItem.NCM_PID &&
-              item.NC_PART_TYPECODE != "LBT" &&
-              item.curtain_choose
+          var mlList = this.curtainData.filter((item) =>
+            item.NCM_PID == originItem.NCM_PID &&
+            item.NC_PART_TYPECODE != "LBT" &&
+            item.curtain_choose
           );
-          if (
-            mlList.length &&
-            mlList[mlList.length - 1].ITEM_NO == originItem.ITEM_NO
-          ) {
+          if (mlList.length && mlList[mlList.length - 1].ITEM_NO == originItem.ITEM_NO) {
             //改变拉边条数据
-            var lbtItem = this.curtainData.filter(
-              (item) =>
-                item.NCM_PID == originItem.NCM_PID &&
-                item.NC_PART_TYPECODE == "LBT"
+            var lbtItem = this.curtainData.filter((item) =>
+              item.NCM_PID == originItem.NCM_PID &&
+              item.NC_PART_TYPECODE == "LBT"
             );
             if (lbtItem.length) {
               lbtItem[0].ITEM_NO = originItem.MATERIAL_NO;
@@ -1249,7 +1143,7 @@ export default {
           //this.exchangeItemNow.ITEM_NO = item.ITEM_NO;
           this.drawerShow2 = false;
         })
-        .catch(() => {});
+        .catch(() => { });
     },
     //合并第一列显示预览
     cellMerge({ row, column, rowIndex, columnIndex }) {
@@ -1273,30 +1167,21 @@ export default {
     },
     beforeAddCar() {
       //表头
-      if (
-        !this.curtainHeadData.width ||
-        Number(this.curtainHeadData.width == 0)
-      ) {
+      if (!this.curtainHeadData.width || Number(this.curtainHeadData.width == 0)) {
         this.$alert("请填写帘款【成品宽】", "提示", {
           confirmButtonText: "确定",
           type: "warning",
         });
         return;
       }
-      if (
-        !this.curtainHeadData.height ||
-        Number(this.curtainHeadData.height == 0)
-      ) {
+      if (!this.curtainHeadData.height || Number(this.curtainHeadData.height == 0)) {
         this.$alert("请填写帘款【成品高】", "提示", {
           confirmButtonText: "确定",
           type: "warning",
         });
         return;
       }
-      if (
-        !this.curtainHeadData.setNum ||
-        Number(this.curtainHeadData.setNum == 0)
-      ) {
+      if (!this.curtainHeadData.setNum || Number(this.curtainHeadData.setNum == 0)) {
         this.$alert("请填写帘款【套数】", "提示", {
           confirmButtonText: "确定",
           type: "warning",
@@ -1307,136 +1192,83 @@ export default {
       for (var i = 0; i < this.chooseCurtainData.length; i++) {
         var oneCurtain = this.chooseCurtainData[i];
         //宽高
-        if (
-          oneCurtain.WIDTH_ENABLE == 2 &&
-          (!oneCurtain.curtain_width || Number(oneCurtain.curtain_width == 0))
-        ) {
-          this.$alert(
-            `请填写${this.transPartTypeCode(
-              oneCurtain.NC_PART_TYPECODE
-            )}【宽】`,
-            "提示",
-            {
-              confirmButtonText: "确定",
-              type: "warning",
-            }
+        if (oneCurtain.WIDTH_ENABLE == 2 && (!oneCurtain.curtain_width || Number(oneCurtain.curtain_width == 0))) {
+          this.$alert(`请填写${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【宽】`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          }
           );
           return;
         }
-        if (
-          oneCurtain.HEIGHT_ENABLE == 2 &&
-          (!oneCurtain.curtain_height || Number(oneCurtain.curtain_height == 0))
-        ) {
-          this.$alert(
-            `请填写${this.transPartTypeCode(
-              oneCurtain.NC_PART_TYPECODE
-            )}【高】`,
-            "提示",
-            {
-              confirmButtonText: "确定",
-              type: "warning",
-            }
+        if (oneCurtain.HEIGHT_ENABLE == 2 && (!oneCurtain.curtain_height || Number(oneCurtain.curtain_height == 0))) {
+          this.$alert(`请填写${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【高】`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          }
           );
           return;
         }
         //左右圆角
-        if (
-          oneCurtain.LEFT_ENABLE == 2 &&
-          (!oneCurtain.curtain_left_filet ||
-            Number(oneCurtain.curtain_left_filet == 0))
-        ) {
-          this.$alert(
-            `请填写${this.transPartTypeCode(
-              oneCurtain.NC_PART_TYPECODE
-            )}【左圆角】`,
-            "提示",
-            {
-              confirmButtonText: "确定",
-              type: "warning",
-            }
+        if (oneCurtain.LEFT_ENABLE == 2 && (!oneCurtain.curtain_left_filet || Number(oneCurtain.curtain_left_filet == 0))) {
+          this.$alert(`请填写${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【左圆角】`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          }
           );
           return;
         }
-        if (
-          oneCurtain.RIGHT_ENABLE == 2 &&
-          (!oneCurtain.curtain_right_filet ||
-            Number(oneCurtain.curtain_right_filet == 0))
-        ) {
-          this.$alert(
-            `请填写${this.transPartTypeCode(
-              oneCurtain.NC_PART_TYPECODE
-            )}【右圆角】`,
-            "提示",
-            {
-              confirmButtonText: "确定",
-              type: "warning",
-            }
+        if (oneCurtain.RIGHT_ENABLE == 2 && (!oneCurtain.curtain_right_filet || Number(oneCurtain.curtain_right_filet == 0))) {
+          this.$alert(`请填写${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【右圆角】`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          }
           );
           return;
         }
         //么术贴
         if (oneCurtain.TIE_ENABLE == 2 && !oneCurtain.NCM_MESUTIE) {
-          this.$alert(
-            `请选择${this.transPartTypeCode(
-              oneCurtain.NC_PART_TYPECODE
-            )}【么术贴】`,
-            "提示",
-            {
-              confirmButtonText: "确定",
-              type: "warning",
-            }
+          this.$alert(`请选择${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【么术贴】`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          }
           );
           return;
         }
         //打开方式
         if (oneCurtain.KAIKOU_ENABLE == 2 && !oneCurtain.NCM_KAIKOU) {
-          this.$alert(
-            `请选择${this.transPartTypeCode(
-              oneCurtain.NC_PART_TYPECODE
-            )}【打开方式】`,
-            "提示",
-            {
-              confirmButtonText: "确定",
-              type: "warning",
-            }
+          this.$alert(`请选择${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【打开方式】`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          }
           );
           return;
         }
         //工艺方式
         if (oneCurtain.OPERATION_ENABLE == 2 && !oneCurtain.NCM_OPERATION) {
-          this.$alert(
-            `请选择${this.transPartTypeCode(
-              oneCurtain.NC_PART_TYPECODE
-            )}【工艺方式】`,
-            "提示",
-            {
-              confirmButtonText: "确定",
-              type: "warning",
-            }
+          this.$alert(`请选择${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【工艺方式】`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          }
           );
           return;
         }
         //包边方式
         if (oneCurtain.BIAN_ENABLE == 2 && !oneCurtain.NCM_BIAN) {
-          this.$alert(
-            `请选择${this.transPartTypeCode(
-              oneCurtain.NC_PART_TYPECODE
-            )}【包边方式】`,
-            "提示",
-            {
-              confirmButtonText: "确定",
-              type: "warning",
-            }
+          this.$alert(`请选择${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【包边方式】`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          }
           );
           return;
         }
+        //物料号
       }
     },
     addCurtainToShoppingCar() {
       //添加之前的验证
       this.beforeAddCar();
       //加入购物车
-      
+
     },
   },
   mounted() {

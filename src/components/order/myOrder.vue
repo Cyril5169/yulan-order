@@ -510,27 +510,22 @@ export default {
         case "pending":
           this.options = this.options1;
           this.statusIdOptionValue1 = ["0", "5", "6", "21", "22"];
-          this.isAll = false;
           break;
         case "LJPending":
           this.options = this.options2;
           this.statusIdOptionValue1 = ["20", "23"];
-          this.isAll = false;
           break;
         case "YLPending":
           this.options = this.options3;
           this.statusIdOptionValue1 = ["1", "2", "4", "7", "12"];
-          this.isAll = false;
           break;
         case "invalid":
           this.options = this.options4;
           this.statusIdOptionValue1 = ["3"];
-          this.isAll = false;
           break;
         case "allOrder":
           this.options = this.options5;
           this.statusIdOptionValue1 = [];
-          this.isAll = true;
           break;
       }
       this.refresh();
@@ -750,9 +745,6 @@ export default {
       return "";
     },
   },
-  // created() {
-  //   this.refresh();
-  // },
   activated() {
     this.refresh();
   },

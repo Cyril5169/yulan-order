@@ -1360,7 +1360,7 @@ export default {
 }
 .curtain-params {
   text-align: center;
-  margin-top: 10px;
+  margin-top: 5px;
 }
 .curtain-list {
   margin-top: 10px;
@@ -1387,7 +1387,7 @@ export default {
   cursor: unset;
 }
 .manufacturing-ct {
-  margin-bottom: 1px;
+  margin-bottom: 0;
 }
 .no-data {
   width: 100%;
@@ -1478,7 +1478,11 @@ export default {
 }
 </style>
 <style>
-.curtain-table .el-input__inner {
+.curtain-list .el-table td,
+.curtain-list .el-table th {
+  padding: 1PX !important;
+}
+.curtain-list .el-input__inner {
   padding: 0 5px;
   height: 20px;
 }

@@ -28,6 +28,7 @@ import orderDetail from '@/components/order/orderDetail'
 import checkOrder from '@/components/order/checkOrder'
 import shipment from '@/components/order/shipment'
 import examine from '@/components/order/examine'
+import newCurtainExamine from '@/components/order/newCurtainExamine'
 import examineDetailNew from '@/components/order/examineDetailNew'
 import checkExamine from '@/components/order/checkExamine'
 import myCoupon from '@/components/center/myCoupon'
@@ -232,6 +233,14 @@ const router = new Router({
           path: '/order/examine',
           name: 'examine',
           component: examine,
+          meta: {
+            keepAlive: true
+          }
+        },
+        {
+          path: '/order/newCurtainExamine',
+          name: 'newCurtainExamine',
+          component: newCurtainExamine,
           meta: {
             keepAlive: true
           }

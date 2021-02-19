@@ -422,7 +422,7 @@ export default {
         curtainStatusId: this.orderType || this.canOptionValue,
         isAll: this.isAll,
         orderBy: this.orderBy,
-        prefix: 'X'
+        prefix: 'N'
       };
       if (!data.beginTime) {
         data.beginTime = "0001/1/1";

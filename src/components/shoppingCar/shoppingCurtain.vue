@@ -4,14 +4,12 @@
       :expand-row-keys="expands" @expand-change="packUpNot" :data="activityData" empty-text="该购物车是空的">
       <el-table-column width="100px" type="expand">
         <template slot-scope="scope">
-          <el-table :ref="multipleTable(scope.$index)" :data="table(scope.$index)" tooltip-effect="dark" style="width:100%;"
+          <el-table :ref="multipleTable(scope.$index)" :data="tableData(scope.$index)" tooltip-effect="dark" style="width:100%;"
             @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55" :selectable="checkActiviyEffect" align="center">
             </el-table-column>
             <el-table-column label="型号" width="100" align="center">
-              <template slot-scope="scope1">{{
-                scope1.row.modelNumber
-              }}</template>
+              <template slot-scope="scope1">{{scope1.row.modelNumber}}</template>
             </el-table-column>
             <el-table-column label="宽度(m)" width="90" align="center">
               <template slot-scope="scope1">{{ scope1.row.width }}</template>
@@ -56,9 +54,7 @@
             <el-table-column label="小计" width="100" align="center">
               <template slot-scope="scope1">
                 <span v-if="isManager === '0'">***</span>
-                <span v-else>{{
-                  (scope1.row.price * scope1.row.count) | dosageFilter
-                }}</span>
+                <span v-else>{{(scope1.row.price * scope1.row.count) | dosageFilter}}</span>
               </template>
             </el-table-column>
             <el-table-column label="折后金额" width="100" align="center">
@@ -125,7 +121,6 @@ export default {
       cid: Cookies.get("cid"), //假定给的用户id
       isManager: Cookies.get("isManager"), //是否为管理员
       activityData: [], //获取组别
-      //全部的商品信息(全类型)
       shopsData: [],
       multipleSelection: [], //选中的数据
       totalMoney: 0,
@@ -134,6 +129,7 @@ export default {
     };
   },
   methods: {
+    ...mapMutations("navTabs", ["addTab"]),
     //展开行的标识
     getRowKeys(row) {
       return row.activity;
@@ -176,18 +172,6 @@ export default {
         }
       }
       this.shopsData = theData;
-    },
-    ...mapMutations("navTabs", ["addTab"]),
-    //给不同的行添加样式颜色用于区分
-    tableRowClassName({ row, rowIndex }) {
-      if (rowIndex % 3 === 0) {
-        return "colorType_0";
-      } else if (rowIndex % 3 === 1) {
-        return "colorType_1";
-      } else if (rowIndex % 3 === 2) {
-        return "colorType_2";
-      }
-      return "";
     },
     //判断商品是否可选(活动是否有效)
     checkActiviyEffect(row, index) {
@@ -427,7 +411,7 @@ export default {
       return "multipleTable" + index;
     },
     //返回展开行的商品数据
-    table(index) {
+    tableData(index) {
       if (
         Array.isArray(this.shopsData) &&
         this.shopsData[index] &&
@@ -436,6 +420,17 @@ export default {
         return this.shopsData[index].curtainCartItems;
       }
       return [];
+    },
+    //给不同的行添加样式颜色用于区分
+    tableRowClassName({ row, rowIndex }) {
+      if (rowIndex % 3 === 0) {
+        return "colorType_0";
+      } else if (rowIndex % 3 === 1) {
+        return "colorType_1";
+      } else if (rowIndex % 3 === 2) {
+        return "colorType_2";
+      }
+      return "";
     },
   },
   created() {

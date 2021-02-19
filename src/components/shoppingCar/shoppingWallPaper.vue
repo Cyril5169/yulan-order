@@ -4,7 +4,7 @@
       :expand-row-keys="expands" @expand-change="packUpNot" :data="activityData" empty-text="该购物车是空的">
       <el-table-column width="100px" type="expand">
         <template slot-scope="scope">
-          <el-table :ref="multipleTable(scope.$index)" :data="table(scope.$index)" tooltip-effect="dark" style="width:100%;"
+          <el-table :ref="multipleTable(scope.$index)" :data="tableData(scope.$index)" tooltip-effect="dark" style="width:100%;"
             @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55" :selectable="checkActiviyEffect" align="center">
             </el-table-column>
@@ -131,7 +131,6 @@ export default {
       isManager: Cookies.get("isManager"), //是否为管理员
       customerType: Cookies.get("customerType"),
       activityData: [], //获取组别
-      //全部的商品信息(全类型)
       shopsData: [],
       multipleSelection: [],
       totalMoney: 0, //原总价
@@ -184,7 +183,7 @@ export default {
       return re;
     },
     //返回展开行的商品数据
-    table(index) {
+    tableData(index) {
       if (
         Array.isArray(this.shopsData) &&
         this.shopsData[index] &&
@@ -194,17 +193,7 @@ export default {
       }
       return [];
     },
-    //给不同的行添加样式颜色用于区分
-    tableRowClassName({ row, rowIndex }) {
-      if (rowIndex % 3 === 0) {
-        return "colorType_0";
-      } else if (rowIndex % 3 === 1) {
-        return "colorType_1";
-      } else if (rowIndex % 3 === 2) {
-        return "colorType_2";
-      }
-      return "";
-    }, //监测选中项的变化
+    //监测选中项的变化
     handleSelectionChange(val) {
       //当已有选项时，只能选当前组其他项，不可选其他组，若选其他组，原有组清空
       if (this.multipleSelection.length !== 0) {
@@ -465,6 +454,17 @@ export default {
       price = quantity.mul(data.price);
       return this.dosageFilter(price);
     },
+    //给不同的行添加样式颜色用于区分
+    tableRowClassName({ row, rowIndex }) {
+      if (rowIndex % 3 === 0) {
+        return "colorType_0";
+      } else if (rowIndex % 3 === 1) {
+        return "colorType_1";
+      } else if (rowIndex % 3 === 2) {
+        return "colorType_2";
+      }
+      return "";
+    }, 
   },
   created() {
     this.init();

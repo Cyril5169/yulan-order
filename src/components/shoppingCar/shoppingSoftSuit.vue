@@ -4,7 +4,7 @@
       :expand-row-keys="expands" @expand-change="packUpNot" :data="activityData" empty-text="该购物车是空的">
       <el-table-column width="100px" type="expand">
         <template slot-scope="scope">
-          <el-table :ref="multipleTable(scope.$index)" :data="table(scope.$index)" tooltip-effect="dark" style="width:100%;"
+          <el-table :ref="multipleTable(scope.$index)" :data="tableData(scope.$index)" tooltip-effect="dark" style="width:100%;"
             @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55" :selectable="checkActiviyEffect" align="center">
             </el-table-column>
@@ -13,9 +13,7 @@
             <el-table-column label="活动" min-width="140px" show-overflow-tooltip align="center">
               <template slot-scope="scope">
                 <span style="color: red;" v-if="scope.row.activityEffective === false">(过期活动)</span>
-                {{
-                  scope.row.activityName ? scope.row.activityName : "不参与活动"
-                }}
+                {{scope.row.activityName ? scope.row.activityName : "不参与活动"}}
               </template>
             </el-table-column>
             <!-- <el-table-column
@@ -41,10 +39,7 @@
                     {{ scope1.row.width }} × {{ scope1.row.height }} =
                     {{ (scope1.row.width * scope1.row.height) | dosageFilter }}
                   </span>
-
-                  <span style="color: red;" v-if="
-                      scope1.row.width * scope1.row.height <
-                        scope1.row.item.minimumPurchase
+                  <span style="color: red;" v-if="scope1.row.width * scope1.row.height < scope1.row.item.minimumPurchase
                     ">(最小起购数量{{ scope1.row.item.minimumPurchase }})</span>
                 </div>
                 <div v-else>
@@ -128,7 +123,6 @@ export default {
       isManager: Cookies.get("isManager"), //是否为管理员
       customerType: Cookies.get("customerType"),
       activityData: [], //获取组别
-      //全部的商品信息(全类型)
       shopsData: [],
       multipleSelection: [],
       totalMoney: 0,
@@ -181,7 +175,7 @@ export default {
       return re;
     },
     //返回展开行的商品数据
-    table(index) {
+    tableData(index) {
       if (
         Array.isArray(this.shopsData) &&
         this.shopsData[index] &&
@@ -190,17 +184,6 @@ export default {
         return this.shopsData[index].commodities;
       }
       return [];
-    },
-    //给不同的行添加样式颜色用于区分
-    tableRowClassName({ row, rowIndex }) {
-      if (rowIndex % 3 === 0) {
-        return "colorType_0";
-      } else if (rowIndex % 3 === 1) {
-        return "colorType_1";
-      } else if (rowIndex % 3 === 2) {
-        return "colorType_2";
-      }
-      return "";
     },
     //计算每件商品的小计:长乘高
     squareChange(value, index, groupIndex, flag) {
@@ -583,6 +566,17 @@ export default {
           : this.dosageFilter(data.width.mul(data.height));
       price = quantity.mul(data.price);
       return this.dosageFilter(price);
+    },
+    //给不同的行添加样式颜色用于区分
+    tableRowClassName({ row, rowIndex }) {
+      if (rowIndex % 3 === 0) {
+        return "colorType_0";
+      } else if (rowIndex % 3 === 1) {
+        return "colorType_1";
+      } else if (rowIndex % 3 === 2) {
+        return "colorType_2";
+      }
+      return "";
     },
   },
   created() {

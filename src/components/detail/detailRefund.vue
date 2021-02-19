@@ -1,11 +1,7 @@
 <template>
   <div id="detailRefund" class="rel">
     <el-card shadow="hover">
-      <div
-        id="printTable"
-        class="f16"
-        style="width: 1164px; border:1px solid #000; margin: -1px;"
-      >
+      <div id="printTable" class="f16" style="width: 1164px; border:1px solid #000; margin: -1px;">
         <section class="f14 t-foot border-b tr">
           <span v-if="baseData.method !== 'new'">编号：{{ baseData.ID }}</span>
           <span>创建人：{{ baseData.ERP_CREATORNAME }}</span>
@@ -16,57 +12,13 @@
           <i class="icon-print el-icon-printer cpoi" style="margin-right:20px;" @click="printRefund"></i>
         </h3>
         <br />
-        <!-- <p class="ovh">
-          <a
-            v-if="
-              baseData.method === 'edit' ||
-                (baseData.method === 'new' && item.length !== 0)
-            "
-            @click="updateOrDelete(1)"
-            class="r cpoi"
-          >
-            <i
-              :class="[
-                item.length === 0
-                  ? 'el-icon-error error-icon'
-                  : 'el-icon-success success-icon'
-              ]"
-            >
-              {{ judgeOpa }}
-            </i>
-          </a>
-          <a
-            v-else-if="
-              baseData.method === 'see' &&
-                baseData.STATE === 'CUSTOMERAFFIRM' &&
-                identity === 'ECWEB'
-            "
-          >
-            <i
-              @click="userOperation(0)"
-              class="el-icon-error error-icon r cpoi mr10"
-              >不同意</i
-            >
-            <i
-              @click="userOperation(1)"
-              class="el-icon-success success-icon r cpoi mr10"
-              >同意</i
-            >
-          </a>
-        </p> -->
         <section class="mt10">
           <p class="uli" style="margin-left:5px;">TO：{{ baseData.CNAME }}</p>
           <p class="t-indent">
             我公司现收到以下拟申请退货产品，经调查、检测核实，作如下处理：
           </p>
         </section>
-        <el-table
-          id="refundTable"
-          stripe
-          :data="item"
-          class="border-t border-b"
-          style="width: 100%;"
-        >
+        <el-table id="refundTable" stripe :data="item" class="border-t border-b" style="width: 100%;">
           <el-table-column prop="PRODUCTION_VERSION" width="150" align="center" label="产品/项目">
           </el-table-column>
           <el-table-column prop="ITEM_NO" width="150" align="center" label="型号"> </el-table-column>
@@ -77,30 +29,17 @@
           </el-table-column>
           <el-table-column prop="NOTES" align="center" label="质量问题"> </el-table-column>
           <el-table-column prop="PROCESS" align="center" label="处理意见"> </el-table-column>
-          <el-table-column
-            label="操作"
-            v-if="baseData.method !== 'see' && baseData.ERP_CREATOR === cid"
-          >
+          <el-table-column label="操作" v-if="baseData.method !== 'see' && baseData.ERP_CREATOR === cid">
             <template slot-scope="scope">
-              <i
-                class="el-icon-close cpoi"
-                @click="deleteItem(scope.$index)"
-              ></i>
+              <i class="el-icon-close cpoi" @click="deleteItem(scope.$index)"></i>
             </template>
           </el-table-column>
         </el-table>
-        <table
-          id="moneyTable"
-          border="0"
-          style="width: 100%;"
-          v-if="item.length > 0"
-        >
+        <table id="moneyTable" border="0" style="width: 100%;" v-if="item.length > 0">
           <tr>
             <td width="130.5px" style="text-align:center;">金额（小写）</td>
             <td width="581px" class="tr">{{ totalMoney }}</td>
-            <td
-              rowspan="2"
-            ></td>
+            <td rowspan="2"></td>
           </tr>
           <tr>
             <td width="130.5px" style="text-align:center;">金额（大写）</td>
@@ -109,11 +48,7 @@
         </table>
 
         <section class="f14">
-          <p
-            @click="addItem"
-            class="tc f16 p20 cpoi border-b p-click"
-            v-if="baseData.method !== 'see'"
-          >
+          <p @click="addItem" class="tc f16 p20 cpoi border-b p-click" v-if="baseData.method !== 'see'">
             添加退换货品
             <i class="el-icon-circle-plus success-icon f24 r"></i>
           </p>
@@ -134,9 +69,7 @@
             </div>
             <div class="t-com dib r">
               经销商
-              <span v-if="baseData.STATE === 'APPROVED'"
-                >:{{ baseData.CNAME }}</span
-              ><br />
+              <span v-if="baseData.STATE === 'APPROVED'">:{{ baseData.CNAME }}</span><br />
               （盖章）<br />
               <span v-if="baseData.STATE !== 'APPROVED'"> 年 月 日</span>
               <span v-else>
@@ -151,102 +84,53 @@
         </section>
       </div>
       <div class="tc mt20">
-        <el-button
-          v-if="baseData.method !== 'see'"
-          type="danger"
-          style="margin-right: 20px;"
-          :disabled="item.length === 0"
-          @click.native="updateOrDelete(0)"
-        >
+        <el-button v-if="baseData.method !== 'see'" type="danger" style="margin-right: 20px;" :disabled="item.length === 0"
+          @click.native="updateOrDelete(0)">
           保存修改
         </el-button>
-        <el-button
-          v-if="
+        <el-button v-if="
               baseData.method === 'edit' ||
                 (baseData.method === 'new' && item.length !== 0)
-            "
-          :type="item.length != 0?'primary':'danger'"
-          style="margin-right: 20px;"
-          @click.native="updateOrDelete(1)"
-        >
+            " :type="item.length != 0?'primary':'danger'" style="margin-right: 20px;" @click.native="updateOrDelete(1)">
           {{ judgeOpa }}
         </el-button>
-        <el-button
-          v-if="
+        <el-button v-if="
             baseData.method === 'see' &&
               baseData.STATE === 'CUSTOMERAFFIRM' &&
               identity === 'ECWEB'
-          "
-          type="primary"
-          style="margin-left: 20px;"
-          @click.native="userOperation(1)"
-        >
+          " type="primary" style="margin-left: 20px;" @click.native="userOperation(1)">
           同意
         </el-button>
-        <el-button
-          v-if="
+        <el-button v-if="
             baseData.method === 'see' &&
               baseData.STATE === 'CUSTOMERAFFIRM' &&
               identity === 'ECWEB'
-          "
-          type="danger"
-          style="margin-left: 20px;"
-          @click="userOperation(0)"
-        >
+          " type="danger" style="margin-left: 20px;" @click="userOperation(0)">
           不同意
         </el-button>
-        <el-button
-          type="info"
-          style="margin-left: 20px;"
-          @click="returnBack"
-        >
+        <el-button type="info" style="margin-left: 20px;" @click="returnBack">
           返回
         </el-button>
       </div>
     </el-card>
-    <el-dialog
-      title="填写货品信息"
-      width="500px"
-      :visible.sync="dialogFormVisible"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-    >
+    <el-dialog title="填写货品信息" width="500px" :visible.sync="dialogFormVisible" :close-on-click-modal="false"
+      :close-on-press-escape="false">
       <el-form label-width="100px" :model="itemMsg">
         <el-form-item label="型号">
-          <el-input
-            style="width:300px;"
-            v-model="itemMsg.ITEM_NO"
-            readonly
-          ></el-input>
+          <el-input style="width:300px;" v-model="itemMsg.ITEM_NO" readonly></el-input>
         </el-form-item>
         <el-form-item label="产品/项目">
-          <el-input
-            style="width:300px;"
-            v-model="itemMsg.PRODUCTION_VERSION"
-            readonly
-          ></el-input>
+          <el-input style="width:300px;" v-model="itemMsg.PRODUCTION_VERSION" readonly></el-input>
         </el-form-item>
         <el-form-item label="单位">
-          <el-input
-            style="width:300px;"
-            v-model="itemMsg.UNIT"
-            readonly
-          ></el-input>
+          <el-input style="width:300px;" v-model="itemMsg.UNIT" readonly></el-input>
         </el-form-item>
         <el-form-item label="数量">
-          <currency-input
-            v-model="itemMsg.QTY"
-            :placeholder="''"
-            :customStyle="'width: 300px; height: 40px;'"
-          >
+          <currency-input v-model="itemMsg.QTY" :placeholder="''" :customStyle="'width: 300px; height: 40px;'">
           </currency-input>
         </el-form-item>
         <el-form-item label="金额">
-          <currency-input
-            v-model="itemMsg.TOTALMONEY"
-            :placeholder="''"
-            :customStyle="'width: 300px; height: 40px;'"
-          >
+          <currency-input v-model="itemMsg.TOTALMONEY" :placeholder="''" :customStyle="'width: 300px; height: 40px;'">
           </currency-input>
         </el-form-item>
         <el-form-item label="质量问题">
@@ -349,17 +233,17 @@ export default {
                 this.$alert(`${value}--未查询到货品信息`, "提示", {
                   type: "warning",
                   confirmButtonText: "好的"
-                }).catch(() => {});
+                }).catch(() => { });
               }
             })
             .catch(err => {
               this.$alert(`${value}--未查询到货品信息`, "提示", {
                 type: "warning",
                 confirmButtonText: "好的"
-              }).catch(() => {});
+              }).catch(() => { });
             });
         })
-        .catch(() => {});
+        .catch(() => { });
     },
     //保存货品信息表
     saveDialog() {
@@ -383,7 +267,7 @@ export default {
         this.$alert(`请确保该表单的 ${tip} 已经输入！`, "提示", {
           type: "warning",
           confirmButtonText: "好的"
-        }).catch(() => {});
+        }).catch(() => { });
         return;
       }
       //插入
@@ -446,7 +330,7 @@ export default {
             this.$alert("删除失败", "提示", {
               type: "warning",
               confirmButtonText: "好的"
-            }).catch(() => {});
+            }).catch(() => { });
           });
       } else {
         let _rcbItems = this.item;
@@ -506,7 +390,7 @@ export default {
               this.$alert("添加失败", "提示", {
                 type: "warning",
                 confirmButtonText: "好的"
-              }).catch(() => {});
+              }).catch(() => { });
             });
         }
         //edit--修改
@@ -538,7 +422,7 @@ export default {
               this.$alert("删除失败", "提示", {
                 type: "warning",
                 confirmButtonText: "好的"
-              }).catch(() => {});
+              }).catch(() => { });
             });
         }
       }
@@ -629,15 +513,15 @@ export default {
   },
   computed: {
     //判断此时确认书可以提交还是删除-->处理中
-    judgeOpa: function() {
+    judgeOpa: function () {
       return this.item.length === 0 ? "删除" : "提交";
     },
     //返回特定格式的时间戳
-    toLocaleTime: function() {
+    toLocaleTime: function () {
       return toLocale(this.baseData.CREATE_TS);
     },
     //返回总金额
-    totalMoney: function() {
+    totalMoney: function () {
       let total = 0;
       this.item.forEach(_item => {
         total += Number(_item.TOTALMONEY);
@@ -645,7 +529,7 @@ export default {
       return total.toFixed(2);
     },
     //返回大写形式的总金额
-    totalMoneyUpper: function() {
+    totalMoneyUpper: function () {
       return digitUppercase(this.totalMoney);
     }
   },
@@ -660,7 +544,7 @@ export default {
 #detailRefund .el-card {
   color: #000;
 }
-#refundTable td{
+#refundTable td {
   border-right: 1px solid #000;
   border-bottom: 0 !important;
 }
@@ -673,10 +557,10 @@ export default {
   border-right: none;
 }
 #detailRefund .el-table,
-#detailRefund .el-table thead{
+#detailRefund .el-table thead {
   color: #000;
 }
-#detailRefund .el-table::before{
+#detailRefund .el-table::before {
   height: 0;
 }
 #detailRefund .el-dialog__body {

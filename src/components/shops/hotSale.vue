@@ -320,9 +320,6 @@ export default {
 .hot-index-normal {
   background-color: #8eb9f5;
 }
-.hover-link {
-  cursor: pointer;
-}
 .hover-link:hover {
   text-decoration: underline !important;
 }

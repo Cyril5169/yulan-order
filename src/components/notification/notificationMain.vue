@@ -1,28 +1,15 @@
 <template>
   <el-card class="centerCard">
-    <el-input
-      @keyup.enter.native="search()"
-      placeholder="请输入主题关键词"
-      v-model="condition"
-      style="width:300px;margin-bottom:10px;"
-    >
-      <el-button @click="search()" slot="append" icon="el-icon-search"
-        >搜索</el-button
-      >
+    <el-input @keyup.enter.native="search()" placeholder="请输入主题关键词" v-model="condition" style="width:300px;margin-bottom:10px;">
+      <el-button @click="search()" slot="append" icon="el-icon-search">搜索</el-button>
     </el-input>
-    <el-table
-      style="width: 90%"
-      :data="notiData"
-      :row-class-name="tableRowClassName"
-    >
+    <el-table style="width: 90%" :data="notiData" :row-class-name="tableRowClassName">
       <el-table-column label="主题" header-align="center">
         <template slot-scope="scope">
           <a class="link" @click="showDetail(scope.row)">{{
             scope.row.TITLE
           }}</a>
-          <span v-if="dateIsValid(scope.row.ENDDATE)" class="newTooltip"
-            >新</span
-          >
+          <span v-if="dateIsValid(scope.row.ENDDATE)" class="newTooltip">新</span>
         </template>
       </el-table-column>
       <el-table-column label="发布时间" width="120" align="center">
@@ -32,24 +19,11 @@
       </el-table-column>
     </el-table>
     <div style="margin:0 25%;" class="block">
-      <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page.sync="currentPage"
-        :page-sizes="[20, 50, 100, 150]"
-        :page-size="limit"
-        layout="total,sizes, prev, pager, next, jumper"
-        :total="count"
-      ></el-pagination>
+      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="currentPage"
+        :page-sizes="[20, 50, 100, 150]" :page-size="limit" layout="total,sizes, prev, pager, next, jumper" :total="count">
+      </el-pagination>
     </div>
-    <el-dialog
-      :show-close="true"
-      :visible.sync="detailVisible"
-      width="1000px"
-      top="5vh"
-      :title="detailTitle"
-      center
-    >
+    <el-dialog :show-close="true" :visible.sync="detailVisible" width="1000px" top="5vh" :title="detailTitle" center>
       <div v-html="detailData"></div>
     </el-dialog>
   </el-card>
@@ -68,7 +42,7 @@ export default {
       count: 0,
       currentPage: 1,
       detailVisible: false,
-      detailTitle:"",
+      detailTitle: "",
       detailData: "",
       notiData: [
         {
@@ -108,7 +82,7 @@ export default {
   methods: {
     dateIsValid(date) {
       var endDate = new Date(date);//失效时间
-      endDate.setTime(endDate.getTime()+24*60*60*1000);
+      endDate.setTime(endDate.getTime() + 24 * 60 * 60 * 1000);
       return endDate - new Date() > 0;
     },
     search() {
@@ -117,7 +91,7 @@ export default {
     },
     getDetail() {
       var data = {
-        cid:Cookies.get('cid'),
+        cid: Cookies.get('cid'),
         condition: this.condition,
         page: this.currentPage,
         limit: this.limit
@@ -163,7 +137,6 @@ export default {
   position: relative;
 }
 .link {
-  cursor: pointer;
   color: #666;
 }
 .link::before {

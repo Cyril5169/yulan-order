@@ -11,8 +11,8 @@
             placeholder="日期区间">
           </el-date-picker>
           <span style="font-size:15px;margin-right:35px">至</span>
-          <el-date-picker value-format="yyyy-MM-dd" style="width:14%;margin-right:10px;" v-model="finishTime"
-            type="date" placeholder="日期区间">
+          <el-date-picker value-format="yyyy-MM-dd" style="width:14%;margin-right:10px;" v-model="finishTime" type="date"
+            placeholder="日期区间">
           </el-date-picker>
           <span style="font-size:15px;margin-right:31px">状态:</span>
           <el-select style="width:14%;margin-right:10px;" v-model="SELECT_STATUS" placeholder="请选择">
@@ -70,8 +70,8 @@
                   scope.row.STATE == 'SUBMITTED' ||
                     scope.row.STATE == 'SENDBACK'
                 " content="删除" placement="top">
-                <el-button circle style="padding: 7px;" @click="_Delete(scope.row.ID)" type="danger"
-                  icon="el-icon-close" size="mini">
+                <el-button circle style="padding: 7px;" @click="_Delete(scope.row.ID)" type="danger" icon="el-icon-close"
+                  size="mini">
                 </el-button>
               </el-tooltip>
               <el-tooltip v-if="
@@ -80,16 +80,15 @@
                     (scope.row.STATE == 'RECEIVE' &&
                       scope.row.RETURN_TYPE == '客户邮寄')
                 " content="编辑" placement="top">
-                <el-button circle style="padding: 7px;" @click="_CheckDetail(scope.row, 2)" type="primary"
-                  icon="el-icon-edit" size="mini">
+                <el-button circle style="padding: 7px;" @click="_CheckDetail(scope.row, 2)" type="primary" icon="el-icon-edit"
+                  size="mini">
                 </el-button>
               </el-tooltip>
             </template>
           </el-table-column>
         </el-table>
-        <el-pagination style="width: 100%;" class="dib tc" @current-change="handleCurrentChange"
-          :current-page.sync="currentPage" :page-size="limit" layout="total, prev, pager, next, jumper"
-          :total="allNum">
+        <el-pagination style="width: 100%;" class="dib tc" @current-change="handleCurrentChange" :current-page.sync="currentPage"
+          :page-size="limit" layout="total, prev, pager, next, jumper" :total="allNum">
         </el-pagination>
       </div>
     </el-card>
@@ -126,8 +125,7 @@
                 处理人：
               </td>
               <td style="font-size:10px;height:15px;width:8%;" colspan="1" v-else></td>
-              <td style="font-size:10px;height:15px;text-align:left;width:19%;" colspan="1"
-                v-if="submit.STATE !='SUBMITTED'">
+              <td style="font-size:10px;height:15px;text-align:left;width:19%;" colspan="1" v-if="submit.STATE !='SUBMITTED'">
                 {{ submit.DEALMAN_NAME }}
               </td>
               <td style="font-size:10px;height:15px;width:19%;" colspan="1" v-else></td>
@@ -135,8 +133,7 @@
                 处理时间：
               </td>
               <td style="font-size:10px;height:15px;width:9%;" colspan="1" v-else></td>
-              <td style="font-size:10px;height:15px;text-align:left;width:17%;" colspan="3"
-                v-if="submit.STATE !='SUBMITTED'">
+              <td style="font-size:10px;height:15px;text-align:left;width:17%;" colspan="3" v-if="submit.STATE !='SUBMITTED'">
                 {{ submit.DEAL_TS | datatrans }}
               </td>
               <td style="font-size:10px;height:15px;width:17%;" colspan="1" v-else></td>
@@ -206,7 +203,7 @@
                       </el-link>
                     </a>
                     <label style="display:block;position:absolute;top:1px;right:10px;">
-                      <a style="cursor:pointer;" @click="downLoad(file.url)">下载</a>
+                      <a @click="downLoad(file.url)">下载</a>
                     </label>
                   </li>
                 </ul>
@@ -273,8 +270,7 @@
                   submit.RETURN_TYPE == '客户邮寄'
               ">
               <td class="grayTD" style="height:15px">物流备注信息</td>
-              <td style="height:15px;color:red;" colspan="7"
-                v-if="!submit.RETURN_TRANSINFO && submit.STATE == 'RECEIVE'">
+              <td style="height:15px;color:red;" colspan="7" v-if="!submit.RETURN_TRANSINFO && submit.STATE == 'RECEIVE'">
                 {{ submit.RETURN_TRANSINFO | transInfoTip }}
               </td>
               <td style="height:15px;" colspan="7" v-if="!submit.RETURN_TRANSINFO && submit.STATE != 'RECEIVE'">
@@ -298,7 +294,7 @@
                       </el-link>
                     </a>
                     <label style="display:block;position:absolute;top:1px;right:10px;">
-                      <a style="cursor:pointer;" @click="downLoad(file.url)">下载</a>
+                      <a @click="downLoad(file.url)">下载</a>
                     </label>
                   </li>
                 </ul>
@@ -358,7 +354,7 @@
                       </el-link>
                     </a>
                     <label style="display:block;position:absolute;top:1px;right:10px;">
-                      <a style="cursor:pointer;" @click="downLoad(file.url)">下载</a>
+                      <a @click="downLoad(file.url)">下载</a>
                     </label>
                   </li>
                 </ul>
@@ -553,7 +549,7 @@
                       </el-link>
                     </a>
                     <label style="display:block;position:absolute;top:1px;right:10px;">
-                      <a style="cursor:pointer;" @click="downLoad(file.url)">下载</a>
+                      <a @click="downLoad(file.url)">下载</a>
                     </label>
                   </li>
                 </ul>
@@ -646,8 +642,7 @@
               <td class="grayTD" style="height:15px">
                 物流备注信息<span style="color:red;">*</span>
               </td>
-              <td style="height:15px;color:red;" colspan="7"
-                v-if="!submit.RETURN_TRANSINFO && submit.STATE == 'RECEIVE'">
+              <td style="height:15px;color:red;" colspan="7" v-if="!submit.RETURN_TRANSINFO && submit.STATE == 'RECEIVE'">
                 {{ submit.RETURN_TRANSINFO | transInfoTip }}
               </td>
               <td style="height:15px;" colspan="7" v-if="!submit.RETURN_TRANSINFO && submit.STATE != 'RECEIVE'">
@@ -671,7 +666,7 @@
                       </el-link>
                     </a>
                     <label style="display:block;position:absolute;top:1px;right:10px;">
-                      <a style="cursor:pointer;" @click="downLoad(file.url)">下载</a>
+                      <a @click="downLoad(file.url)">下载</a>
                     </label>
                   </li>
                 </ul>
@@ -725,7 +720,7 @@
                       </el-link>
                     </a>
                     <label style="display:block;position:absolute;top:1px;right:10px;">
-                      <a style="cursor:pointer;" @click="downLoad(file.url)">下载</a>
+                      <a @click="downLoad(file.url)">下载</a>
                     </label>
                   </li>
                 </ul>
@@ -959,8 +954,8 @@
     </el-dialog>
 
     <!-- 旧系统提货单新增，提货单号输入界面 -->
-    <el-dialog title="请确保输入的信息准确无误" :visible.sync="getItemFromSaleNo" :close-on-click-modal="false" width="20%"
-      top="20%" append-to-body>
+    <el-dialog title="请确保输入的信息准确无误" :visible.sync="getItemFromSaleNo" :close-on-click-modal="false" width="20%" top="20%"
+      append-to-body>
       <div v-if="inputItemNo">
         <div>
           <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -1851,7 +1846,7 @@ export default {
           this.$alert("添加失败", "提示", {
             type: "warning",
             confirmButtonText: "好的",
-          }).catch(() => {});
+          }).catch(() => { });
         });
     },
     //修改
@@ -1999,7 +1994,7 @@ export default {
           this.inputItemNo = false;
           this.addRefundRecord();
         })
-        .catch(() => {});
+        .catch(() => { });
     },
     GetNowDate() {
       var date = new Date();
@@ -2055,8 +2050,8 @@ export default {
             // }
           }
         })
-        .then(() => {})
-        .catch(() => {});
+        .then(() => { })
+        .catch(() => { });
     },
 
     ...mapMutations("badge", ["addBadge", "releaseBadge"]),

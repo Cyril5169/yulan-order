@@ -47,8 +47,8 @@
             " class="item" effect="dark" content="作废订单" placement="top">
             <i style="float:right;cursor: pointer;" class="el-icon-delete" @click="deleteOrder(item.ORDER_NO)"></i>
           </el-tooltip>
-          <el-tooltip v-if="item.STATUS_ID == 3 && item.ORDER_NO.slice(0, 1) == 'X'" class="item" effect="dark"
-            content="退回数据到购物车" placement="top">
+          <el-tooltip v-if="item.STATUS_ID == 3 && item.ORDER_NO.slice(0, 1) == 'X'" class="item" effect="dark" content="退回数据到购物车"
+            placement="top">
             <i style="float:right;cursor: pointer;" class="el-icon-sell" @click="copyCart(item.ORDER_NO)"></i>
           </el-tooltip>
           <a v-if="
@@ -61,7 +61,7 @@
                 item.STATUS_ID == 12) &&
                 (item.ORDER_NO.slice(0, 1) == 'X' ||
                   item.ORDER_NO.slice(0, 1) == 'Y')
-            " target="_blank" style="float:right;cursor: pointer;font-size:13px;" :href="
+            " target="_blank" style="float:right;font-size:13px;" :href="
               'http://www.luxlano.com/ddkc/DD_bjl.asp?b2b=' + item.ORDER_NO
             ">兰居尚品订单进度查询</a>
         </div>
@@ -127,8 +127,8 @@
             </p>
           </router-link>
           <p>
-            <el-button v-if="item.STATUS_ID == 5 || item.STATUS_ID == 6" @click="refreshPay(item)" size="medium"
-              type="danger" plain>提交订单</el-button>
+            <el-button v-if="item.STATUS_ID == 5 || item.STATUS_ID == 6" @click="refreshPay(item)" size="medium" type="danger"
+              plain>提交订单</el-button>
           </p>
           <router-link to="/order/checkExamine">
             <p>
@@ -144,9 +144,9 @@
         </div>
       </el-card>
       <div style="margin:0 25%;" class="block">
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-          :current-page.sync="currentPage" :page-sizes="[5, 10, 15, 20]" :page-size="limit"
-          layout="total,sizes, prev, pager, next, jumper" :total="count"></el-pagination>
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="currentPage"
+          :page-sizes="[5, 10, 15, 20]" :page-size="limit" layout="total,sizes, prev, pager, next, jumper" :total="count">
+        </el-pagination>
       </div>
     </div>
     <el-dialog :show-close="true" :visible.sync="shipmentVisible" width="1100px" title="出货详情">
@@ -585,7 +585,7 @@ export default {
                       this.$root.$emit("refreshBadgeIcon", "curtainCount");
                     });
                   })
-                  .catch(() => {});
+                  .catch(() => { });
               } else {
                 this.$alert("删除成功", "提示", {
                   confirmButtonText: "确定",
@@ -603,7 +603,7 @@ export default {
             });
           //预留接口-删除订单
         })
-        .catch((err) => {});
+        .catch((err) => { });
     },
     copyCart(orderNo) {
       this.$confirm("是否退回数据到购物车？", "提示", {
@@ -623,7 +623,7 @@ export default {
             this.$root.$emit("refreshBadgeIcon", "curtainCount");
           });
         })
-        .catch(() => {});
+        .catch(() => { });
     },
     refreshPay(item) {
       var url = "/order/getResidemoney.do";
@@ -643,8 +643,8 @@ export default {
           //欠款可提交的话可以跳过判断
           this.$alert(
             "余额不足，当前订单还需充值" +
-              (item.ALL_SPEND - this.Initial_balance).toFixed(2) +
-              "元才能提交",
+            (item.ALL_SPEND - this.Initial_balance).toFixed(2) +
+            "元才能提交",
             "提示",
             {
               confirmButtonText: "确定",

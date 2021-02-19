@@ -1,12 +1,11 @@
 <template>
-  <div id="shoppingWallPaper">
-    <el-table default-expand-all width="100%" style="margin-top:10px;" :row-class-name="tableRowClassName"
-      :row-key="getRowKeys" :expand-row-keys="expands" @expand-change="packUpNot" :data="activityData"
-      empty-text="该购物车是空的">
+  <div class="shoppingCarCls">
+    <el-table default-expand-all width="100%" style="margin-top:10px;" :row-class-name="tableRowClassName" :row-key="getRowKeys"
+      :expand-row-keys="expands" @expand-change="packUpNot" :data="activityData" empty-text="该购物车是空的">
       <el-table-column width="100px" type="expand">
         <template slot-scope="scope">
-          <el-table :ref="multipleTable(scope.$index)" :data="table(scope.$index)" tooltip-effect="dark"
-            style="width:100%;" @selection-change="handleSelectionChange">
+          <el-table :ref="multipleTable(scope.$index)" :data="table(scope.$index)" tooltip-effect="dark" style="width:100%;"
+            @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55" :selectable="checkActiviyEffect" align="center">
             </el-table-column>
             <el-table-column prop="item.itemNo" label="型号" min-width="100" align="center">
@@ -74,8 +73,7 @@
             </el-table-column>
             <el-table-column label="操作" min-width="170" align="center">
               <template slot-scope="scope">
-                <a class="link-detail" @click="handleDetails(scope.$index, scope.row)"
-                  v-if="canShowDetail(scope.row)">查看详情</a>
+                <a class="link-detail" @click="handleDetails(scope.$index, scope.row)" v-if="canShowDetail(scope.row)">查看详情</a>
                 <a class="link-delete" @click="deleteSingle(scope.row)">删除商品</a>
               </template>
             </el-table-column>
@@ -98,7 +96,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <div id="accountBox">
+    <div class="accountBox">
       <div class="r">
         <div>
           <span>已选择</span>
@@ -331,7 +329,7 @@ export default {
               });
             });
         })
-        .catch(() => {});
+        .catch(() => { });
     },
     //删除选中项
     deleteChoose(index) {
@@ -372,7 +370,7 @@ export default {
               });
             });
         })
-        .catch(() => {});
+        .catch(() => { });
     },
     //删除一整个分组
     deleteGroup(index) {
@@ -402,7 +400,7 @@ export default {
               });
             });
         })
-        .catch(() => {});
+        .catch(() => { });
     },
     //判断结算
     handleCommit() {
@@ -473,72 +471,3 @@ export default {
   },
 };
 </script>
-
-<style>
-#shoppingWallPaper {
-  margin-top: -32px;
-}
-#shoppingWallPaper .el-table .colorType_0 {
-  background: oldlace;
-}
-#shoppingWallPaper .el-table .colorType_1 {
-  background: #ceecbe;
-}
-#shoppingWallPaper .el-table .colorType_2 {
-  background: #cde1f7;
-}
-#shoppingWallPaper .el-table__expanded-cell[class*="cell"] {
-  padding: 0;
-}
-#shoppingWallPaper .el-table__expand-icon::after {
-  position: relative;
-  bottom: 1px;
-  font-size: 14px;
-  content: "分组";
-  color: #606266;
-  cursor: pointer;
-  -webkit-transition: background-color 0.25s ease;
-  transition: background-color 0.25s ease;
-}
-</style>
-<style scoped>
-a {
-  text-decoration: none;
-}
-a:hover {
-  cursor: pointer;
-}
-#accountBox {
-  width: 100%;
-  height: 53px;
-  margin-top: 20px;
-  background: #f0f0f0;
-  line-height: 50px;
-  color: #101010;
-  font-size: 14px;
-}
-#accountBox span {
-  cursor: pointer;
-}
-#accountBox :nth-child(1) > div {
-  margin-left: 20px;
-  display: inline-block;
-}
-.link-detail {
-  margin: 0 5px;
-  display: inline;
-}
-.link-delete {
-  color: #13ce66;
-  margin: 0 5px;
-  display: inline;
-}
-.commitBtn {
-  width: 80px;
-  height: 50px;
-  color: white;
-  font-size: 18px;
-  text-align: center;
-  cursor: pointer;
-}
-</style>

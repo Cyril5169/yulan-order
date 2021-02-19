@@ -8,10 +8,10 @@
       </div>
 
       <div id="tbar" class="tbarStyle">
-        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询开始日期"
-          v-model="beginTime" style="width:14%;"></el-date-picker> --
-        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询截止日期"
-          v-model="finishTime" style="width:14%;"></el-date-picker>
+        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询开始日期" v-model="beginTime"
+          style="width:14%;"></el-date-picker> --
+        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询截止日期" v-model="finishTime"
+          style="width:14%;"></el-date-picker>
 
         <el-select v-model="SELECT_STATUS" style="margin-left:10px;width:160px;" placeholder="状态">
           <el-option v-for="item in statusArray" :key="item.label" :label="item.label" :value="item.value"></el-option>
@@ -57,9 +57,9 @@
       </div>
 
       <div style="margin:0 25%;margin-top:10px" class="block">
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-          :current-page.sync="currentPage" :page-sizes="[5, 10, 15, 20]" :page-size="limit"
-          layout="total,sizes, prev, pager, next, jumper" :total="count"></el-pagination>
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="currentPage"
+          :page-sizes="[5, 10, 15, 20]" :page-size="limit" layout="total,sizes, prev, pager, next, jumper" :total="count">
+        </el-pagination>
       </div>
     </el-card>
 
@@ -119,7 +119,7 @@
                     <i class="el-icon-document"></i>{{ file.name }}
                   </a>
                   <label style="display:block;position:absolute;top:0px;right:30px;">
-                    <a style="cursor:pointer;" @click="downLoad(file.url)">下载附件</a>
+                    <a @click="downLoad(file.url)">下载附件</a>
                   </label>
                 </li>
               </ul>
@@ -153,7 +153,7 @@
                     <i class="el-icon-document"></i>{{ file.name }}
                   </a>
                   <label style="display:block;position:absolute;top:0px;right:30px;">
-                    <a style="cursor:pointer;" @click="downLoad(file.url)">下载附件</a>
+                    <a @click="downLoad(file.url)">下载附件</a>
                   </label>
                 </li>
               </ul>
@@ -206,8 +206,8 @@
               <td colspan="1" rowspan="1" class="grayTD" style="height:15px">楼盘定位</td>
               <td colspan="3" rowspan="1" style="height:15px">
                 <div class="selectCard">
-                  <el-select style="height:16px;width:100%;padding:0px 0px 0px 0px;" v-model="submitForm.ESTATE_TYPE"
-                    filterable placeholder="选择楼盘类型">
+                  <el-select style="height:16px;width:100%;padding:0px 0px 0px 0px;" v-model="submitForm.ESTATE_TYPE" filterable
+                    placeholder="选择楼盘类型">
                     <el-option v-for="item in typeArray" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                   </el-select>
@@ -231,17 +231,15 @@
             <tr v-for="(item,index) of submitDetailForm" :key="index">
               <td colspan="1" rowspan="1" style="height:30px">
                 <span>
-                  <el-button type="danger" size="mini" icon="el-icon-minus" @click="_rowSubtract(index)" v-if="index!=0"
-                    circle></el-button>
+                  <el-button type="danger" size="mini" icon="el-icon-minus" @click="_rowSubtract(index)" v-if="index!=0" circle>
+                  </el-button>
                 </span>
-                <input v-model="submitDetailForm[index].HOUSE_CODE" placeholder="" v-if="index==0" clearable
-                  class="inputStyle">
+                <input v-model="submitDetailForm[index].HOUSE_CODE" placeholder="" v-if="index==0" clearable class="inputStyle">
                 <input v-model="submitDetailForm[index].HOUSE_CODE" placeholder="" v-if="index!=0" clearable
                   class="inputStyleNew">
               </td>
               <td colspan="1" rowspan="1" style="height:30px">
-                <input v-model="submitDetailForm[index].HOUSING_AREA" placeholder="" clearable class="inputStyle"
-                  oninput="value=value.replace(/[^\d.]/g,'')
+                <input v-model="submitDetailForm[index].HOUSING_AREA" placeholder="" clearable class="inputStyle" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
@@ -258,9 +256,8 @@
                   <el-upload class="upload-de" :action="Global.baseUrl + '/Lanju/UploadFiles'" drag multiple
                     :on-change="function(file,fileList){return  handleChange(file,fileList,index)}"
                     :on-remove="function(file,fileList){return  handleRemove(file,fileList,index)}"
-                    :on-success="function(res,file,fileList){return  handleSuccess(res,file,fileList,index)}"
-                    ref="upload" :auto-upload="false" :file-list="submitDetailForm[index].fileList"
-                    :data="{ CID: CID, dateStamp: dateStamp }">
+                    :on-success="function(res,file,fileList){return  handleSuccess(res,file,fileList,index)}" ref="upload"
+                    :auto-upload="false" :file-list="submitDetailForm[index].fileList" :data="{ CID: CID, dateStamp: dateStamp }">
                     <i class="el-icon-upload2" style="margin-top:8px;">
                       <span style="font-size:15px;">上传附件</span>
                     </i>
@@ -313,16 +310,14 @@
             <td style="width:8%;"></td>
           </tr>
           <tr>
-            <td style="width:12%"
-              v-if="submitForm.STATUS!=1&&submitForm.STATUS!=2&&submitForm.STATUS!=4&&submitForm.STATUS!=7">市场部审核时间：
+            <td style="width:12%" v-if="submitForm.STATUS!=1&&submitForm.STATUS!=2&&submitForm.STATUS!=4&&submitForm.STATUS!=7">
+              市场部审核时间：
             </td>
-            <td style="width:20%;"
-              v-if="submitForm.STATUS!=1&&submitForm.STATUS!=2&&submitForm.STATUS!=4&&submitForm.STATUS!=7">
+            <td style="width:20%;" v-if="submitForm.STATUS!=1&&submitForm.STATUS!=2&&submitForm.STATUS!=4&&submitForm.STATUS!=7">
               {{ submitForm.AUDIT_TIME| datatransDetail }}</td>
-            <td style="width:12%"
-              v-if="submitForm.STATUS==8||submitForm.STATUS==4||submitForm.STATUS==5||submitForm.STATUS==6">财务审核时间：</td>
-            <td style="width:30%;"
-              v-if="submitForm.STATUS==8||submitForm.STATUS==4||submitForm.STATUS==5||submitForm.STATUS==6">
+            <td style="width:12%" v-if="submitForm.STATUS==8||submitForm.STATUS==4||submitForm.STATUS==5||submitForm.STATUS==6">
+              财务审核时间：</td>
+            <td style="width:30%;" v-if="submitForm.STATUS==8||submitForm.STATUS==4||submitForm.STATUS==5||submitForm.STATUS==6">
               {{ submitForm.FINANCE_AUDIT_TIME| datatransDetail}}</td>
             <td style="width:8%;"></td>
             <td style="width:8%;"></td>
@@ -507,7 +502,7 @@ export default {
       BigPic: false
     };
   },
-  created: function() {
+  created: function () {
     this.refresh();
   },
   filters: {

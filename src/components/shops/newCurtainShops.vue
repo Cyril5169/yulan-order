@@ -1372,14 +1372,12 @@ export default {
 }
 .a-link {
   text-decoration: underline;
-  cursor: pointer;
 }
 .a-userset {
   color: #409eff;
   background: 0 0;
   text-decoration: none;
   outline: 0;
-  cursor: pointer;
   transition: color 0.2s ease;
 }
 .delete-cls {

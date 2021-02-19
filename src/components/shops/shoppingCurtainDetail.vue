@@ -3,8 +3,7 @@
     <el-card shadow="hover">
       <div class="mb10">
         <p class="fstrong f16">商品信息：</p>
-        <span>活动：<el-select style="width:250px" :disabled="activityOptions.length == 1" v-model="message.activityId"
-            :placeholder="
+        <span>活动：<el-select style="width:250px" :disabled="activityOptions.length == 1" v-model="message.activityId" :placeholder="
                   activityOptions.length == 1
                     ? '无可选活动'
                     : '请选择活动'
@@ -77,14 +76,13 @@
               <span v-if="
                   scope.row.itemType === 'pjb' && scope.row.changeFlag === 'Y'
                 ">
-                <el-select size="mini" v-model="scope.row.itemNo" placeholder="请选择"
-                  @change="changePJBUnit(scope.$index)">
+                <el-select size="mini" v-model="scope.row.itemNo" placeholder="请选择" @change="changePJBUnit(scope.$index)">
                   <el-option v-for="item in part2" :key="item.value" :label="item.label" :value="item.value">
                   </el-option>
                 </el-select>
               </span>
               <span v-else-if="scope.row.changeFlag === 'Y'">
-                <a class="uline" @click="getNewItemNo(scope.row, scope.$index)">
+                <a @click="getNewItemNo(scope.row, scope.$index)">
                   {{ scope.row.itemNo }}
                 </a>
                 <el-checkbox v-if="scope.row.deleteFlag === 'Y'" v-model="scope.row.choose"
@@ -139,8 +137,7 @@
                   scope.row.fixType !== null &&
                   scope.row.productType === 'ML'
               ">
-              <el-select size="mini" v-model="scope.row.fixType" placeholder="请选择"
-                @change="changeDosageByFixtype(scope.$index)">
+              <el-select size="mini" v-model="scope.row.fixType" placeholder="请选择" @change="changeDosageByFixtype(scope.$index)">
                 <el-option v-for="item in fixType" :key="item.value" :label="item.label" :value="item.value">
                 </el-option>
               </el-select>
@@ -230,15 +227,15 @@
           style="color:red;">￥{{allTotal | dosageFilter}}</span></div>
 
       <!--  -->
-      <el-dialog width="65%" :visible.sync="dialogTableVisible" :close-on-click-modal="false"
-        :close-on-press-escape="false" :show-close="false">
+      <el-dialog width="65%" :visible.sync="dialogTableVisible" :close-on-click-modal="false" :close-on-press-escape="false"
+        :show-close="false">
         <div slot="title">
           <b>{{ dialogTitle }}</b>
         </div>
         <div v-if="items.length !== 0">
           <el-input clearable size="small" class="ml10 mb10" v-if="curtainData[chooseIndex].productType !== 'GY'"
-            placeholder="输入商品型号查找" style="width:25%; min-width:220px;" v-model.trim="searchKey"
-            @clear="getAllItemNoData(1)" @keyup.enter.native="getSingleItemNoData(1)">
+            placeholder="输入商品型号查找" style="width:25%; min-width:220px;" v-model.trim="searchKey" @clear="getAllItemNoData(1)"
+            @keyup.enter.native="getSingleItemNoData(1)">
             <div id="searchBtn" slot="append" style="cursor:pointer;" @click="getSingleItemNoData(1)">
               搜索
             </div>
@@ -251,9 +248,9 @@
             </span>
             <span v-else>{{ item.itemNo }}</span>
           </el-radio>
-          <el-pagination v-if="curtainData[chooseIndex].productType !== 'GY'" class="tc mt10"
-            @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="currentPage"
-            :page-size="limit" layout="prev, pager, next, jumper" :total="totalNumber">
+          <el-pagination v-if="curtainData[chooseIndex].productType !== 'GY'" class="tc mt10" @size-change="handleSizeChange"
+            @current-change="handleCurrentChange" :current-page.sync="currentPage" :page-size="limit"
+            layout="prev, pager, next, jumper" :total="totalNumber">
           </el-pagination>
         </div>
         <div v-else style="height: 200px;">
@@ -846,7 +843,7 @@ export default {
           for (let i = 0; i < this.curtainData.length; i++) {
             if (
               this.curtainData[i].itemType ===
-                this.curtainData[this.chooseIndex].itemType &&
+              this.curtainData[this.chooseIndex].itemType &&
               i !== this.chooseIndex
             ) {
               if (this.curtainData[i].productType === "ML") {

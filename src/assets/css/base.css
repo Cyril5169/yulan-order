@@ -8,6 +8,7 @@ body {
 /*a标签初始化*/
 a {
   color: #409eff;
+  cursor: pointer;
   text-decoration: none;
 }
 a:hover {

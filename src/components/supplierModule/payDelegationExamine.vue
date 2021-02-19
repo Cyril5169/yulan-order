@@ -181,7 +181,7 @@
                       </el-link>
                   </a>
                   <label style="display:block;position:absolute;top:0px;right:10px;">
-                    <a style="cursor:pointer;" @click="downLoad(file.url)">下载</a>
+                    <a @click="downLoad(file.url)">下载</a>
                   </label>
               </li>
               </ul>
@@ -254,7 +254,7 @@
                       </el-link>
                   </a>
                   <label style="display:block;position:absolute;top:0px;right:10px;">
-                    <a style="cursor:pointer;" @click="downLoad(file.url)">下载</a>
+                    <a @click="downLoad(file.url)">下载</a>
                   </label>
               </li>
               </ul>

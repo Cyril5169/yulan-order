@@ -1,12 +1,11 @@
 <template>
-  <div id="shoppingCurtain">
-    <el-table default-expand-all width="100%" style="margin-top:10px;" :row-class-name="tableRowClassName"
-      :row-key="getRowKeys" :expand-row-keys="expands" @expand-change="packUpNot" :data="activityData"
-      empty-text="该购物车是空的">
+  <div class="shoppingCarCls">
+    <el-table default-expand-all width="100%" style="margin-top:10px;" :row-class-name="tableRowClassName" :row-key="getRowKeys"
+      :expand-row-keys="expands" @expand-change="packUpNot" :data="activityData" empty-text="该购物车是空的">
       <el-table-column width="100px" type="expand">
         <template slot-scope="scope">
-          <el-table :ref="multipleTable(scope.$index)" :data="table(scope.$index)" tooltip-effect="dark"
-            style="width:100%;" @selection-change="handleSelectionChange">
+          <el-table :ref="multipleTable(scope.$index)" :data="table(scope.$index)" tooltip-effect="dark" style="width:100%;"
+            @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55" :selectable="checkActiviyEffect" align="center">
             </el-table-column>
             <el-table-column label="型号" width="100" align="center">
@@ -93,7 +92,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <div id="accountBox">
+    <div class="accountBox">
       <div class="r">
         <div>
           <span>已选择</span>
@@ -105,8 +104,7 @@
           <span v-if="isManager === '0'" style="color:red; font-size:20px;" class="mr10">***</span>
           <span v-else style="color:red; font-size:20px;" class="mr10">￥{{ totalPriceMoney | dosageFilter }}</span>
         </div>
-        <div @click="handleCommitNew" class="commitBtn"
-          :style="{'background':multipleSelection.length?'#E15B60':'gray'}">
+        <div @click="handleCommitNew" class="commitBtn" :style="{'background':multipleSelection.length?'#E15B60':'gray'}">
           去结算
         </div>
       </div>
@@ -334,7 +332,7 @@ export default {
               });
             });
         })
-        .catch(() => {});
+        .catch(() => { });
     },
     //删除选中项
     deleteChoose() {
@@ -365,7 +363,7 @@ export default {
               });
             });
         })
-        .catch(() => {});
+        .catch(() => { });
     },
     //删除分组
     deleteGroup(index) {
@@ -445,75 +443,3 @@ export default {
   },
 };
 </script>
-<style>
-#shoppingCurtain {
-  margin-top: -32px;
-}
-#shoppingCurtain .el-table .colorType_0 {
-  background: oldlace;
-}
-#shoppingCurtain .el-table .colorType_1 {
-  background: #ceecbe;
-}
-#shoppingCurtain .el-table .colorType_2 {
-  background: #cde1f7;
-}
-#shoppingCurtain .el-table__expanded-cell[class*="cell"] {
-  padding: 0;
-}
-#shoppingCurtain .el-table__expand-icon::after {
-  position: relative;
-  bottom: 1px;
-  font-size: 14px;
-  content: "分组";
-  color: #606266;
-  cursor: pointer;
-  -webkit-transition: background-color 0.25s ease;
-  transition: background-color 0.25s ease;
-}
-</style>
-<style scoped>
-a {
-  text-decoration: none;
-}
-a:hover {
-  cursor: pointer;
-}
-#accountBox {
-  width: 100%;
-  height: 53px;
-  margin-top: 20px;
-  background: #f0f0f0;
-  line-height: 50px;
-  color: #101010;
-  font-size: 14px;
-}
-#accountBox > div > div {
-  display: inline-block;
-  margin: 0 5px;
-}
-#accountBox span {
-  cursor: pointer;
-}
-#accountBox :nth-child(2) > div {
-  margin-left: 20px;
-  display: inline-block;
-}
-.link-detail {
-  margin: 0 5px;
-  display: inline;
-}
-.link-delete {
-  color: #13ce66;
-  margin: 0 5px;
-  display: inline;
-}
-.commitBtn {
-  width: 80px;
-  height: 50px;
-  color: white;
-  font-size: 18px;
-  text-align: center;
-  cursor: pointer;
-}
-</style>

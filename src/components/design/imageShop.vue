@@ -2,11 +2,11 @@
   <div class="centerCard">
     <el-card shadow="hover">
       <div class="tbarStyle">
-        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询开始日期"
-          v-model="beginTime" style="width:12%;"></el-date-picker>
+        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询开始日期" v-model="beginTime"
+          style="width:12%;"></el-date-picker>
         --
-        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询截止日期"
-          v-model="finishTime" style="width:12%;"></el-date-picker>
+        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询截止日期" v-model="finishTime"
+          style="width:12%;"></el-date-picker>
         <el-select v-model="status" style="margin-left: 10px;width:12%;" placeholder="全部状态">
           <el-option v-for="item in options" :key="item.label" :label="item.label" :value="item.value"></el-option>
         </el-select>
@@ -25,7 +25,8 @@
         <el-table-column width="80" label="店面形式" align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.STORE_FORM | formTrans }}</span>
-          </template></el-table-column>
+          </template>
+        </el-table-column>
         <el-table-column prop="STORE_AREA" label="店面面积(m2)" align="center" width="70"></el-table-column>
         <el-table-column prop="STORE_PLIE" label="层数" align="center" width="60"></el-table-column>
         <el-table-column width="110" label="计划动工时间" align="center">
@@ -77,15 +78,15 @@
               " @click="checkDetail(scope.row)" type="success" icon="el-icon-search" size="mini" circle></el-button>
             <el-button v-if="scope.row.STATUS == 4 || scope.row.STATUS == 5" @click="editIt(scope.row)" type="primary"
               icon="el-icon-edit" size="mini" circle></el-button>
-            <el-button v-if="scope.row.STATUS == 4 || scope.row.STATUS == 5" @click="deleteDetail(scope.row)"
-              type="danger" icon="el-icon-delete" size="mini" circle></el-button>
+            <el-button v-if="scope.row.STATUS == 4 || scope.row.STATUS == 5" @click="deleteDetail(scope.row)" type="danger"
+              icon="el-icon-delete" size="mini" circle></el-button>
           </template>
         </el-table-column>
       </el-table>
       <div style="margin:0 25%;" class="block">
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-          :current-page.sync="currentPage" :page-sizes="[5, 10, 15, 20]" :page-size="limit"
-          layout="total,sizes,prev, pager, next, jumper" :total="count"></el-pagination>
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="currentPage"
+          :page-sizes="[5, 10, 15, 20]" :page-size="limit" layout="total,sizes,prev, pager, next, jumper" :total="count">
+        </el-pagination>
       </div>
     </el-card>
 
@@ -187,8 +188,8 @@
               店面面积<span style="color:red;">*</span>
             </td>
             <td colspan="1" style="height:28px;">
-              <el-input :disabled="EDITorCHECK" style="width:65%" placeholder="（客户必填）" clearable class="inputStyle"
-                size="mini" oninput="value=value.replace(/[^\d.]/g,'')
+              <el-input :disabled="EDITorCHECK" style="width:65%" placeholder="（客户必填）" clearable class="inputStyle" size="mini"
+                oninput="value=value.replace(/[^\d.]/g,'')
                                 .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                                 .replace('.', '$#$').replace(/\./g, '')
                                 .replace('$#$', '.')
@@ -243,8 +244,7 @@
               是否需要上门测量
             </td>
             <td colspan="1" style="height:35px">
-              <el-radio-group :disabled="tableData.IMPLEMENTTATION_FORM != 1 || EDITorCHECK"
-                v-model="tableData.MEASURE">
+              <el-radio-group :disabled="tableData.IMPLEMENTTATION_FORM != 1 || EDITorCHECK" v-model="tableData.MEASURE">
                 <el-radio :label="1">是</el-radio>
                 <el-radio :label="0">否</el-radio>
               </el-radio-group>
@@ -271,8 +271,8 @@
             <td colspan="2" style="height:14px;">
               <el-upload v-if="!EDITorCHECK" class="upload-IM-CUS" :action="Global.baseUrl + '/IMAGE_STORE/UploadFiles'"
                 style="margin-top:10px;" drag multiple :on-change="handleChange" :on-remove="handleRemove"
-                :on-success="handleSuccess" :on-error="handleError" ref="upload" :auto-upload="false"
-                :file-list="fileList" :data="{ cid: cid, dateStamp: dateStamp }">
+                :on-success="handleSuccess" :on-error="handleError" ref="upload" :auto-upload="false" :file-list="fileList"
+                :data="{ cid: cid, dateStamp: dateStamp }">
                 <i class="el-icon-upload" style="width:300px;height:30px;margin-top:10px;"></i>
                 <div class="el-upload__text">
                   将文件拖到此处，或<em>点击上传</em>
@@ -282,13 +282,12 @@
                 </div>
               </el-upload>
               <ul v-else class="el-upload-list el-upload-list--text">
-                <li v-for="(fileList, index) in fileList" :key="index" class="el-upload-list__item is-success"
-                  tabindex="0">
+                <li v-for="(fileList, index) in fileList" :key="index" class="el-upload-list__item is-success" tabindex="0">
                   <a class="el-upload-list__item-name">
                     <i class="el-icon-document"> </i>{{ fileList.name }}
                   </a>
                   <label style="display:block;position:absolute;top:1px;right:20px;">
-                    <a style="cursor:pointer;" @click="downLoad(fileList.url)">下载附件</a>
+                    <a @click="downLoad(fileList.url)">下载附件</a>
                   </label>
                 </li>
               </ul>
@@ -307,8 +306,7 @@
               付款凭证<span style="color:red;">*</span>
             </td>
             <td colspan="3" style="text-align:left;height:28px;">
-              <el-select v-if="!EDITorCHECK" style="width:500px;" v-model="tableData.PAYMENT" filterable
-                placeholder="请选择汇款凭证">
+              <el-select v-if="!EDITorCHECK" style="width:500px;" v-model="tableData.PAYMENT" filterable placeholder="请选择汇款凭证">
                 <el-option v-for="item in bankData" :key="item.value" :label="item.label" :value="item.value">
                 </el-option>
               </el-select>
@@ -323,8 +321,7 @@
               <span style="margin-left:10px;">责任人签字：{{tableData.CUSTOMER_AGENT}}</span>
             </td>
             <td colspan="2" style="text-align:left;height:28px;">
-              <span v-if="!EDITorCHECK && !newORedit"
-                style="margin-left:10px;">日期：{{ new Date().getTime() | datatrans }}</span>
+              <span v-if="!EDITorCHECK && !newORedit" style="margin-left:10px;">日期：{{ new Date().getTime() | datatrans }}</span>
               <span v-else style="margin-left:10px;">日期：{{ tableData.DATE_CRE | datatrans }}</span>
             </td>
           </tr>
@@ -346,13 +343,12 @@
         <div v-if="fileListGM.length > 0" style="width:60%">
           <span>设计结果：</span>
           <ul width="50%" class="el-upload-list el-upload-list--text">
-            <li v-for="(fileList, index) in fileListGM" :key="index" class="el-upload-list__item is-success"
-              tabindex="0">
+            <li v-for="(fileList, index) in fileListGM" :key="index" class="el-upload-list__item is-success" tabindex="0">
               <a class="el-upload-list__item-name">
                 <i class="el-icon-document"> </i>{{ fileList.name }}
               </a>
               <label style="display:block;position:absolute;top:1px;right:20px;">
-                <a style="cursor:pointer;" @click="downLoad(fileList.url)">下载附件</a>
+                <a @click="downLoad(fileList.url)">下载附件</a>
               </label>
             </li>
           </ul>
@@ -787,7 +783,7 @@ export default {
             this.getDetail();
           });
         })
-        .catch(() => {});
+        .catch(() => { });
     },
     //搜索
     search() {

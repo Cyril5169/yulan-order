@@ -55,7 +55,7 @@
         </el-table-column>
         <el-table-column label="操作" width="100" align="center">
           <template slot-scope="scope">
-            <a style="color:red;cursor:pointer;" @click="addToCart(scope.row)">加入购物车</a>
+            <a style="color:red;" @click="addToCart(scope.row)">加入购物车</a>
           </template>
         </el-table-column>
       </el-table>

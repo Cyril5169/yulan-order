@@ -179,8 +179,8 @@
             </td>
             <td class="grayTD" style="height:15px" colspan="1">联系电话<span style="color:red;">*</span></td>
             <td style="height:15px" colspan="1">
-              <el-input v-model="submit.CONTACT_PHONE" placeholder="请填写" clearable
-                oninput="value=value.replace(/[^\d]/g,'')" class="inputStyle">
+              <el-input v-model="submit.CONTACT_PHONE" placeholder="请填写" clearable oninput="value=value.replace(/[^\d]/g,'')"
+                class="inputStyle">
               </el-input>
             </td>
             <td class="grayTD" style="height:15px" colspan="1">物流单号</td>
@@ -205,8 +205,7 @@
             <td colspan="1" style="height:21px">{{submit.ITEM_NO}}</td>
             <td colspan="1" style="height:21px">{{submit.UNIT}}</td>
             <td colspan="1" style="height:21px">
-              <el-input v-model="submit.QTY" placeholder="应小于发货数量" clearable class="inputStyle" style="height:25px"
-                oninput="value=value.replace(/[^\d.]/g,'')
+              <el-input v-model="submit.QTY" placeholder="应小于发货数量" clearable class="inputStyle" style="height:25px" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
@@ -793,7 +792,7 @@ export default {
           this.$alert("添加失败", "提示", {
             type: "warning",
             confirmButtonText: "好的",
-          }).catch(() => {});
+          }).catch(() => { });
         });
     },
     GetNowDate() {
@@ -833,8 +832,8 @@ export default {
             }
           }
         })
-        .then(() => {})
-        .catch(() => {});
+        .then(() => { })
+        .catch(() => { });
     },
     ...mapMutations("navTabs", ["addTab"]),
     ...mapActions("navTabs", ["closeTab", "closeToTab"]),

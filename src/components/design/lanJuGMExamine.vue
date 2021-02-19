@@ -8,10 +8,10 @@
       </div>
 
       <div id="tbar" class="tbarStyle">
-        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询开始日期"
-          v-model="beginTime" style="width:14%;"></el-date-picker> --
-        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询截止日期"
-          v-model="finishTime" style="width:14%;"></el-date-picker>
+        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询开始日期" v-model="beginTime"
+          style="width:14%;"></el-date-picker> --
+        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询截止日期" v-model="finishTime"
+          style="width:14%;"></el-date-picker>
 
         <el-select v-model="SELECT_STATUS" style="margin-left:10px;width:160px;" placeholder="状态">
           <el-option v-for="item in statusArray" :key="item.label" :label="item.label" :value="item.value"></el-option>
@@ -43,19 +43,19 @@
           </el-table-column>
           <el-table-column align="center" label="操作" width="100px">
             <template slot-scope="scope">
-              <el-button v-if="scope.row.STATUS == 8||scope.row.STATUS == 5" @click="_EditDetail(scope.row)"
-                type="primary" size="mini" icon="el-icon-edit" circle></el-button>
-              <el-button v-else @click="_CheckDetail(scope.row)" type="warning" size="mini" icon="el-icon-search"
-                circle></el-button>
+              <el-button v-if="scope.row.STATUS == 8||scope.row.STATUS == 5" @click="_EditDetail(scope.row)" type="primary"
+                size="mini" icon="el-icon-edit" circle></el-button>
+              <el-button v-else @click="_CheckDetail(scope.row)" type="warning" size="mini" icon="el-icon-search" circle>
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
       </div>
 
       <div style="margin:0 25%;margin-top:10px" class="block">
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-          :current-page.sync="currentPage" :page-sizes="[5, 10, 15, 20]" :page-size="limit"
-          layout="total,sizes, prev, pager, next, jumper" :total="count"></el-pagination>
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="currentPage"
+          :page-sizes="[5, 10, 15, 20]" :page-size="limit" layout="total,sizes, prev, pager, next, jumper" :total="count">
+        </el-pagination>
       </div>
     </el-card>
 
@@ -115,7 +115,7 @@
                     <i class="el-icon-document"></i>{{ file.name }}
                   </a>
                   <label style="display:block;position:absolute;top:0px;right:30px;">
-                    <a style="cursor:pointer;" @click="downLoad(file.url)">下载附件</a>
+                    <a @click="downLoad(file.url)">下载附件</a>
                   </label>
                 </li>
               </ul>
@@ -149,7 +149,7 @@
                     <i class="el-icon-document"></i>{{ file.name }}
                   </a>
                   <label style="display:block;position:absolute;top:0px;right:30px;">
-                    <a style="cursor:pointer;" @click="downLoad(file.url)">下载附件</a>
+                    <a @click="downLoad(file.url)">下载附件</a>
                   </label>
                 </li>
               </ul>
@@ -214,7 +214,7 @@
                     <i class="el-icon-document"></i>{{ file.name }}
                   </a>
                   <label style="display:block;position:absolute;top:0px;right:30px;">
-                    <a style="cursor:pointer;" @click="downLoad(file.url)">下载附件</a>
+                    <a @click="downLoad(file.url)">下载附件</a>
                   </label>
                 </li>
               </ul>
@@ -249,9 +249,8 @@
             <td colspan="2" rowspan="1" style="height:30px" v-if="submitForm.STATUS==5">
               <div>
                 <el-upload class="upload-de" :action="Global.baseUrl + '/Lanju/UploadFiles'" drag multiple
-                  :on-change="handleChange" :on-remove="handleRemove" :on-success="handleSuccess"
-                  :on-error="handleError" ref="upload" :auto-upload="false" :file-list="this.fileListGM"
-                  :data="{ CID: CID, dateStamp: dateStamp }">
+                  :on-change="handleChange" :on-remove="handleRemove" :on-success="handleSuccess" :on-error="handleError"
+                  ref="upload" :auto-upload="false" :file-list="this.fileListGM" :data="{ CID: CID, dateStamp: dateStamp }">
                   <div style="text-align:center">
                     <i class="el-icon-upload2" style="height:30px;margin-top:10px;">
                       <span>上传附件</span>
@@ -288,16 +287,14 @@
             <td style="width:8%;"></td>
           </tr>
           <tr>
-            <td style="width:12%"
-              v-if="submitForm.STATUS!=1&&submitForm.STATUS!=2&&submitForm.STATUS!=4&&submitForm.STATUS!=7">市场部审核时间：
+            <td style="width:12%" v-if="submitForm.STATUS!=1&&submitForm.STATUS!=2&&submitForm.STATUS!=4&&submitForm.STATUS!=7">
+              市场部审核时间：
             </td>
-            <td style="width:20%;"
-              v-if="submitForm.STATUS!=1&&submitForm.STATUS!=2&&submitForm.STATUS!=4&&submitForm.STATUS!=7">
+            <td style="width:20%;" v-if="submitForm.STATUS!=1&&submitForm.STATUS!=2&&submitForm.STATUS!=4&&submitForm.STATUS!=7">
               {{ submitForm.AUDIT_TIME| datatransDetail }}</td>
-            <td style="width:12%"
-              v-if="submitForm.STATUS==8||submitForm.STATUS==4||submitForm.STATUS==5||submitForm.STATUS==6">财务审核时间：</td>
-            <td style="width:30%;"
-              v-if="submitForm.STATUS==8||submitForm.STATUS==4||submitForm.STATUS==5||submitForm.STATUS==6">
+            <td style="width:12%" v-if="submitForm.STATUS==8||submitForm.STATUS==4||submitForm.STATUS==5||submitForm.STATUS==6">
+              财务审核时间：</td>
+            <td style="width:30%;" v-if="submitForm.STATUS==8||submitForm.STATUS==4||submitForm.STATUS==5||submitForm.STATUS==6">
               {{ submitForm.FINANCE_AUDIT_TIME| datatransDetail}}</td>
             <td style="width:8%;"></td>
             <td style="width:8%;"></td>
@@ -405,7 +402,7 @@ export default {
       BigPic: false
     };
   },
-  created: function() {
+  created: function () {
     this.refresh();
   },
   filters: {

@@ -2,16 +2,15 @@
   <div class="centerCard">
     <el-card shadow="hover">
       <div class="tbarStyle">
-        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询开始日期"
-          v-model="beginTime" style="width:12%;"></el-date-picker>
+        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询开始日期" v-model="beginTime"
+          style="width:12%;"></el-date-picker>
         --
-        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询截止日期"
-          v-model="finishTime" style="width:12%;"></el-date-picker>
+        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="查询截止日期" v-model="finishTime"
+          style="width:12%;"></el-date-picker>
         <el-select v-model="status" style="margin-left: 10px;width:12%;" placeholder="全部状态">
           <el-option v-for="item in options" :key="item.label" :label="item.label" :value="item.value"></el-option>
         </el-select>
-        <el-input @keyup.enter.native="search()" placeholder="可搜索单号、申请人、实施形式" v-model="find" style="width:250px;"
-          clearable>
+        <el-input @keyup.enter.native="search()" placeholder="可搜索单号、申请人、实施形式" v-model="find" style="width:250px;" clearable>
         </el-input>
         <el-button size="medium" type="success" style="margin-left: 10px" @click="search()">查询</el-button>
       </div>
@@ -26,7 +25,8 @@
         <el-table-column width="80" label="店面形式" align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.STORE_FORM | formTrans }}</span>
-          </template></el-table-column>
+          </template>
+        </el-table-column>
         <el-table-column prop="STORE_AREA" label="店面面积(m2)" align="center" width="110"></el-table-column>
         <el-table-column prop="STORE_PLIE" label="层数" align="center" width="60"></el-table-column>
         <el-table-column width="110" label="计划动工时间" align="center">
@@ -66,15 +66,15 @@
           <template slot-scope="scope">
             <el-button @click="checkDetail(scope.row)" type="success" v-if="scope.row.STATUS != 1" icon="el-icon-search"
               size="mini" circle></el-button>
-            <el-button @click="checkDetail(scope.row)" v-if="scope.row.STATUS == 1" type="primary" icon="el-icon-edit"
-              size="mini" circle></el-button>
+            <el-button @click="checkDetail(scope.row)" v-if="scope.row.STATUS == 1" type="primary" icon="el-icon-edit" size="mini"
+              circle></el-button>
           </template>
         </el-table-column>
       </el-table>
       <div style="margin:0 25%;" class="block">
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-          :current-page.sync="currentPage" :page-sizes="[5, 10, 15, 20]" :page-size="limit"
-          layout="total,sizes,prev, pager, next, jumper" :total="count"></el-pagination>
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="currentPage"
+          :page-sizes="[5, 10, 15, 20]" :page-size="limit" layout="total,sizes,prev, pager, next, jumper" :total="count">
+        </el-pagination>
       </div>
     </el-card>
 
@@ -232,13 +232,12 @@
 
             <td colspan="2" style="height:14px;">
               <ul class="el-upload-list el-upload-list--text">
-                <li v-for="(fileList, index) in fileList" :key="index" class="el-upload-list__item is-success"
-                  tabindex="0">
+                <li v-for="(fileList, index) in fileList" :key="index" class="el-upload-list__item is-success" tabindex="0">
                   <a class="el-upload-list__item-name">
                     <i class="el-icon-document"> </i>{{ fileList.name }}
                   </a>
                   <label style="display:block;position:absolute;top:1px;right:20px;">
-                    <a style="cursor:pointer;" @click="downLoad(fileList.url)">下载附件</a>
+                    <a @click="downLoad(fileList.url)">下载附件</a>
                   </label>
                 </li>
               </ul>

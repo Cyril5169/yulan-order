@@ -65,8 +65,8 @@
         </el-header>
         <el-header class="second-header">
           <el-tabs class="tabs" v-model="activeTabName" @tab-click="getTab" @tab-remove="closeTab" type="border-card">
-            <el-tab-pane v-for="item in tabList" :key="item.name" :name="item.name" :label="item.label"
-              :closable="item.closable"></el-tab-pane>
+            <el-tab-pane v-for="item in tabList" :key="item.name" :name="item.name" :label="item.label" :closable="item.closable">
+            </el-tab-pane>
           </el-tabs>
         </el-header>
         <el-main class="backTop" id="mainBackTop">
@@ -76,7 +76,7 @@
             <span v-if="newsTextArr.length == 0">{{ adminText }}</span>
             <span v-else style="line-height:30px;">
               <transition name="slide">
-                <a style="cursor:pointer;text-decoration:underline" :key="newsTextArr[newsIndex].ID"
+                <a style="text-decoration:underline" :key="newsTextArr[newsIndex].ID"
                   @click="showNotification(newsTextArr[newsIndex])">{{ newsTextArr[newsIndex].TITLE }}</a>
               </transition>
             </span>
@@ -84,8 +84,7 @@
               <strong>
                 <i>{{ moneySituation }}</i>
               </strong>
-              <i title="刷新余额" :class="refreshMoneyClass" style="color:black;cursor:pointer;"
-                @click="refreshUserMoney"></i>
+              <i title="刷新余额" :class="refreshMoneyClass" style="color:black;cursor:pointer;" @click="refreshUserMoney"></i>
             </span>
           </div>
           <div v-if="activeTabName == 'main' && identity != 'SUPLY'">
@@ -104,8 +103,7 @@
     </el-backtop>
 
     <!-- 公告 -->
-    <el-dialog :show-close="true" :visible.sync="notificationVisible" width="1000px" top="5vh" :title="newsTitle"
-      center>
+    <el-dialog :show-close="true" :visible.sync="notificationVisible" width="1000px" top="5vh" :title="newsTitle" center>
       <div v-html="newsHtmlData"></div>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="notificationVisible = false">确 定</el-button>
@@ -116,8 +114,8 @@
     <el-dialog title="请填写完此调查表，才能继续操作！" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false"
       :visible.sync="studyVisible" width="900px" top="5vh" center>
       <keep-alive>
-        <studyContextDetail ref="studyContextDetail" v-if="studyVisible" :selectData="studySelectData"
-          @refresh="refreshStudy"></studyContextDetail>
+        <studyContextDetail ref="studyContextDetail" v-if="studyVisible" :selectData="studySelectData" @refresh="refreshStudy">
+        </studyContextDetail>
       </keep-alive>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitStudy">提交调查表</el-button>
@@ -128,16 +126,16 @@
     <el-dialog title="修改密码" :close-on-click-modal="false" :visible.sync="changePasswordVisible" width="450px">
       <el-form :model="passwordForm" :rules="passwordRules" ref="passwordForm" class="passwordForm" label-width="80px">
         <el-form-item label="原密码" prop="pw">
-          <el-input style="width:300px;" type="password" v-model="passwordForm.pw" placeholder="填写原密码"
-            autocomplete="off"></el-input>
+          <el-input style="width:300px;" type="password" v-model="passwordForm.pw" placeholder="填写原密码" autocomplete="off">
+          </el-input>
         </el-form-item>
         <el-form-item label="新密码" prop="npw">
-          <el-input style="width:300px;" type="password" v-model="passwordForm.npw" placeholder="填写新密码"
-            autocomplete="off"></el-input>
+          <el-input style="width:300px;" type="password" v-model="passwordForm.npw" placeholder="填写新密码" autocomplete="off">
+          </el-input>
         </el-form-item>
         <el-form-item label="确认密码" prop="npw1">
-          <el-input style="width:300px;" type="password" v-model="passwordForm.npw1" placeholder="再次填写新密码"
-            autocomplete="off"></el-input>
+          <el-input style="width:300px;" type="password" v-model="passwordForm.npw1" placeholder="再次填写新密码" autocomplete="off">
+          </el-input>
         </el-form-item>
         <el-form-item style="text-align:center;">
           <el-button type="primary" @click="changePassWord('passwordForm')">确认修改</el-button>
@@ -713,7 +711,7 @@ export default {
           //协议书
           let contractCount = await Axios.post(
             this.Global.wangqianUrl +
-              "/yulan/infoState/getYLcontractentryState.do",
+            "/yulan/infoState/getYLcontractentryState.do",
             {
               cid: Cookies.get("cid"),
               cyear: new Date().getFullYear(),
@@ -763,7 +761,7 @@ export default {
                 if (state != "") {
                   let cardsCount = await Axios.post(
                     this.Global.wangqianUrl +
-                      "/yulan/customerInfo/getNcustomerinfo.do",
+                    "/yulan/customerInfo/getNcustomerinfo.do",
                     {
                       page: "1",
                       limit: "99",
@@ -789,7 +787,7 @@ export default {
                     //需创建数量
                     let cardsCount2 = await Axios.post(
                       this.Global.wangqianUrl +
-                        "/yulan/customerInfo/getNcustomerinfo.do",
+                      "/yulan/customerInfo/getNcustomerinfo.do",
                       {
                         page: "1",
                         limit: "99",
@@ -810,7 +808,7 @@ export default {
                     //需修改数量
                     let cardsCount3 = await Axios.post(
                       this.Global.wangqianUrl +
-                        "/yulan/customerInfo/getNcustomerinfo.do",
+                      "/yulan/customerInfo/getNcustomerinfo.do",
                       {
                         page: "1",
                         limit: "99",
@@ -832,7 +830,7 @@ export default {
                     //审核协议
                     let contractCount = await Axios.post(
                       this.Global.wangqianUrl +
-                        "/yulan/YLcontractentry/getYlcsbysigned.do",
+                      "/yulan/YLcontractentry/getYlcsbysigned.do",
                       {
                         limit: "99",
                         page: "1",

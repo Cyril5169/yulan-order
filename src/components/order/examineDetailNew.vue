@@ -1,11 +1,10 @@
 <template>
   <div class="centerCard">
-    <el-dialog title="窗帘详情" :show-close="false" :visible.sync="detailVisible" :close-on-click-modal="false" width="95%"
-      top="5vh">
+    <el-dialog title="窗帘详情" :show-close="false" :visible.sync="detailVisible" :close-on-click-modal="false" width="95%" top="5vh">
       <keep-alive>
-        <detailCurtainTable v-if="detailVisible" :tableStatus="tableStatus" :STATUS_ID="STATUS_ID"
-          :isModified="isModified" :headerData="headerData" :curtainData="curtainData" :suggestion="ljsuggestion"
-          @visible="closeTheDialog" @finalData="getFinalData" @deleteArr="getDeleteArr" @suggest="getSuggest">
+        <detailCurtainTable v-if="detailVisible" :tableStatus="tableStatus" :STATUS_ID="STATUS_ID" :isModified="isModified"
+          :headerData="headerData" :curtainData="curtainData" :suggestion="ljsuggestion" @visible="closeTheDialog"
+          @finalData="getFinalData" @deleteArr="getDeleteArr" @suggest="getSuggest">
         </detailCurtainTable>
       </keep-alive>
     </el-dialog>
@@ -156,7 +155,7 @@
                         </el-select>
                       </span>
                       <span v-else-if="scope1.row.changeFlag === 'Y'">
-                        <a class="uline" @click="
+                        <a @click="
                             getNewItemNo(
                               scope1.row,
                               scope1.$index,
@@ -165,8 +164,8 @@
                           ">
                           {{ scope1.row.item.itemNo }}
                         </a>
-                        <el-checkbox v-if="scope1.row.deleteFlag === 'Y'"
-                          v-model="chooseSamll[scope.$index][scope1.$index]" @change="
+                        <el-checkbox v-if="scope1.row.deleteFlag === 'Y'" v-model="chooseSamll[scope.$index][scope1.$index]"
+                          @change="
                             changeLinkReverse(
                               scope1.row,
                               scope1.$index,
@@ -177,8 +176,8 @@
                       </span>
                       <span v-else>
                         {{ scope1.row.item.itemNo }}
-                        <el-checkbox v-if="scope1.row.deleteFlag === 'Y'"
-                          v-model="chooseSamll[scope.$index][scope1.$index]" @change="
+                        <el-checkbox v-if="scope1.row.deleteFlag === 'Y'" v-model="chooseSamll[scope.$index][scope1.$index]"
+                          @change="
                             changeLinkReverse(
                               scope1.row,
                               scope1.$index,
@@ -322,16 +321,16 @@
                 </el-table-column>
                 <el-table-column label="客户备注" header-align="center">
                   <template slot-scope="scope1">
-                    <el-input resize="none" :autosize="{minRows:1, maxRows: 3 }" :disabled="tableStatus === 3"
-                      type="textarea" v-model="scope1.row.note" clearable>
+                    <el-input resize="none" :autosize="{minRows:1, maxRows: 3 }" :disabled="tableStatus === 3" type="textarea"
+                      v-model="scope1.row.note" clearable>
                     </el-input>
                     {{ getRemark(scope1.row, scope.$index) }}
                   </template>
                 </el-table-column>
                 <el-table-column label="兰居意见" header-align="center" v-if="tableStatus !== 0">
                   <template slot-scope="scope1">
-                    <el-input v-if="tableStatus === 1" resize="none" type="textarea"
-                      :autosize="{ minRows:1, maxRows: 3 }" v-model="scope1.row.suggestion" clearable>
+                    <el-input v-if="tableStatus === 1" resize="none" type="textarea" :autosize="{ minRows:1, maxRows: 3 }"
+                      v-model="scope1.row.suggestion" clearable>
                     </el-input>
                     <el-input v-else-if="tableStatus === 2 || tableStatus === 3" disabled resize="none" type="textarea"
                       :autosize="{ minRows:1, maxRows: 3 }" v-model="scope1.row.suggestion">
@@ -340,8 +339,8 @@
                 </el-table-column>
                 <el-table-column label="生产备注" header-align="center" v-if="tableStatus !== 0">
                   <template slot-scope="scope1">
-                    <el-input resize="none" type="textarea" :autosize="{ minRows:1, maxRows: 1 }"
-                      placeholder="专门给生产人员查看" v-model="scope1.row.productNote" clearable>
+                    <el-input resize="none" type="textarea" :autosize="{ minRows:1, maxRows: 1 }" placeholder="专门给生产人员查看"
+                      v-model="scope1.row.productNote" clearable>
                     </el-input>
                   </template>
                 </el-table-column>
@@ -353,8 +352,8 @@
                 </el-input>
               </div>
             </div>
-            <el-dialog width="65%" :append-to-body="true" :visible.sync="dialogTableVisible"
-              :close-on-click-modal="false" :close-on-press-escape="false" :show-close="false">
+            <el-dialog width="65%" :append-to-body="true" :visible.sync="dialogTableVisible" :close-on-click-modal="false"
+              :close-on-press-escape="false" :show-close="false">
               <div slot="title">
                 <b>{{ dialogTitle }}</b>
               </div>
@@ -369,8 +368,8 @@
                   </div>
                 </el-input>
                 <br />
-                <el-radio border size="small" class="mt10 ml10" v-for="item in items" :value="item.itemNo"
-                  :key="item.itemNo" v-model="itemNo" :label="item.itemNo">
+                <el-radio border size="small" class="mt10 ml10" v-for="item in items" :value="item.itemNo" :key="item.itemNo"
+                  v-model="itemNo" :label="item.itemNo">
                   <span v-if="chooseType === 'LCB' || chooseType === 'GY'">
                     {{ item.itemNo + " " + item.note }}
                   </span>
@@ -380,8 +379,7 @@
                     allCurtaindata[chooseRowIndex][chooseIndex].productType !==
                       'GY'
                   " class="tc mt10" @size-change="handleSizeChange" @current-change="handleCurrentChange"
-                  :current-page.sync="currentPage" :page-size="limit" layout="prev, pager, next, jumper"
-                  :total="totalNumber">
+                  :current-page.sync="currentPage" :page-size="limit" layout="prev, pager, next, jumper" :total="totalNumber">
                 </el-pagination>
               </div>
               <div v-else style="height: 200px;">
@@ -1152,7 +1150,7 @@ export default {
             this.$emit("finalData", 1);
             this.$emit("suggest", this.suggestionLJ);
           })
-          .catch(() => {});
+          .catch(() => { });
       }
       //非修改
       else {
@@ -1205,7 +1203,7 @@ export default {
               this.$emit("finalData", _data, 1);
               this.$emit("suggest", this.suggestionLJ);
             })
-            .catch(() => {});
+            .catch(() => { });
         } else {
           this.$emit("visible", false);
           this.$emit("finalData", _data, 1);
@@ -1275,7 +1273,7 @@ export default {
       }
     },
     //获取每页的条数
-    handleSizeChange(val) {},
+    handleSizeChange(val) { },
     //当前页改变时的操作
     handleCurrentChange(val) {
       if (this.searchKey === "") {
@@ -1427,7 +1425,7 @@ export default {
       if (
         !status1 &&
         this.allCurtaindata[this.chooseRowIndex][this.chooseIndex].itemType !==
-          "lspb"
+        "lspb"
       ) {
         //修改用量
         //changeDosageByNo(obj)
@@ -1495,8 +1493,8 @@ export default {
           ) {
             if (
               this.allCurtaindata[this.chooseRowIndex][i].itemType ===
-                this.allCurtaindata[this.chooseRowIndex][this.chooseIndex]
-                  .itemType &&
+              this.allCurtaindata[this.chooseRowIndex][this.chooseIndex]
+                .itemType &&
               i !== this.chooseIndex
             ) {
               if (
@@ -1639,7 +1637,7 @@ export default {
       if (data.certainHeightWidth === 0) {
         if (
           data.specification <
-            this.ruleForm.ORDERBODY[rowIndex].CURTAIN_HEIGHT &&
+          this.ruleForm.ORDERBODY[rowIndex].CURTAIN_HEIGHT &&
           data.specification > 0
         ) {
           return "超高帘，用量待审核!!";

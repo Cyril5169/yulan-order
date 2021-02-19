@@ -95,16 +95,13 @@
               <span v-else-if="
                   scope.row.itemType === 'pjb' && scope.row.changeFlag === 'Y'
                 ">
-                <el-select size="mini" v-model="scope.row.item.itemNo" placeholder="请选择"
-                  @change="changePJBUnit(scope.$index)">
+                <el-select size="mini" v-model="scope.row.item.itemNo" placeholder="请选择" @change="changePJBUnit(scope.$index)">
                   <el-option v-for="item in part2" :key="item.value" :label="item.label" :value="item.value">
                   </el-option>
                 </el-select>
               </span>
               <span v-else-if="scope.row.changeFlag === 'Y'">
-                <a class="uline" @click="getNewItemNo(scope.row, scope.$index)">
-                  {{ scope.row.item.itemNo }}
-                </a>
+                <a @click="getNewItemNo(scope.row, scope.$index)">{{ scope.row.item.itemNo }}</a>
                 <el-checkbox v-if="scope.row.deleteFlag === 'Y'" v-model="scope.row.choose"
                   @change="changeLinkReverse(scope.row)">
                 </el-checkbox>
@@ -129,16 +126,15 @@
             <div v-else>{{ getTypeName(scope.row.itemType) }}</div>
           </template>
         </el-table-column>
-        <el-table-column v-if="isManager != '0' ||  (isManager == '0' && check_CURTAIN_STATUS_ID == -1)" label="单价"
-          align="center" width="50">
+        <el-table-column v-if="isManager != '0' ||  (isManager == '0' && check_CURTAIN_STATUS_ID == -1)" label="单价" align="center"
+          width="50">
           <template slot-scope="scope">
             <span>
               {{ scope.row.price }}
             </span>
           </template>
         </el-table-column>
-        <el-table-column
-          v-if="(isManager != '0' ||  (isManager == '0' && check_CURTAIN_STATUS_ID == -1)) && salPromotion.P_ID"
+        <el-table-column v-if="(isManager != '0' ||  (isManager == '0' && check_CURTAIN_STATUS_ID == -1)) && salPromotion.P_ID"
           label="折后" align="center" width="55">
           <template slot-scope="scope">
             <span>
@@ -161,8 +157,8 @@
                 scope.row.certainHeightWidth !== null &&
                   scope.row.productType === 'ML'
               ">
-              <el-select :disabled="tableStatus === 3" size="mini" v-model="scope.row.certainHeightWidth"
-                placeholder="请选择" @change="changeDosageByFixtype(scope.$index)">
+              <el-select :disabled="tableStatus === 3" size="mini" v-model="scope.row.certainHeightWidth" placeholder="请选择"
+                @change="changeDosageByFixtype(scope.$index)">
                 <el-option v-for="item in fixType" :key="item.value" :label="item.label" :value="item.value">
                 </el-option>
               </el-select>
@@ -217,8 +213,8 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column v-if="isManager != '0' ||  (isManager == '0' && check_CURTAIN_STATUS_ID == -1)" label="总价"
-          align="center" width="60">
+        <el-table-column v-if="isManager != '0' ||  (isManager == '0' && check_CURTAIN_STATUS_ID == -1)" label="总价" align="center"
+          width="60">
           <template slot-scope="scope">
             <span>
               {{ oneTotal(scope.row) }}
@@ -260,8 +256,7 @@
         </el-table-column>
         <el-table-column label="备注" header-align="center">
           <template slot-scope="scope">
-            <el-input :autosize="{ maxRows: 6 }" :disabled="tableStatus === 3" type="textarea" v-model="scope.row.note"
-              clearable>
+            <el-input :autosize="{ maxRows: 6 }" :disabled="tableStatus === 3" type="textarea" v-model="scope.row.note" clearable>
             </el-input>
             {{ getRemark(scope.row) }}
           </template>
@@ -286,9 +281,9 @@
           <b>{{ dialogTitle }}</b>
         </div>
         <div v-if="items.length !== 0">
-          <el-input clearable size="small" class="ml10 mb10" v-if="data[chooseIndex].productType !== 'GY'"
-            placeholder="输入商品型号查找" style="width:25%; min-width:220px;" v-model.trim="searchKey"
-            @clear="getAllItemNoData(1)" @keyup.enter.native="getSingleItemNoData(1)">
+          <el-input clearable size="small" class="ml10 mb10" v-if="data[chooseIndex].productType !== 'GY'" placeholder="输入商品型号查找"
+            style="width:25%; min-width:220px;" v-model.trim="searchKey" @clear="getAllItemNoData(1)"
+            @keyup.enter.native="getSingleItemNoData(1)">
             <div id="searchBtn" slot="append" style="cursor:pointer;" @click="getSingleItemNoData(1)">
               搜索
             </div>
@@ -674,7 +669,7 @@ export default {
             this.$emit("finalData", 1);
             this.$emit("suggest", this.suggestionLJ);
           })
-          .catch(() => {});
+          .catch(() => { });
       }
       //非修改
       else {
@@ -725,7 +720,7 @@ export default {
               this.$emit("finalData", _data, 1);
               this.$emit("suggest", this.suggestionLJ);
             })
-            .catch(() => {});
+            .catch(() => { });
         } else {
           this.$emit("visible", false);
           this.$emit("finalData", _data, 1);
@@ -794,7 +789,7 @@ export default {
       }
     },
     //获取每页的条数
-    handleSizeChange(val) {},
+    handleSizeChange(val) { },
     //当前页改变时的操作
     handleCurrentChange(val) {
       if (this.searchKey === "") {
@@ -1564,7 +1559,7 @@ export default {
     },
     oneTotal(row) {
       var price = this.calculatePromotionPrice(row);
-      if(row.dosage == undefined) row.dosage = 0;
+      if (row.dosage == undefined) row.dosage = 0;
       return price.mul(row.dosage);
     },
     calculatePromotionPrice(data) {

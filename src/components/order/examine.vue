@@ -25,8 +25,7 @@
       <el-card style="position:relative;" v-for="(item, index) of tableData" :key="index">
         <div slot="header" @dblclick="item.collapse=!item.collapse">
           <i style="float: right;color:#20a0ff;line-height: 35px;cursor: pointer;"
-            :class="[item.collapse?'el-icon-caret-bottom':'el-icon-caret-top']"
-            @click="item.collapse=!item.collapse"></i>
+            :class="[item.collapse?'el-icon-caret-bottom':'el-icon-caret-top']" @click="item.collapse=!item.collapse"></i>
 
           <a v-if="
               (item.STATUS_ID == 1 &&
@@ -36,8 +35,7 @@
                 item.STATUS_ID == 4 ||
                 item.STATUS_ID == 7 ||
                 item.STATUS_ID == 12
-            " target="_blank" style="float:right;cursor: pointer;font-size:13px;line-height: 35px;margin-right:10px;"
-            :href="
+            " target="_blank" style="float:right;font-size:13px;line-height: 35px;margin-right:10px;" :href="
               'http://www.luxlano.com/ddkc/DD_bjl.asp?b2b=' + item.ORDER_NO
             ">兰居尚品订单进度查询</a>
           <el-button style="float: right;margin-right:20px;" v-if="item.collapse" @click="toCheckExamine(item.ORDER_NO)"
@@ -50,8 +48,8 @@
               (item.CURTAIN_STATUS_ID == '0' && item.STATUS_ID == '1') ||
                 item.CURTAIN_STATUS_ID == '3'
             " @click="_back(item)" size="mini" type="warning" plain>直接退回</el-button>
-          <el-button style="float: right;" @click="exportProductExcel(item)"
-            v-if="item.collapse && showExportProduct(item)" size="mini" plain>
+          <el-button style="float: right;" @click="exportProductExcel(item)" v-if="item.collapse && showExportProduct(item)"
+            size="mini" plain>
             导出生产模板
           </el-button>
           <span class="zoomLeft">时间：</span>
@@ -78,8 +76,7 @@
         </div>
         <div v-if="!item.collapse">
           <div class="outDiv" style="float:left;width:90%">
-            <el-table border :data="item.ORDERBODY" style="width: 100%;margin-bottom:5px;"
-              :row-class-name="tableRowClassName">
+            <el-table border :data="item.ORDERBODY" style="width: 100%;margin-bottom:5px;" :row-class-name="tableRowClassName">
               <el-table-column prop="ITEM_NO" label="型号" align="center"></el-table-column>
               <el-table-column prop="BRAND_NAME" label="品牌" align="center"></el-table-column>
               <el-table-column prop="NOTE" label="类型" align="center">
@@ -124,8 +121,8 @@
                 " @click="toExamineDetail(item.ORDER_NO)" size="medium" type="success" plain>审核订单</el-button>
             </p>
             <p>
-              <el-button v-if="!item.collapse" @click="toCheckExamine(item.ORDER_NO)" size="medium" type="primary"
-                plain>订单详情</el-button>
+              <el-button v-if="!item.collapse" @click="toCheckExamine(item.ORDER_NO)" size="medium" type="primary" plain>订单详情
+              </el-button>
             </p>
             <p>
               <el-button v-if=" !item.collapse &&
@@ -134,8 +131,8 @@
                 " @click="_back(item)" size="medium" type="warning" plain>直接退回</el-button>
             </p>
             <p>
-              <el-button style="float: right;" @click="exportProductExcel(item)"
-                v-if="!item.collapse && showExportProduct(item)" size="mini" plain>
+              <el-button style="float: right;" @click="exportProductExcel(item)" v-if="!item.collapse && showExportProduct(item)"
+                size="mini" plain>
                 导出生产模板
               </el-button>
             </p>
@@ -146,9 +143,9 @@
         {{ waitText }}
       </div> -->
       <div style="margin:0 25%;" class="block">
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-          :current-page.sync="currentPage" :page-sizes="[20, 50, 100, 1000]" :page-size="limit"
-          layout="total, sizes, prev, pager, next, jumper" :total="count"></el-pagination>
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="currentPage"
+          :page-sizes="[20, 50, 100, 1000]" :page-size="limit" layout="total, sizes, prev, pager, next, jumper" :total="count">
+        </el-pagination>
       </div>
     </div>
   </el-card>

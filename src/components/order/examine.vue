@@ -79,10 +79,10 @@
             <el-table border :data="item.ORDERBODY" style="width: 100%;margin-bottom:5px;" :row-class-name="tableRowClassName">
               <el-table-column prop="ITEM_NO" label="型号" align="center"></el-table-column>
               <el-table-column prop="BRAND_NAME" label="品牌" align="center"></el-table-column>
-              <el-table-column prop="NOTE" label="类型" align="center">
+              <el-table-column prop="TYPE_NAME" label="类型" align="center">
                 <template slot-scope="scope1">
-                  <span v-if="scope1.row.NOTE == '帘头'">定制窗帘</span>
-                  <span v-else>{{ scope1.row.NOTE }}</span>
+                  <span v-if="scope1.row.TYPE_NAME == '帘头'">定制窗帘</span>
+                  <span v-else>{{ scope1.row.TYPE_NAME }}</span>
                 </template>
               </el-table-column>
               <el-table-column label="销售状态" align="center">

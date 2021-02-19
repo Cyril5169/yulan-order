@@ -1186,21 +1186,21 @@ export default {
           confirmButtonText: "确定",
           type: "warning",
         });
-        return;
+        return false;
       }
       if (!this.curtainHeadData.height || Number(this.curtainHeadData.height == 0)) {
         this.$alert("请填写帘款【成品高】", "提示", {
           confirmButtonText: "确定",
           type: "warning",
         });
-        return;
+        return false;
       }
       if (!this.curtainHeadData.setNum || Number(this.curtainHeadData.setNum == 0)) {
         this.$alert("请填写帘款【套数】", "提示", {
           confirmButtonText: "确定",
           type: "warning",
         });
-        return;
+        return false;
       }
       //只看选中的
       for (var i = 0; i < this.chooseCurtainData.length; i++) {
@@ -1211,14 +1211,14 @@ export default {
             confirmButtonText: "确定",
             type: "warning",
           });
-          return;
+          return false;
         }
         if (oneCurtain.HEIGHT_ENABLE == 2 && (!oneCurtain.curtain_height || Number(oneCurtain.curtain_height == 0))) {
           this.$alert(`请填写${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【高】`, "提示", {
             confirmButtonText: "确定",
             type: "warning",
           });
-          return;
+          return false;
         }
         //左右圆角
         if (oneCurtain.LEFT_ENABLE == 2 && (!oneCurtain.curtain_left_fillet || Number(oneCurtain.curtain_left_fillet == 0))) {
@@ -1226,14 +1226,14 @@ export default {
             confirmButtonText: "确定",
             type: "warning",
           });
-          return;
+          return false;
         }
         if (oneCurtain.RIGHT_ENABLE == 2 && (!oneCurtain.curtain_right_fillet || Number(oneCurtain.curtain_right_fillet == 0))) {
           this.$alert(`请填写${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【右圆角】`, "提示", {
             confirmButtonText: "确定",
             type: "warning",
           });
-          return;
+          return false;
         }
         //么术贴
         if (oneCurtain.TIE_ENABLE == 2 && !oneCurtain.NCM_MESUTIE) {
@@ -1241,7 +1241,7 @@ export default {
             confirmButtonText: "确定",
             type: "warning",
           });
-          return;
+          return false;
         }
         //打开方式
         if (oneCurtain.KAIKOU_ENABLE == 2 && !oneCurtain.NCM_KAIKOU) {
@@ -1249,7 +1249,7 @@ export default {
             confirmButtonText: "确定",
             type: "warning",
           });
-          return;
+          return false;
         }
         //工艺方式
         if (oneCurtain.OPERATION_ENABLE == 2 && !oneCurtain.NCM_OPERATION) {
@@ -1257,7 +1257,7 @@ export default {
             confirmButtonText: "确定",
             type: "warning",
           });
-          return;
+          return false;
         }
         //包边方式
         if (oneCurtain.BIAN_ENABLE == 2 && !oneCurtain.NCM_BIAN) {
@@ -1265,7 +1265,7 @@ export default {
             confirmButtonText: "确定",
             type: "warning",
           });
-          return;
+          return false;
         }
         //编码
         if (!oneCurtain.ITEM_NO) {
@@ -1273,13 +1273,14 @@ export default {
             confirmButtonText: "确定",
             type: "warning",
           });
-          return;
+          return false;
         }
       }
+      return true;
     },
     addCurtainToShoppingCar() {
       //添加之前的验证
-      this.beforeAddCar();
+      if(!this.beforeAddCar()) return;
       //加入购物车
       //表头
       var head = {

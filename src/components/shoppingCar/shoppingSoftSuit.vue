@@ -4,7 +4,7 @@
       :expand-row-keys="expands" @expand-change="packUpNot" :data="activityData" empty-text="该购物车是空的">
       <el-table-column width="100px" type="expand">
         <template slot-scope="scope">
-          <el-table :ref="multipleTable(scope.$index)" :data="tableData(scope.$index)" tooltip-effect="dark" style="width:100%;"
+          <el-table :ref="'multipleTable' + scope.$index" :data="tableData(scope.$index)"
             @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55" :selectable="checkActiviyEffect" align="center">
             </el-table-column>
@@ -16,16 +16,6 @@
                 {{scope.row.activityName ? scope.row.activityName : "不参与活动"}}
               </template>
             </el-table-column>
-            <!-- <el-table-column
-                        label="发货说明"
-                        min-width="120"
-                        show-overflow-tooltip>
-                        <template slot-scope="scope">
-                            <span v-if="scope.row.splitShipment === '0'">等生产</span>
-                            <span v-else-if="scope.row.splitShipment === '1'">分批发货</span>
-                            <span style="margin-left:20px;" v-else>--</span>
-                        </template>
-            </el-table-column>-->
             <el-table-column label="单价" align="center">
               <template slot-scope="scope">
                 <span v-if="isManager === '0'">***</span>
@@ -76,7 +66,7 @@
         <template slot-scope="scope">
           <div v-if="scope.row.activity">
             {{ scope.row.activity }}
-            <a class="ml20" style="color:#606266" @click="deleteGroup(scope.$index)">删除分组</a>
+            <a class="ml20" style="color:#606266" @click="deleteOneGroup(scope.$index)">删除分组</a>
           </div>
         </template>
       </el-table-column>
@@ -169,10 +159,6 @@ export default {
         this.expands.push(val);
       }
       this.shopsData = theData;
-    },
-    multipleTable(index) {
-      var re = "multipleTable" + index;
-      return re;
     },
     //返回展开行的商品数据
     tableData(index) {
@@ -345,10 +331,7 @@ export default {
     },
     calculatePromotionPrice(data) {
       var price = 0;
-      var quantity =
-        data.quantity != 0
-          ? data.quantity
-          : this.dosageFilter(data.width.mul(data.height));
+      var quantity = data.quantity != 0 ? data.quantity : this.dosageFilter(data.width.mul(data.height));
       //首先判断TYPE,1折扣，2定价。然后判断priority
       if (data.salPromotion) {
         //一口价
@@ -372,10 +355,7 @@ export default {
       return this.dosageFilter(price);
     },
     canShowDetail(row) {
-      return (
-        !row.salPromotion ||
-        (row.salPromotion && row.salPromotion.MODIFY_FLAG != "N")
-      );
+      return (!row.salPromotion || (row.salPromotion && row.salPromotion.MODIFY_FLAG != "N"));
     },
     //查看详情
     handleDetails(index, row) {
@@ -478,7 +458,7 @@ export default {
         .catch(() => { });
     },
     //删除一整个分组
-    deleteGroup(index) {
+    deleteOneGroup(index) {
       this.$confirm("是否删除本组中的商品？删除后将不可恢复！", "提示", {
         confirmButtonText: "确定删除",
         cancelButtonText: "我再想想",
@@ -554,8 +534,7 @@ export default {
     },
     //收起不能
     packUpNot(row, expandsRow) {
-      var that = this;
-      that.expands.push(row.activity);
+      this.expands.push(row.activity);
     },
     //小计：面积四舍五入后*价格
     subtotal(data) {

@@ -435,6 +435,7 @@ export default {
       dialogUse: false,
       dialogBack: false,
       curtainStatus: "",
+      newCurtainStatus: "",
       buyUserVisible: false,
       addBuyUserVisible: false,
       buyUserInfoData: [],
@@ -1227,7 +1228,7 @@ export default {
         }
         this.ctm_order.allSpend = this.totalPrice;
         var data2 = {
-          product_group_tpye: this.product_group_tpye, //产品类别
+          product_group_tpye: this.newCurtainStatus == "1" ? "EE" : this.product_group_tpye, //产品类别
           promotion_cost: this.totalPrice, //活动价格【】
           cid: Cookies.get("cid"), //登录用户账号
           companyId: Cookies.get("companyId"),
@@ -1790,6 +1791,7 @@ export default {
   },
   created: function () {
     this.curtainStatus = Cookies.get("cur_status");
+    this.newCurtainStatus = Cookies.get("new_cur_status");
     this.getOrderInfo(); //获得订单相关信息
     this.getActivity(); //获取活动价
     this.getProvince(); //三级联动

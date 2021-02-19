@@ -4,7 +4,7 @@
       :expand-row-keys="expands" @expand-change="packUpNot" :data="activityData" empty-text="该购物车是空的">
       <el-table-column width="100px" type="expand">
         <template slot-scope="scope">
-          <el-table :ref="multipleTable(scope.$index)" :data="tableData(scope.$index)" tooltip-effect="dark" style="width:100%;"
+          <el-table :ref="'multipleTable' + scope.$index" :data="tableData(scope.$index)"
             @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55" :selectable="checkActiviyEffect" align="center">
             </el-table-column>
@@ -76,7 +76,7 @@
         <template slot-scope="scope">
           <div v-if="scope.row.activity">
             {{ scope.row.activity }}
-            <a class="ml20" style="color:#606266" @click="deleteGroup(scope.$index)">删除分组</a>
+            <a class="ml20" style="color:#606266" @click="deleteOneGroup(scope.$index)">删除分组</a>
           </div>
         </template>
       </el-table-column>
@@ -221,57 +221,12 @@ export default {
       }
       return this.dosageFilter(price);
     },
-    //数量修改
-    //7.23新需求，数量不作修改，仅为1
-    getChange(index0, index1, data) {
-      //判断数量是否为整数
-      if (!Number.isInteger(data.count)) {
-        let _count = Math.round(data.count);
-        this.$nextTick(() => {
-          this.shopsData[index0].curtainCartItems[index1].count = _count;
-        });
-      }
-      //调用修改数量的接口
-      let obj = {
-        cartItemID: data.cartItemId,
-        count: data.count,
-      };
-      alterCount(obj)
-        .then((res) => {
-          //若该商品被选中，修改总价
-          //判断是否选中
-          let val = this.multipleSelection;
-          let result = val.some((item) => {
-            if (item === data) {
-              return true;
-            }
-          });
-          if (!result) return;
-          //价格计算
-          let total = 0;
-          for (let i = 0; i < val.length; i++) {
-            let index = val[i].unNullNum;
-            total += val[i].price * data.count;
-          }
-          this.totalMoney = total;
-        })
-        .catch((err) => {
-          this.$alert("修改数量失败", "提示", {
-            confirmButtonText: "好的",
-            type: "warning",
-          });
-        });
-    },
     //活动是否可以修改
     canShowDetail(row) {
-      return (
-        !row.salPromotion ||
-        (row.salPromotion && row.salPromotion.MODIFY_FLAG != "N")
-      );
+      return (!row.salPromotion || (row.salPromotion && row.salPromotion.MODIFY_FLAG != "N"));
     },
     //查看详情
     handleDetails(index, data) {
-      //Cookies.set('curtain',data);
       this.addTab("detail/detailCurtain");
       this.$router.push({
         name: `detailCurtain`,
@@ -350,29 +305,37 @@ export default {
         .catch(() => { });
     },
     //删除分组
-    deleteGroup(index) {
-      let obj = [];
-      let multipleTable = "multipleTable" + index;
-      for (let i = 0; i < this.shopsData[index].curtainCartItems.length; i++) {
-        obj.push(this.shopsData[index].curtainCartItems[i].cartItemId);
-      }
-      deleteTheGroup(obj)
-        .then((res) => {
-          this.deleteTable(index);
-          this.$refs[multipleTable].clearSelection();
-          this.$alert("删除成功", "提示", {
-            confirmButtonText: "确定",
-            type: "success",
-          });
+    deleteOneGroup(index) {
+      this.$confirm("是否删除本组中的商品？删除后将不可恢复！", "提示", {
+        confirmButtonText: "确定删除",
+        cancelButtonText: "我再想想",
+        type: "warning",
+      })
+        .then(() => {
+          let obj = [];
+          let multipleTable = "multipleTable" + index;
+          for (let i = 0; i < this.shopsData[index].curtainCartItems.length; i++) {
+            obj.push(this.shopsData[index].curtainCartItems[i].cartItemId);
+          }
+          deleteTheGroup(obj)
+            .then((res) => {
+              this.deleteTable(index);
+              this.$refs[multipleTable].clearSelection();
+              this.$alert("删除成功", "提示", {
+                confirmButtonText: "确定",
+                type: "success",
+              });
+            })
+            .catch((err) => {
+              this.$alert("删除失败", "提示", {
+                confirmButtonText: "确定",
+                type: "warning",
+              }).then(() => {
+                this.$refs[multipleTable].clearSelection();
+              });
+            });
         })
-        .catch((err) => {
-          this.$alert("删除失败", "提示", {
-            confirmButtonText: "确定",
-            type: "warning",
-          }).then(() => {
-            this.$refs[multipleTable].clearSelection();
-          });
-        });
+        .catch(() => { });
     },
     //新建一个方法，不动原来的
     handleCommitNew() {
@@ -396,19 +359,13 @@ export default {
           return;
         }
       }
-      sessionStorage.setItem(
-        "shopping",
-        JSON.stringify(this.multipleSelection)
-      );
+      sessionStorage.setItem("shopping", JSON.stringify(this.multipleSelection));
       Cookies.set("cur_status", 3);
       this.addTab("order/checkOrder");
     },
     //收起不能
     packUpNot(row, expandsRow) {
-      that.expands.push(row.activity);
-    },
-    multipleTable(index) {
-      return "multipleTable" + index;
+      this.expands.push(row.activity);
     },
     //返回展开行的商品数据
     tableData(index) {

@@ -72,10 +72,10 @@
             <el-table-column prop="ITEM_NO" label="型号" align="center" width="150"></el-table-column>
             <el-table-column prop="BRAND_NAME" label="品牌" align="center" width="150"></el-table-column>
             <el-table-column prop="PRODUCTVERSION_NAME" label="版本" align="center" width="150"></el-table-column>
-            <el-table-column prop="NOTE" label="类型" align="center" width="120">
+            <el-table-column prop="TYPE_NAME" label="类型" align="center" width="120">
               <template slot-scope="scope1">
-                <span v-if="scope1.row.NOTE == '帘头'">定制窗帘</span>
-                <span v-else>{{ scope1.row.NOTE }}</span>
+                <span v-if="scope1.row.TYPE_NAME == '帘头'">定制窗帘</span>
+                <span v-else>{{ scope1.row.TYPE_NAME }}</span>
               </template>
             </el-table-column>
             <el-table-column label="数量（宽x高）" align="center" width="120">
@@ -496,7 +496,7 @@ export default {
       this.shipmentOrderNo = tab.ORDER_NO;
       this.shipmentLineNo = tab.LINE_NO;
       this.shipmentItemNo = tab.ITEM_NO;
-      this.shipmentNote = tab.NOTE;
+      this.shipmentNote = tab.TYEPE_NAME;
       this.shipmentUnit = tab.UNIT;
       this.shipmentVisible = true;
     },
@@ -753,7 +753,7 @@ export default {
   // created() {
   //   this.refresh();
   // },
-  activated: function () {
+  activated() {
     this.refresh();
   },
 };

@@ -97,6 +97,8 @@ export default {
           return this.$store.state.badge.wallCount; //墙纸
         case "shoppingCar/shopping?curtain":
           return this.$store.state.badge.curtainCount; //窗帘
+        case "shoppingCar/shopping?newCurtain":
+          return this.$store.state.badge.newCurtainCount; //窗帘  
         case "shoppingCar/shopping?softSuit":
           return this.$store.state.badge.softCount; //软装
         case "newRefund":

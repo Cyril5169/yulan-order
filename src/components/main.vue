@@ -629,6 +629,22 @@ export default {
         });
       }
     },
+    //购物车新窗帘数量
+    async newCurtainCountIcon() {
+      if (this.isContainAttr("shoppingCar/shopping?newCurtain")) {
+        let curtain = await GetCartItemCount(
+          {
+            cid: Cookies.get("cid"),
+            commodityType: "newcurtain",
+          },
+          { loading: false }
+        );
+        this.changeBadge({
+          name: "newCurtainCount",
+          index: curtain.count,
+        });
+      }
+    },
     //购物车软装数量
     async softCountIcon() {
       if (this.isContainAttr("shoppingCar/shopping?softSuit")) {
@@ -1088,6 +1104,7 @@ export default {
       this.ISExamineGMIcon();
       this.wallCountIcon();
       this.curtainCountIcon();
+      this.newCurtainCountIcon();
       this.softCountIcon();
       this.newRefundUserIcon();
       this.newRefundExamineIcon();
@@ -1147,6 +1164,9 @@ export default {
         case "curtainCount":
           this.curtainCountIcon();
           break;
+        case "newCurtainCount":
+          this.newCurtainCountIcon();
+          break;  
         case "softCount":
           this.softCountIcon();
           break;

@@ -16,6 +16,7 @@ const state = {
     imageShop3: 0,//形象店设计中可编辑的单据个数（广美）
     wallCount: 0,//墙纸购物车
     curtainCount: 0,//窗帘购物车
+    newCurtainCount: 0, //新窗帘
     softCount: 0,//软装购物车
     newRefund1: 0,//新退款投诉中用户可确认的单据
     newRefund2: 0,//新退款投诉中兰居可审核编辑的单据

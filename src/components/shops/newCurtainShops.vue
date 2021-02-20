@@ -239,7 +239,6 @@
                 <span v-else>-</span>
               </template>
             </el-table-column>
-            <!-- <el-table-column label="单位" width="60" align="center" prop="UNIT_NAME"></el-table-column> -->
             <el-table-column label="库存" width="60" align="center" prop="curtain_store"></el-table-column>
             <el-table-column label="单价" width="60" align="center" prop="curtain_price" v-if="isManager != '0'">
               <template slot-scope="scope">
@@ -262,10 +261,14 @@
                 <span v-else>-</span>
               </template>
             </el-table-column>
-            <el-table-column label="说明" width="100" align="center"></el-table-column>
+            <el-table-column label="说明" width="100" align="center" prop="curtain_remark">
+              <template slot-scope="scope">
+                <span style="color:red;font-size:12px;"> {{ scope.row.curtain_remark }}</span>
+              </template>
+            </el-table-column>
             <el-table-column label="备注" align="center">
               <template slot-scope="scope">
-                <el-input v-if="scope.row.ITEM_NO" v-model="scope.row.curtain_note" size="mini" type="textarea"
+                <el-input v-if="scope.row.ITEM_NO" v-model="scope.row.curtain_note" size="mini" type="textarea" resize="none"
                   :autosize="{ maxRows: 6 }" clearable></el-input>
               </template>
             </el-table-column>
@@ -704,6 +707,8 @@ export default {
         this.$set(originData[i], "curtain_store", "");
         //客户备注
         this.$set(originData[i], "curtain_note", "");
+        //说明
+        this.$set(originData[i], "curtain_remark", "");
       }
       return originData;
     },
@@ -720,12 +725,27 @@ export default {
           loading: false,
         }).then((res) => {
           if (res.data && res.data.data) {
+            var store_charge = "";
+            if (res.data.data.kucun == null || res.data.data.dinghuoshu == null
+              || res.data.data.ddz == null || res.data.data.xiaxian == null)
+              return;
+            var store_num = res.data.data.kucun - res.data.data.dinghuoshu - res.data.data.ddz;
+            var xiaxian = res.data.data.xiaxian;
+            if (store_num >= xiaxian) {
+              store_charge = "充足"
+            } else if (store_num > 0 && store_num < xiaxian) {
+              store_charge = "量少待查";
+            } else if (store_num < 0) {
+              store_charge = "欠料待审";
+            }
             var data = originData.filter((item) => item.ITEM_NO == res.data.data.code);
             if (data.length) {
-              data[0].curtain_store = res.data.data.kucun;
+              for (var j = 0; j < data.length; j++) {
+                data[j].curtain_store = store_charge;
+              }
             }
           }
-        });
+        }).catch(res => { });
       }
       return originData;
     },
@@ -767,15 +787,17 @@ export default {
     },
     //改变单个宽或者高
     changeOneWidthOrHeight(val, index) {
-      this.curtainData[index].curtain_area = this.dosageFilter(this.curtainData[index].curtain_width * this.curtainData[index].curtain_height);
-      if (this.curtainData[index].NC_PART_TYPECODE == "LS") {
+      var oneCurtain = this.curtainData[index];
+      oneCurtain.curtain_area = this.dosageFilter(oneCurtain.curtain_width * oneCurtain.curtain_height);
+      if (oneCurtain.NC_PART_TYPECODE == "LS") {
         //改变里衬布的
         var LCBITEM = this.curtainData.filter((item) => item.NC_PART_TYPECODE == "LCB");
         for (var i = 0; i < LCBITEM.length; i++) {
           //假设有多个里衬布的情况
-          LCBITEM[i].curtain_area = this.curtainData[index].curtain_area;
+          LCBITEM[i].curtain_area = oneCurtain.curtain_area;
         }
       }
+      this.getRemark(index);
     },
     //计算折后价格
     calculatePromotionPrice(data) {
@@ -818,8 +840,8 @@ export default {
             item.curtain_choose
         );
         if (mlList.length) {
-          //在原始数据中找到拉边条数据并push进去
-          var lbtItem = this.curtainDataOrigin.filter((item) => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
+          //在修改后的数据中找到拉边条数据并push进去
+          var lbtItem = this.curtainDataChange.filter((item) => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
           if (lbtItem.length) {
             lbtItem = lbtItem[0]; //只取第一个拉边条（按理应该只有一个）
             this.curtainData.push({ ...lbtItem });
@@ -875,8 +897,8 @@ export default {
               //先看看当前数据有没有拉边条，有的话应该是全选的时候这一条还没勾选上的时候上一条数据加载的
               var lbtItemNow = this.curtainData.filter((item) => item.NCM_PID == row.NCM_PID && item.NC_PART_TYPECODE == "LBT");
               if (lbtItemNow.length == 0) {
-                //在原始数据中找到拉边条数据并push进去
-                var lbtItem = this.curtainDataOrigin.filter((item) =>
+                //在修改后的数据中找到拉边条数据并push进去
+                var lbtItem = this.curtainDataChange.filter((item) =>
                   item.NCM_PID == row.NCM_PID &&
                   item.NC_PART_TYPECODE == "LBT"
                 );
@@ -917,10 +939,7 @@ export default {
               } else {
                 //没有的话删除拉边条
                 for (var i = 0; i < lbtItem.length; i++) {
-                  this.curtainData.splice(
-                    this.curtainData.indexOf(lbtItem[i]),
-                    1
-                  );
+                  this.curtainData.splice(this.curtainData.indexOf(lbtItem[i]), 1);
                 }
               }
             }
@@ -989,7 +1008,7 @@ export default {
         }
       });
     },
-    //点击替换
+    //点击替换组件
     onChangeModelClick(model) {
       if (model.NC_MODEL_ID == this.exchangeModelNow.NC_MODEL_ID) return;
       var selectModel = model.curtain_model.filter((item) => item.NC_MODEL_ID == model.NC_MODEL_ID);
@@ -1005,68 +1024,71 @@ export default {
           confirmButtonText: "是",
           cancelButtonText: "否",
           type: "warning",
-        })
-          .then(() => {
-            //替换当前，第一步，把当前的删掉
-            this.curtainData = this.curtainData.filter((item) => item.NC_TEMPLATE_ID != this.exchangeModelNow.NC_TEMPLATE_ID);
-            this.curtainDataChange = this.curtainDataChange.filter((item) => item.NC_TEMPLATE_ID != this.exchangeModelNow.NC_TEMPLATE_ID);
-            //第二步，把当前选中的push进去
-            var curtain_temp = this.getOtherCurtainMsgForExchange(model.curtain_model);
-            for (var i = 0; i < curtain_temp.length; i++) {
-              var oneCurtain = curtain_temp[i];
-              if (oneCurtain.NC_PART_TYPECODE == "LBT") {
-                //先看父节点需不需要加载出拉边条
-                var fatherCurtain = curtain_temp.filter((item) =>
-                  item.NC_MODEL_ID == oneCurtain.NCM_PID &&
-                  item.BIAN_ENABLE > 0 &&
-                  item.NCM_BIAN == "4B"
+        }).then(() => {
+          //替换当前，第一步，把当前的删掉
+          this.curtainData = this.curtainData.filter((item) => item.NC_TEMPLATE_ID != this.exchangeModelNow.NC_TEMPLATE_ID);
+          this.curtainDataChange = this.curtainDataChange.filter((item) => item.NC_TEMPLATE_ID != this.exchangeModelNow.NC_TEMPLATE_ID);
+          //第二步，把当前选中的push进去
+          var curtain_temp = this.getOtherCurtainMsgForExchange(model.curtain_model);
+          for (var i = 0; i < curtain_temp.length; i++) {
+            var oneCurtain = curtain_temp[i];
+            if (oneCurtain.NC_PART_TYPECODE == "LBT") {
+              //先看父节点需不需要加载出拉边条
+              var fatherCurtain = curtain_temp.filter((item) =>
+                item.NC_MODEL_ID == oneCurtain.NCM_PID &&
+                item.BIAN_ENABLE > 0 &&
+                item.NCM_BIAN == "4B"
+              );
+              if (fatherCurtain.length) {
+                //如果需要加载，看排序最大的面料对应的拉边条,并且是要勾选的
+                var mlList = this.curtainData.filter((item) =>
+                  item.NCM_PID == oneCurtain.NCM_PID &&
+                  item.NC_PART_TYPECODE != "LBT" &&
+                  item.curtain_choose
                 );
-                if (fatherCurtain.length) {
-                  //如果需要加载，看排序最大的面料对应的拉边条,并且是要勾选的
-                  var mlList = this.curtainData.filter((item) =>
-                    item.NCM_PID == oneCurtain.NCM_PID &&
-                    item.NC_PART_TYPECODE != "LBT" &&
-                    item.curtain_choose
-                  );
-                  if (mlList.length) {
-                    this.curtainData.push({ ...oneCurtain });
-                    this.curtainData[this.curtainData.length - 1].ITEM_NO = mlList[mlList.length - 1].MATERIAL_NO;
-                  }
+                if (mlList.length) {
+                  this.curtainData.push({ ...oneCurtain });
+                  this.curtainData[this.curtainData.length - 1].ITEM_NO = mlList[mlList.length - 1].MATERIAL_NO;
                 }
-              } else {
-                this.curtainData.push({ ...oneCurtain });
               }
+            } else {
+              this.curtainData.push({ ...oneCurtain });
             }
-            this.curtainData.sort((a, b) => {
-              if (a.NCT_SORTNO == b.NCT_SORTNO) {
-                return a.NCM_SORTNO > b.NCM_SORTNO ? 1 : -1;
-              }
-              return a.NCT_SORTNO > b.NCT_SORTNO ? 1 : -1;
-            });
-            this.curtainDataChange.push(...curtain_temp);
-            //this.exchangeModelNow = selectModel;
-            this.drawerShow = false;
-            this.$nextTick(() => {
-              this.$refs.curtainTable.doLayout();
-            });
-          })
+          }
+          this.curtainData.sort((a, b) => {
+            if (a.NCT_SORTNO == b.NCT_SORTNO) {
+              return a.NCM_SORTNO > b.NCM_SORTNO ? 1 : -1;
+            }
+            return a.NCT_SORTNO > b.NCT_SORTNO ? 1 : -1;
+          });
+          this.curtainDataChange.push(...curtain_temp);
+          //this.exchangeModelNow = selectModel;
+          this.drawerShow = false;
+          this.$nextTick(() => {
+            this.$refs.curtainTable.doLayout();
+          });
+          this.getRemark();
+        })
           .catch(() => { });
       }
     },
     //添加其他没有的数据
-    getOtherCurtainMsgForExchange(originData, originLevel) {
+    getOtherCurtainMsgForExchange(originData) {
       for (var i = 0; i < originData.length; i++) {
         //选中标识(父节点以部件为准，子节点综合父节点考虑)
         var defaultChose = originData[i].NCT_DELETE < 2 && originData[i].NCM_DELETE < 2;
         this.$set(originData[i], "curtain_choose", defaultChose);
-        //单价
-        //var price = this.getPrice(this.customerType, originData[i]);
-        //this.$set(originData[i], "curtain_price", price);
         //宽
-        var curtain_width = this.dosageFilter(this.curtainHeadData.width * originData[i].NCM_WIDTH_RATIO);
+        var curtain_width = 0;
+        if (originData[i].WIDTH_ENABLE > 0) {
+          curtain_width = this.dosageFilter(this.curtainHeadData.width * originData[i].NCM_WIDTH_RATIO);
+        }
         this.$set(originData[i], "curtain_width", curtain_width);
         //高
-        var curtain_height = this.dosageFilter(this.curtainHeadData.height * originData[i].NCM_HEIGHT_RATIO);
+        var curtain_height = 0;
+        if (originData[i].HEIGHT_ENABLE > 0) {
+          curtain_height = this.dosageFilter(this.curtainHeadData.height * originData[i].NCM_HEIGHT_RATIO);
+        }
         this.$set(originData[i], "curtain_height", curtain_height);
         //总数（面积）
         var area = this.dosageFilter(curtain_width * curtain_height);
@@ -1074,7 +1096,7 @@ export default {
         this.$set(originData[i], "curtain_area", area);
         if (originData[i].NC_PART_TYPECODE == "LS") {
           //改变里衬布的
-          var LCBITEM = this.curtainData.filter((item) => item.NC_PART_TYPECODE == "LCB");
+          var LCBITEM = originData.filter((item) => item.NC_PART_TYPECODE == "LCB");
           for (var j = 0; j < LCBITEM.length; j++) {
             //假设有多个里衬布的情况
             LCBITEM[j].curtain_area = area;
@@ -1084,10 +1106,10 @@ export default {
         this.$set(originData[i], "curtain_left_fillet", 0);
         //右转角
         this.$set(originData[i], "curtain_right_fillet", 0);
-        //库存
-        //this.$set(originData[i], "curtain_store", "");
         //客户备注
         this.$set(originData[i], "curtain_note", "");
+        //说明
+        this.$set(originData[i], "curtain_remark", "");
       }
       return originData;
     },
@@ -1118,45 +1140,44 @@ export default {
         }
       });
     },
+    //点击替换子件
     onChangeItemClick(item) {
       if (item.ITEM_NO == this.exchangeItemNow.ITEM_NO) return;
       this.$confirm(`确认使用【${item.ITEM_NO}】替换当前【${this.exchangeItemNow.ITEM_NO}】？`, "提示", {
         confirmButtonText: "是",
         cancelButtonText: "否",
         type: "warning",
-      }
-      )
-        .then(() => {
-          //替换只是更换item，现在只需要替换字段ITEM_NO，NOTE和拉边条MATERIAL_NO
-          var originItem = this.curtainData.filter((item) => item.NC_MODEL_ID == this.exchangeItemNow.NC_MODEL_ID);
-          if (originItem.length) {
-            originItem = originItem[0];
-            originItem.ITEM_NO = item.ITEM_NO;
-            originItem.NOTE = item.NOTE;
-            originItem.MATERIAL_NO = item.MATERIAL_NO;
-          }
-          //替换拉边条
-          //如果需要加载，看自身是不是勾选中排序最大的
-          var mlList = this.curtainData.filter((item) =>
+      }).then(() => {
+        //替换只是更换item，现在只需要替换字段ITEM_NO，NOTE和拉边条MATERIAL_NO
+        var originItem = this.curtainData.filter((item) => item.NC_MODEL_ID == this.exchangeItemNow.NC_MODEL_ID);
+        if (originItem.length) {
+          originItem = originItem[0];
+          originItem.ITEM_NO = item.ITEM_NO;
+          originItem.NOTE = item.NOTE;
+          originItem.MATERIAL_NO = item.MATERIAL_NO;
+        }
+        //替换拉边条
+        //如果需要加载，看自身是不是勾选中排序最大的
+        var mlList = this.curtainData.filter((item) =>
+          item.NCM_PID == originItem.NCM_PID &&
+          item.NC_PART_TYPECODE != "LBT" &&
+          item.curtain_choose
+        );
+        if (mlList.length && mlList[mlList.length - 1].ITEM_NO == originItem.ITEM_NO) {
+          //改变拉边条数据
+          var lbtItem = this.curtainData.filter((item) =>
             item.NCM_PID == originItem.NCM_PID &&
-            item.NC_PART_TYPECODE != "LBT" &&
-            item.curtain_choose
+            item.NC_PART_TYPECODE == "LBT"
           );
-          if (mlList.length && mlList[mlList.length - 1].ITEM_NO == originItem.ITEM_NO) {
-            //改变拉边条数据
-            var lbtItem = this.curtainData.filter((item) =>
-              item.NCM_PID == originItem.NCM_PID &&
-              item.NC_PART_TYPECODE == "LBT"
-            );
-            if (lbtItem.length) {
-              lbtItem[0].ITEM_NO = originItem.MATERIAL_NO;
-            }
+          if (lbtItem.length) {
+            lbtItem[0].ITEM_NO = originItem.MATERIAL_NO;
           }
-          //更新库存
-          this.curtainData = this.getStoreData(this.curtainData);
-          //this.exchangeItemNow.ITEM_NO = item.ITEM_NO;
-          this.drawerShow2 = false;
-        })
+        }
+        //更新库存
+        this.curtainData = this.getStoreData(this.curtainData);
+        this.drawerShow2 = false;
+        this.getRemark();
+      })
         .catch(() => { });
     },
     //合并第一列显示预览
@@ -1179,6 +1200,7 @@ export default {
     showDefaultImg(e) {
       this.previewUrl = this.defaultUrl;
     },
+    //加入购物车前验证
     beforeAddCar() {
       //表头
       if (!this.curtainHeadData.width || Number(this.curtainHeadData.width == 0)) {
@@ -1278,9 +1300,10 @@ export default {
       }
       return true;
     },
+    //加入购物车
     addCurtainToShoppingCar() {
       //添加之前的验证
-      if(!this.beforeAddCar()) return;
+      if (!this.beforeAddCar()) return;
       //加入购物车
       //表头
       var head = {
@@ -1304,6 +1327,7 @@ export default {
           CURTAIN_ITEM_NAME: oneCurtain.NOTE,
           CURTAIN_PART_NAME: this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE),
           DOSAGE: oneCurtain.curtain_area,
+          ILLUSTRATE: oneCurtain.curtain_remark,
           INLINE_NO: i + 1,
           KAIKOU: oneCurtain.NCM_KAIKOU,
           OPERATION: oneCurtain.NCM_OPERATION,
@@ -1341,6 +1365,37 @@ export default {
         });
       })
     },
+    //获得窗帘的说明
+    getRemark(index) {
+      var curtains = [];
+      if (index == undefined) {
+        curtains = this.curtainData;
+      } else {
+        curtains.push(this.curtainData[index]);
+      }
+      for (var i = 0; i < curtains.length; i++) {
+        var oneCurtain = curtains[i];
+        //最小下单量。帘头0.5.帘身，窗纱4
+        if (oneCurtain.NC_PART_TYPECODE == 'LT') {
+          if (oneCurtain.curtain_area < 0.5) {
+            if (oneCurtain.curtain_remark.indexOf('小于最小下单量;') == -1) {
+              oneCurtain.curtain_remark += '小于最小下单量;';
+            }
+          } else {
+            oneCurtain.curtain_remark = oneCurtain.curtain_remark.replace('小于最小下单量;', '');
+          }
+        }
+        if (oneCurtain.NC_PART_TYPECODE == 'LS' || oneCurtain.NC_PART_TYPECODE == 'CS') {
+          if (oneCurtain.curtain_area < 4) {
+            if (oneCurtain.curtain_remark.indexOf('小于最小下单量;') == -1) {
+              oneCurtain.curtain_remark += '小于最小下单量;';
+            }
+          } else {
+            oneCurtain.curtain_remark = oneCurtain.curtain_remark.replace('小于最小下单量;', '');
+          }
+        }
+      }
+    }
   },
   mounted() {
     this.getPartTypeData();
@@ -1481,7 +1536,10 @@ export default {
 <style>
 .curtain-list .el-table td,
 .curtain-list .el-table th {
-  padding: 1PX !important;
+  padding: 1px 0 !important;
+}
+.curtain-list .el-table .cell {
+  padding: 0 2px !important;
 }
 .curtain-list .el-input__inner {
   padding: 0 5px;

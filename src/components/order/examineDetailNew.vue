@@ -1860,7 +1860,10 @@ export default {
 }
 .curtainTable .el-table td,
 .curtainTable .el-table th {
-  padding: 1px !important;
+  padding: 1px 0 !important;
+}
+.curtainTable .el-table .cell {
+  padding: 0 2px !important;
 }
 .curtainTable .el-input__inner {
   padding: 0 5px;

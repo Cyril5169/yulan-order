@@ -36,9 +36,9 @@
       :row-key="getRowKeys">
       <el-table-column width="1" type="expand">
         <!-- 窗帘详情 -->
-        <template slot-scope="scope">
+        <template slot-scope="scopeHead">
           <div class="curtain-list">
-            <el-table :data="scope.row.curtains" ref="curtainTable" class="curtain-table" border>
+            <el-table :data="scopeHead.row.curtains" ref="curtainTable" class="curtain-table" border>
               <el-table-column label="部件" width="80" header-align="center" prop="NC_PART_TYPECODE">
                 <template slot-scope="scope">
                   <!-- 树缩进 -->
@@ -56,22 +56,216 @@
                     <!-- 是否可替换 -->
                     <a v-if="scope.row.NCT_CHANGE == 1 && scope.row.NCM_CHANGE == 1" class="a-link"
                       :class="{'delete-cls': !scope.row.curtain_choose}"
-                      @click="exchangeModelOrItem(scope.row)">{{scope.row.ITEM_NO}}</a>
+                      @click="exchangeModelOrItem(scope.row, scopeHead.$index)">{{scope.row.ITEM_NO}}</a>
                     <span v-else :class="{'delete-cls': !scope.row.curtain_choose}">{{scope.row.ITEM_NO}}</span>
                     <!-- 是否可删/是否默认勾选 -->
                     <el-checkbox v-if="scope.row.NCT_DELETE > 0 && scope.row.NCM_DELETE > 0" v-model="scope.row.curtain_choose"
-                      @change="onCheckChange($event, scope.row)"></el-checkbox>
+                      @change="onCheckChange($event, scope.row, scopeHead.$index)"></el-checkbox>
                   </template>
                   <!-- 没有模板，非标定 -->
                   <template v-else-if="scope.row.curtain_level == 0">
                     <a class="a-link" :class="{'delete-cls': !scope.row.curtain_choose}"
-                      @click="exchangeModelOrItem(scope.row)">请选择</a>
-                    <el-checkbox v-model="scope.row.curtain_choose" @change="onCheckChange($event, scope.row)">
+                      @click="exchangeModelOrItem(scope.row, scopeHead.$index)">请选择</a>
+                    <el-checkbox v-model="scope.row.curtain_choose" @change="onCheckChange($event, scope.row, scopeHead.$index)">
                     </el-checkbox>
                   </template>
                   <template v-else>
                     <span style="color:red;">未维护数据!</span>
                   </template>
+                </template>
+              </el-table-column>
+              <el-table-column label="名称" width="80" header-align="center" prop="CURTAIN_ITEM_NAME">
+              </el-table-column>
+              <el-table-column label="制造说明" width="280" header-align="center">
+                <template slot-scope="scope">
+                  <!-- N个配置项逐个检测 -->
+                  <!-- 宽，高 -->
+                  <div class="manufacturing-ct" v-if="scope.row.WIDTH_ENABLE > 0 || scope.row.HEIGHT_ENABLE > 0">
+                    <template v-if="scope.row.WIDTH_ENABLE == 1">
+                      <span>【宽】: {{ scope.row.WIDTH }}m</span>
+                    </template>
+                    <template v-if="scope.row.WIDTH_ENABLE == 2">
+                      <span>【宽】: <el-input v-model="scope.row.WIDTH" style="width:40px;" size="mini"
+                          @input="changeOneWidthOrHeight($event, scope.$index, scopeHead.$index)" oninput="value=value.replace(/[^\d.]/g,'')
+                           .replace(/^\./g, '').replace(/\.{2,}/g, '.')
+                           .replace('.', '$#$').replace(/\./g, '')
+                           .replace('$#$', '.')
+                           .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>m
+                      </span>
+                    </template>
+                    <template v-if="scope.row.HEIGHT_ENABLE == 1">
+                      <span>【高】: {{ scope.row.HEIGHT }}m</span>
+                    </template>
+                    <template v-if="scope.row.HEIGHT_ENABLE == 2">
+                      <span>【高】: <el-input v-model="scope.row.HEIGHT" style="width:40px;" size="mini"
+                          @input="changeOneWidthOrHeight($event, scope.$index, scopeHead.$index)" oninput="value=value.replace(/[^\d.]/g,'')
+                           .replace(/^\./g, '').replace(/\.{2,}/g, '.')
+                           .replace('.', '$#$').replace(/\./g, '')
+                           .replace('$#$', '.')
+                           .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>m
+                      </span>
+                    </template>
+                  </div>
+                  <!-- 左右圆角 -->
+                  <div class="manufacturing-ct" v-if="scope.row.LEFT_ENABLE > 0 || scope.row.RIGHT_ENABLE > 0">
+                    <template v-if="scope.row.LEFT_ENABLE == 1">
+                      <span>【左转角】: {{ scope.row.LEFT_FILLET }}m</span>
+                    </template>
+                    <template v-if="scope.row.LEFT_ENABLE == 2">
+                      <span>【左转角】: <el-input v-model="scope.row.LEFT_FILLET" style="width:40px;" size="mini"
+                          @input="changeOneWidthOrHeight($event, scope.$index, scopeHead.$index)" oninput="value=value.replace(/[^\d.]/g,'')
+                           .replace(/^\./g, '').replace(/\.{2,}/g, '.')
+                           .replace('.', '$#$').replace(/\./g, '')
+                           .replace('$#$', '.')
+                           .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>m
+                      </span>
+                    </template>
+                    <template v-if="scope.row.RIGHT_ENABLE == 1">
+                      <span>【右转角】: {{ scope.row.RIGHT_FILLET }}m</span>
+                    </template>
+                    <template v-if="scope.row.RIGHT_ENABLE == 2">
+                      <span>【右转角】: <el-input v-model="scope.row.RIGHT_FILLET" style="width:40px;" size="mini"
+                          @input="changeOneWidthOrHeight($event, scope.$index, scopeHead.$index)" oninput="value=value.replace(/[^\d.]/g,'')
+                           .replace(/^\./g, '').replace(/\.{2,}/g, '.')
+                           .replace('.', '$#$').replace(/\./g, '')
+                           .replace('$#$', '.')
+                           .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>m
+                      </span>
+                    </template>
+                  </div>
+                  <!-- 么术贴 -->
+                  <div class="manufacturing-ct" v-if="scope.row.TIE_ENABLE > 0">
+                    <template v-if="scope.row.TIE_ENABLE == 1">
+                      <span>【么术贴】: {{ scope.row.MESUTIE | meshutie_filter}}</span>
+                    </template>
+                    <template v-if="scope.row.TIE_ENABLE == 2">
+                      <span>【么术贴】: </span>
+                      <el-dropdown trigger="click">
+                        <a class="a-userset">{{ scope.row.MESUTIE? scope.row.MESUTIE : '请选择' | meshutie_filter}}</a>
+                        <el-dropdown-menu slot="dropdown">
+                          <el-dropdown-item @click.native="scope.row.MESUTIE = 'ZC'">正车</el-dropdown-item>
+                          <el-dropdown-item @click.native="scope.row.MESUTIE = 'FC'">反车</el-dropdown-item>
+                        </el-dropdown-menu>
+                      </el-dropdown>
+                    </template>
+                  </div>
+                  <!-- 打开方式 -->
+                  <div class="manufacturing-ct" v-if="scope.row.KAIKOU_ENABLE > 0">
+                    <template v-if="scope.row.KAIKOU_ENABLE == 1">
+                      <span>【打开方式】: {{ scope.row.KAIKOU | kaikou_filter }}</span>
+                    </template>
+                    <template v-if="scope.row.KAIKOU_ENABLE == 2">
+                      <span>【打开方式】: </span>
+                      <el-dropdown trigger="click">
+                        <a class="a-userset">{{ scope.row.KAIKOU? scope.row.KAIKOU : '请选择' | kaikou_filter}}</a>
+                        <el-dropdown-menu slot="dropdown">
+                          <el-dropdown-item @click.native="scope.row.KAIKOU = 'TK'">对开</el-dropdown-item>
+                          <el-dropdown-item @click.native="scope.row.KAIKOU = 'DK'">单开</el-dropdown-item>
+                          <el-dropdown-item @click.native="scope.row.KAIKOU = 'SK'">特殊开</el-dropdown-item>
+                        </el-dropdown-menu>
+                      </el-dropdown>
+                    </template>
+                  </div>
+                  <!-- 工艺方式 -->
+                  <div class="manufacturing-ct" v-if="scope.row.OPERATION_ENABLE > 0">
+                    <template v-if="scope.row.OPERATION_ENABLE == 1">
+                      <span>【工艺方式】: {{ scope.row.OPERATION | operation_filter }}</span>
+                    </template>
+                    <template v-if="scope.row.OPERATION_ENABLE == 2">
+                      <span>【工艺方式】: </span>
+                      <el-dropdown trigger="click">
+                        <a class="a-userset">{{ scope.row.OPERATION? scope.row.OPERATION : '请选择' | operation_filter}}</a>
+                        <el-dropdown-menu slot="dropdown">
+                          <el-dropdown-item @click.native="scope.row.OPERATION = 'GDZ'">固定褶</el-dropdown-item>
+                          <el-dropdown-item @click.native="scope.row.OPERATION = 'DQ'">打圈</el-dropdown-item>
+                        </el-dropdown-menu>
+                      </el-dropdown>
+                    </template>
+                  </div>
+                  <!-- 包边方式 -->
+                  <div class="manufacturing-ct" v-if="scope.row.BIAN_ENABLE > 0">
+                    <template v-if="scope.row.BIAN_ENABLE == 1">
+                      <span>【包边方式】: {{ scope.row.BIAN | bian_filter }}</span>
+                    </template>
+                    <template v-if="scope.row.BIAN_ENABLE == 2">
+                      <span>【包边方式】: </span>
+                      <el-dropdown trigger="click" @command="handleBianCommand($event, scope.row, scopeHead.$index)">
+                        <a class="a-userset">{{ scope.row.BIAN? scope.row.BIAN : '请选择' | bian_filter}}</a>
+                        <el-dropdown-menu slot="dropdown">
+                          <el-dropdown-item @click.native="scope.row.BIAN = '4B'" command="4B">4S边</el-dropdown-item>
+                          <el-dropdown-item @click.native="scope.row.BIAN = '3B'" command="3B">3.0边</el-dropdown-item>
+                        </el-dropdown-menu>
+                      </el-dropdown>
+                    </template>
+                  </div>
+                  <!-- 说明 -->
+                  <div class="manufacturing-ct"
+                    v-if="scope.row.NCM_NOTE || scope.row.JOINT || scope.row.WRINKLE || scope.row.MAKETYPE ">
+                    <span>【说明】: <template v-if="scope.row.MAKETYPE">{{scope.row.MAKETYPE | makeType_filter}}<template
+                          v-if="scope.row.JOINT || scope.row.WRINKLE || scope.row.MAKETYPE">、</template></template>
+                      <template v-if="scope.row.JOINT">{{scope.row.JOINT | joint_filter}}<template
+                          v-if="scope.row.WRINKLE || scope.row.MAKETYPE">、</template></template>
+                      <template v-if="scope.row.WRINKLE">{{scope.row.WRINKLE }}褶<template
+                          v-if="scope.row.MAKETYPE">、</template></template>
+                      <template v-if="scope.row.NCM_NOTE">{{scope.row.NCM_NOTE }}</template></span>
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column label="褶数" width="50" align="center" prop="FU_QTY">
+                <template slot-scope="scope">
+                  <el-input v-model="scope.row.FU_QTY" style="width:40px;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
+                           .replace(/^\./g, '').replace(/\.{2,}/g, '.')
+                           .replace('.', '$#$').replace(/\./g, '')
+                           .replace('$#$', '.')
+                           .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
+                </template>
+              </el-table-column>
+              <el-table-column label="幅数" width="50" align="center" prop="ZE_QTY">
+                <template slot-scope="scope">
+                  <el-input v-model="scope.row.ZE_QTY" style="width:40px;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
+                           .replace(/^\./g, '').replace(/\.{2,}/g, '.')
+                           .replace('.', '$#$').replace(/\./g, '')
+                           .replace('$#$', '.')
+                           .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
+                </template>
+              </el-table-column>
+              <el-table-column label="用量" width="100" align="center" prop="DOSAGE">
+                <template slot-scope="scope">
+                  <span>
+                    <el-input v-model="scope.row.DOSAGE" style="width:40px;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
+                           .replace(/^\./g, '').replace(/\.{2,}/g, '.')
+                           .replace('.', '$#$').replace(/\./g, '')
+                           .replace('$#$', '.')
+                           .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
+                    {{scope.row.UNIT_NAME}}
+                  </span>
+                </template>
+              </el-table-column>
+              <el-table-column label="库存" width="60" align="center" prop="curtain_store"></el-table-column>
+              <el-table-column label="单价" width="60" align="center" prop="PRICE">
+                <template slot-scope="scope">
+                  <!-- 只有部件算钱 -->
+                  <span v-if="scope.row.ITEM_NO && scope.row.curtain_level == 0">{{scope.row.PRICE}}</span>
+                  <span v-else>-</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="说明" width="100" align="center" prop="ILLUSTRATE"></el-table-column>
+              <el-table-column label="客户备注" align="center">
+                <template slot-scope="scope">
+                  <el-input v-model="scope.row.NOTE" size="mini" type="textarea" resize="none" :autosize="{ maxRows: 6 }"
+                    clearable></el-input>
+                </template>
+              </el-table-column>
+              <el-table-column label="兰居意见" header-align="center">
+                <template slot-scope="scope">
+                  <el-input v-model="scope.row.SUGGESTION" size="mini" type="textarea" resize="none" :autosize="{ maxRows: 6 }"
+                    clearable></el-input>
+                </template>
+              </el-table-column>
+              <el-table-column label="生产备注" header-align="center">
+                <template slot-scope="scope">
+                  <el-input v-model="scope.row.PRODUCT_NOTE" size="mini" type="textarea" resize="none" :autosize="{ maxRows: 6 }"
+                    clearable></el-input>
                 </template>
               </el-table-column>
             </el-table>
@@ -91,7 +285,7 @@
       <el-table-column align="center" prop="CURTAIN_WIDTH" label="成品宽" width="80"></el-table-column>
       <el-table-column align="center" prop="CURTAIN_HEIGHT" label="成品高" width="80"></el-table-column>
       <el-table-column align="center" prop="CURTAIN_ROOM_NAME" label="位置" width="100"></el-table-column>
-      <el-table-column align="center" prop="QTY_REQUIRED" label="套数" width="80"></el-table-column>
+      <el-table-column align="center" prop="QTY_REQUIRED" label="套数" width="70"></el-table-column>
       <el-table-column prop="PROMOTION" align="center" label="活动" show-overflow-tooltip></el-table-column>
       <el-table-column label="总价" align="center" width="130">
         <template slot-scope="scope">
@@ -157,26 +351,107 @@
         </el-step>
       </el-steps>
     </div>
+
+    <!-- 替换组件 -->
+    <el-drawer :title='"【" + transPartTypeCode(exchangeModelTemplate.NC_PART_TYPECODE) + "】" + "可替换列表"' :visible.sync="drawerShow"
+      :with-header="false" :size="isManager!='0'?'730px':'670px'">
+      <span style="color:grey;margin-left:10px;">*单击选择</span>
+      <div class="model-exchange-list">
+        <div class="model-exchange-list-ct">
+          <div v-for="(item, index) in exchangeModelList" :key="index" class="model-exchange-ct"
+            :class="{'model-exchange-now': item.NC_MODEL_ID == exchangeModelNow.NC_MODEL_ID }" @click="onChangeModelClick(item)">
+            <div class="model-exchange-inner">
+              <el-table :data="item.curtain_model" border :style="{width: isManager!='0'?'670px':'610px'}">
+                <el-table-column label="部件" width="80" header-align="center" prop="NC_PART_TYPECODE">
+                  <template slot-scope="scope">
+                    <!-- 树缩进 -->
+                    <span v-if="scope.row.curtain_level > 0">
+                      <span :style="{'padding-left': scope.row.curtain_level * 16 + 'px'}"></span>
+                    </span>
+                    <span
+                      :style="{'font-weight': scope.row.curtain_level==0?'bold':''}">{{transPartTypeCode(scope.row.NC_PART_TYPECODE)}}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="编码" width="170" header-align="center" prop="ITEM_NO">
+                </el-table-column>
+                <el-table-column label="名称" width="80" header-align="center" prop="NOTE">
+                </el-table-column>
+                <el-table-column label="库存" width="60" align="center" prop="curtain_store"></el-table-column>
+                <el-table-column label="单价" width="60" align="center" prop="curtain_price">
+                  <template slot-scope="scope">
+                    <!-- 只有部件算钱 -->
+                    <span v-if="scope.row.curtain_level == 0">{{scope.row.curtain_price}}</span>
+                    <span v-else>-</span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="说明" header-align="center" prop="NOTE">
+                  <template slot-scope="scope">
+                    <template v-if="scope.row.NCM_MAKETYPE">{{scope.row.NCM_MAKETYPE | makeType_filter}}<template
+                        v-if="scope.row.NCM_JOINT || scope.row.NCM_WRINKLE || scope.row.NCM_MAKETYPE">、</template></template>
+                    <template v-if="scope.row.NCM_JOINT">{{scope.row.NCM_JOINT | joint_filter}}<template
+                        v-if="scope.row.NCM_WRINKLE || scope.row.NCM_MAKETYPE">、</template></template>
+                    <template v-if="scope.row.NCM_WRINKLE">{{scope.row.NCM_WRINKLE }}褶<template
+                        v-if="scope.row.NCM_MAKETYPE">、</template></template>
+                    <template v-if="scope.row.NCM_NOTE">{{scope.row.NCM_NOTE }}</template>
+                  </template>
+                </el-table-column>
+              </el-table>
+              <label class="default-model-label" v-if="item.NC_MODEL_ID == exchangeModelTemplate.NC_MODEL_ID">默认组件</label>
+              <!-- 序号 -->
+              <el-badge class="index-badge" :value="index+1" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </el-drawer>
+    <!-- 替换子件 -->
+    <el-drawer :title='"【" + exchangeItemNow.ITEM_NO + " " + exchangeItemNow.NOTE + "】" +  "可替换列表"' :visible.sync="drawerShow2"
+      :with-header="false" size="530px">
+      <div style="padding:0 10px;margin-bottom:10px;">
+        <el-input clearable v-model.trim="itemCondition" @clear="getExangeItemList" size="small"
+          @keyup.enter.native="getExangeItemList" placeholder="请输入物料号" style="width:300px;">
+          <el-button @click="getExangeItemList" slot="append" icon="el-icon-search">搜索</el-button>
+        </el-input>
+        <span style="color:grey;margin-left:10px;">*单击选择</span>
+      </div>
+      <div class="item-exchange-list">
+        <div class="item-exchange-list-ct">
+          <div v-for="(item, index) in exchangeItemList" :key="index" class="item-exchange-ct"
+            :class="{'item-exchange-now': item.ITEM_NO == exchangeItemNow.ITEM_NO }" @click="onChangeItemClick(item)">
+            <span>{{item.ITEM_NO + " " + item.NOTE}}</span>
+            <label class="default-item-label" v-if="item.ITEM_NO == exchangeItemDefault.ITEM_NO">默认</label>
+          </div>
+        </div>
+      </div>
+      <el-pagination class="tc mt10" @current-change="getExangeItemList" :current-page.sync="currentPage" :page-size="limit"
+        layout="total, prev, pager, next, jumper" :total="totalNumber">
+      </el-pagination>
+    </el-drawer>
   </el-card>
 </template>
 
 <script>
 import Cookies from "js-cookie";
 import { mapActions } from "vuex";
+import Axios from "axios";
 import {
   getOrderDetails,
   updateCurtainOrder,
   getOperationRecord,
   getCustomerInfo,
 } from "@/api/orderListASP";
-import { GetPartTypeDataTabale } from "@/api/newCurtainASP";
+import {
+  GetPartTypeDataTabale, GetExchangeModel,
+  GetExchangeModelItem,
+} from "@/api/newCurtainASP";
 
 export default {
   data() {
     return {
-      orderNumber: '',
+      isManager: "1",
       customerType: Cookies.get("customerType"),
       cus_customerType: "",
+      orderNumber: '',
       operationRecords: [],
       expands: [],
       ruleForm: {
@@ -189,6 +464,20 @@ export default {
         ORDERBODY: [],
       },
       isFixed: false,
+      curtainPartTypeData: [],
+      drawerShow: false,
+      drawerShow2: false,
+      exchangeModelList: [],
+      exchangeModelTemplate: {},
+      exchangeModelNow: {},
+      exchangeItemList: [],
+      exchangeItemNow: [],
+      exchangeItemDefault: {},
+      itemCondition: "",
+      currentPage: 0,
+      limit: 50,
+      totalNumber: 0,
+      currentIndex: -1,
     }
   },
   filters: {
@@ -323,8 +612,13 @@ export default {
       }
       return name;
     },
-    allTotal() {
-
+    allTotal(index) {
+      let totalMoney = 0;
+      for (var i = 0; i < this.ruleForm.ORDERBODY[index].curtains.length; i++) {
+        var curtain = this.ruleForm.ORDERBODY[index].curtains[i];
+        totalMoney += curtain.PRICE.mul(curtain.DOSAGE);
+      }
+      return totalMoney;
     },
     getRowKeys(row) {
       return row.LINE_NO;
@@ -373,7 +667,126 @@ export default {
           //库存
           this.$set(detail.curtains[j], "curtain_store", "");
         }
+        detail.curtains = this.getStoreData(detail.curtains);
+        //change
+        for (var j = 0; j < detail.curtain_change.length; j++) {
+          var oneCurtain = detail.curtain_change[j];
+          //窗帘层级
+          var level = 0;
+          var NCM_PID = oneCurtain.NCM_PID;
+          while (NCM_PID != 0) {
+            var temp = detail.curtain_change.filter((item) => item.NC_MODEL_ID == NCM_PID);
+            if (temp.length) {
+              NCM_PID = temp[0].NCM_PID;
+              level++;
+            }
+          }
+          this.$set(detail.curtain_change[j], "curtain_level", level);
+          //选中标识
+          this.$set(detail.curtain_change[j], "curtain_choose", true);
+          //单价
+          var price = this.getPrice(this.cus_customerType, detail.curtain_change[j]);
+          this.$set(detail.curtain_change[j], "curtain_price", price);
+          //宽
+          var curtain_width = 0;
+          if (detail.curtain_change[j].WIDTH_ENABLE > 0) {
+            curtain_width = this.dosageFilter(this.ruleForm.ORDERBODY[this.currentIndex].CURTAIN_WIDTH * detail.curtain_change[j].NCM_WIDTH_RATIO);
+          }
+          this.$set(detail.curtain_change[j], "curtain_width", curtain_width);
+          //高
+          var curtain_height = 0;
+          if (detail.curtain_change[j].HEIGHT_ENABLE > 0) {
+            curtain_height = this.dosageFilter(this.ruleForm.ORDERBODY[this.currentIndex].CURTAIN_HEIGHT * detail.curtain_change[j].NCM_HEIGHT_RATIO);
+          }
+          //总数（面积）
+          var area = this.dosageFilter(curtain_width * curtain_height);
+          if (detail.curtain_change[j].NC_PART_TYPECODE == "GBD") area = 1; //挂绑带默认为1
+          this.$set(detail.curtain_change[j], "curtain_area", area);
+          if (detail.curtain_change[j].NC_PART_TYPECODE == "LS") {
+            //改变里衬布的
+            var LCBITEM = detail.curtain_change.filter((item) => item.NC_PART_TYPECODE == "LCB");
+            for (var k = 0; k < LCBITEM.length; k++) {
+              //假设有多个里衬布的情况
+              LCBITEM[k].curtain_area = area;
+            }
+          }
+          //左转角
+          this.$set(detail.curtain_change[j], "curtain_left_fillet", 0);
+          //右转角
+          this.$set(detail.curtain_change[j], "curtain_right_fillet", 0);
+          //库存
+          this.$set(detail.curtain_change[j], "curtain_store", "");
+          //客户备注
+          this.$set(detail.curtain_change[j], "curtain_note", "");
+          //说明
+          this.$set(detail.curtain_change[j], "curtain_remark", "");
+        }
+        detail.curtain_change = this.getStoreData(detail.curtain_change);
       }
+    },
+    //把model数据转换为comodity数据
+    dealInsertData(data) {
+      var returnData = {
+        ...data,
+        PRICE: data.curtain_price,
+        ITEM_ID: data.ITEM_NO,
+        WIDTH: data.curtain_width,
+        HEIGHT: data.curtain_height,
+        NOTE: "",
+        UNIT: data.UNIT_NAME,
+        CURTAIN_ITEM_NAME: data.NOTE,
+        CURTAIN_PART_NAME: this.transPartTypeCode(data.NC_PART_TYPECODE),
+        DOSAGE: data.curtain_area,
+        ILLUSTRATE: data.curtain_remark,
+        INLINE_NO: 0,
+        KAIKOU: data.NCM_KAIKOU,
+        OPERATION: data.NCM_OPERATION,
+        BIAN: data.NCM_BIAN,
+        JOINT: data.NCM_JOINT,
+        WRINKLE: data.NCM_WRINKLE,
+        MAKETYPE: data.NCM_MAKETYPE,
+        MESUTIE: data.NCM_MESUTIE,
+        LEFT_FILLET: data.curtain_left_fillet,
+        RIGHT_FILLET: data.curtain_right_fillet,
+      }
+      return returnData;
+    },
+    getStoreData(originData) {
+      for (var i = 0; i < originData.length; i++) {
+        if (!originData[i].ITEM_NO) continue;
+        //库存
+        var postData = {
+          token: "兰居尚品",
+          code: originData[i].ITEM_NO,
+        };
+        Axios.post("http://ljsp.ubxiu.com:8098/api/getXXDMX", postData, {
+          params: postData,
+          loading: false,
+        }).then((res) => {
+          if (res.data && res.data.data) {
+            var store_charge = "";
+            if (res.data.data.kucun == null || res.data.data.dinghuoshu == null
+              || res.data.data.ddz == null || res.data.data.xiaxian == null)
+              return;
+            var store_num = res.data.data.kucun - res.data.data.dinghuoshu - res.data.data.ddz;
+            var xiaxian = res.data.data.xiaxian;
+            if (store_num >= xiaxian) {
+              store_charge = "充足"
+            } else if (store_num > 0 && store_num < xiaxian) {
+              store_charge = "量少待查";
+            } else if (store_num < 0) {
+              store_charge = "欠料待审";
+            }
+            var data = originData.filter((item) => item.ITEM_NO == res.data.data.code);
+            if (data.length) {
+              for (var j = 0; j < data.length; j++) {
+                data[j].curtain_store = store_charge;
+              }
+            }
+          }
+        }).catch(res => { });
+      }
+      return originData;
     },
     //根据客户类型获取价格
     getPrice(type, item) {
@@ -392,6 +805,375 @@ export default {
         }
       }
       return price;
+    },
+    //改变单个宽或者高
+    changeOneWidthOrHeight(val, index1, index) {
+      var oneCurtain = this.ruleForm.ORDERBODY[index].curtains[index1];
+      oneCurtain.DOSAGE = this.dosageFilter(oneCurtain.WIDTH * oneCurtain.HEIGHT);
+      if (oneCurtain.NC_PART_TYPECODE == "LS") {
+        //改变里衬布的
+        var LCBITEM = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NC_PART_TYPECODE == "LCB");
+        for (var i = 0; i < LCBITEM.length; i++) {
+          //假设有多个里衬布的情况
+          LCBITEM[i].DOSAGE = oneCurtain.DOSAGE;
+        }
+      }
+    },
+    //处理拉边条
+    handleBianCommand(common, row, index) {
+      if (common == "4B" && row.BIAN != "4B") {
+        //显示拉边条
+        //先看看当前数据有没有这个拉边条，有的话应该是bug
+        var lbtItemNow = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
+        if (lbtItemNow.length) return;
+        //找到最大序号的面料,并且是要勾选的
+        var mlList = this.ruleForm.ORDERBODY[index].curtains.filter(
+          (item) =>
+            item.NCM_PID == row.NC_MODEL_ID &&
+            item.NC_PART_TYPECODE != "LBT" &&
+            item.curtain_choose
+        );
+        if (mlList.length) {
+          //在修改后的数据中找到拉边条数据并push进去
+          var lbtItem = this.ruleForm.ORDERBODY[index].curtain_change.filter((item) => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
+          if (lbtItem.length) {
+            lbtItem = lbtItem[0]; //只取第一个拉边条（按理应该只有一个）
+            lbtItem = this.dealInsertData(lbtItem);
+            this.ruleForm.ORDERBODY[index].curtains.push({ ...lbtItem });
+            //强制改成对应的ITEM_NO
+            this.ruleForm.ORDERBODY[index].curtains[this.ruleForm.ORDERBODY[index].curtains.length - 1].ITEM_NO = mlList[mlList.length - 1].MATERIAL_NO;
+            //排序
+            this.ruleForm.ORDERBODY[index].curtains.sort((a, b) => {
+              if (a.NCT_SORTNO == b.NCT_SORTNO) {
+                return a.NCM_SORTNO > b.NCM_SORTNO ? 1 : -1;
+              }
+              return a.NCT_SORTNO > b.NCT_SORTNO ? 1 : -1;
+            });
+          }
+        }
+      } else if (common == "3B" && row.BIAN == "4B") {
+        //去掉拉边条
+        //找到有没有拉边条
+        var lbtItem = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
+        //应该只有一个拉边条，但是循环一下，保险
+        for (var i = 0; i < lbtItem.length; i++) {
+          this.ruleForm.ORDERBODY[index].curtains.splice(this.ruleForm.ORDERBODY[index].curtains.indexOf(lbtItem[i]), 1);
+        }
+      }
+    },
+    //勾选的联动处理
+    onCheckChange(checked, row, index) {
+      if (!row.ITEM_NO) return;
+      var childrenCurtain = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NCM_PID == row.NC_MODEL_ID);
+      var fatherCurtain = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NC_MODEL_ID == row.NCM_PID);
+      if (childrenCurtain.length) {
+        //自身作为父节点，勾选或者取消，子节点应该同步
+        for (var i = 0; i < childrenCurtain.length; i++) {
+          childrenCurtain[i].curtain_choose = checked;
+          //往下更新需要联动，往上更新不需要
+          this.onCheckChange(checked, childrenCurtain[i], index);
+        }
+      }
+      if (fatherCurtain.length) {
+        fatherCurtain = fatherCurtain[0];
+        //自身作为子节点，分两种情况
+        if (checked) {
+          //子节点勾选，父节点肯定要勾选
+          fatherCurtain.curtain_choose = checked;
+          //勾选上的时候看需不需要加载自己的拉边条，看自己是不是最大排序的那个
+          //从父节点看是否需要加载
+          if (fatherCurtain.BIAN_ENABLE > 0 && fatherCurtain.BIAN == "4B") {
+            var mlList = this.ruleForm.ORDERBODY[index].curtains.filter((item) =>
+              item.NCM_PID == row.NCM_PID &&
+              item.NC_PART_TYPECODE != "LBT" &&
+              item.curtain_choose
+            );
+            if (mlList.length && mlList[mlList.length - 1].ITEM_NO == row.ITEM_NO) {
+              //先看看当前数据有没有拉边条，有的话应该是全选的时候这一条还没勾选上的时候上一条数据加载的
+              var lbtItemNow = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NCM_PID == row.NCM_PID && item.NC_PART_TYPECODE == "LBT");
+              if (lbtItemNow.length == 0) {
+                //在修改后的数据中找到拉边条数据并push进去
+                var lbtItem = this.ruleForm.ORDERBODY[index].curtain_change.filter((item) =>
+                  item.NCM_PID == row.NCM_PID &&
+                  item.NC_PART_TYPECODE == "LBT"
+                );
+                if (lbtItem.length) {
+                  lbtItem = lbtItem[0]; //只取第一个拉边条（按理应该只有一个）
+                  lbtItem = this.dealInsertData(lbtItem)
+                  this.ruleForm.ORDERBODY[index].curtains.push({ ...lbtItem });
+                  //强制改成对应的ITEM_NO
+                  this.ruleForm.ORDERBODY[index].curtains[this.ruleForm.ORDERBODY[index].curtains.length - 1].ITEM_NO = mlList[mlList.length - 1].MATERIAL_NO;
+                  //排序
+                  this.ruleForm.ORDERBODY[index].curtains.sort((a, b) => {
+                    if (a.NCT_SORTNO == b.NCT_SORTNO) {
+                      return a.NCM_SORTNO > b.NCM_SORTNO ? 1 : -1;
+                    }
+                    return a.NCT_SORTNO > b.NCT_SORTNO ? 1 : -1;
+                  });
+                }
+              } else {
+                //有的话直接更新
+                lbtItemNow[0].ITEM_NO = mlList[mlList.length - 1].MATERIAL_NO;
+              }
+            }
+          }
+        } else {
+          //取消勾选删掉对应的拉边条，并找有没有其他
+          //从父节点看是否需要删除
+          if (fatherCurtain.BIAN_ENABLE > 0 && fatherCurtain.BIAN == "4B") {
+            var lbtItem = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NCM_PID == row.NCM_PID && item.NC_PART_TYPECODE == "LBT");
+            if (lbtItem.length) {
+              //继续找到最大的面料对应的拉边条
+              var mlList = this.ruleForm.ORDERBODY[index].curtains.filter((item) =>
+                item.NCM_PID == row.NCM_PID &&
+                item.NC_PART_TYPECODE != "LBT" &&
+                item.curtain_choose
+              );
+              if (mlList.length) {
+                //有的话更新拉边条
+                lbtItem[0].ITEM_NO = mlList[mlList.length - 1].MATERIAL_NO;
+              } else {
+                //没有的话删除拉边条
+                for (var i = 0; i < lbtItem.length; i++) {
+                  this.ruleForm.ORDERBODY[index].curtains.splice(this.ruleForm.ORDERBODY[index].curtains.indexOf(lbtItem[i]), 1);
+                }
+              }
+            }
+          }
+          //子节点取消勾选，如果同级没有其他勾选了，父节点取消勾选
+          var brotherCurtain = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NCM_PID == row.NCM_PID && item.curtain_choose);
+          if (brotherCurtain.length == 0)
+            fatherCurtain.curtain_choose = checked;
+        }
+      }
+    },
+    //点击显示可替换列表
+    exchangeModelOrItem(row, index) {
+      this.currentIndex = index;
+      if (!row.curtain_choose) return;
+      if (row.curtain_level == 0) {
+        //整个组件替换
+        this.exchangeModelNow = JSON.parse(JSON.stringify(row)); //当前数据
+        this.getExchangeModelList();
+      } else {
+        //子件替换
+        this.exchangeItemNow = JSON.parse(JSON.stringify(row)); //当前数据
+        this.getExangeItemList();
+      }
+    },
+    //获得可替换组件列表
+    getExchangeModelList() {
+      this.exchangeModelList = [];
+      GetExchangeModel({
+        NC_TEMPLATE_ID: this.exchangeModelNow.NC_TEMPLATE_ID,
+      }).then((res) => {
+        if (res.data.length > 0 || (res.data.length == 1 && res.data[0].NC_MODEL_ID != this.exchangeModelNow.NC_MODEL_ID)) {
+          this.exchangeModelList = res.data;
+          //默认数据
+          var defaultModel = this.ruleForm.ORDERBODY[this.currentIndex].curtain_template.filter((item) =>
+            item.NC_TEMPLATE_ID == this.exchangeModelNow.NC_TEMPLATE_ID);
+          if (defaultModel.length) {
+            this.exchangeModelTemplate = defaultModel[0];
+          }
+          //添加层级数据
+          for (var i = 0; i < this.exchangeModelList.length; i++) {
+            var curtain_list = this.exchangeModelList[i].curtain_model;
+            for (var j = 0; j < curtain_list.length; j++) {
+              var level = 0;
+              var NCM_PID = curtain_list[j].NCM_PID;
+              while (NCM_PID != 0) {
+                var temp = curtain_list.filter((item) => item.NC_MODEL_ID == NCM_PID);
+                if (temp.length) {
+                  NCM_PID = temp[0].NCM_PID;
+                  level++;
+                }
+              }
+              this.$set(curtain_list[j], "curtain_level", level);
+              //单价
+              var price = this.getPrice(this.cus_customerType, curtain_list[j]);
+              this.$set(curtain_list[j], "curtain_price", price);
+            }
+            //库存
+            curtain_list = this.getStoreData(curtain_list);
+          }
+          this.drawerShow = true;
+        } else {
+          this.$message({
+            message: "没有可替换的组件!",
+            type: "warning",
+            duration: 1000,
+          });
+        }
+      });
+    },
+    //点击替换组件
+    onChangeModelClick(model) {
+      if (model.NC_MODEL_ID == this.exchangeModelNow.NC_MODEL_ID) return;
+      var selectModel = model.curtain_model.filter((item) => item.NC_MODEL_ID == model.NC_MODEL_ID);
+      if (selectModel.length) {
+        selectModel = selectModel[0];
+        var msg = "";
+        if (this.exchangeModelNow.ITEM_NO) {
+          msg = `确认使用【${selectModel.ITEM_NO}】替换当前【${this.exchangeModelNow.ITEM_NO}】？`;
+        } else {
+          msg = `确认使用【${selectModel.ITEM_NO}】作为当前组件？`;
+        }
+        this.$confirm(msg, "提示", {
+          confirmButtonText: "是",
+          cancelButtonText: "否",
+          type: "warning",
+        }).then(() => {
+          //替换当前，第一步，把当前的删掉
+          this.ruleForm.ORDERBODY[this.currentIndex].curtains = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter((item) =>
+            item.NC_TEMPLATE_ID != this.exchangeModelNow.NC_TEMPLATE_ID);
+          this.ruleForm.ORDERBODY[this.currentIndex].curtain_change = this.ruleForm.ORDERBODY[this.currentIndex].curtain_change.filter((item) =>
+            item.NC_TEMPLATE_ID != this.exchangeModelNow.NC_TEMPLATE_ID);
+          //第二步，把当前选中的push进去
+          var curtain_temp = this.getOtherCurtainMsgForExchange(model.curtain_model);
+          for (var i = 0; i < curtain_temp.length; i++) {
+            curtain_temp[i] = this.dealInsertData(curtain_temp[i]);
+            var oneCurtain = curtain_temp[i];
+            if (oneCurtain.NC_PART_TYPECODE == "LBT") {
+              //先看父节点需不需要加载出拉边条
+              var fatherCurtain = curtain_temp.filter((item) =>
+                item.NC_MODEL_ID == oneCurtain.NCM_PID &&
+                item.BIAN_ENABLE > 0 &&
+                item.NCM_BIAN == "4B"
+              );
+              if (fatherCurtain.length) {
+                //如果需要加载，看排序最大的面料对应的拉边条,并且是要勾选的
+                var mlList = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter((item) =>
+                  item.NCM_PID == oneCurtain.NCM_PID &&
+                  item.NC_PART_TYPECODE != "LBT" &&
+                  item.curtain_choose
+                );
+                if (mlList.length) {
+                  this.ruleForm.ORDERBODY[this.currentIndex].curtains.push({ ...oneCurtain });
+                  this.ruleForm.ORDERBODY[this.currentIndex].curtains[this.ruleForm.ORDERBODY[this.currentIndex].curtains.length - 1].ITEM_NO = mlList[mlList.length - 1].MATERIAL_NO;
+                }
+              }
+            } else {
+              this.ruleForm.ORDERBODY[this.currentIndex].curtains.push({ ...oneCurtain });
+            }
+          }
+          this.ruleForm.ORDERBODY[this.currentIndex].curtains.sort((a, b) => {
+            if (a.NCT_SORTNO == b.NCT_SORTNO) {
+              return a.NCM_SORTNO > b.NCM_SORTNO ? 1 : -1;
+            }
+            return a.NCT_SORTNO > b.NCT_SORTNO ? 1 : -1;
+          });
+          this.ruleForm.ORDERBODY[this.currentIndex].curtain_change.push(...curtain_temp);
+          this.drawerShow = false;
+        })
+          .catch(() => { });
+      }
+    },
+    //添加其他没有的数据
+    getOtherCurtainMsgForExchange(originData) {
+      for (var i = 0; i < originData.length; i++) {
+        //选中标识(父节点以部件为准，子节点综合父节点考虑)
+        var defaultChose = originData[i].NCT_DELETE < 2 && originData[i].NCM_DELETE < 2;
+        this.$set(originData[i], "curtain_choose", defaultChose);
+        //宽
+        var curtain_width = 0;
+        if (originData[i].WIDTH_ENABLE > 0) {
+          curtain_width = this.dosageFilter(this.ruleForm.ORDERBODY[this.currentIndex].CURTAIN_WIDTH * originData[i].NCM_WIDTH_RATIO);
+        }
+        this.$set(originData[i], "curtain_width", curtain_width);
+        //高
+        var curtain_height = 0;
+        if (originData[i].HEIGHT_ENABLE > 0) {
+          curtain_height = this.dosageFilter(this.ruleForm.ORDERBODY[this.currentIndex].CURTAIN_HEIGHT * originData[i].NCM_HEIGHT_RATIO);
+        }
+        this.$set(originData[i], "curtain_height", curtain_height);
+        //总数（面积）
+        var area = this.dosageFilter(curtain_width * curtain_height);
+        if (originData[i].NC_PART_TYPECODE == "GBD") area = 1; //挂绑带默认为1
+        this.$set(originData[i], "curtain_area", area);
+        if (originData[i].NC_PART_TYPECODE == "LS") {
+          //改变里衬布的
+          var LCBITEM = originData.filter((item) => item.NC_PART_TYPECODE == "LCB");
+          for (var j = 0; j < LCBITEM.length; j++) {
+            //假设有多个里衬布的情况
+            LCBITEM[j].curtain_area = area;
+          }
+        }
+        //左转角
+        this.$set(originData[i], "curtain_left_fillet", 0);
+        //右转角
+        this.$set(originData[i], "curtain_right_fillet", 0);
+        //客户备注
+        this.$set(originData[i], "curtain_note", "");
+        //说明
+        this.$set(originData[i], "curtain_remark", "");
+      }
+      return originData;
+    },
+    //获得可替换子件列表
+    getExangeItemList() {
+      this.exchangeItemList = [];
+      GetExchangeModelItem({
+        NC_MODEL_ID: this.exchangeItemNow.NC_MODEL_ID,
+        condition: this.itemCondition,
+        page: this.currentPage,
+        limit: this.limit,
+      }).then((res) => {
+        if (res.data.length > 0 || (res.data.length == 1 && res.data[0].ITEM_NO != this.exchangeItemNow.ITEM_NO)) {
+          this.exchangeItemList = res.data;
+          this.totalNumber = res.count;
+          //默认物料(从替换后的找)
+          var defaultItem = this.ruleForm.ORDERBODY[this.currentIndex].curtain_change.filter((item) => item.NC_MODEL_ID == this.exchangeItemNow.NC_MODEL_ID);
+          if (defaultItem.length) {
+            this.exchangeItemDefault = defaultItem[0];
+          }
+          this.drawerShow2 = true;
+        } else {
+          this.$message({
+            message: "没有可替换的物料!",
+            type: "warning",
+            duration: 1000,
+          });
+        }
+      });
+    },
+    //点击替换子件
+    onChangeItemClick(item) {
+      if (item.ITEM_NO == this.exchangeItemNow.ITEM_NO) return;
+      this.$confirm(`确认使用【${item.ITEM_NO}】替换当前【${this.exchangeItemNow.ITEM_NO}】？`, "提示", {
+        confirmButtonText: "是",
+        cancelButtonText: "否",
+        type: "warning",
+      }).then(() => {
+        //替换只是更换item，现在只需要替换字段ITEM_NO，NOTE和拉边条MATERIAL_NO
+        var originItem = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter((item) => item.NC_MODEL_ID == this.exchangeItemNow.NC_MODEL_ID);
+        if (originItem.length) {
+          originItem = originItem[0];
+          originItem.ITEM_NO = item.ITEM_NO;
+          originItem.NOTE = item.NOTE;
+          originItem.MATERIAL_NO = item.MATERIAL_NO;
+        }
+        //替换拉边条
+        //如果需要加载，看自身是不是勾选中排序最大的
+        var mlList = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter((item) =>
+          item.NCM_PID == originItem.NCM_PID &&
+          item.NC_PART_TYPECODE != "LBT" &&
+          item.curtain_choose
+        );
+        if (mlList.length && mlList[mlList.length - 1].ITEM_NO == originItem.ITEM_NO) {
+          //改变拉边条数据
+          var lbtItem = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter((item) =>
+            item.NCM_PID == originItem.NCM_PID &&
+            item.NC_PART_TYPECODE == "LBT"
+          );
+          if (lbtItem.length) {
+            lbtItem[0].ITEM_NO = originItem.MATERIAL_NO;
+          }
+        }
+        //更新库存
+        this.ruleForm.ORDERBODY[this.currentIndex].curtains = this.getStoreData(this.ruleForm.ORDERBODY[this.currentIndex].curtains);
+        this.drawerShow2 = false;
+      })
+        .catch(() => { });
     },
     //隔行变色
     tableRowClassName({ row, rowIndex }) {
@@ -577,7 +1359,10 @@ export default {
 }
 .curtain-list .el-table td,
 .curtain-list .el-table th {
-  padding: 1px !important;
+  padding: 1px 0 !important;
+}
+.curtain-list .el-table .cell {
+  padding: 0 2px !important;
 }
 .curtain-list .el-input__inner {
   padding: 0 5px;

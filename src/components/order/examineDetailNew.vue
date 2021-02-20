@@ -32,7 +32,8 @@
       <div style="height:80px;width:100%;"></div>
     </div>
     <!-- 循环订单详情 -->
-    <el-table border :data="ruleForm.ORDERBODY" :row-class-name="tableRowClassName" :expand-row-keys="expands" :row-key="getRowKeys">
+    <el-table border :data="ruleForm.ORDERBODY" :row-class-name="tableRowClassName" :expand-row-keys="expands"
+      :row-key="getRowKeys">
       <el-table-column width="1" type="expand">
         <template slot-scope="scope">
           <div style="margin:10px;" class="curtainTable">

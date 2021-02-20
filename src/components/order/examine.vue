@@ -57,13 +57,9 @@
           <span class="zoomLeft">订单号：</span>
           <span class="zoomRight">{{ item.ORDER_NO }}</span>
           <span class="zoomLeft">窗帘状态：</span>
-          <span style="color:#8BC34A;font-weight:bold;" class="zoomRight">{{
-            item.CURTAIN_STATUS_ID | curtainStatus
-          }}</span>
+          <span style="color:#8BC34A;font-weight:bold;" class="zoomRight">{{item.CURTAIN_STATUS_ID | curtainStatus}}</span>
           <span class="zoomLeft">订单状态：</span>
-          <span style="color:#8BC34A;font-weight:bold;" class="zoomRight">{{
-            item.STATUS_ID | transStatus
-          }}</span>
+          <span style="color:#8BC34A;font-weight:bold;" class="zoomRight">{{item.STATUS_ID | transStatus}}</span>
           <br />
           <span class="zoomLeft">客户名称：</span>
           <span class="zoomRight">{{ item.REALNAME || item.realName }}</span>
@@ -102,10 +98,7 @@
               </el-table-column>
               <el-table-column label="商品总价" align="center">
                 <template slot-scope="scope1">
-                  <span>{{
-                    (scope1.row.UNIT_PRICE * scope1.row.QTY_REQUIRED)
-                      | dosageFilter
-                  }}</span>
+                  <span>{{(scope1.row.UNIT_PRICE * scope1.row.QTY_REQUIRED) | dosageFilter}}</span>
                 </template>
               </el-table-column>
             </el-table>
@@ -131,17 +124,13 @@
                 " @click="_back(item)" size="medium" type="warning" plain>直接退回</el-button>
             </p>
             <p>
-              <el-button style="float: right;" @click="exportProductExcel(item)" v-if="!item.collapse && showExportProduct(item)"
-                size="mini" plain>
+              <el-button @click="exportProductExcel(item)" v-if="!item.collapse && showExportProduct(item)" size="mini" plain>
                 导出生产模板
               </el-button>
             </p>
           </div>
         </div>
       </el-card>
-      <!-- <div v-if="data.length == 0" style="text-align:center;margin:20px 0;">
-        {{ waitText }}
-      </div> -->
       <div style="margin:0 25%;" class="block">
         <el-pagination @size-change="handleSizeChange" @current-change="getorderList" :current-page.sync="currentPage"
           :page-sizes="[20, 50, 100, 1000]" :page-size="limit" layout="total, sizes, prev, pager, next, jumper" :total="count">
@@ -244,7 +233,6 @@ export default {
           value: "4",
         },
       ],
-      waitText: "加载中。。。",
     };
   },
   filters: {

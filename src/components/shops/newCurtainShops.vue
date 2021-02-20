@@ -1317,7 +1317,8 @@ export default {
           NCM_PID: oneCurtain.NCM_PID,
           NC_MODEL_ID: oneCurtain.NC_MODEL_ID,
           NC_TEMPLATE_ID: oneCurtain.NC_TEMPLATE_ID,
-          NC_PART_TYPECODE: oneCurtain.NC_PART_TYPECODE
+          NC_PART_TYPECODE: oneCurtain.NC_PART_TYPECODE,
+          NCM_NOTE: oneCurtain.NCM_NOTE
         }
         details.push(oneDetail);
       }

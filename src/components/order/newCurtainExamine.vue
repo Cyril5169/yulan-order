@@ -326,8 +326,8 @@ export default {
       return row.COMPANY_ID == "C01613";
     },
     toExamineDetail(val) {
-      Cookies.set("ORDER_NO", val);
-      this.addTab("order/examineDetailNew");
+      Cookies.set("NEW_ORDER_NO", val);
+      this.addTab("order/newCurtainExamineDetail");
     },
     //订单详情
     toCheckExamine(val) {
@@ -386,6 +386,7 @@ export default {
         });
     },
     exportProductExcel(item) {
+      return;
       this.$confirm(
         "此功能只适用于导出测试账号订单，导出模板后订单状态将变成已完成状态，请慎重操作，是否确认导出？",
         "提示",

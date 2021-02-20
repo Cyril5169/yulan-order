@@ -101,7 +101,7 @@
                 </el-select>
               </span>
               <span v-else-if="scope.row.changeFlag === 'Y'">
-                <a @click="getNewItemNo(scope.row, scope.$index)">{{ scope.row.item.itemNo }}</a>
+                <a class="uline" @click="getNewItemNo(scope.row, scope.$index)">{{ scope.row.item.itemNo }}</a>
                 <el-checkbox v-if="scope.row.deleteFlag === 'Y'" v-model="scope.row.choose"
                   @change="changeLinkReverse(scope.row)">
                 </el-checkbox>

@@ -30,6 +30,7 @@ import shipment from '@/components/order/shipment'
 import examine from '@/components/order/examine'
 import newCurtainExamine from '@/components/order/newCurtainExamine'
 import examineDetailNew from '@/components/order/examineDetailNew'
+import newCurtainExamineDetail from '@/components/order/newCurtainExamineDetail'
 import checkExamine from '@/components/order/checkExamine'
 import myCoupon from '@/components/center/myCoupon'
 import DetailRefund from '@/components/detail/detailRefund'
@@ -380,6 +381,14 @@ const router = new Router({
           path: '/order/examineDetailNew',
           name: 'examineDetailNew',
           component: examineDetailNew,
+          meta: {
+            returnMain: true//该页面刷新回到主界面
+          }
+        },
+        {
+          path: '/order/newCurtainExamineDetail',
+          name: 'newCurtainExamineDetail',
+          component: newCurtainExamineDetail,
           meta: {
             returnMain: true//该页面刷新回到主界面
           }

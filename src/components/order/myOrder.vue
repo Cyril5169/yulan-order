@@ -559,7 +559,6 @@ export default {
         type: "warning",
       })
         .then(() => {
-          //cancelOrder(url, data).then(res => {
           cancelOrderNew(data)
             .then((res) => {
               if (pushOrderNum.slice(0, 1) == "X") {

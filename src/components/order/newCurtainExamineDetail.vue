@@ -1,6 +1,6 @@
 <template>
   <el-card class="centerCard" shadow="hover">
-    <div slot="header" :class="{fixHead:isFixed}">
+    <div slot="header" :class="{fixHead: isFixed && isFixed2}">
       <span class="zoomLeft">
         订单号：
         <span class="zoomRight">{{ ruleForm.ORDER_NO }}</span>
@@ -27,6 +27,22 @@
         玉兰处理说明：
         <span class="zoomRight">{{ ruleForm.YULAN_NOTES }}</span>
       </span>
+      <br />
+      <span class="zoomLeft">
+        交货日期：
+        <span class="zoomRight">
+          <el-date-picker v-model="ruleForm.JIAOHUO_DATE" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
+            placeholder="选择时间" style="width:130px;" size="mini" :picker-options="pickerOptions"></el-date-picker>
+        </span>
+      </span>
+      <br />
+      <span class="zoomLeft">
+        备注：
+        <span class="zoomRight">
+          <el-input size="mini" v-model="ruleForm.LANJU_NOTE" style="width: 500px;"></el-input>
+        </span>
+      </span>
+      <i class="el-icon-paperclip fixed-icon" :style="{ background: isFixed2? '#eee': ''}" @click="isFixed2 = !isFixed2"></i>
     </div>
     <div slot="header" v-if="isFixed">
       <div style="height:80px;width:100%;"></div>
@@ -249,7 +265,11 @@
                   <span v-else>-</span>
                 </template>
               </el-table-column>
-              <el-table-column label="说明" width="100" align="center" prop="ILLUSTRATE"></el-table-column>
+              <el-table-column label="说明" width="100" align="center" prop="ILLUSTRATE">
+                <template slot-scope="scope">
+                  <span style="color:red;font-size:12px;"> {{ scope.row.ILLUSTRATE }}</span>
+                </template>
+              </el-table-column>
               <el-table-column label="客户备注" align="center">
                 <template slot-scope="scope">
                   <el-input v-model="scope.row.NOTE" size="mini" type="textarea" resize="none" :autosize="{ maxRows: 6 }"
@@ -464,6 +484,7 @@ export default {
         ORDERBODY: [],
       },
       isFixed: false,
+      isFixed2: true,
       curtainPartTypeData: [],
       drawerShow: false,
       drawerShow2: false,
@@ -478,6 +499,33 @@ export default {
       limit: 50,
       totalNumber: 0,
       currentIndex: -1,
+      pickerOptions: {
+        shortcuts: [{
+          text: '明天',
+          onClick(picker) {
+            const date = new Date();
+            date.setTime(date.getTime() + 3600 * 1000 * 24);
+            picker.$emit('pick', date);
+          }
+        }, {
+          text: '一周后',
+          onClick(picker) {
+            const date = new Date();
+            date.setTime(date.getTime() + 3600 * 1000 * 24 * 7);
+            picker.$emit('pick', date);
+          }
+        }, {
+          text: '一月后',
+          onClick(picker) {
+            const date = new Date();
+            date.setTime(date.getTime() + 3600 * 1000 * 24 * 30);
+            picker.$emit('pick', date);
+          }
+        }]
+      },
+      oldCurtainData: [],
+      newCurtainData: [],
+      deleteIds: []
     }
   },
   filters: {
@@ -616,7 +664,8 @@ export default {
       let totalMoney = 0;
       for (var i = 0; i < this.ruleForm.ORDERBODY[index].curtains.length; i++) {
         var curtain = this.ruleForm.ORDERBODY[index].curtains[i];
-        totalMoney += curtain.PRICE.mul(curtain.DOSAGE);
+        if (curtain.curtain_choose)
+          totalMoney += curtain.PRICE.mul(curtain.DOSAGE);
       }
       return totalMoney;
     },
@@ -635,6 +684,7 @@ export default {
     getDetail() {
       getOrderDetails({ orderNo: this.orderNumber }).then((res) => {
         this.ruleForm = res.data[0];
+        if (this.ruleForm.JIAOHUO_DATE == '9999/12/31 00:00:00') this.ruleForm.JIAOHUO_DATE = "";
         this.getCustomer();
         for (let i = 0; i < this.ruleForm.ORDERBODY.length; i++) {
           this.ruleForm.ORDERBODY[i].checkStatus = "未修改";
@@ -666,9 +716,12 @@ export default {
           this.$set(detail.curtains[j], "curtain_choose", true);
           //库存
           this.$set(detail.curtains[j], "curtain_store", "");
+          //push到olddata中，用来对比
+          this.oldCurtainData.push(JSON.parse(JSON.stringify(detail.curtains[j])))
         }
         detail.curtains = this.getStoreData(detail.curtains);
-        //change
+
+        //把change的数据也加上各个字段
         for (var j = 0; j < detail.curtain_change.length; j++) {
           var oneCurtain = detail.curtain_change[j];
           //窗帘层级
@@ -690,13 +743,13 @@ export default {
           //宽
           var curtain_width = 0;
           if (detail.curtain_change[j].WIDTH_ENABLE > 0) {
-            curtain_width = this.dosageFilter(this.ruleForm.ORDERBODY[this.currentIndex].CURTAIN_WIDTH * detail.curtain_change[j].NCM_WIDTH_RATIO);
+            curtain_width = this.dosageFilter(detail.CURTAIN_WIDTH * detail.curtain_change[j].NCM_WIDTH_RATIO);
           }
           this.$set(detail.curtain_change[j], "curtain_width", curtain_width);
           //高
           var curtain_height = 0;
           if (detail.curtain_change[j].HEIGHT_ENABLE > 0) {
-            curtain_height = this.dosageFilter(this.ruleForm.ORDERBODY[this.currentIndex].CURTAIN_HEIGHT * detail.curtain_change[j].NCM_HEIGHT_RATIO);
+            curtain_height = this.dosageFilter(detail.CURTAIN_HEIGHT * detail.curtain_change[j].NCM_HEIGHT_RATIO);
           }
           //总数（面积）
           var area = this.dosageFilter(curtain_width * curtain_height);
@@ -739,6 +792,7 @@ export default {
         DOSAGE: data.curtain_area,
         ILLUSTRATE: data.curtain_remark,
         INLINE_NO: 0,
+        LINE_NO: this.ruleForm.ORDERBODY[this.currentIndex].LINE_NO,
         KAIKOU: data.NCM_KAIKOU,
         OPERATION: data.NCM_OPERATION,
         BIAN: data.NCM_BIAN,
@@ -821,6 +875,7 @@ export default {
     },
     //处理拉边条
     handleBianCommand(common, row, index) {
+      this.currentIndex = index;
       if (common == "4B" && row.BIAN != "4B") {
         //显示拉边条
         //先看看当前数据有没有这个拉边条，有的话应该是bug
@@ -864,8 +919,9 @@ export default {
     //勾选的联动处理
     onCheckChange(checked, row, index) {
       if (!row.ITEM_NO) return;
+      this.currentIndex = index;
       var childrenCurtain = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NCM_PID == row.NC_MODEL_ID);
-      var fatherCurtain = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NC_MODEL_ID == row.NCM_PID);
+      var fatherCurtain = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NC_MODEL_ID == row.NCM_PID && item.NC_MODEL_ID !=0);
       if (childrenCurtain.length) {
         //自身作为父节点，勾选或者取消，子节点应该同步
         for (var i = 0; i < childrenCurtain.length; i++) {
@@ -1175,6 +1231,144 @@ export default {
       })
         .catch(() => { });
     },
+    //获得需要提交的窗帘数据
+    getCurtainData() {
+      this.newCurtainData = [];
+      this.deleteIds = [];
+      for (var i = 0; i < this.ruleForm.ORDERBODY.length; i++) {
+        var detail = this.ruleForm.ORDERBODY[i];
+        for (var j = 0; j < detail.curtains.length; j++) {
+          var oneCurtain = detail.curtains[j];
+          if (oneCurtain.curtain_choose) {
+            this.newCurtainData.push(JSON.parse(JSON.stringify(oneCurtain)))
+          } else {
+            this.deleteIds.push(oneCurtain.ID);
+          }
+        }
+      }
+    },
+    //数据有效性判断
+    beforeChangeData() {
+      for (var i = 0; i < this.newCurtainData.length; i++) {
+        var oneCurtain = this.newCurtainData[i];
+        //编码
+        if (!oneCurtain.ITEM_NO) {
+          this.$alert(`${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}没有对应的编码，请检查！`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return false;
+        }
+        //宽高
+        if (oneCurtain.WIDTH_ENABLE == 2 && (!oneCurtain.WIDTH || Number(oneCurtain.WIDTH == 0))) {
+          this.$alert(`请填写${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【宽】`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return false;
+        }
+        if (oneCurtain.HEIGHT_ENABLE == 2 && (!oneCurtain.HEIGHT || Number(oneCurtain.HEIGHT == 0))) {
+          this.$alert(`请填写${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【高】`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return false;
+        }
+        //左右圆角
+        if (oneCurtain.LEFT_ENABLE == 2 && (!oneCurtain.LEFT_FILLET || Number(oneCurtain.LEFT_FILLET == 0))) {
+          this.$alert(`请填写${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【左圆角】`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return false;
+        }
+        if (oneCurtain.RIGHT_ENABLE == 2 && (!oneCurtain.RIGHT_FILLET || Number(oneCurtain.RIGHT_FILLET == 0))) {
+          this.$alert(`请填写${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【右圆角】`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return false;
+        }
+        //么术贴
+        if (oneCurtain.TIE_ENABLE == 2 && !oneCurtain.MESUTIE) {
+          this.$alert(`请选择${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【么术贴】`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return false;
+        }
+        //打开方式
+        if (oneCurtain.KAIKOU_ENABLE == 2 && !oneCurtain.KAIKOU) {
+          this.$alert(`请选择${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【打开方式】`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return false;
+        }
+        //工艺方式
+        if (oneCurtain.OPERATION_ENABLE == 2 && !oneCurtain.OPERATION) {
+          this.$alert(`请选择${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【工艺方式】`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return false;
+        }
+        //包边方式
+        if (oneCurtain.BIAN_ENABLE == 2 && !oneCurtain.BIAN) {
+          this.$alert(`请选择${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【包边方式】`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return false;
+        }
+      }
+      return true
+    },
+    //数据修改对比
+    contrastData() {
+      let _data = JSON.parse(JSON.stringify(this.newCurtainData)); //修改后数据
+      let _old_data = JSON.parse(JSON.stringify(this.oldCurtainData)); //原始数据
+      //把不需要比对的数据拿出来,处理输入的数字数据
+      _data.forEach((item) => {
+        item.curtain_store = "";
+        item.WIDTH = Number(item.WIDTH);
+        item.HEIGHT = Number(item.HEIGHT);
+        item.LEFT_FILLET = Number(item.LEFT_FILLET);
+        item.RIGHT_FILLET = Number(item.RIGHT_FILLET);
+        item.FU_QTY = Number(item.FU_QTY);
+        item.ZE_QTY = Number(item.ZE_QTY);
+        item.DOSAGE = Number(item.DOSAGE);
+      });
+      _old_data.forEach((item) => {
+        item.curtain_store = "";
+        item.WIDTH = Number(item.WIDTH);
+        item.HEIGHT = Number(item.HEIGHT);
+        item.LEFT_FILLET = Number(item.LEFT_FILLET);
+        item.RIGHT_FILLET = Number(item.RIGHT_FILLET);
+        item.FU_QTY = Number(item.FU_QTY);
+        item.ZE_QTY = Number(item.ZE_QTY);
+        item.DOSAGE = Number(item.DOSAGE);
+      });
+      return JSON.stringify(_data) == JSON.stringify(_old_data);
+    },
+    //兰居修改
+    LanjuChange() {
+      this.getCurtainData();
+      if (!this.beforeChangeData()) return;
+      var msg = "确认修改吗？";
+      if (this.contrastData()) {
+        msg = "所有窗帘未修改，依然修改吗？";
+      }
+      this.$confirm(msg, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+
+        })
+        .catch(() => { });
+    },
     //隔行变色
     tableRowClassName({ row, rowIndex }) {
       return "success-row";
@@ -1244,7 +1438,14 @@ export default {
   top: 81px;
   z-index: 100;
   background: white;
-  width: 100%;
+  left: 230px;
+  right: 32px;
+}
+.fixed-icon {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  cursor: pointer;
 }
 .a-link {
   text-decoration: underline;

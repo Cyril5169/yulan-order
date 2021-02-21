@@ -870,7 +870,7 @@ export default {
     onCheckChange(checked, row) {
       if (!row.ITEM_NO) return;
       var childrenCurtain = this.curtainData.filter((item) => item.NCM_PID == row.NC_MODEL_ID);
-      var fatherCurtain = this.curtainData.filter((item) => item.NC_MODEL_ID == row.NCM_PID);
+      var fatherCurtain = this.curtainData.filter((item) => item.NC_MODEL_ID == row.NCM_PID && item.NC_MODEL_ID !=0);
       if (childrenCurtain.length) {
         //自身作为父节点，勾选或者取消，子节点应该同步
         for (var i = 0; i < childrenCurtain.length; i++) {
@@ -1227,6 +1227,14 @@ export default {
       //只看选中的
       for (var i = 0; i < this.chooseCurtainData.length; i++) {
         var oneCurtain = this.chooseCurtainData[i];
+        //编码
+        if (!oneCurtain.ITEM_NO) {
+          this.$alert(`${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}没有对应的编码，请检查！`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return false;
+        }
         //宽高
         if (oneCurtain.WIDTH_ENABLE == 2 && (!oneCurtain.curtain_width || Number(oneCurtain.curtain_width == 0))) {
           this.$alert(`请填写${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【宽】`, "提示", {
@@ -1284,14 +1292,6 @@ export default {
         //包边方式
         if (oneCurtain.BIAN_ENABLE == 2 && !oneCurtain.NCM_BIAN) {
           this.$alert(`请选择${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【包边方式】`, "提示", {
-            confirmButtonText: "确定",
-            type: "warning",
-          });
-          return false;
-        }
-        //编码
-        if (!oneCurtain.ITEM_NO) {
-          this.$alert(`${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}没有对应的编码，请检查！`, "提示", {
             confirmButtonText: "确定",
             type: "warning",
           });

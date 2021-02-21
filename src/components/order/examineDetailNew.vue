@@ -1,6 +1,6 @@
 <template>
   <el-card class="centerCard" shadow="hover">
-    <div slot="header" :class="{fixHead:isFixed}">
+    <div slot="header" :class="{fixHead: isFixed && isFixed2}">
       <span class="zoomLeft">
         订单号：
         <span class="zoomRight">{{ ruleForm.ORDER_NO }}</span>
@@ -27,6 +27,7 @@
         玉兰处理说明：
         <span class="zoomRight">{{ ruleForm.YULAN_NOTES }}</span>
       </span>
+      <i class="el-icon-paperclip fixed-icon" :style="{ background: isFixed2? '#eee': ''}" @click="isFixed2 = !isFixed2"></i>
     </div>
     <div slot="header" v-if="isFixed">
       <div style="height:80px;width:100%;"></div>
@@ -561,6 +562,7 @@ export default {
       //配件编码
       part2: [],
       isFixed: false,
+      isFixed2: true,
     };
   },
   filters: {
@@ -1852,7 +1854,14 @@ export default {
   top: 81px;
   z-index: 100;
   background: white;
-  width: 100%;
+  left: 230px;
+  right: 32px;
+}
+.fixed-icon {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  cursor: pointer;
 }
 </style>
 <style>

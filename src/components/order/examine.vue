@@ -147,7 +147,6 @@ import {
   updateCurtainOrder,
   ljExportProductExcel,
 } from "@/api/orderListASP";
-import { cancelOrder } from "@/api/orderList";
 import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
 import Cookies from "js-cookie";

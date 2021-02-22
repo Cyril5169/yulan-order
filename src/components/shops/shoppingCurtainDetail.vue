@@ -265,16 +265,14 @@
         <el-button type="danger" class="mr20" width="130px" @click="addCurtainToShoppingCar">
           保存至购物车
         </el-button>
-        <router-link to="/shops/curtain">
-          <el-button type="info" class="ml20" width="130px" @click.native="
+        <el-button type="info" class="ml20" width="130px" @click.native="
               closeToTab({
                 oldUrl: 'shops/shoppingCurtainDetail',
                 newUrl: 'shops/curtain'
               })
             ">
-            返回
-          </el-button>
-        </router-link>
+          返回
+        </el-button>
       </div>
     </el-card>
   </div>

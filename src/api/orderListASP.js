@@ -79,6 +79,14 @@ export function cancelOrderNew(data, config = {}) {
         return Promise.reject(err);
     })
 }
+//修改订单状态
+export function updateCurtainOrderStatus(data, config = {}) {
+    return post('/CTM_ORDER/updateCurtainOrderStatus', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
 //优惠券使用记录
 export function getUseRecord(data, config = {}) {
     return post('/SAL_REBATE_CERTIFICATE_RECORD/getUseRecord', data, config).then((res) => {

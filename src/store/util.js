@@ -7,8 +7,6 @@ export function tabsName(index) {
       return "商品详情";
     case "detail/detailRefund":
       return "赔偿确认书详情";
-    case "order/orderDetail":
-      return "订单详情";
     case "order/checkOrder":
       return "订单结算";
     case "order/shipment":

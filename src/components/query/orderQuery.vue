@@ -199,7 +199,7 @@
 <script>
 import checkExamine from "../order/checkExamine";
 import Cookies from "js-cookie";
-import { orderDetail, manageCoupon } from "@/api/orderList";
+import { manageCoupon } from "@/api/orderList";
 import {
   getAreaCode,
   getDistrictByAreaCode,

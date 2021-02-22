@@ -48,3 +48,11 @@ export function AddNewCurtainToCart(data, config = {}) {
       return Promise.reject(err);
   })
 }
+//修改，退回，客户修改，审核通过
+export function newCurtainUpdateCurtainOrder(data, config = {}) {
+  return post('/CTM_ORDER/newCurtainUpdateCurtainOrder', data, config).then((res) => {
+      return Promise.resolve(res);
+  }).catch((err) => {
+      return Promise.reject(err);
+  })
+}

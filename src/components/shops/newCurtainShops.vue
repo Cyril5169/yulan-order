@@ -15,13 +15,13 @@
         </div>
         <!-- 帘款参数 -->
         <div class="curtain-params">
-          <span>成品宽：</span>
+          <span>成品宽<span style="color:red;">*</span>：</span>
           <el-input style="width:60px;" size="mini" v-model="curtainHeadData.width" @input="changeHeadWidth" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
                            .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
-          <span style="margin-left:20px;">成品高：</span>
+          <span style="margin-left:20px;">成品高<span style="color:red;">*</span>：</span>
           <el-input style="width:60px;" size="mini" v-model="curtainHeadData.height" @input="changeHeadHeight" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
@@ -34,9 +34,9 @@
               :label="item.ORDER_TYPE? item.ORDER_TYPE + ' -- ' + item.ORDER_NAME : item.ORDER_NAME" :value="item.P_ID">
             </el-option>
           </el-select>
-          <span style="margin-left:20px;">位置：</span>
-          <el-input style="width:80px;" v-model="curtainHeadData.location" size="mini"></el-input>
-          <span style="margin-left:20px;">套数：</span>
+          <span style="margin-left:20px;">位置<span style="color:red;">*</span>：</span>
+          <el-input style="width:100px;" v-model="curtainHeadData.location" size="mini"></el-input>
+          <span style="margin-left:20px;">套数<span style="color:red;">*</span>：</span>
           <el-input style="width:50px;" v-model="curtainHeadData.setNum" size="mini" oninput="value=value.replace(/[^\d]/g,'')">
           </el-input>
         </div>
@@ -118,14 +118,14 @@
                     </span>
                   </template>
                 </div>
-                <!-- 左右圆角 -->
+                <!-- 左右转角 -->
                 <div class="manufacturing-ct" v-if="scope.row.LEFT_ENABLE > 0 || scope.row.RIGHT_ENABLE > 0">
                   <template v-if="scope.row.LEFT_ENABLE == 1">
                     <span>【左转角】: {{ scope.row.curtain_left_fillet }}m</span>
                   </template>
                   <template v-if="scope.row.LEFT_ENABLE == 2">
                     <span>【左转角】: <el-input v-model="scope.row.curtain_left_fillet" style="width:40px;" size="mini"
-                        @input="changeOneWidthOrHeight($event, scope.$index)" oninput="value=value.replace(/[^\d.]/g,'')
+                        oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
@@ -137,7 +137,7 @@
                   </template>
                   <template v-if="scope.row.RIGHT_ENABLE == 2">
                     <span>【右转角】: <el-input v-model="scope.row.curtain_right_fillet" style="width:40px;" size="mini"
-                        @input="changeOneWidthOrHeight($event, scope.$index)" oninput="value=value.replace(/[^\d.]/g,'')
+                        oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
@@ -229,7 +229,7 @@
                 <span
                   v-if="scope.row.curtain_level == 0 && scope.row.TOTAL_ENABLE == 1">{{scope.row.curtain_area}}{{scope.row.UNIT_NAME}}</span>
                 <span v-else-if="scope.row.TOTAL_ENABLE == 2">
-                  <el-input v-model="scope.row.curtain_area" style="width:40px;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
+                  <el-input v-model="scope.row.curtain_area" style="width:40px;" size="mini" @input="changeLSArea($event, scope.$index)" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
@@ -261,7 +261,7 @@
                 <span v-else>-</span>
               </template>
             </el-table-column>
-            <el-table-column label="说明" width="100" align="center" prop="curtain_remark">
+            <el-table-column label="说明" width="100" header-align="center" prop="curtain_remark">
               <template slot-scope="scope">
                 <span style="color:red;font-size:12px;"> {{ scope.row.curtain_remark }}</span>
               </template>
@@ -799,6 +799,18 @@ export default {
       }
       this.getRemark(index);
     },
+    //直接改变帘身用量
+    changeLSArea(val, index) {
+      var oneCurtain = this.curtainData[index];
+      if (oneCurtain.NC_PART_TYPECODE == "LS") {
+        //改变里衬布的
+        var LCBITEM = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NC_PART_TYPECODE == "LCB");
+        for (var i = 0; i < LCBITEM.length; i++) {
+          //假设有多个里衬布的情况
+          LCBITEM[i].DOSAGE = oneCurtain.DOSAGE;
+        }
+      }
+    },
     //计算折后价格
     calculatePromotionPrice(data) {
       var price = 0;
@@ -822,8 +834,12 @@ export default {
     },
     //一个子件的总价
     oneTotal(row) {
-      var price = this.calculatePromotionPrice(row);
-      return price.mul(row.curtain_area);
+      var price = 0;
+      if(row.curtain_area){
+        price = this.calculatePromotionPrice(row);
+        price = price.mul(row.curtain_area)
+      }
+      return price;
     },
     //处理拉边条
     handleBianCommand(common, row) {
@@ -1180,26 +1196,6 @@ export default {
       })
         .catch(() => { });
     },
-    //合并第一列显示预览
-    cellMerge({ row, column, rowIndex, columnIndex }) {
-      if (columnIndex == 0) {
-        if (rowIndex == 0) {
-          return {
-            rowspan: this.curtainData.length,
-            colspan: 1,
-          };
-        } else {
-          return {
-            rowspan: 0,
-            colspan: 0,
-          };
-        }
-      }
-    },
-    //显示默认图片
-    showDefaultImg(e) {
-      this.previewUrl = this.defaultUrl;
-    },
     //加入购物车前验证
     beforeAddCar() {
       //表头
@@ -1212,6 +1208,13 @@ export default {
       }
       if (!this.curtainHeadData.height || Number(this.curtainHeadData.height == 0)) {
         this.$alert("请填写帘款【成品高】", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
+        return false;
+      }
+      if (!this.curtainHeadData.location) {
+        this.$alert("请填写帘款【位置】", "提示", {
           confirmButtonText: "确定",
           type: "warning",
         });
@@ -1375,26 +1378,52 @@ export default {
       }
       for (var i = 0; i < curtains.length; i++) {
         var oneCurtain = curtains[i];
-        //最小下单量。帘头0.5.帘身，窗纱4
+        //最小下单量。帘头1.帘身，窗纱4
         if (oneCurtain.NC_PART_TYPECODE == 'LT') {
-          if (oneCurtain.curtain_area < 0.5) {
-            if (oneCurtain.curtain_remark.indexOf('小于最小下单量;') == -1) {
-              oneCurtain.curtain_remark += '小于最小下单量;';
+          if (oneCurtain.curtain_area < 1) {
+            if (oneCurtain.curtain_remark.indexOf('不足1平方米。按1平方米下单量收费;') == -1) {
+              oneCurtain.curtain_remark += '不足1平方米。按1平方米下单量收费;';
             }
           } else {
-            oneCurtain.curtain_remark = oneCurtain.curtain_remark.replace('小于最小下单量;', '');
+            oneCurtain.curtain_remark = oneCurtain.curtain_remark.replace('不足1平方米。按1平方米下单量收费;', '');
           }
         }
         if (oneCurtain.NC_PART_TYPECODE == 'LS' || oneCurtain.NC_PART_TYPECODE == 'CS') {
           if (oneCurtain.curtain_area < 4) {
-            if (oneCurtain.curtain_remark.indexOf('小于最小下单量;') == -1) {
-              oneCurtain.curtain_remark += '小于最小下单量;';
+            if (oneCurtain.curtain_remark.indexOf('不足4平方米。按4平方米下单量收费;') == -1) {
+              oneCurtain.curtain_remark += '不足4平方米。按4平方米下单量收费;';
             }
           } else {
-            oneCurtain.curtain_remark = oneCurtain.curtain_remark.replace('小于最小下单量;', '');
+            oneCurtain.curtain_remark = oneCurtain.curtain_remark.replace('不足4平方米。按4平方米下单量收费;', '');
           }
         }
       }
+    },
+    //显示默认图片
+    showDefaultImg(e) {
+      this.previewUrl = this.defaultUrl;
+    },
+    //合并第一列显示预览
+    cellMerge({ row, column, rowIndex, columnIndex }) {
+      if (columnIndex == 0) {
+        if (rowIndex == 0) {
+          return {
+            rowspan: this.curtainData.length,
+            colspan: 1,
+          };
+        } else {
+          return {
+            rowspan: 0,
+            colspan: 0,
+          };
+        }
+      }
+    },
+    tableRowClassName({ row, rowIndex }){
+      if (row.curtain_level == 0) {
+        return 'father-row';
+      }
+      return '';
     }
   },
   mounted() {
@@ -1547,5 +1576,8 @@ export default {
 }
 .index-badge .el-badge__content {
   background: gray;
+}
+.el-table .father-row {
+  background: #CDE6C7;
 }
 </style>

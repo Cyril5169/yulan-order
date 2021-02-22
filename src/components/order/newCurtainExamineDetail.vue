@@ -42,13 +42,10 @@
           <el-input size="mini" v-model="ruleForm.LANJU_NOTE" style="width: 500px;"></el-input>
         </span>
       </span>
-      <i class="el-icon-paperclip fixed-icon" :style="{ background: isFixed2? '#eee': ''}" @click="isFixed2 = !isFixed2"></i>
-    </div>
-    <div slot="header" v-if="isFixed">
-      <div style="height:80px;width:100%;"></div>
+      <i class="el-icon-paperclip fixed-icon" :style="{ background: isFixed2? '#eee': ''}" @click="changeFix"></i>
     </div>
     <!-- 循环订单详情 -->
-    <el-table border :data="ruleForm.ORDERBODY" :row-class-name="tableRowClassName" :expand-row-keys="expands"
+    <el-table border :data="ruleForm.ORDERBODY" :row-class-name="headTableRowClassName" :expand-row-keys="expands"
       :row-key="getRowKeys">
       <el-table-column width="1" type="expand">
         <!-- 窗帘详情 -->
@@ -122,14 +119,13 @@
                       </span>
                     </template>
                   </div>
-                  <!-- 左右圆角 -->
+                  <!-- 左右转角 -->
                   <div class="manufacturing-ct" v-if="scope.row.LEFT_ENABLE > 0 || scope.row.RIGHT_ENABLE > 0">
                     <template v-if="scope.row.LEFT_ENABLE == 1">
                       <span>【左转角】: {{ scope.row.LEFT_FILLET }}m</span>
                     </template>
                     <template v-if="scope.row.LEFT_ENABLE == 2">
-                      <span>【左转角】: <el-input v-model="scope.row.LEFT_FILLET" style="width:40px;" size="mini"
-                          @input="changeOneWidthOrHeight($event, scope.$index, scopeHead.$index)" oninput="value=value.replace(/[^\d.]/g,'')
+                      <span>【左转角】: <el-input v-model="scope.row.LEFT_FILLET" style="width:40px;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
@@ -140,8 +136,7 @@
                       <span>【右转角】: {{ scope.row.RIGHT_FILLET }}m</span>
                     </template>
                     <template v-if="scope.row.RIGHT_ENABLE == 2">
-                      <span>【右转角】: <el-input v-model="scope.row.RIGHT_FILLET" style="width:40px;" size="mini"
-                          @input="changeOneWidthOrHeight($event, scope.$index, scopeHead.$index)" oninput="value=value.replace(/[^\d.]/g,'')
+                      <span>【右转角】: <el-input v-model="scope.row.RIGHT_FILLET" style="width:40px;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
@@ -229,14 +224,17 @@
               </el-table-column>
               <el-table-column label="褶数" width="50" align="center" prop="FU_QTY">
                 <template slot-scope="scope">
-                  <el-input v-model="scope.row.FU_QTY" style="width:40px;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
+                  <el-input v-if="scope.row.curtain_level != 0 && scope.row.NC_PART_TYPECODE != 'LBT'" v-model="scope.row.FU_QTY"
+                    style="width:40px;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
                            .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
+
+                  <span v-else>-</span>
                 </template>
               </el-table-column>
-              <el-table-column label="幅数" width="50" align="center" prop="ZE_QTY">
+              <!-- <el-table-column label="幅数" width="50" align="center" prop="ZE_QTY">
                 <template slot-scope="scope">
                   <el-input v-model="scope.row.ZE_QTY" style="width:40px;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
@@ -244,17 +242,19 @@
                            .replace('$#$', '.')
                            .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
                 </template>
-              </el-table-column>
-              <el-table-column label="用量" width="100" align="center" prop="DOSAGE">
+              </el-table-column> -->
+              <el-table-column label="用量" width="100" header-align="center" prop="DOSAGE">
                 <template slot-scope="scope">
-                  <span>
-                    <el-input v-model="scope.row.DOSAGE" style="width:40px;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
+                  <span v-if="scope.row.NC_PART_TYPECODE != 'LBT'">
+                    <el-input v-model="scope.row.DOSAGE" style="width:40px;" size="mini"
+                      @input="changeLSArea($event, scope.$index, scopeHead.$index)" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
                            .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
                     {{scope.row.UNIT_NAME}}
                   </span>
+                  <span v-else>-</span>
                 </template>
               </el-table-column>
               <el-table-column label="库存" width="60" align="center" prop="curtain_store"></el-table-column>
@@ -265,27 +265,23 @@
                   <span v-else>-</span>
                 </template>
               </el-table-column>
-              <el-table-column label="说明" width="100" align="center" prop="ILLUSTRATE">
+              <el-table-column label="说明" width="100" header-align="center" prop="ILLUSTRATE">
                 <template slot-scope="scope">
                   <span style="color:red;font-size:12px;"> {{ scope.row.ILLUSTRATE }}</span>
                 </template>
               </el-table-column>
               <el-table-column label="客户备注" align="center">
                 <template slot-scope="scope">
-                  <el-input v-model="scope.row.NOTE" size="mini" type="textarea" resize="none" :autosize="{ maxRows: 6 }"
-                    clearable></el-input>
+                  <el-input v-if="scope.row.NC_PART_TYPECODE != 'LBT'" v-model="scope.row.NOTE" size="mini" type="textarea"
+                    resize="none" :autosize="{ maxRows: 6 }" clearable></el-input>
+                  <span v-else>-</span>
                 </template>
               </el-table-column>
               <el-table-column label="兰居意见" header-align="center">
                 <template slot-scope="scope">
-                  <el-input v-model="scope.row.SUGGESTION" size="mini" type="textarea" resize="none" :autosize="{ maxRows: 6 }"
-                    clearable></el-input>
-                </template>
-              </el-table-column>
-              <el-table-column label="生产备注" header-align="center">
-                <template slot-scope="scope">
-                  <el-input v-model="scope.row.PRODUCT_NOTE" size="mini" type="textarea" resize="none" :autosize="{ maxRows: 6 }"
-                    clearable></el-input>
+                  <el-input v-if="scope.row.NC_PART_TYPECODE != 'LBT'" v-model="scope.row.SUGGESTION" size="mini" type="textarea"
+                    resize="none" :autosize="{ maxRows: 6 }" clearable></el-input>
+                  <span v-else>-</span>
                 </template>
               </el-table-column>
             </el-table>
@@ -461,8 +457,10 @@ import {
   getCustomerInfo,
 } from "@/api/orderListASP";
 import {
-  GetPartTypeDataTabale, GetExchangeModel,
+  GetPartTypeDataTabale,
+  GetExchangeModel,
   GetExchangeModelItem,
+  newCurtainUpdateCurtainOrder,
 } from "@/api/newCurtainASP";
 
 export default {
@@ -484,7 +482,8 @@ export default {
         ORDERBODY: [],
       },
       isFixed: false,
-      isFixed2: true,
+      isFixed2: !window.localStorage.getItem("curtainFixed") ||
+        window.localStorage.getItem("curtainFixed") == "true",
       curtainPartTypeData: [],
       drawerShow: false,
       drawerShow2: false,
@@ -781,6 +780,8 @@ export default {
     dealInsertData(data) {
       var returnData = {
         ...data,
+        ORDER_NO: this.orderNumber,
+        ORDER_ITEM_ID: this.ruleForm.ORDERBODY[this.currentIndex].curtains[0].ORDER_ITEM_ID,
         PRICE: data.curtain_price,
         ITEM_ID: data.ITEM_NO,
         WIDTH: data.curtain_width,
@@ -873,6 +874,18 @@ export default {
         }
       }
     },
+    //直接改变帘身用量
+    changeLSArea(val, index1, index) {
+      var oneCurtain = this.ruleForm.ORDERBODY[index].curtains[index1];
+      if (oneCurtain.NC_PART_TYPECODE == "LS") {
+        //改变里衬布的
+        var LCBITEM = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NC_PART_TYPECODE == "LCB");
+        for (var i = 0; i < LCBITEM.length; i++) {
+          //假设有多个里衬布的情况
+          LCBITEM[i].DOSAGE = oneCurtain.DOSAGE;
+        }
+      }
+    },
     //处理拉边条
     handleBianCommand(common, row, index) {
       this.currentIndex = index;
@@ -921,7 +934,7 @@ export default {
       if (!row.ITEM_NO) return;
       this.currentIndex = index;
       var childrenCurtain = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NCM_PID == row.NC_MODEL_ID);
-      var fatherCurtain = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NC_MODEL_ID == row.NCM_PID && item.NC_MODEL_ID !=0);
+      var fatherCurtain = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NC_MODEL_ID == row.NCM_PID && item.NC_MODEL_ID != 0);
       if (childrenCurtain.length) {
         //自身作为父节点，勾选或者取消，子节点应该同步
         for (var i = 0; i < childrenCurtain.length; i++) {
@@ -1240,10 +1253,17 @@ export default {
         for (var j = 0; j < detail.curtains.length; j++) {
           var oneCurtain = detail.curtains[j];
           if (oneCurtain.curtain_choose) {
+            oneCurtain.ITEM_ID = oneCurtain.ITEM_NO;
             this.newCurtainData.push(JSON.parse(JSON.stringify(oneCurtain)))
-          } else {
-            this.deleteIds.push(oneCurtain.ID);
           }
+        }
+      }
+      //被整个替换而删除的配件需要另外判断
+      for (var i = 0; i < this.oldCurtainData.length; i++) {
+        var oldOneCurtain = this.oldCurtainData[i];
+        var hasThis = this.newCurtainData.filter(item => item.ID == oldOneCurtain.ID);
+        if (!hasThis.length) {
+          if (oldOneCurtain.ID) this.deleteIds.push(oldOneCurtain);
         }
       }
     },
@@ -1253,7 +1273,7 @@ export default {
         var oneCurtain = this.newCurtainData[i];
         //编码
         if (!oneCurtain.ITEM_NO) {
-          this.$alert(`${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}没有对应的编码，请检查！`, "提示", {
+          this.$alert(`第${oneCurtain.LINE_NO}幅窗帘${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}没有对应的编码，请检查！`, "提示", {
             confirmButtonText: "确定",
             type: "warning",
           });
@@ -1261,14 +1281,14 @@ export default {
         }
         //宽高
         if (oneCurtain.WIDTH_ENABLE == 2 && (!oneCurtain.WIDTH || Number(oneCurtain.WIDTH == 0))) {
-          this.$alert(`请填写${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【宽】`, "提示", {
+          this.$alert(`请填写第${oneCurtain.LINE_NO}幅窗帘${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【宽】`, "提示", {
             confirmButtonText: "确定",
             type: "warning",
           });
           return false;
         }
         if (oneCurtain.HEIGHT_ENABLE == 2 && (!oneCurtain.HEIGHT || Number(oneCurtain.HEIGHT == 0))) {
-          this.$alert(`请填写${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【高】`, "提示", {
+          this.$alert(`请填写第${oneCurtain.LINE_NO}幅窗帘${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【高】`, "提示", {
             confirmButtonText: "确定",
             type: "warning",
           });
@@ -1276,14 +1296,14 @@ export default {
         }
         //左右圆角
         if (oneCurtain.LEFT_ENABLE == 2 && (!oneCurtain.LEFT_FILLET || Number(oneCurtain.LEFT_FILLET == 0))) {
-          this.$alert(`请填写${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【左圆角】`, "提示", {
+          this.$alert(`请填写第${oneCurtain.LINE_NO}幅窗帘${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【左圆角】`, "提示", {
             confirmButtonText: "确定",
             type: "warning",
           });
           return false;
         }
         if (oneCurtain.RIGHT_ENABLE == 2 && (!oneCurtain.RIGHT_FILLET || Number(oneCurtain.RIGHT_FILLET == 0))) {
-          this.$alert(`请填写${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【右圆角】`, "提示", {
+          this.$alert(`请填写第${oneCurtain.LINE_NO}幅窗帘${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【右圆角】`, "提示", {
             confirmButtonText: "确定",
             type: "warning",
           });
@@ -1291,7 +1311,7 @@ export default {
         }
         //么术贴
         if (oneCurtain.TIE_ENABLE == 2 && !oneCurtain.MESUTIE) {
-          this.$alert(`请选择${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【么术贴】`, "提示", {
+          this.$alert(`请选择第${oneCurtain.LINE_NO}幅窗帘${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【么术贴】`, "提示", {
             confirmButtonText: "确定",
             type: "warning",
           });
@@ -1299,7 +1319,7 @@ export default {
         }
         //打开方式
         if (oneCurtain.KAIKOU_ENABLE == 2 && !oneCurtain.KAIKOU) {
-          this.$alert(`请选择${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【打开方式】`, "提示", {
+          this.$alert(`请选择第${oneCurtain.LINE_NO}幅窗帘${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【打开方式】`, "提示", {
             confirmButtonText: "确定",
             type: "warning",
           });
@@ -1307,7 +1327,7 @@ export default {
         }
         //工艺方式
         if (oneCurtain.OPERATION_ENABLE == 2 && !oneCurtain.OPERATION) {
-          this.$alert(`请选择${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【工艺方式】`, "提示", {
+          this.$alert(`请选择第${oneCurtain.LINE_NO}幅窗帘${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【工艺方式】`, "提示", {
             confirmButtonText: "确定",
             type: "warning",
           });
@@ -1315,7 +1335,7 @@ export default {
         }
         //包边方式
         if (oneCurtain.BIAN_ENABLE == 2 && !oneCurtain.BIAN) {
-          this.$alert(`请选择${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【包边方式】`, "提示", {
+          this.$alert(`请选择第${oneCurtain.LINE_NO}幅窗帘${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【包边方式】`, "提示", {
             confirmButtonText: "确定",
             type: "warning",
           });
@@ -1365,25 +1385,51 @@ export default {
         type: "warning",
       })
         .then(() => {
-
+          newCurtainUpdateCurtainOrder({
+            cid: Cookies.get("cid"),
+            curtainStatusId: "2",
+            orderHead: this.ruleForm,
+            orderDetails: this.ruleForm.ORDERBODY,
+            allCurtains: this.newCurtainData,
+            deleteIds: this.deleteIds
+          }).then(res => {
+            this.$alert("操作成功,已将该订单退回给客户进行确认", "提示", {
+              confirmButtonText: "确定",
+              type: "success",
+            });
+            this.closeToTab({
+              oldUrl: "order/newCurtainExamineDetailNew",
+              newUrl: "order/examine",
+            });
+          })
         })
-        .catch(() => { });
+        .catch(() => {
+          this.$alert("操作失败:" + res.msg, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          console.log(res);
+        });
     },
     //隔行变色
-    tableRowClassName({ row, rowIndex }) {
+    headTableRowClassName({ row, rowIndex }) {
       return "success-row";
     },
     handleScroll() {
       this.$nextTick(() => {
         let main = document.getElementById("mainBackTop");
         let scrollTop = main.scrollTop;
-        if (scrollTop > 110) {
+        if (scrollTop > 180) {
           this.isFixed = true;
         } else {
           this.isFixed = false;
         }
       });
     },
+    changeFix() {
+      this.isFixed2 = !this.isFixed2;
+      window.localStorage.setItem("curtainFixed", this.isFixed2);
+    }
   },
   mounted() {
     this.orderNumber = Cookies.get("NEW_ORDER_NO");

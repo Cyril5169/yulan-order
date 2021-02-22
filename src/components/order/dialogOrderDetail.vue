@@ -28,7 +28,7 @@
       <el-table :data="ruleForm.ORDERBODY" style="width: 100%" :row-class-name="tableRowClassName">
         <el-table-column align="center" prop="ITEM_NO" label="型号"></el-table-column>
         <el-table-column prop="ITEM_NO_SAMPLE" align="center" label="样本型号"></el-table-column>
-        <el-table-column align="center" prop="NOTE" label="类型"></el-table-column>
+        <el-table-column align="center" prop="TYPE_NAME" label="类型"></el-table-column>
         <el-table-column align="center" prop="QTY_REQUIRED" label="数量"></el-table-column>
         <el-table-column prop="PROMOTION" align="center" label="活动类型"></el-table-column>
         <el-table-column label="应付金额" align="center">

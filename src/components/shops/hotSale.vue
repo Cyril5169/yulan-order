@@ -15,7 +15,7 @@
                               'hot-index3':
                                 index == 0 && (indexx == 3 || indexx == 4)
                             }">{{ index * 5 + indexx + 1 }}</span>
-              <a>{{ item[indexx].ITEM_NO }}</a>
+              <a style="cursor:default;">{{ item[indexx].ITEM_NO }}</a>
               <img src="../../assets/img/img/search-hot.gif" v-if="index == 0 && item[indexx].ITEM_NO != ''" />
             </td>
           </tr>
@@ -59,7 +59,7 @@
                               'hot-index2': index == 1,
                               'hot-index3': index == 2
                             }">{{ index * 5 + indexx + 1 }}</span>
-              <a>{{ item[indexx].ITEM_NO }}</a>
+              <a style="cursor:default;">{{ item[indexx].ITEM_NO }}</a>
               <img src="../../assets/img/img/search-hot.gif" v-if="
                               (index == 0 || index == 1) &&
                                 item[indexx].ITEM_NO != ''

@@ -27,10 +27,7 @@
         玉兰处理说明：
         <span class="zoomRight">{{ ruleForm.YULAN_NOTES }}</span>
       </span>
-      <i class="el-icon-paperclip fixed-icon" :style="{ background: isFixed2? '#eee': ''}" @click="isFixed2 = !isFixed2"></i>
-    </div>
-    <div slot="header" v-if="isFixed">
-      <div style="height:80px;width:100%;"></div>
+      <i class="el-icon-paperclip fixed-icon" :style="{ background: isFixed2? '#eee': ''}" @click="changeFix"></i>
     </div>
     <!-- 循环订单详情 -->
     <el-table border :data="ruleForm.ORDERBODY" :row-class-name="tableRowClassName" :expand-row-keys="expands"
@@ -463,12 +460,6 @@
 </template>
 
 <script>
-import Axios from "axios";
-import {
-  passExamine,
-  orderDetail,
-  defeatChange,
-} from "@/api/orderList";
 import {
   getCurtainDetailMsg,
   getGY,
@@ -562,7 +553,8 @@ export default {
       //配件编码
       part2: [],
       isFixed: false,
-      isFixed2: true,
+      isFixed2: !window.localStorage.getItem("curtainFixed") ||
+        window.localStorage.getItem("curtainFixed") == "true",
     };
   },
   filters: {
@@ -638,13 +630,6 @@ export default {
       });
     },
     getDetail() {
-      // let url = "/order/getOrderContent.do";
-      // let data = {
-      //   cid: Cookies.get("cid"),
-      //   order_no: Cookies.get("ORDER_NO"),
-      // };
-      //orderDetail(url, data).then((res) => {
-      //  this.ruleForm = res.data.data[0];
       getOrderDetails({ orderNo: Cookies.get("ORDER_NO") }).then((res) => {
         this.ruleForm = res.data[0];
         this.getCustomer();
@@ -1571,57 +1556,36 @@ export default {
         ctmOrderDetails: this.ctmOrderDetails,
         deleteIds: this.deleteIds,
       };
+      var msg = "确认修改吗？";
       if (this.contrastData()) {
-        this.$confirm("所有窗帘未修改，依然修改吗？", "提示", {
-          confirmButtonText: "确定",
-          type: "warning",
-        })
-          .then(() => {
-            this.LanjuChangeANYS(data);
-          })
-          .catch(() => {
-            return;
-          });
-      } else {
-        this.$confirm("确认修改吗？", "提示", {
-          confirmButtonText: "确定",
-          type: "warning",
-        })
-          .then(() => {
-            this.LanjuChangeANYS(data);
-          })
-          .catch(() => {
-            return;
-          });
+        msg = "所有窗帘未修改，依然修改吗？";
       }
-    },
-    LanjuChangeANYS(data) {
-      //defeatChange(url, data).then(res => {
-      updateCurtainOrder(data)
-        .then((res) => {
-          if (res.code == 0) {
-            this.$alert("操作成功,已将该订单退回给客户进行确认", "提示", {
-              confirmButtonText: "确定",
-              type: "success",
+      this.$confirm(msg, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          updateCurtainOrder(data)
+            .then((res) => {
+              this.$alert("操作成功,已将该订单退回给客户进行确认", "提示", {
+                confirmButtonText: "确定",
+                type: "success",
+              });
+              this.closeToTab({
+                oldUrl: "order/examineDetailNew",
+                newUrl: "order/examine",
+              });
+            })
+            .catch((res) => {
+              this.$alert("操作失败:" + res.msg, "提示", {
+                confirmButtonText: "确定",
+                type: "warning",
+              });
+              console.log(res);
             });
-            this.closeToTab({
-              oldUrl: "order/examineDetailNew",
-              newUrl: "order/examine",
-            });
-          } else {
-            this.$alert("操作失败，请稍后重试", "提示", {
-              confirmButtonText: "确定",
-              type: "warning",
-            });
-          }
         })
-        .catch((res) => {
-          this.$alert("操作失败:" + res.msg, "提示", {
-            confirmButtonText: "确定",
-            type: "warning",
-          });
-          console.log(res);
-        });
+        .catch(() => { });
     },
     //退回客户修改
     _back() {
@@ -1647,56 +1611,36 @@ export default {
         }
         data.allCurtains.push(array);
       }
+      var msg = "确认退回吗？";
       if (!this.contrastData()) {
-        this.$confirm("有窗帘已经修改了，依然确认退回吗？", "提示", {
-          confirmButtonText: "确定",
-          type: "warning",
-        })
-          .then(() => {
-            this._backANSCYC(data);
-          })
-          .catch(() => {
-            return;
-          });
-      } else {
-        this.$confirm("确认退回吗？", "提示", {
-          confirmButtonText: "确定",
-          type: "warning",
-        })
-          .then(() => {
-            this._backANSCYC(data);
-          })
-          .catch(() => {
-            return;
-          });
+        msg = "有窗帘已经修改了，依然确认退回吗？";
       }
-    },
-    _backANSCYC(data) {
-      //defeatChange(url, data).then(res => {
-      updateCurtainOrder(data)
-        .then((res) => {
-          if (res.code == 0) {
-            this.$alert("操作成功,已将该订单退回给客户进行确认", "提示", {
-              confirmButtonText: "确定",
-              type: "success",
+      this.$confirm(msg, "提示", {
+        confirmButtonText: "确定",
+        type: "warning",
+      })
+        .then(() => {
+          updateCurtainOrder(data)
+            .then((res) => {
+              this.$alert("操作成功,已将该订单退回给客户进行确认", "提示", {
+                confirmButtonText: "确定",
+                type: "success",
+              });
+              this.closeToTab({
+                oldUrl: "order/examineDetailNew",
+                newUrl: "order/examine",
+              });
+            })
+            .catch((res) => {
+              this.$alert("操作失败:" + res.msg, "提示", {
+                confirmButtonText: "确定",
+                type: "warning",
+              });
+              console.log(res);
             });
-            this.closeToTab({
-              oldUrl: "order/examineDetailNew",
-              newUrl: "order/examine",
-            });
-          } else {
-            this.$alert("操作失败，请稍后重试", "提示", {
-              confirmButtonText: "确定",
-              type: "warning",
-            });
-          }
         })
-        .catch((res) => {
-          this.$alert("操作失败:" + res.msg, "提示", {
-            confirmButtonText: "确定",
-            type: "warning",
-          });
-          console.log(res);
+        .catch(() => {
+          return;
         });
     },
     //审核通过
@@ -1724,57 +1668,36 @@ export default {
         }
         data.allCurtains.push(array);
       }
+      var msg = "确认通过吗？";
       if (!this.contrastData()) {
-        this.$confirm("有窗帘已经修改了，依然确认通过吗？", "提示", {
-          confirmButtonText: "确定",
-          type: "warning",
-        })
-          .then(() => {
-            this._passANSYC(data);
-          })
-          .catch(() => {
-            return;
-          });
-      } else {
-        this.$confirm("确认通过吗？", "提示", {
-          confirmButtonText: "确定",
-          type: "warning",
-        })
-          .then(() => {
-            this._passANSYC(data);
-          })
-          .catch(() => {
-            return;
-          });
+        msg = "有窗帘已经修改了，依然确认通过吗？";
       }
-    },
-    _passANSYC(data) {
-      //passExamine(url, data).then(res => {
-      updateCurtainOrder(data)
-        .then((res) => {
-          if (res.code == 0) {
-            this.$alert("操作成功,该订单已通过审核", "提示", {
-              confirmButtonText: "确定",
-              type: "success",
+      this.$confirm(msg, "提示", {
+        confirmButtonText: "确定",
+        type: "warning",
+      })
+        .then(() => {
+          updateCurtainOrder(data)
+            .then((res) => {
+              this.$alert("操作成功,该订单已通过审核", "提示", {
+                confirmButtonText: "确定",
+                type: "success",
+              });
+              this.closeToTab({
+                oldUrl: "order/examineDetailNew",
+                newUrl: "order/examine",
+              });
+            })
+            .catch((res) => {
+              this.$alert("操作失败:" + res.msg, "提示", {
+                confirmButtonText: "确定",
+                type: "warning",
+              });
+              console.log(res);
             });
-            this.closeToTab({
-              oldUrl: "order/examineDetailNew",
-              newUrl: "order/examine",
-            });
-            //跳转
-          } else {
-            this.$alert("操作失败，请稍后重试", "提示", {
-              confirmButtonText: "确定",
-              type: "warning",
-            });
-          }
         })
-        .catch((res) => {
-          this.$alert("操作失败:" + res.msg, "提示", {
-            confirmButtonText: "确定",
-            type: "warning",
-          });
-          console.log(res);
+        .catch(() => {
+          return;
         });
     },
     //隔行变色
@@ -1785,13 +1708,17 @@ export default {
       this.$nextTick(() => {
         let main = document.getElementById("mainBackTop");
         let scrollTop = main.scrollTop;
-        if (scrollTop > 110) {
+        if (scrollTop > 130) {
           this.isFixed = true;
         } else {
           this.isFixed = false;
         }
       });
     },
+    changeFix() {
+      this.isFixed2 = !this.isFixed2;
+      window.localStorage.setItem("curtainFixed", this.isFixed2);
+    }
   },
   created() {
     this.orderNumber = Cookies.get("ORDER_NO");

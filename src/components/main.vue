@@ -24,12 +24,10 @@
                 asideStatus? "菜单展开" : "菜单收起"
               }}</span>
             </li>
-            <router-link to="/notification/notificationMain" tag="li">
               <li title="公告" @click="addTab('notification/notificationMain')">
                 <i class="el-icon-bell headIcon2"></i>
                 <span class="ml10 mr10 headSpan2">公告</span>
               </li>
-            </router-link>
           </ul>
           <ul class="r">
             <li>
@@ -47,9 +45,7 @@
                       ">网络协议签订</a>
                     <el-badge v-if="wangqian > 0" style="margin-top:5px;" :value="wangqian"></el-badge>
                   </el-dropdown-item>
-                  <router-link v-if="isContainAttr('myZone/myCoupon')" to="/myZone/myCoupon" tag="li">
-                    <el-dropdown-item @click.native="addTab('myZone/myCoupon')">我的优惠券</el-dropdown-item>
-                  </router-link>
+                  <el-dropdown-item @click.native="addTab('myZone/myCoupon')">我的优惠券</el-dropdown-item>
                   <el-dropdown-item @click.native="changePasswordVisible = true">修改密码</el-dropdown-item>
                   <el-dropdown-item divided @click.native="logout">退出登录</el-dropdown-item>
                 </el-dropdown-menu>

@@ -1,193 +1,114 @@
 <template>
-  <div>
-    <el-card shadow="hover">
-      <div slot="header">
-        <span class="fstrong f16">修改商品信息：</span>
-        <!-- <el-steps
-          style="margin-top: -10px;"
-          align-center
-          class="r scale"
-          :space="150"
-          :active="1"
-          process-status="wait"
-          finish-status="success"
-        >
-          <el-step title="填写商品信息"></el-step>
-          <el-step class="ml10 mr10" title="核对订单信息"></el-step>
-          <el-step class="ml10" title="成功提交订单"></el-step>
-        </el-steps> -->
-      </div>
-      <router-link to="/shoppingCar/shopping?wallPaper" tag="div">
-        <el-button
-          type="info"
-          plain
-          size="mini"
-          class="r mr40"
-          @click.native="
+  <el-card shadow="hover">
+    <div slot="header">
+      <span class="fstrong f16">修改商品信息：</span>
+    </div>
+    <el-button type="info" plain size="mini" class="r mr40" @click.native="
             closeToTab({
               oldUrl: 'detail/detailWallPaper',
               newUrl: 'shoppingCar/shopping?wallPaper'
             })
-          "
-          >返回</el-button
-        >
-      </router-link>
-      <div class="dib" style="border-bottom: 1px solid #ebeef5;">
-        <!-- <p class="fstrong f16" style="margin:0;">商品信息：</p> -->
-        <table id="messageRight">
-          <tr>
-            <td>型号：</td>
-            <td>{{ data.item.itemNo }}</td>
-          </tr>
-          <tr></tr>
-          <tr>
-            <td>样本型号：</td>
-            <td>{{ data.item.oldItemNo }}</td>
-          </tr>
-          <tr>
-            <td>版本：</td>
-            <td>{{ data.item.productversionName }}</td>
-          </tr>
-          <tr>
-            <td>类别：</td>
-            <td>{{ data.item.typeName }}</td>
-          </tr>
-          <tr>
-            <td>单位：</td>
-            <td>{{ data.unit }}</td>
-          </tr>
-          <tr>
-            <td>单价：</td>
-            <td>
-              <span v-if="customerType === '10'">
-                <currency-input
-                  v-model="data.price"
-                  :placeholder="'请输入单价'"
-                  :customStyle="'width: 150px;'"
-                  :customClass="customClass"
-                ></currency-input>
-              </span>
-              <span v-else-if="isManager === '0'">***</span>
-              <span v-else>{{ data.price }}</span>
-            </td>
-          </tr>
-          <tr v-if="customerType === '10'">
-            <td>网上销售金额：</td>
-            <td>
-              <span>
-                <currency-input
-                  v-model="data.onlineSalesAmount"
-                  :placeholder="'请输入网销金额'"
-                  :customStyle="'width: 150px;'"
-                  :customClass="customClass"
-                ></currency-input>
-              </span>
-            </td>
-          </tr>
-          <tr v-if="data.item.minimumPurchase">
-            <td>起购数量：</td>
-            <td>{{ data.item.minimumPurchase }}</td>
-          </tr>
-          <tr>
-            <td>
-              数量
-              <span v-if="data.unit === '平方米'">(宽*高)</span>：
-            </td>
-            <td>
-              <div v-if="data.unit === '平方米'">
-                <currency-input
-                  :decimalNum="decimalNum"
-                  v-model="data.width"
-                  :placeholder="'请输入宽度'"
-                  :customStyle="'width: 100px;'"
-                  :customClass="customClass"
-                ></currency-input
-                >×
-                <currency-input
-                  :decimalNum="decimalNum"
-                  v-model="data.height"
-                  :placeholder="'请输入高度'"
-                  :customStyle="'width: 100px;'"
-                  :customClass="customClass"
-                ></currency-input>
-              </div>
-              <div v-else>
-                <currency-input
-                  :decimalNum="decimalNum"
-                  v-model="data.quantity"
-                  :placeholder="'请输入数量'"
-                  :customStyle="'width: 150px;'"
-                  :customClass="customClass"
-                ></currency-input>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>活动：</td>
-            <td>
-              <el-select
-                style="width:300px;"
-                :disabled="disableFlag"
-                v-model="data.activityId"
-                :placeholder="
+          ">返回</el-button>
+    <div class="dib" style="border-bottom: 1px solid #ebeef5;">
+      <table id="messageRight">
+        <tr>
+          <td>型号：</td>
+          <td>{{ data.item.itemNo }}</td>
+        </tr>
+        <tr></tr>
+        <tr>
+          <td>样本型号：</td>
+          <td>{{ data.item.oldItemNo }}</td>
+        </tr>
+        <tr>
+          <td>版本：</td>
+          <td>{{ data.item.productversionName }}</td>
+        </tr>
+        <tr>
+          <td>类别：</td>
+          <td>{{ data.item.typeName }}</td>
+        </tr>
+        <tr>
+          <td>单位：</td>
+          <td>{{ data.unit }}</td>
+        </tr>
+        <tr>
+          <td>单价：</td>
+          <td>
+            <span v-if="customerType === '10'">
+              <currency-input v-model="data.price" :placeholder="'请输入单价'" :customStyle="'width: 150px;'"
+                :customClass="customClass"></currency-input>
+            </span>
+            <span v-else-if="isManager === '0'">***</span>
+            <span v-else>{{ data.price }}</span>
+          </td>
+        </tr>
+        <tr v-if="customerType === '10'">
+          <td>网上销售金额：</td>
+          <td>
+            <span>
+              <currency-input v-model="data.onlineSalesAmount" :placeholder="'请输入网销金额'" :customStyle="'width: 150px;'"
+                :customClass="customClass"></currency-input>
+            </span>
+          </td>
+        </tr>
+        <tr v-if="data.item.minimumPurchase">
+          <td>起购数量：</td>
+          <td>{{ data.item.minimumPurchase }}</td>
+        </tr>
+        <tr>
+          <td>
+            数量
+            <span v-if="data.unit === '平方米'">(宽*高)</span>：
+          </td>
+          <td>
+            <div v-if="data.unit === '平方米'">
+              <currency-input :decimalNum="decimalNum" v-model="data.width" :placeholder="'请输入宽度'" :customStyle="'width: 100px;'"
+                :customClass="customClass"></currency-input>×
+              <currency-input :decimalNum="decimalNum" v-model="data.height" :placeholder="'请输入高度'" :customStyle="'width: 100px;'"
+                :customClass="customClass"></currency-input>
+            </div>
+            <div v-else>
+              <currency-input :decimalNum="decimalNum" v-model="data.quantity" :placeholder="'请输入数量'"
+                :customStyle="'width: 150px;'" :customClass="customClass"></currency-input>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>活动：</td>
+          <td>
+            <el-select style="width:300px;" :disabled="disableFlag" v-model="data.activityId" :placeholder="
                   disableFlag === false ? '请选择一个活动' : '此产品不参与活动'
-                "
-              >
-                <el-option
-                  v-for="item in activity"
-                  :label="item.label"
-                  :key="item.value"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-              <span
-                class="pl10 t-red"
-                v-if="
+                ">
+              <el-option v-for="item in activity" :label="item.label" :key="item.value" :value="item.value"></el-option>
+            </el-select>
+            <span class="pl10 t-red" v-if="
                   data.activityId === data.activityName &&
                     data.activityEffective != null &&
                     !data.activityEffective
-                "
-                >此活动已经过期，请重新选择</span
-              >
-            </td>
-          </tr>
-          <tr>
-            <td>备注：</td>
-            <td>
-              <div class="rel dib" style="width:300px;position:relative;">
-                <el-input
-                  resize="none"
-                  type="textarea"
-                  maxlength="50"
-                  placeholder="请输入您的备注信息（50字内）"
-                  :autosize="{ minRows: 3, maxRows: 6 }"
-                  v-model="data.note"
-                ></el-input>
-                <i
-                  class="el-icon-edit"
-                  style="position:absolute;
-                                        right:10px;bottom:5px;"
-                ></i>
-              </div>
-              <span style="margin-left:10px;"
-                >{{ data.note ? data.note.length : 0 }}/50</span
-              >
-            </td>
-          </tr>
-        </table>
+                ">此活动已经过期，请重新选择</span>
+          </td>
+        </tr>
+        <tr>
+          <td>备注：</td>
+          <td>
+            <div class="rel dib" style="width:300px;position:relative;">
+              <el-input resize="none" type="textarea" maxlength="50" placeholder="请输入您的备注信息（50字内）"
+                :autosize="{ minRows: 3, maxRows: 6 }" v-model="data.note"></el-input>
+              <i class="el-icon-edit" style="position:absolute;
+                                        right:10px;bottom:5px;"></i>
+            </div>
+            <span style="margin-left:10px;">{{ data.note ? data.note.length : 0 }}/50</span>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="mt20">
+      <div style="text-align: left; margin-left: 125px;" class="mt20">
+        <el-button type="danger" class="ml20" @click.native="update">保存至购物车</el-button>
       </div>
-      <div class="mt20">
-        <div style="text-align: left; margin-left: 125px;" class="mt20">
-          <!-- <el-button type="success" class="mr20">一键购</el-button> -->
-          <!-- <router-link to="/shoppingCar/shopping?wallPaper"> -->
-          <el-button type="danger" class="ml20" @click.native="update"
-            >保存至购物车</el-button
-          >
-          <!-- </router-link> -->
-        </div>
-      </div>
-    </el-card>
-  </div>
+    </div>
+  </el-card>
 </template>
 
 <script>
@@ -449,8 +370,8 @@ export default {
       ) {
         this.$alert(
           "本产品最小起购数量为" +
-            this.data.item.minimumPurchase +
-            this.data.unit,
+          this.data.item.minimumPurchase +
+          this.data.unit,
           "提示",
           {
             type: "warning",

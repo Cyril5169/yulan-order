@@ -50,7 +50,7 @@
         <el-table-column :render-header="renderFirstHead">
           <el-table-column label="订单号" align="center">
             <template slot-scope="scope1">
-              <el-button @click="openDialog(scope1.row.ORDER_NO, scope1.row.STATUS_ID)" type="text" size="medium">
+              <el-button @click="openDialog(scope1.row.ORDER_NO)" type="text" size="medium">
                 {{ scope1.row.ORDER_NO }}</el-button>
             </template>
           </el-table-column>
@@ -94,8 +94,8 @@
 import Axios from "axios";
 import Cookies from "js-cookie";
 import dialogOrderDetail from "../components/order/dialogOrderDetail";
-import { searchAssignments, orderDetail } from "@/api/orderList";
-import { GetTaskProgress, GetYearTaskProgress } from "@/api/orderListASP";
+import { searchAssignments } from "@/api/orderList";
+import { GetTaskProgress, GetYearTaskProgress, getOrderDetails } from "@/api/orderListASP";
 import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
 export default {
@@ -147,8 +147,7 @@ export default {
     dialogOrderDetail,
   },
   methods: {
-    openDialog(val, status) {
-      this.cid = Cookies.get("cid");
+    openDialog(val) {
       this.order_no = val;
       this.getDetail();
     },
@@ -196,11 +195,11 @@ export default {
     getDetail() {
       let url = "/order/getOrderContent.do";
       let data = {
-        cid: this.cid,
+        cid: Cookies.get("cid"),
         order_no: this.order_no,
       };
-      orderDetail(url, data).then((res) => {
-        this.ruleForm = res.data.data[0];
+      getOrderDetails({ orderNo: this.order_no }).then((res) => {
+        this.ruleForm = res.data[0];
         this.dialogVisible = true;
       });
     },
@@ -221,8 +220,8 @@ export default {
           confirmButtonText: "确定",
           type: "warning",
         });
+        return;
       }
-      let url = "/assignments/getAssignments.do";
       let data = {
         year: year,
         endYear: endYear,

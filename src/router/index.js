@@ -24,7 +24,6 @@ import DetailWallPaper from '@/components/detail/detailWallPaper'
 import DetailCurtain from '@/components/detail/detailCurtain'
 import DetailSoftSuit from '@/components/detail/detailSoftSuit'
 import ShoppingCurtainDetail from '@/components/shops/shoppingCurtainDetail'
-import orderDetail from '@/components/order/orderDetail'
 import checkOrder from '@/components/order/checkOrder'
 import shipment from '@/components/order/shipment'
 import examine from '@/components/order/examine'
@@ -221,14 +220,6 @@ const router = new Router({
           path: '/design/lanJu',
           name: 'lanJu',
           component: LanJu
-        },
-        {
-          path: '/order/orderDetail',
-          name: 'orderDetail',
-          component: orderDetail,
-          meta: {
-            returnMain: true//该页面刷新回到主界面
-          }
         },
         {
           path: '/order/examine',

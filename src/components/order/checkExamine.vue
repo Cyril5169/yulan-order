@@ -2,9 +2,9 @@
   <el-card class="centerCard">
     <el-dialog title="窗帘详情" :visible.sync="detailVisible" width="95%" top="5vh">
       <keep-alive>
-        <detailCurtainTable v-if="detailVisible" :tableStatus="check_CURTAIN_STATUS_ID != 1 ? 3 : 2"
-          :headerData="headerData" :curtainData="curtainData" :suggestion="ljsuggestion" @visible="closeTheDialog"
-          @deleteArr="getDeleteArr" @finalData="getFinalData">
+        <detailCurtainTable v-if="detailVisible" :tableStatus="check_CURTAIN_STATUS_ID != 1 ? 3 : 2" :headerData="headerData"
+          :curtainData="curtainData" :suggestion="ljsuggestion" @visible="closeTheDialog" @deleteArr="getDeleteArr"
+          @finalData="getFinalData">
         </detailCurtainTable>
       </keep-alive>
     </el-dialog>
@@ -17,8 +17,7 @@
 
     <div slot="header">
       <span class="headSpan">订单详情</span>
-      <el-button @click="exportProductExcel" v-if="check_CURTAIN_STATUS_ID == -1 && showExportProduct" size="mini"
-        plain>
+      <el-button @click="exportProductExcel" v-if="check_CURTAIN_STATUS_ID == -1 && showExportProduct" size="mini" plain>
         导出生产模板
       </el-button>
       <el-button @click="backTowhere()" style="float:right;" size="small" type="success" plain v-if="button_1">返回
@@ -46,7 +45,8 @@
         <br />
         <span class="zoomLeft">
           购买人：
-          <span class="zoomRight">{{ ruleForm.BUYUSER }}({{ ruleForm.BUYUSERPHONE }})</span>
+          <span class="zoomRight">{{ ruleForm.BUYUSER }}<span
+              v-if="ruleForm.BUYUSERPHONE">({{ ruleForm.BUYUSERPHONE }})</span></span>
         </span>
         <span class="zoomLeft">
           购买人地址：
@@ -69,8 +69,8 @@
           <span class="zoomRight">{{ ruleForm.YULAN_NOTES }}</span>
         </span>
       </div>
-      <el-table border :show-summary="ruleForm.ORDERBODY.length > 1" :summary-method="getSummaries"
-        :data="ruleForm.ORDERBODY" style="width: 100%" :row-class-name="tableRowClassName">
+      <el-table border :show-summary="ruleForm.ORDERBODY.length > 1" :summary-method="getSummaries" :data="ruleForm.ORDERBODY"
+        style="width: 100%" :row-class-name="tableRowClassName">
         <el-table-column align="center" prop="LINE_NO" label="序号" width="50"></el-table-column>
         <el-table-column align="center" prop="ITEM_NO" label="型号" width="140"></el-table-column>
         <el-table-column align="center" label="经销单价" width="80">
@@ -114,22 +114,22 @@
             <el-button @click="openDialog(scope.row, scope.$index)" type="primary" size="mini">查看详情</el-button>
           </template>
         </el-table-column>
-        <el-table-column v-if="check_CURTAIN_STATUS_ID == 1 && isX" align="center" prop="checkStatus" label="是否修改"
-          width="80"></el-table-column>
+        <el-table-column v-if="check_CURTAIN_STATUS_ID == 1 && isX" align="center" prop="checkStatus" label="是否修改" width="80">
+        </el-table-column>
       </el-table>
 
       <div style="float:right;margin-top:20px;margin-right:10px;height:80px;">
         <el-button v-if="check_CURTAIN_STATUS_ID == 2" @click="_defeat()" size="medium" type="warning">退回兰居修改
         </el-button>
         <el-button v-if="check_CURTAIN_STATUS_ID == 2" @click="_pass()" size="medium" type="success">确认兰居修改</el-button>
-        <el-button :disabled="exButton" v-if="check_CURTAIN_STATUS_ID == 1" @click="LjExamine()" size="medium"
-          type="success">确认修改</el-button>
+        <el-button :disabled="exButton" v-if="check_CURTAIN_STATUS_ID == 1" @click="LjExamine()" size="medium" type="success">确认修改
+        </el-button>
         <el-button v-if="
             (check_CURTAIN_STATUS_ID == 0 || check_CURTAIN_STATUS_ID == 4) &&
               check_STATUS_ID == 0
           " @click="summitCurtain" size="medium" type="primary">提交订单</el-button>
-        <el-button v-if="check_STATUS_ID == 5 || check_STATUS_ID == 6" @click="refreshPay()" size="medium" type="danger"
-          plain>提交订单</el-button>
+        <el-button v-if="check_STATUS_ID == 5 || check_STATUS_ID == 6" @click="refreshPay()" size="medium" type="danger" plain>
+          提交订单</el-button>
       </div>
       <div style="padding:10px;">
         <span class="timeLeft">
@@ -177,12 +177,7 @@
 </template>
 
 <script>
-import Axios from "axios";
 import {
-  getOrderlist,
-  passExamine,
-  orderDetail,
-  defeatChange,
   queryCash,
   payAgain,
 } from "@/api/orderList";
@@ -196,12 +191,11 @@ import {
   GetPromotionByTypeAndId,
   GetOrderUseRebate,
   ljExportProductExcel,
+  updateCurtainOrderStatus,
 } from "@/api/orderListASP";
 import { mapMutations, mapActions } from "vuex";
-import { mapState } from "vuex";
 import Cookies from "js-cookie";
 import DetailCurtainTable from "../detail/detailCurtainTable";
-import { async } from "q";
 import { downLoadFile } from "@/common/js/downLoadFile";
 
 export default {
@@ -362,30 +356,20 @@ export default {
     },
     //客户修改
     LjExamine() {
-      let url = "/order/updateCurtainOrder.do";
-      let data = {
+      updateCurtainOrder({
         cid: Cookies.get("cid"),
         orderNo: this.orderNum,
         curtainStatusId: "0",
         allCurtains: this.allCurtains,
         deleteIds: this.deleteIds,
-      };
-      //defeatChange(url,data).then(res =>{
-      updateCurtainOrder(data)
+      })
         .then((res) => {
-          if (res.code == 0) {
-            this.$alert("操作成功,请提交结算再次审核", "提示", {
-              confirmButtonText: "确定",
-              type: "success",
-            });
-            this.check_CURTAIN_STATUS_ID = "0";
-            this.getDetail();
-          } else {
-            this.$alert("操作失败，请稍后重试", "提示", {
-              confirmButtonText: "确定",
-              type: "warning",
-            });
-          }
+          this.$alert("操作成功,请提交结算再次审核", "提示", {
+            confirmButtonText: "确定",
+            type: "success",
+          });
+          this.check_CURTAIN_STATUS_ID = "0";
+          this.getDetail();
         })
         .catch((res) => {
           this.$alert("操作失败:" + res.msg, "提示", {
@@ -396,38 +380,23 @@ export default {
     },
     //确认兰居修改，通过订单审核变为可提交状态
     _pass() {
-      var url = "/order/updateCurOrderStatus.do";
-      var data = {
-        orderNo: this.orderNum,
-        curtainStatusId: "4",
-      };
       this.$confirm("确认同意兰居修改？", "提示", {
         confirmButtonText: "是",
         cancelButtonText: "否",
         type: "info",
       }).then(() => {
-        passExamine(url, data)
-          .then((res) => {
-            if (res.code == 0) {
-              var recordData = {
-                ORDER_NO: this.orderNum,
-                OPERATION_PERSON: Cookies.get("cid"),
-                OPERATION_NAME: "确认兰居修改",
-              };
-              InsertOperationRecord(recordData); //插入操作记录
-              this.$alert("操作成功,该订单已经确认,可再次提交", "提示", {
-                confirmButtonText: "确定",
-                type: "success",
-              }).then(() => {
-                this.check_CURTAIN_STATUS_ID = "4";
-              });
-            } else {
-              this.$alert("操作失败，请稍后重试", "提示", {
-                confirmButtonText: "确定",
-                type: "warning",
-              });
-            }
-          })
+        updateCurtainOrderStatus({
+          cid: Cookies.get("cid"),
+          orderNo: this.orderNum,
+          curtainStatusId: "4",
+        }).then((res) => {
+          this.$alert("操作成功,该订单已经确认,可再次提交", "提示", {
+            confirmButtonText: "确定",
+            type: "success",
+          }).then(() => {
+            this.check_CURTAIN_STATUS_ID = "4";
+          });
+        })
           .catch((res) => {
             this.$alert("操作失败，请稍后重试", "提示", {
               confirmButtonText: "确定",
@@ -438,41 +407,26 @@ export default {
     },
     //退回兰居修改
     _defeat() {
-      var url = "/order/updateCurOrderStatus.do";
-      var data = {
-        orderNo: this.orderNum,
-        curtainStatusId: "3",
-      };
       this.$confirm("确定将订单退回兰居重新修改？", "提示", {
         confirmButtonText: "是",
         cancelButtonText: "否",
         type: "info",
       }).then(() => {
-        passExamine(url, data)
-          .then((res) => {
-            if (res.code == 0) {
-              var recordData = {
-                ORDER_NO: this.orderNum,
-                OPERATION_PERSON: Cookies.get("cid"),
-                OPERATION_NAME: "退回兰居修改",
-              };
-              InsertOperationRecord(recordData); //插入操作记录
-              this.$alert("操作成功,该订单已退回兰居修改", "提示", {
-                confirmButtonText: "确定",
-                type: "success",
-              }).then(() => {
-                this.closeToTab({
-                  oldUrl: "order/checkExamine",
-                  newUrl: "order/myOrder",
-                });
-              });
-            } else {
-              this.$alert("操作失败，请稍后重试", "提示", {
-                confirmButtonText: "确定",
-                type: "warning",
-              });
-            }
-          })
+        updateCurtainOrderStatus({
+          cid: Cookies.get("cid"),
+          orderNo: this.orderNum,
+          curtainStatusId: "3",
+        }).then((res) => {
+          this.$alert("操作成功,该订单已退回兰居修改", "提示", {
+            confirmButtonText: "确定",
+            type: "success",
+          }).then(() => {
+            this.closeToTab({
+              oldUrl: "order/checkExamine",
+              newUrl: "order/myOrder",
+            });
+          });
+        })
           .catch((res) => {
             this.$alert("操作失败，请稍后重试", "提示", {
               confirmButtonText: "确定",
@@ -582,11 +536,6 @@ export default {
       //每次重新提交的时候判断一下余额
       queryCash(url, data).then(async (res) => {
         this.Initial_balance = res.data;
-        var url2 = "/order/putAgainOrder.do";
-        var data2 = {
-          cid: Cookies.get("cid"),
-          orderNo: this.orderNum,
-        };
         if (
           this.ruleForm.ALL_SPEND > this.Initial_balance &&
           this.check_STATUS_ID == 5
@@ -594,8 +543,8 @@ export default {
           //欠款可提交的话可以跳过判断
           this.$alert(
             "余额不足，当前订单还需充值" +
-              (this.ruleForm.ALL_SPEND - this.Initial_balance) +
-              "元才能提交",
+            (this.ruleForm.ALL_SPEND - this.Initial_balance) +
+            "元才能提交",
             "提示",
             {
               confirmButtonText: "确定",
@@ -667,6 +616,11 @@ export default {
               }
             }
           }
+          var url2 = "/order/putAgainOrder.do";
+          var data2 = {
+            cid: Cookies.get("cid"),
+            orderNo: this.orderNum,
+          };
           payAgain(url2, data2)
             .then((res) => {
               var recordData = {

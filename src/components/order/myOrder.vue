@@ -117,30 +117,26 @@
           <p style="width:100px; font-size:18px; color:tomato; text-align:center;">
             {{ item.status }}
           </p>
-          <router-link to="/order/checkOrder">
-            <p>
-              <el-button @click="summitCurtain(item)" v-if="
+          <p>
+            <el-button @click="summitCurtain(item)" v-if="
                   (item.CURTAIN_STATUS_ID == 0 ||
                     item.CURTAIN_STATUS_ID == 4) &&
                     item.STATUS_ID == 0
                 " size="medium" type="primary" plain>提交订单</el-button>
-            </p>
-          </router-link>
+          </p>
           <p>
             <el-button v-if="item.STATUS_ID == 5 || item.STATUS_ID == 6" @click="refreshPay(item)" size="medium" type="danger"
               plain>提交订单</el-button>
           </p>
-          <router-link to="/order/checkExamine">
-            <p>
-              <el-button @click="
+          <p>
+            <el-button @click="
                   toCheckExamine(
                     item.ORDER_NO,
                     item.CURTAIN_STATUS_ID,
                     item.STATUS_ID
                   )
                 " size="medium" type="success">订单详情</el-button>
-            </p>
-          </router-link>
+          </p>
         </div>
       </el-card>
       <div style="margin:0 25%;" class="block">
@@ -159,7 +155,6 @@
 </template>
 
 <script>
-import { getOrderlist, passExamine } from "@/api/orderList";
 import {
   getAllOrders,
   InsertOperationRecord,
@@ -169,11 +164,9 @@ import {
   GetPromotionByTypeAndId,
   GetOrderUseRebate,
 } from "@/api/orderListASP";
-import { cancelOrder, payAgain, queryCash } from "@/api/orderList";
+import { payAgain, queryCash } from "@/api/orderList";
 import { mapMutations, mapActions } from "vuex";
-import { mapState } from "vuex";
 import Cookies from "js-cookie";
-import { async } from "q";
 import shipment from "./shipment";
 
 export default {
@@ -479,20 +472,12 @@ export default {
       getAllOrders(data).then((res) => {
         this.count = res.count;
         this.data = res.data;
+        console.log(res.data)
         this.$root.$emit("refreshBadgeIcon", "orderDeal");
       });
     },
     //出货详情
     shipmentDetail(tab) {
-      // this.$router.push({
-      //   name: `shipment`,
-      //   params: {
-      //     itemNo: tab.ITEM_NO,
-      //     orderId: tab.ORDER_NO,
-      //     lineNo: tab.LINE_NO
-      //   }
-      // });
-      // this.addTab("order/shipment");
       this.shipmentOrderNo = tab.ORDER_NO;
       this.shipmentLineNo = tab.LINE_NO;
       this.shipmentItemNo = tab.ITEM_NO;
@@ -548,18 +533,16 @@ export default {
     },
     //删除订单
     deleteOrder(pushOrderNum) {
-      var url = "/order/cancelOrder.do";
-      var data = {
-        cid: Cookies.get("cid"),
-        orderNo: pushOrderNum,
-      };
       this.$confirm("确定作废订单？", "提示", {
         confirmButtonText: "是",
         cancelButtonText: "否",
         type: "warning",
       })
         .then(() => {
-          cancelOrderNew(data)
+          cancelOrderNew({
+            cid: Cookies.get("cid"),
+            orderNo: pushOrderNum,
+          })
             .then((res) => {
               if (pushOrderNum.slice(0, 1) == "X") {
                 this.$confirm("作废成功，是否退回数据到购物车？", "提示", {

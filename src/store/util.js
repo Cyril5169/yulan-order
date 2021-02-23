@@ -20,7 +20,7 @@ export function tabsName(index) {
     case "order/examineDetailNew":
       return "审核详情";
     case "order/newCurtainExamineDetail":
-        return "审核详情";  
+        return "新窗帘审核详情";  
     case "order/checkExamine":
       return "订单详情";
     case "myZone/myCoupon":

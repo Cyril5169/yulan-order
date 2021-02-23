@@ -1639,9 +1639,7 @@ export default {
               console.log(res);
             });
         })
-        .catch(() => {
-          return;
-        });
+        .catch(() => { });
     },
     //审核通过
     _pass() {
@@ -1696,9 +1694,7 @@ export default {
               console.log(res);
             });
         })
-        .catch(() => {
-          return;
-        });
+        .catch(() => { });
     },
     //隔行变色
     tableRowClassName({ row, rowIndex }) {

@@ -27,6 +27,12 @@
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
                            .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
+          <span style="margin-left:20px;">暗槽高<span style="color:red;">*</span>：</span>
+          <el-input style="width:60px;" size="mini" v-model="curtainHeadData.ancaoHeight" @input="changeAncaoHeight" oninput="value=value.replace(/[^\d.]/g,'')
+                           .replace(/^\./g, '').replace(/\.{2,}/g, '.')
+                           .replace('.', '$#$').replace(/\./g, '')
+                           .replace('$#$', '.')
+                           .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
           <span style="margin-left:20px;">活动：</span>
           <el-select size="mini" style="width:220px" :disabled="activityOptions.length == 1" v-model="curtainHeadData.activityId"
             :placeholder="activityOptions.length == 1? '无可选活动': '请选择活动'">
@@ -42,7 +48,8 @@
         </div>
         <!-- 窗帘部件 -->
         <div class="curtain-list">
-          <el-table :data="curtainData" ref="curtainTable" class="curtain-table" border :span-method="cellMerge">
+          <el-table :data="curtainData" ref="curtainTable" class="curtain-table" border :span-method="cellMerge"
+            :row-class-name="tableRowClassName">
             <el-table-column label="预览" width="120" align="center">
               <template slot-scope="scope">
                 <!-- 显示图片预览 -->
@@ -74,15 +81,15 @@
                   <el-checkbox v-if="scope.row.NCT_DELETE > 0 && scope.row.NCM_DELETE > 0" v-model="scope.row.curtain_choose"
                     @change="onCheckChange($event, scope.row)"></el-checkbox>
                 </template>
+                <template v-else-if="scope.row.NC_PART_TYPECODE == 'LBT'">
+                  <span style="color:red;">未维护数据!</span>
+                </template>
                 <!-- 没有模板，非标定 -->
-                <template v-else-if="scope.row.curtain_level == 0">
+                <template v-else>
                   <a class="a-link" :class="{'delete-cls': !scope.row.curtain_choose}"
                     @click="exchangeModelOrItem(scope.row)">请选择</a>
                   <el-checkbox v-model="scope.row.curtain_choose" @change="onCheckChange($event, scope.row)">
                   </el-checkbox>
-                </template>
-                <template v-else>
-                  <span style="color:red;">未维护数据!</span>
                 </template>
               </template>
             </el-table-column>
@@ -125,7 +132,7 @@
                   </template>
                   <template v-if="scope.row.LEFT_ENABLE == 2">
                     <span>【左转角】: <el-input v-model="scope.row.curtain_left_fillet" style="width:40px;" size="mini"
-                        oninput="value=value.replace(/[^\d.]/g,'')
+                        @input="changeOneWidthOrHeight($event, scope.$index)" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
@@ -137,7 +144,7 @@
                   </template>
                   <template v-if="scope.row.RIGHT_ENABLE == 2">
                     <span>【右转角】: <el-input v-model="scope.row.curtain_right_fillet" style="width:40px;" size="mini"
-                        oninput="value=value.replace(/[^\d.]/g,'')
+                        @input="changeOneWidthOrHeight($event, scope.$index)" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
@@ -229,7 +236,8 @@
                 <span
                   v-if="scope.row.curtain_level == 0 && scope.row.TOTAL_ENABLE == 1">{{scope.row.curtain_area}}{{scope.row.UNIT_NAME}}</span>
                 <span v-else-if="scope.row.TOTAL_ENABLE == 2">
-                  <el-input v-model="scope.row.curtain_area" style="width:40px;" size="mini" @input="changeLSArea($event, scope.$index)" oninput="value=value.replace(/[^\d.]/g,'')
+                  <el-input v-model="scope.row.curtain_area" style="width:40px;" size="mini"
+                    @input="changeLSArea($event, scope.$index)" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
@@ -273,12 +281,13 @@
               </template>
             </el-table-column>
           </el-table>
-          <div v-if="isManager != '0'" style="font-size:16px;margin-top:10px;margin-left: 1010px;">
-            <span>总计：<span style="color:red;">￥{{ allTotal | dosageFilter }}</span></span>
+          <div style="position: relative;">
+            <span v-if="isManager != '0'" style="font-size:16px;position:absolute;left: 940px;">
+              总计：<span style="color:red;">￥{{ allTotal | dosageFilter }}</span>
+            </span>
           </div>
-          <div style="text-align: center;margin-bottom:10px;">
+          <div style="text-align:center;margin:20px 0;">
             <el-button type="danger" width="130px" @click="addCurtainToShoppingCar">加入购物车</el-button>
-            <el-button type="info" width="130px">返回</el-button>
           </div>
         </div>
       </div>
@@ -295,7 +304,8 @@
           <div v-for="(item, index) in exchangeModelList" :key="index" class="model-exchange-ct"
             :class="{'model-exchange-now': item.NC_MODEL_ID == exchangeModelNow.NC_MODEL_ID }" @click="onChangeModelClick(item)">
             <div class="model-exchange-inner">
-              <el-table :data="item.curtain_model" border :style="{width: isManager!='0'?'670px':'610px'}">
+              <el-table :data="item.curtain_model" border :style="{width: isManager!='0'?'670px':'610px'}"
+                :row-class-name="tableRowClassName">
                 <el-table-column label="部件" width="80" header-align="center" prop="NC_PART_TYPECODE">
                   <template slot-scope="scope">
                     <!-- 树缩进 -->
@@ -563,6 +573,7 @@ export default {
             this.$set(this.curtainHeadData, "activityId", "");
             this.$set(this.curtainHeadData, "location", "");
             this.$set(this.curtainHeadData, "setNum", 1);
+            this.$set(this.curtainHeadData, "ancaoHeight", 0);
             //加载活动
             this.getActivity();
           }
@@ -685,8 +696,15 @@ export default {
           }
         }
         this.$set(originData[i], "curtain_level", level);
-        //选中标识(父节点以部件为准，子节点综合父节点考虑)
-        var defaultChose = originData[i].NCT_DELETE < 2 && originData[i].NCM_DELETE < 2;
+        //默认选中
+        var defaultChose = false;
+        if (originData[i].curtain_level == 0) {
+          //根节点的由父节点控制
+          defaultChose = originData[i].NCT_DELETE < 2;
+        } else {
+          //子节点综合父节点考虑
+          defaultChose = originData[i].NCT_DELETE < 2 && originData[i].NCM_DELETE < 2;
+        }
         this.$set(originData[i], "curtain_choose", defaultChose);
         //单价
         var price = this.getPrice(this.customerType, originData[i]);
@@ -767,11 +785,19 @@ export default {
       }
       return price;
     },
+    convertNumber(val){
+      if(typeof val === 'number' && !isNaN(val)) return val;
+      if(typeof val === 'string'){
+        if(Number(val) != NaN) return Number(val);
+      }
+      return 0;
+    },
     //改变成品宽
     changeHeadWidth(val) {
       for (var i = 0; i < this.curtainData.length; i++) {
         if (this.curtainData[i].WIDTH_ENABLE > 0) {
-          this.curtainData[i].curtain_width = this.dosageFilter(val * this.curtainData[i].NCM_WIDTH_RATIO);
+          var width = this.convertNumber(this.curtainHeadData.width);
+          this.curtainData[i].curtain_width = this.dosageFilter(width * this.curtainData[i].NCM_WIDTH_RATIO);
           this.changeOneWidthOrHeight(val, i);
         }
       }
@@ -779,16 +805,45 @@ export default {
     //改变成品高
     changeHeadHeight(val) {
       for (var i = 0; i < this.curtainData.length; i++) {
-        if (this.curtainData[i].WIDTH_ENABLE > 0) {
-          this.curtainData[i].curtain_height = this.dosageFilter(val * this.curtainData[i].NCM_HEIGHT_RATIO);
+        if (this.curtainData[i].HEIGHT_ENABLE > 0) {
+          var height = this.convertNumber(this.curtainHeadData.height);
+          var ancaoHeight = this.convertNumber(this.curtainHeadData.ancaoHeight);
+          if (this.curtainData[i].NC_PART_TYPECODE == 'LT') {
+            //计算帘头高 帘头的高 =（成品高-暗槽高度）÷0.1*0.0235-0.11 结果保留两位
+            this.curtainData[i].curtain_height = this.dosageFilter((height - ancaoHeight) * 10 * 0.0235 - 0.11);
+          } else {
+            this.curtainData[i].curtain_height = this.dosageFilter(height * this.curtainData[i].NCM_HEIGHT_RATIO);
+          }
           this.changeOneWidthOrHeight(val, i);
         }
       }
     },
-    //改变单个宽或者高
+    //改变暗槽高
+    changeAncaoHeight(val) {
+      for (var i = 0; i < this.curtainData.length; i++) {
+        if (this.curtainData[i].NC_PART_TYPECODE == 'LT') {
+          var height = this.convertNumber(this.curtainHeadData.height);
+          var ancaoHeight = this.convertNumber(this.curtainHeadData.ancaoHeight);
+          //计算帘头高 帘头的高 =（成品高-暗槽高度）÷0.1*0.0235-0.11 结果保留两位
+          this.curtainData[i].curtain_height = this.dosageFilter((height - ancaoHeight) * 10 * 0.0235 - 0.11);
+          this.changeOneWidthOrHeight(val, i);
+        }
+      }
+    },
+    //改变单个宽或者高或左右转角
     changeOneWidthOrHeight(val, index) {
       var oneCurtain = this.curtainData[index];
-      oneCurtain.curtain_area = this.dosageFilter(oneCurtain.curtain_width * oneCurtain.curtain_height);
+      var curtain_width = this.convertNumber(oneCurtain.curtain_width);
+      var curtain_height = this.convertNumber(oneCurtain.curtain_height);
+      var curtain_left_fillet = this.convertNumber(oneCurtain.curtain_left_fillet);
+      var curtain_right_fillet = this.convertNumber(oneCurtain.curtain_right_fillet);
+      if (oneCurtain.NC_PART_TYPECODE == "LT") {
+      //计算帘头用量 帘头用量=（帘头宽+左转角+右转角）*帘头高
+        oneCurtain.curtain_area = this.dosageFilter((curtain_width + curtain_left_fillet + curtain_right_fillet) * curtain_height);
+      } else {
+        oneCurtain.curtain_area = this.dosageFilter(curtain_width * curtain_height);
+      }
+      //帘身改变同时改变里衬布的
       if (oneCurtain.NC_PART_TYPECODE == "LS") {
         //改变里衬布的
         var LCBITEM = this.curtainData.filter((item) => item.NC_PART_TYPECODE == "LCB");
@@ -804,7 +859,7 @@ export default {
       var oneCurtain = this.curtainData[index];
       if (oneCurtain.NC_PART_TYPECODE == "LS") {
         //改变里衬布的
-        var LCBITEM = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NC_PART_TYPECODE == "LCB");
+        var LCBITEM = this.curtainData.filter((item) => item.NC_PART_TYPECODE == "LCB");
         for (var i = 0; i < LCBITEM.length; i++) {
           //假设有多个里衬布的情况
           LCBITEM[i].DOSAGE = oneCurtain.DOSAGE;
@@ -835,9 +890,16 @@ export default {
     //一个子件的总价
     oneTotal(row) {
       var price = 0;
-      if(row.curtain_area){
+      if (row.curtain_area) {
         price = this.calculatePromotionPrice(row);
-        price = price.mul(row.curtain_area)
+        //最小下单量 帘头1.帘身，窗纱4
+        var curtain_area = this.convertNumber(row.curtain_area);
+        if(row.NC_PART_TYPECODE == 'LT' && curtain_area < 1){
+          curtain_area = 1;
+        }else if((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'CS') && curtain_area < 4){
+          curtain_area = 4;
+        }
+        price = price.mul(curtain_area)
       }
       return price;
     },
@@ -886,7 +948,7 @@ export default {
     onCheckChange(checked, row) {
       if (!row.ITEM_NO) return;
       var childrenCurtain = this.curtainData.filter((item) => item.NCM_PID == row.NC_MODEL_ID);
-      var fatherCurtain = this.curtainData.filter((item) => item.NC_MODEL_ID == row.NCM_PID && item.NC_MODEL_ID !=0);
+      var fatherCurtain = this.curtainData.filter((item) => item.NC_MODEL_ID == row.NCM_PID && item.NC_MODEL_ID != 0);
       if (childrenCurtain.length) {
         //自身作为父节点，勾选或者取消，子节点应该同步
         for (var i = 0; i < childrenCurtain.length; i++) {
@@ -1091,19 +1153,34 @@ export default {
     //添加其他没有的数据
     getOtherCurtainMsgForExchange(originData) {
       for (var i = 0; i < originData.length; i++) {
-        //选中标识(父节点以部件为准，子节点综合父节点考虑)
-        var defaultChose = originData[i].NCT_DELETE < 2 && originData[i].NCM_DELETE < 2;
+        //默认选中
+        var defaultChose = false;
+        if (originData[i].curtain_level == 0) {
+          //根节点的由父节点控制
+          defaultChose = originData[i].NCT_DELETE < 2;
+        } else {
+          //子节点综合父节点考虑
+          defaultChose = originData[i].NCT_DELETE < 2 && originData[i].NCM_DELETE < 2;
+        }
         this.$set(originData[i], "curtain_choose", defaultChose);
         //宽
         var curtain_width = 0;
         if (originData[i].WIDTH_ENABLE > 0) {
-          curtain_width = this.dosageFilter(this.curtainHeadData.width * originData[i].NCM_WIDTH_RATIO);
+          var width = this.convertNumber(this.curtainHeadData.width);
+          curtain_width = this.dosageFilter(width * originData[i].NCM_WIDTH_RATIO);
         }
         this.$set(originData[i], "curtain_width", curtain_width);
         //高
         var curtain_height = 0;
         if (originData[i].HEIGHT_ENABLE > 0) {
-          curtain_height = this.dosageFilter(this.curtainHeadData.height * originData[i].NCM_HEIGHT_RATIO);
+          var height = this.convertNumber(this.curtainHeadData.height);
+          var ancaoHeight = this.convertNumber(this.curtainHeadData.ancaoHeight);
+          if(originData[i].NC_PART_TYPECODE == 'LT'){
+            //计算帘头高 帘头的高 =（成品高-暗槽高度）÷0.1*0.0235-0.11 结果保留两位
+            curtain_height = this.dosageFilter((height - ancaoHeight) * 10 * 0.0235 - 0.11);
+          }else{
+            curtain_height = this.dosageFilter(height * originData[i].NCM_HEIGHT_RATIO);
+          }
         }
         this.$set(originData[i], "curtain_height", curtain_height);
         //总数（面积）
@@ -1199,15 +1276,22 @@ export default {
     //加入购物车前验证
     beforeAddCar() {
       //表头
-      if (!this.curtainHeadData.width || Number(this.curtainHeadData.width == 0)) {
+      if (!this.curtainHeadData.width || Number(this.curtainHeadData.width) == 0) {
         this.$alert("请填写帘款【成品宽】", "提示", {
           confirmButtonText: "确定",
           type: "warning",
         });
         return false;
       }
-      if (!this.curtainHeadData.height || Number(this.curtainHeadData.height == 0)) {
+      if (!this.curtainHeadData.height || Number(this.curtainHeadData.height) == 0) {
         this.$alert("请填写帘款【成品高】", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
+        return false;
+      }
+      if (!this.curtainHeadData.ancaoHeight) {
+        this.$alert("请填写帘款【暗槽】", "提示", {
           confirmButtonText: "确定",
           type: "warning",
         });
@@ -1220,7 +1304,7 @@ export default {
         });
         return false;
       }
-      if (!this.curtainHeadData.setNum || Number(this.curtainHeadData.setNum == 0)) {
+      if (!this.curtainHeadData.setNum || Number(this.curtainHeadData.setNum) == 0) {
         this.$alert("请填写帘款【套数】", "提示", {
           confirmButtonText: "确定",
           type: "warning",
@@ -1239,30 +1323,22 @@ export default {
           return false;
         }
         //宽高
-        if (oneCurtain.WIDTH_ENABLE == 2 && (!oneCurtain.curtain_width || Number(oneCurtain.curtain_width == 0))) {
+        if (oneCurtain.WIDTH_ENABLE == 2 && (!oneCurtain.curtain_width || Number(oneCurtain.curtain_width) == 0)) {
           this.$alert(`请填写${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【宽】`, "提示", {
             confirmButtonText: "确定",
             type: "warning",
           });
           return false;
         }
-        if (oneCurtain.HEIGHT_ENABLE == 2 && (!oneCurtain.curtain_height || Number(oneCurtain.curtain_height == 0))) {
+        if (oneCurtain.HEIGHT_ENABLE == 2 && (!oneCurtain.curtain_height || Number(oneCurtain.curtain_height) == 0)) {
           this.$alert(`请填写${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【高】`, "提示", {
             confirmButtonText: "确定",
             type: "warning",
           });
           return false;
         }
-        //左右圆角
-        if (oneCurtain.LEFT_ENABLE == 2 && (!oneCurtain.curtain_left_fillet || Number(oneCurtain.curtain_left_fillet == 0))) {
-          this.$alert(`请填写${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【左圆角】`, "提示", {
-            confirmButtonText: "确定",
-            type: "warning",
-          });
-          return false;
-        }
-        if (oneCurtain.RIGHT_ENABLE == 2 && (!oneCurtain.curtain_right_fillet || Number(oneCurtain.curtain_right_fillet == 0))) {
-          this.$alert(`请填写${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【右圆角】`, "提示", {
+        if (Number(oneCurtain.curtain_height) < 0) {
+          this.$alert(`${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【高】不能小于0`, "提示", {
             confirmButtonText: "确定",
             type: "warning",
           });
@@ -1315,6 +1391,7 @@ export default {
         HEIGHT: this.curtainHeadData.height,
         LOCATION: this.curtainHeadData.location,
         COUNT: this.curtainHeadData.setNum,
+        ANCAO_HEIGHT: this.curtainHeadData.ancaoHeight,
       }
       //明细
       var details = [];
@@ -1357,7 +1434,7 @@ export default {
       }).then(res => {
         this.$alert("成功加入购物车！如需继续下单请修改相关信息后再次添加！", "提示", {
           confirmButtonText: "确定",
-          type: "warning",
+          type: "success",
         });
 
       }).catch(res => {
@@ -1419,9 +1496,11 @@ export default {
         }
       }
     },
-    tableRowClassName({ row, rowIndex }){
+    tableRowClassName({ row, rowIndex }) {
       if (row.curtain_level == 0) {
-        return 'father-row';
+        return 'bold-row';
+      } else {
+        return 'fade-row'
       }
       return '';
     }
@@ -1496,6 +1575,7 @@ export default {
   padding: 5px;
   margin: 5px 10px;
   background: #eee;
+  border: 1px solid #eee;
   cursor: pointer;
   box-sizing: border-box;
 }
@@ -1577,7 +1657,10 @@ export default {
 .index-badge .el-badge__content {
   background: gray;
 }
-.el-table .father-row {
-  background: #CDE6C7;
+.el-table .bold-row {
+  font-weight: bold;
+}
+.el-table .fade-row {
+  color: #b0b4bb;
 }
 </style>

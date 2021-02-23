@@ -1402,10 +1402,7 @@ export default {
     },
     subtotal(data) {
       var price = 0;
-      var quantity =
-        data.quantity != 0
-          ? data.quantity
-          : this.dosageFilter(data.width.mul(data.height));
+      var quantity = data.quantity != 0 ? data.quantity : this.dosageFilter(data.width.mul(data.height));
       price = quantity.mul(data.price);
       return this.dosageFilter(price);
     },

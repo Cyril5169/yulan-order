@@ -31,8 +31,8 @@
       <span class="zoomLeft">
         交货日期：
         <span class="zoomRight">
-          <el-date-picker v-model="ruleForm.JIAOHUO_DATE" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
-            placeholder="选择时间" style="width:130px;" size="mini" :picker-options="pickerOptions"></el-date-picker>
+          <el-date-picker v-model="ruleForm.JIAOHUO_DATE" type="date" placeholder="选择时间" style="width:130px;" size="mini"
+            :picker-options="pickerOptions"></el-date-picker>
         </span>
       </span>
       <br />
@@ -51,7 +51,8 @@
         <!-- 窗帘详情 -->
         <template slot-scope="scopeHead">
           <div class="curtain-list">
-            <el-table :data="scopeHead.row.curtains" ref="curtainTable" class="curtain-table" border>
+            <el-table :data="scopeHead.row.curtains" ref="curtainTable" class="curtain-table" border
+              :row-class-name="tableRowClassName">
               <el-table-column label="部件" width="80" header-align="center" prop="NC_PART_TYPECODE">
                 <template slot-scope="scope">
                   <!-- 树缩进 -->
@@ -125,7 +126,8 @@
                       <span>【左转角】: {{ scope.row.LEFT_FILLET }}m</span>
                     </template>
                     <template v-if="scope.row.LEFT_ENABLE == 2">
-                      <span>【左转角】: <el-input v-model="scope.row.LEFT_FILLET" style="width:40px;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
+                      <span>【左转角】: <el-input v-model="scope.row.LEFT_FILLET" style="width:40px;" size="mini"
+                          @input="changeOneWidthOrHeight($event, scope.$index, scopeHead.$index)" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
@@ -136,7 +138,8 @@
                       <span>【右转角】: {{ scope.row.RIGHT_FILLET }}m</span>
                     </template>
                     <template v-if="scope.row.RIGHT_ENABLE == 2">
-                      <span>【右转角】: <el-input v-model="scope.row.RIGHT_FILLET" style="width:40px;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
+                      <span>【右转角】: <el-input v-model="scope.row.RIGHT_FILLET" style="width:40px;" size="mini"
+                          @input="changeOneWidthOrHeight($event, scope.$index, scopeHead.$index)" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
@@ -265,6 +268,13 @@
                   <span v-else>-</span>
                 </template>
               </el-table-column>
+              <el-table-column label="总价" width="60" align="center">
+                <template slot-scope="scope">
+                  <!-- 只有部件算钱 -->
+                  <span v-if="scope.row.ITEM_NO && scope.row.curtain_level == 0">{{ oneTotal(scope.row) }}</span>
+                  <span v-else>-</span>
+                </template>
+              </el-table-column>
               <el-table-column label="说明" width="100" header-align="center" prop="ILLUSTRATE">
                 <template slot-scope="scope">
                   <span style="color:red;font-size:12px;"> {{ scope.row.ILLUSTRATE }}</span>
@@ -300,6 +310,7 @@
       </el-table-column>
       <el-table-column align="center" prop="CURTAIN_WIDTH" label="成品宽" width="80"></el-table-column>
       <el-table-column align="center" prop="CURTAIN_HEIGHT" label="成品高" width="80"></el-table-column>
+      <el-table-column align="center" prop="ANCAO_HEIGHT" label="暗槽高" width="80"></el-table-column>
       <el-table-column align="center" prop="CURTAIN_ROOM_NAME" label="位置" width="100"></el-table-column>
       <el-table-column align="center" prop="QTY_REQUIRED" label="套数" width="70"></el-table-column>
       <el-table-column prop="PROMOTION" align="center" label="活动" show-overflow-tooltip></el-table-column>
@@ -317,9 +328,9 @@
     </el-table>
     <!-- 底部 -->
     <div style="float:right;margin-top:20px;height:80px;">
-      <el-button @click="LanjuChange()" size="medium" type="danger">兰居修改</el-button>
-      <el-button size="medium" type="warning" @click="_back()">退回修改</el-button>
-      <el-button @click="_pass()" size="medium" type="success">通过审核</el-button>
+      <el-button @click="LanjuChange" size="medium" type="danger">兰居修改</el-button>
+      <el-button size="medium" type="warning" @click="backCustomer">退回修改</el-button>
+      <el-button @click="passExamine" size="medium" type="success">通过审核</el-button>
     </div>
     <div style="padding:10px;">
       <span class="timeLeft">
@@ -377,7 +388,8 @@
           <div v-for="(item, index) in exchangeModelList" :key="index" class="model-exchange-ct"
             :class="{'model-exchange-now': item.NC_MODEL_ID == exchangeModelNow.NC_MODEL_ID }" @click="onChangeModelClick(item)">
             <div class="model-exchange-inner">
-              <el-table :data="item.curtain_model" border :style="{width: isManager!='0'?'670px':'610px'}">
+              <el-table :data="item.curtain_model" border :style="{width: isManager!='0'?'670px':'610px'}"
+                :row-class-name="tableRowClassName">
                 <el-table-column label="部件" width="80" header-align="center" prop="NC_PART_TYPECODE">
                   <template slot-scope="scope">
                     <!-- 树缩进 -->
@@ -662,9 +674,9 @@ export default {
     allTotal(index) {
       let totalMoney = 0;
       for (var i = 0; i < this.ruleForm.ORDERBODY[index].curtains.length; i++) {
-        var curtain = this.ruleForm.ORDERBODY[index].curtains[i];
-        if (curtain.curtain_choose)
-          totalMoney += curtain.PRICE.mul(curtain.DOSAGE);
+        var oneCurtain = this.ruleForm.ORDERBODY[index].curtains[i];
+        if (oneCurtain.curtain_choose)
+          totalMoney += this.oneTotal(oneCurtain);
       }
       return totalMoney;
     },
@@ -748,7 +760,12 @@ export default {
           //高
           var curtain_height = 0;
           if (detail.curtain_change[j].HEIGHT_ENABLE > 0) {
-            curtain_height = this.dosageFilter(detail.CURTAIN_HEIGHT * detail.curtain_change[j].NCM_HEIGHT_RATIO);
+            if (detail.curtain_change[j].NC_PART_TYPECODE == 'LT') {
+              //计算帘头高 帘头的高 =（成品高-暗槽高度）÷0.1*0.0235-0.11 结果保留两位
+              curtain_height = this.dosageFilter((detail.CURTAIN_HEIGHT - detail.ANCAO_HEIGHT) * 10 * 0.0235 - 0.11);
+            } else {
+              curtain_height = this.dosageFilter(detail.CURTAIN_HEIGHT * detail.curtain_change[j].NCM_HEIGHT_RATIO);
+            }
           }
           //总数（面积）
           var area = this.dosageFilter(curtain_width * curtain_height);
@@ -861,10 +878,26 @@ export default {
       }
       return price;
     },
+    convertNumber(val) {
+      if (typeof val === 'number' && !isNaN(val)) return val;
+      if (typeof val === 'string') {
+        if (Number(val) != NaN) return Number(val);
+      }
+      return 0;
+    },
     //改变单个宽或者高
     changeOneWidthOrHeight(val, index1, index) {
       var oneCurtain = this.ruleForm.ORDERBODY[index].curtains[index1];
-      oneCurtain.DOSAGE = this.dosageFilter(oneCurtain.WIDTH * oneCurtain.HEIGHT);
+      var width = this.convertNumber(oneCurtain.WIDTH);
+      var height = this.convertNumber(oneCurtain.HEIGHT);
+      var left_fillet = this.convertNumber(oneCurtain.LEFT_FILLET);
+      var right_fillet = this.convertNumber(oneCurtain.RIGHT_FILLET);
+      if (oneCurtain.NC_PART_TYPECODE == "LT") {
+        //计算帘头用量 帘头用量=（帘头宽+左转角+右转角）*帘头高
+        oneCurtain.DOSAGE = this.dosageFilter((width + left_fillet + right_fillet) * height);
+      } else {
+        oneCurtain.DOSAGE = this.dosageFilter(width * height);
+      }
       if (oneCurtain.NC_PART_TYPECODE == "LS") {
         //改变里衬布的
         var LCBITEM = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NC_PART_TYPECODE == "LCB");
@@ -885,6 +918,22 @@ export default {
           LCBITEM[i].DOSAGE = oneCurtain.DOSAGE;
         }
       }
+    },
+    //一个子件的总价
+    oneTotal(row) {
+      var price = 0;
+      if (row.DOSAGE) {
+        price = row.PRICE;
+        //最小下单量 帘头1.帘身，窗纱4
+        var DOSAGE = this.convertNumber(row.DOSAGE);
+        if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < 1) {
+          DOSAGE = 1;
+        } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4) {
+          DOSAGE = 4;
+        }
+        price = price.mul(DOSAGE)
+      }
+      return price;
     },
     //处理拉边条
     handleBianCommand(common, row, index) {
@@ -1140,8 +1189,15 @@ export default {
     //添加其他没有的数据
     getOtherCurtainMsgForExchange(originData) {
       for (var i = 0; i < originData.length; i++) {
-        //选中标识(父节点以部件为准，子节点综合父节点考虑)
-        var defaultChose = originData[i].NCT_DELETE < 2 && originData[i].NCM_DELETE < 2;
+        //默认选中
+        var defaultChose = false;
+        if (originData[i].curtain_level == 0) {
+          //根节点的由父节点控制
+          defaultChose = originData[i].NCT_DELETE < 2;
+        } else {
+          //子节点综合父节点考虑
+          defaultChose = originData[i].NCT_DELETE < 2 && originData[i].NCM_DELETE < 2;
+        }
         this.$set(originData[i], "curtain_choose", defaultChose);
         //宽
         var curtain_width = 0;
@@ -1152,7 +1208,12 @@ export default {
         //高
         var curtain_height = 0;
         if (originData[i].HEIGHT_ENABLE > 0) {
-          curtain_height = this.dosageFilter(this.ruleForm.ORDERBODY[this.currentIndex].CURTAIN_HEIGHT * originData[i].NCM_HEIGHT_RATIO);
+          if (originData[i].NC_PART_TYPECODE == 'LT') {
+            //计算帘头高 帘头的高 =（成品高-暗槽高度）÷0.1*0.0235-0.11 结果保留两位
+            curtain_height = this.dosageFilter((this.ruleForm.ORDERBODY[this.currentIndex].CURTAIN_HEIGHT - this.ruleForm.ORDERBODY[this.currentIndex].ANCAO_HEIGHT) * 10 * 0.0235 - 0.11);
+          } else {
+            curtain_height = this.dosageFilter(this.ruleForm.ORDERBODY[this.currentIndex].CURTAIN_HEIGHT * originData[i].NCM_HEIGHT_RATIO);
+          }
         }
         this.$set(originData[i], "curtain_height", curtain_height);
         //总数（面积）
@@ -1280,30 +1341,22 @@ export default {
           return false;
         }
         //宽高
-        if (oneCurtain.WIDTH_ENABLE == 2 && (!oneCurtain.WIDTH || Number(oneCurtain.WIDTH == 0))) {
+        if (oneCurtain.WIDTH_ENABLE == 2 && (!oneCurtain.WIDTH || Number(oneCurtain.WIDTH) == 0)) {
           this.$alert(`请填写第${oneCurtain.LINE_NO}幅窗帘${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【宽】`, "提示", {
             confirmButtonText: "确定",
             type: "warning",
           });
           return false;
         }
-        if (oneCurtain.HEIGHT_ENABLE == 2 && (!oneCurtain.HEIGHT || Number(oneCurtain.HEIGHT == 0))) {
+        if (oneCurtain.HEIGHT_ENABLE == 2 && (!oneCurtain.HEIGHT || Number(oneCurtain.HEIGHT) == 0)) {
           this.$alert(`请填写第${oneCurtain.LINE_NO}幅窗帘${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【高】`, "提示", {
             confirmButtonText: "确定",
             type: "warning",
           });
           return false;
         }
-        //左右圆角
-        if (oneCurtain.LEFT_ENABLE == 2 && (!oneCurtain.LEFT_FILLET || Number(oneCurtain.LEFT_FILLET == 0))) {
-          this.$alert(`请填写第${oneCurtain.LINE_NO}幅窗帘${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【左圆角】`, "提示", {
-            confirmButtonText: "确定",
-            type: "warning",
-          });
-          return false;
-        }
-        if (oneCurtain.RIGHT_ENABLE == 2 && (!oneCurtain.RIGHT_FILLET || Number(oneCurtain.RIGHT_FILLET == 0))) {
-          this.$alert(`请填写第${oneCurtain.LINE_NO}幅窗帘${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【右圆角】`, "提示", {
+        if (Number(oneCurtain.HEIGHT) < 0) {
+          this.$alert(`第${oneCurtain.LINE_NO}幅窗帘${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【高】不能小于0`, "提示", {
             confirmButtonText: "确定",
             type: "warning",
           });
@@ -1398,8 +1451,8 @@ export default {
               type: "success",
             });
             this.closeToTab({
-              oldUrl: "order/newCurtainExamineDetailNew",
-              newUrl: "order/examine",
+              oldUrl: "order/newCurtainExamineDetail",
+              newUrl: "order/newCurtainExamine",
             });
           })
         })
@@ -1411,9 +1464,95 @@ export default {
           console.log(res);
         });
     },
+    backCustomer() {
+      this.getCurtainData();
+      if (!this.beforeChangeData()) return;
+      var msg = "确认退回吗？";
+      if (!this.contrastData()) {
+        msg = "有窗帘已经修改了，依然确认退回吗？";
+      }
+      this.$confirm(msg, "提示", {
+        confirmButtonText: "确定",
+        type: "warning",
+      })
+        .then(() => {
+          newCurtainUpdateCurtainOrder({
+            cid: Cookies.get("cid"),
+            curtainStatusId: "1",
+            orderHead: this.ruleForm,
+            orderDetails: this.ruleForm.ORDERBODY,
+            allCurtains: this.newCurtainData,
+            deleteIds: []
+          }).then((res) => {
+            this.$alert("操作成功,已将该订单退回给客户进行确认", "提示", {
+              confirmButtonText: "确定",
+              type: "success",
+            });
+            this.closeToTab({
+              oldUrl: "order/newCurtainExamineDetail",
+              newUrl: "order/newCurtainExamine",
+            });
+          })
+            .catch((res) => {
+              this.$alert("操作失败:" + res.msg, "提示", {
+                confirmButtonText: "确定",
+                type: "warning",
+              });
+              console.log(res);
+            });
+        })
+        .catch(() => { });
+    },
+    passExamine() {
+      this.getCurtainData();
+      if (!this.beforeChangeData()) return;
+      var msg = "确认通过吗？";
+      if (!this.contrastData()) {
+        msg = "有窗帘已经修改了，依然确认通过吗？";
+      }
+      this.$confirm(msg, "提示", {
+        confirmButtonText: "确定",
+        type: "warning",
+      })
+        .then(() => {
+          newCurtainUpdateCurtainOrder({
+            cid: Cookies.get("cid"),
+            curtainStatusId: "4",
+            orderHead: this.ruleForm,
+            orderDetails: this.ruleForm.ORDERBODY,
+            allCurtains: this.newCurtainData,
+            deleteIds: []
+          }).then((res) => {
+            this.$alert("操作成功,该订单已通过审核", "提示", {
+              confirmButtonText: "确定",
+              type: "success",
+            });
+            this.closeToTab({
+              oldUrl: "order/newCurtainExamineDetail",
+              newUrl: "order/newCurtainExamine",
+            });
+          })
+            .catch((res) => {
+              this.$alert("操作失败:" + res.msg, "提示", {
+                confirmButtonText: "确定",
+                type: "warning",
+              });
+              console.log(res);
+            });
+        })
+        .catch(() => { });
+    },
     //隔行变色
     headTableRowClassName({ row, rowIndex }) {
       return "success-row";
+    },
+    tableRowClassName({ row, rowIndex }) {
+      if (row.curtain_level == 0) {
+        return 'bold-row';
+      } else {
+        return 'fade-row'
+      }
+      return '';
     },
     handleScroll() {
       this.$nextTick(() => {
@@ -1533,6 +1672,7 @@ export default {
   padding: 5px;
   margin: 5px 10px;
   background: #eee;
+  border: 1px solid #eee;
   cursor: pointer;
   box-sizing: border-box;
 }
@@ -1617,5 +1757,11 @@ export default {
 }
 .index-badge .el-badge__content {
   background: gray;
+}
+.el-table .bold-row {
+  font-weight: bold;
+}
+.el-table .fade-row {
+  color: #b0b4bb;
 }
 </style>

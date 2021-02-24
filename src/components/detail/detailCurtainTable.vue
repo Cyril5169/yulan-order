@@ -472,9 +472,7 @@ export default {
   ],
   computed: {
     salPromotion() {
-      var selectActivity = this.activityOptions.filter(
-        (item) => item.P_ID == this.headerData.activityId
-      );
+      var selectActivity = this.activityOptions.filter((item) => item.P_ID == this.headerData.activityId);
       if (selectActivity.length) {
         return selectActivity[0];
       } else {

@@ -35,9 +35,8 @@
             :picker-options="pickerOptions"></el-date-picker>
         </span>
       </span>
-      <br />
       <span class="zoomLeft">
-        备注：
+        兰居处理说明：
         <span class="zoomRight">
           <el-input size="mini" v-model="ruleForm.LANJU_NOTE" style="width: 500px;"></el-input>
         </span>
@@ -96,7 +95,7 @@
                     <template v-if="scope.row.WIDTH_ENABLE == 1">
                       <span>【宽】: {{ scope.row.WIDTH }}m</span>
                     </template>
-                    <template v-if="scope.row.WIDTH_ENABLE == 2">
+                    <template v-else-if="scope.row.WIDTH_ENABLE == 2">
                       <span>【宽】: <el-input v-model="scope.row.WIDTH" style="width:40px;" size="mini"
                           @input="changeOneWidthOrHeight($event, scope.$index, scopeHead.$index)" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
@@ -108,7 +107,7 @@
                     <template v-if="scope.row.HEIGHT_ENABLE == 1">
                       <span>【高】: {{ scope.row.HEIGHT }}m</span>
                     </template>
-                    <template v-if="scope.row.HEIGHT_ENABLE == 2">
+                    <template v-else-if="scope.row.HEIGHT_ENABLE == 2">
                       <span>【高】: <el-input v-model="scope.row.HEIGHT" style="width:40px;" size="mini"
                           @input="changeOneWidthOrHeight($event, scope.$index, scopeHead.$index)" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
@@ -123,7 +122,7 @@
                     <template v-if="scope.row.LEFT_ENABLE == 1">
                       <span>【左转角】: {{ scope.row.LEFT_FILLET }}m</span>
                     </template>
-                    <template v-if="scope.row.LEFT_ENABLE == 2">
+                    <template v-else-if="scope.row.LEFT_ENABLE == 2">
                       <span>【左转角】: <el-input v-model="scope.row.LEFT_FILLET" style="width:40px;" size="mini"
                           @input="changeOneWidthOrHeight($event, scope.$index, scopeHead.$index)" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
@@ -135,7 +134,7 @@
                     <template v-if="scope.row.RIGHT_ENABLE == 1">
                       <span>【右转角】: {{ scope.row.RIGHT_FILLET }}m</span>
                     </template>
-                    <template v-if="scope.row.RIGHT_ENABLE == 2">
+                    <template v-else-if="scope.row.RIGHT_ENABLE == 2">
                       <span>【右转角】: <el-input v-model="scope.row.RIGHT_FILLET" style="width:40px;" size="mini"
                           @input="changeOneWidthOrHeight($event, scope.$index, scopeHead.$index)" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
@@ -150,7 +149,7 @@
                     <template v-if="scope.row.TIE_ENABLE == 1">
                       <span>【么术贴】: {{ scope.row.MESUTIE | meshutie_filter}}</span>
                     </template>
-                    <template v-if="scope.row.TIE_ENABLE == 2">
+                    <template v-else-if="scope.row.TIE_ENABLE == 2">
                       <span>【么术贴】: </span>
                       <el-dropdown trigger="click">
                         <a class="a-userset">{{ scope.row.MESUTIE? scope.row.MESUTIE : '请选择' | meshutie_filter}}</a>
@@ -166,7 +165,7 @@
                     <template v-if="scope.row.KAIKOU_ENABLE == 1">
                       <span>【打开方式】: {{ scope.row.KAIKOU | kaikou_filter }}</span>
                     </template>
-                    <template v-if="scope.row.KAIKOU_ENABLE == 2">
+                    <template v-else-if="scope.row.KAIKOU_ENABLE == 2">
                       <span>【打开方式】: </span>
                       <el-dropdown trigger="click">
                         <a class="a-userset">{{ scope.row.KAIKOU? scope.row.KAIKOU : '请选择' | kaikou_filter}}</a>
@@ -183,7 +182,7 @@
                     <template v-if="scope.row.OPERATION_ENABLE == 1">
                       <span>【工艺方式】: {{ scope.row.OPERATION | operation_filter }}</span>
                     </template>
-                    <template v-if="scope.row.OPERATION_ENABLE == 2">
+                    <template v-else-if="scope.row.OPERATION_ENABLE == 2">
                       <span>【工艺方式】: </span>
                       <el-dropdown trigger="click">
                         <a class="a-userset">{{ scope.row.OPERATION? scope.row.OPERATION : '请选择' | operation_filter}}</a>
@@ -199,7 +198,7 @@
                     <template v-if="scope.row.BIAN_ENABLE == 1">
                       <span>【包边方式】: {{ scope.row.BIAN | bian_filter }}</span>
                     </template>
-                    <template v-if="scope.row.BIAN_ENABLE == 2">
+                    <template v-else-if="scope.row.BIAN_ENABLE == 2">
                       <span>【包边方式】: </span>
                       <el-dropdown trigger="click" @command="handleBianCommand($event, scope.row, scopeHead.$index)">
                         <a class="a-userset">{{ scope.row.BIAN? scope.row.BIAN : '请选择' | bian_filter}}</a>
@@ -403,10 +402,10 @@
                 <el-table-column label="名称" width="80" header-align="center" prop="NOTE">
                 </el-table-column>
                 <el-table-column label="库存" width="60" align="center" prop="curtain_store"></el-table-column>
-                <el-table-column label="单价" width="60" align="center" prop="curtain_price">
+                <el-table-column label="单价" width="60" align="center" prop="PRICE">
                   <template slot-scope="scope">
                     <!-- 只有部件算钱 -->
-                    <span v-if="scope.row.curtain_level == 0">{{scope.row.curtain_price}}</span>
+                    <span v-if="scope.row.curtain_level == 0">{{scope.row.PRICE}}</span>
                     <span v-else>-</span>
                   </template>
                 </el-table-column>
@@ -696,7 +695,6 @@ export default {
         if (this.ruleForm.JIAOHUO_DATE == '9999/12/31 00:00:00') this.ruleForm.JIAOHUO_DATE = "";
         this.getCustomer();
         for (let i = 0; i < this.ruleForm.ORDERBODY.length; i++) {
-          this.ruleForm.ORDERBODY[i].checkStatus = "未修改";
           this.expands.push(this.ruleForm.ORDERBODY[i].LINE_NO);
         }
         this.dealCurtainData();
@@ -705,6 +703,7 @@ export default {
         });
       });
     },
+    //处理窗帘数据
     dealCurtainData() {
       for (var i = 0; i < this.ruleForm.ORDERBODY.length; i++) {
         var detail = this.ruleForm.ORDERBODY[i];
@@ -748,7 +747,7 @@ export default {
           this.$set(detail.curtain_change[j], "curtain_choose", true);
           //单价
           var price = this.getPrice(this.cus_customerType, detail.curtain_change[j]);
-          this.$set(detail.curtain_change[j], "curtain_price", price);
+          this.$set(detail.curtain_change[j], "PRICE", price);
           //宽
           var curtain_width = 0;
           if (detail.curtain_change[j].WIDTH_ENABLE > 0) {
@@ -766,27 +765,27 @@ export default {
             }
           }
           //总数（面积）
-          var area = this.dosageFilter(curtain_width * curtain_height);
-          if (detail.curtain_change[j].NC_PART_TYPECODE == "GBD") area = 1; //挂绑带默认为1
-          this.$set(detail.curtain_change[j], "curtain_area", area);
+          var dosage = this.dosageFilter(curtain_width * curtain_height);
+          if (detail.curtain_change[j].NC_PART_TYPECODE == "GBD") dosage = 1; //挂绑带默认为1
+          this.$set(detail.curtain_change[j], "DOSAGE", dosage);
           if (detail.curtain_change[j].NC_PART_TYPECODE == "LS") {
             //改变里衬布的
             var LCBITEM = detail.curtain_change.filter((item) => item.NC_PART_TYPECODE == "LCB");
             for (var k = 0; k < LCBITEM.length; k++) {
               //假设有多个里衬布的情况
-              LCBITEM[k].curtain_area = area;
+              LCBITEM[k].DOSAGE = dosage;
             }
           }
           //左转角
-          this.$set(detail.curtain_change[j], "curtain_left_fillet", 0);
+          this.$set(detail.curtain_change[j], "LEFT_FILLET", 0);
           //右转角
-          this.$set(detail.curtain_change[j], "curtain_right_fillet", 0);
+          this.$set(detail.curtain_change[j], "RIGHT_FILLET", 0);
           //库存
           this.$set(detail.curtain_change[j], "curtain_store", "");
           //客户备注
           this.$set(detail.curtain_change[j], "curtain_note", "");
           //说明
-          this.$set(detail.curtain_change[j], "curtain_remark", "");
+          this.$set(detail.curtain_change[j], "ILLUSTRATE", "");
         }
         detail.curtain_change = this.getStoreData(detail.curtain_change);
       }
@@ -797,7 +796,7 @@ export default {
         ...data,
         ORDER_NO: this.orderNumber,
         ORDER_ITEM_ID: this.ruleForm.ORDERBODY[this.currentIndex].curtains[0].ORDER_ITEM_ID,
-        PRICE: data.curtain_price,
+        PRICE: data.PRICE,
         ITEM_ID: data.ITEM_NO,
         WIDTH: data.curtain_width,
         HEIGHT: data.curtain_height,
@@ -805,8 +804,8 @@ export default {
         UNIT: data.UNIT_NAME,
         CURTAIN_ITEM_NAME: data.NOTE,
         CURTAIN_PART_NAME: this.transPartTypeCode(data.NC_PART_TYPECODE),
-        DOSAGE: data.curtain_area,
-        ILLUSTRATE: data.curtain_remark,
+        DOSAGE: data.DOSAGE,
+        ILLUSTRATE: data.ILLUSTRATE,
         INLINE_NO: 0,
         LINE_NO: this.ruleForm.ORDERBODY[this.currentIndex].LINE_NO,
         KAIKOU: data.NCM_KAIKOU,
@@ -816,8 +815,8 @@ export default {
         WRINKLE: data.NCM_WRINKLE,
         MAKETYPE: data.NCM_MAKETYPE,
         MESUTIE: data.NCM_MESUTIE,
-        LEFT_FILLET: data.curtain_left_fillet,
-        RIGHT_FILLET: data.curtain_right_fillet,
+        LEFT_FILLET: data.LEFT_FILLET,
+        RIGHT_FILLET: data.RIGHT_FILLET,
       }
       return returnData;
     },
@@ -887,7 +886,8 @@ export default {
     },
     //改变单个宽或者高
     changeOneWidthOrHeight(val, index1, index) {
-      var oneCurtain = this.ruleForm.ORDERBODY[index].curtains[index1];
+      this.currentIndex = index;
+      var oneCurtain = this.ruleForm.ORDERBODY[this.currentIndex].curtains[index1];
       var width = this.convertNumber(oneCurtain.WIDTH);
       var height = this.convertNumber(oneCurtain.HEIGHT);
       var left_fillet = this.convertNumber(oneCurtain.LEFT_FILLET);
@@ -900,24 +900,27 @@ export default {
       }
       if (oneCurtain.NC_PART_TYPECODE == "LS") {
         //改变里衬布的
-        var LCBITEM = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NC_PART_TYPECODE == "LCB");
+        var LCBITEM = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter((item) => item.NC_PART_TYPECODE == "LCB");
         for (var i = 0; i < LCBITEM.length; i++) {
           //假设有多个里衬布的情况
           LCBITEM[i].DOSAGE = oneCurtain.DOSAGE;
         }
       }
+      this.getRemark(index1);
     },
     //直接改变帘身用量
     changeLSArea(val, index1, index) {
-      var oneCurtain = this.ruleForm.ORDERBODY[index].curtains[index1];
+      this.currentIndex = index;
+      var oneCurtain = this.ruleForm.ORDERBODY[this.currentIndex].curtains[index1];
       if (oneCurtain.NC_PART_TYPECODE == "LS") {
         //改变里衬布的
-        var LCBITEM = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NC_PART_TYPECODE == "LCB");
+        var LCBITEM = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter((item) => item.NC_PART_TYPECODE == "LCB");
         for (var i = 0; i < LCBITEM.length; i++) {
           //假设有多个里衬布的情况
           LCBITEM[i].DOSAGE = oneCurtain.DOSAGE;
         }
       }
+      this.getRemark(index1);
     },
     //一个子件的总价
     oneTotal(row) {
@@ -941,10 +944,10 @@ export default {
       if (common == "4B" && row.BIAN != "4B") {
         //显示拉边条
         //先看看当前数据有没有这个拉边条，有的话应该是bug
-        var lbtItemNow = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
+        var lbtItemNow = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter((item) => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
         if (lbtItemNow.length) return;
         //找到最大序号的面料,并且是要勾选的
-        var mlList = this.ruleForm.ORDERBODY[index].curtains.filter(
+        var mlList = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter(
           (item) =>
             item.NCM_PID == row.NC_MODEL_ID &&
             item.NC_PART_TYPECODE != "LBT" &&
@@ -952,15 +955,15 @@ export default {
         );
         if (mlList.length) {
           //在修改后的数据中找到拉边条数据并push进去
-          var lbtItem = this.ruleForm.ORDERBODY[index].curtain_change.filter((item) => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
+          var lbtItem = this.ruleForm.ORDERBODY[this.currentIndex].curtain_change.filter((item) => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
           if (lbtItem.length) {
             lbtItem = lbtItem[0]; //只取第一个拉边条（按理应该只有一个）
             lbtItem = this.dealInsertData(lbtItem);
-            this.ruleForm.ORDERBODY[index].curtains.push({ ...lbtItem });
+            this.ruleForm.ORDERBODY[this.currentIndex].curtains.push({ ...lbtItem });
             //强制改成对应的ITEM_NO
-            this.ruleForm.ORDERBODY[index].curtains[this.ruleForm.ORDERBODY[index].curtains.length - 1].ITEM_NO = mlList[mlList.length - 1].MATERIAL_NO;
+            this.ruleForm.ORDERBODY[this.currentIndex].curtains[this.ruleForm.ORDERBODY[this.currentIndex].curtains.length - 1].ITEM_NO = mlList[mlList.length - 1].MATERIAL_NO;
             //排序
-            this.ruleForm.ORDERBODY[index].curtains.sort((a, b) => {
+            this.ruleForm.ORDERBODY[this.currentIndex].curtains.sort((a, b) => {
               if (a.NCT_SORTNO == b.NCT_SORTNO) {
                 return a.NCM_SORTNO > b.NCM_SORTNO ? 1 : -1;
               }
@@ -992,11 +995,11 @@ export default {
     itemCanDelete(row) {
       var canDelete = true;
       if (row.curtain_level == 0) {
-        canDelete = row.NCT_CHANGE > 0;
+        canDelete = row.NCT_DELETE > 0;
       } else {
-        canDelete = row.NCT_CHANGE > 0 && row.NCM_CHANGE > 0;
+        canDelete = row.NCT_DELETE > 0 && row.NCM_DELETE > 0;
       }
-      return canDelete; 
+      return canDelete;
     },
     //勾选的联动处理
     onCheckChange(checked, row, index) {
@@ -1140,7 +1143,7 @@ export default {
               this.$set(curtain_list[j], "curtain_choose", true);
               //单价
               var price = this.getPrice(this.cus_customerType, curtain_list[j]);
-              this.$set(curtain_list[j], "curtain_price", price);
+              this.$set(curtain_list[j], "PRICE", price);
             }
             //库存
             curtain_list = this.getStoreData(curtain_list);
@@ -1213,8 +1216,8 @@ export default {
           });
           this.ruleForm.ORDERBODY[this.currentIndex].curtain_change.push(...curtain_temp);
           this.drawerShow = false;
-        })
-          .catch(() => { });
+          this.getRemark();
+        }).catch(() => { });
       }
     },
     //添加其他没有的数据
@@ -1247,26 +1250,26 @@ export default {
           }
         }
         this.$set(originData[i], "curtain_height", curtain_height);
-        //总数（面积）
-        var area = this.dosageFilter(curtain_width * curtain_height);
-        if (originData[i].NC_PART_TYPECODE == "GBD") area = 1; //挂绑带默认为1
-        this.$set(originData[i], "curtain_area", area);
+        //总数（面积）由于开始左右转角都是0，所以不用按公式
+        var dosage = this.dosageFilter(curtain_width * curtain_height);
+        if (originData[i].NC_PART_TYPECODE == "GBD") dosage = 1; //挂绑带默认为1
+        this.$set(originData[i], "DOSAGE", dosage);
         if (originData[i].NC_PART_TYPECODE == "LS") {
           //改变里衬布的
           var LCBITEM = originData.filter((item) => item.NC_PART_TYPECODE == "LCB");
           for (var j = 0; j < LCBITEM.length; j++) {
             //假设有多个里衬布的情况
-            LCBITEM[j].curtain_area = area;
+            LCBITEM[j].DOSAGE = dosage;
           }
         }
         //左转角
-        this.$set(originData[i], "curtain_left_fillet", 0);
+        this.$set(originData[i], "LEFT_FILLET", 0);
         //右转角
-        this.$set(originData[i], "curtain_right_fillet", 0);
+        this.$set(originData[i], "RIGHT_FILLET", 0);
         //客户备注
         this.$set(originData[i], "curtain_note", "");
         //说明
-        this.$set(originData[i], "curtain_remark", "");
+        this.$set(originData[i], "ILLUSTRATE", "");
       }
       return originData;
     },
@@ -1333,8 +1336,8 @@ export default {
         //更新库存
         this.ruleForm.ORDERBODY[this.currentIndex].curtains = this.getStoreData(this.ruleForm.ORDERBODY[this.currentIndex].curtains);
         this.drawerShow2 = false;
-      })
-        .catch(() => { });
+        this.getRemark();
+      }).catch(() => { });
     },
     //获得需要提交的窗帘数据
     getCurtainData() {
@@ -1515,7 +1518,7 @@ export default {
             allCurtains: this.newCurtainData,
             deleteIds: []
           }).then((res) => {
-            this.$alert("操作成功,已将该订单退回给客户进行确认", "提示", {
+            this.$alert("操作成功,已将该订单退回给客户进行修改", "提示", {
               confirmButtonText: "确定",
               type: "success",
             });
@@ -1572,6 +1575,37 @@ export default {
             });
         })
         .catch(() => { });
+    },
+    //获得窗帘的说明
+    getRemark(index) {
+      var curtains = [];
+      if (index == undefined) {
+        curtains = this.ruleForm.ORDERBODY[this.currentIndex].curtains;
+      } else {
+        curtains.push(this.ruleForm.ORDERBODY[this.currentIndex].curtains[index]);
+      }
+      for (var i = 0; i < curtains.length; i++) {
+        var oneCurtain = curtains[i];
+        //最小下单量。帘头1.帘身，窗纱4
+        if (oneCurtain.NC_PART_TYPECODE == 'LT') {
+          if (oneCurtain.DOSAGE < 1) {
+            if (oneCurtain.ILLUSTRATE.indexOf('不足1平方米。按1平方米下单量收费;') == -1) {
+              oneCurtain.ILLUSTRATE += '不足1平方米。按1平方米下单量收费;';
+            }
+          } else {
+            oneCurtain.ILLUSTRATE = oneCurtain.ILLUSTRATE.replace('不足1平方米。按1平方米下单量收费;', '');
+          }
+        }
+        if (oneCurtain.NC_PART_TYPECODE == 'LS' || oneCurtain.NC_PART_TYPECODE == 'CS') {
+          if (oneCurtain.DOSAGE < 4) {
+            if (oneCurtain.ILLUSTRATE.indexOf('不足4平方米。按4平方米下单量收费;') == -1) {
+              oneCurtain.ILLUSTRATE += '不足4平方米。按4平方米下单量收费;';
+            }
+          } else {
+            oneCurtain.ILLUSTRATE = oneCurtain.ILLUSTRATE.replace('不足4平方米。按4平方米下单量收费;', '');
+          }
+        }
+      }
     },
     //隔行变色
     headTableRowClassName({ row, rowIndex }) {
@@ -1781,8 +1815,8 @@ export default {
   padding: 0 2px !important;
 }
 .curtain-list .el-input__inner {
-  padding: 0 5px;
-  height: 20px;
+  padding: 0 5px !important;
+  height: 20px !important;
 }
 .index-badge .el-badge__content {
   background: gray;

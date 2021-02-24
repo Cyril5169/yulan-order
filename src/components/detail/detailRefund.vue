@@ -563,9 +563,6 @@ export default {
 #detailRefund .el-table::before {
   height: 0;
 }
-#detailRefund .el-dialog__body {
-  padding: 5px 0;
-}
 </style>
 
 <style scoped>

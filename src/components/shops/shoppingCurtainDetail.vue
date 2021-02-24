@@ -1357,9 +1357,7 @@ export default {
   },
   computed: {
     salPromotion() {
-      var selectActivity = this.activityOptions.filter(
-        (item) => item.P_ID == this.message.activityId
-      );
+      var selectActivity = this.activityOptions.filter((item) => item.P_ID == this.message.activityId);
       if (selectActivity.length) {
         return selectActivity[0];
       } else {

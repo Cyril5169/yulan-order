@@ -37,18 +37,13 @@
           <span class="zoomLeft">状态：</span>
           <span style="color:#8BC34A;font-weight:bold;" class="zoomRight">{{ item.STATUS_ID | transStatus
             }}{{ item.CURTAIN_STATUS_ID | curtainStatus }}</span>
-          <el-tooltip v-if="
-              item.STATUS_ID == 5 ||
-                item.STATUS_ID == 6 ||
-                item.STATUS_ID == 0 ||
-                (item.STATUS_ID == 1 &&
-                  item.CURTAIN_STATUS_ID !== '' &&
-                  item.CURTAIN_STATUS_ID == 0)
-            " class="item" effect="dark" content="作废订单" placement="top">
+          <el-tooltip v-if="item.STATUS_ID == 5 || item.STATUS_ID == 6 || item.STATUS_ID == 0 
+            || (item.STATUS_ID == 1 && item.CURTAIN_STATUS_ID !== '' && item.CURTAIN_STATUS_ID == 0)" class="item" effect="dark"
+            content="作废订单" placement="top">
             <i style="float:right;cursor: pointer;" class="el-icon-delete" @click="deleteOrder(item.ORDER_NO)"></i>
           </el-tooltip>
-          <el-tooltip v-if="item.STATUS_ID == 3 && item.ORDER_NO.slice(0, 1) == 'X'" class="item" effect="dark" content="退回数据到购物车"
-            placement="top">
+          <el-tooltip v-if="item.STATUS_ID == 3 && (item.ORDER_NO.slice(0, 1) == 'X' || item.ORDER_NO.slice(0, 1) == 'N')"
+            class="item" effect="dark" content="退回数据到购物车" placement="top">
             <i style="float:right;cursor: pointer;" class="el-icon-sell" @click="copyCart(item.ORDER_NO)"></i>
           </el-tooltip>
           <a v-if="
@@ -60,6 +55,7 @@
                 item.STATUS_ID == 7 ||
                 item.STATUS_ID == 12) &&
                 (item.ORDER_NO.slice(0, 1) == 'X' ||
+                item.ORDER_NO.slice(0, 1) == 'N' ||
                   item.ORDER_NO.slice(0, 1) == 'Y')
             " target="_blank" style="float:right;font-size:13px;" :href="
               'http://www.luxlano.com/ddkc/DD_bjl.asp?b2b=' + item.ORDER_NO
@@ -117,25 +113,26 @@
           <p style="width:100px; font-size:18px; color:tomato; text-align:center;">
             {{ item.status }}
           </p>
-          <p>
-            <el-button @click="summitCurtain(item)" v-if="
+          <p v-if="
                   (item.CURTAIN_STATUS_ID == 0 ||
                     item.CURTAIN_STATUS_ID == 4) &&
-                    item.STATUS_ID == 0
-                " size="medium" type="primary" plain>提交订单</el-button>
+                    item.STATUS_ID == 0 && item.ORDER_NO.slice(0, 1) == 'X'">
+            <el-button @click="summitCurtain(item)" size="medium" type="primary" plain>提交订单</el-button>
+          </p>
+          <p v-if="
+                  (item.CURTAIN_STATUS_ID == 0 ||
+                    item.CURTAIN_STATUS_ID == 4) &&
+                    item.STATUS_ID == 0 && item.ORDER_NO.slice(0, 1) == 'N'">
+            <el-button @click="summitNewCurtain(item)" size="medium" type="primary" plain>提交订单</el-button>
+          </p>
+          <p v-if="item.STATUS_ID == 5 || item.STATUS_ID == 6" @click="refreshPay(item)">
+            <el-button size="medium" type="danger" plain>提交订单</el-button>
           </p>
           <p>
-            <el-button v-if="item.STATUS_ID == 5 || item.STATUS_ID == 6" @click="refreshPay(item)" size="medium" type="danger"
-              plain>提交订单</el-button>
-          </p>
-          <p>
-            <el-button @click="
-                  toCheckExamine(
+            <el-button @click="toCheckExamine(
                     item.ORDER_NO,
                     item.CURTAIN_STATUS_ID,
-                    item.STATUS_ID
-                  )
-                " size="medium" type="success">订单详情</el-button>
+                    item.STATUS_ID)" size="medium" type="success">订单详情</el-button>
           </p>
         </div>
       </el-card>
@@ -439,7 +436,51 @@ export default {
       sessionStorage.setItem("shopping", JSON.stringify(transCookies));
       sessionStorage.setItem("shoppingHead", JSON.stringify(item));
       Cookies.set("cur_status", 3);
+      Cookies.set("new_cur_status", 0);
       this.addTab("order/checkOrder");
+    },
+    summitNewCurtain(item){
+      let orderBody = item.ORDERBODY;
+      let transCookies = [];
+      for (let i = 0; i < orderBody.length; i++) {
+        transCookies[i] = new Object();
+        transCookies[i].width = orderBody[i].CURTAIN_WIDTH;
+        transCookies[i].height = orderBody[i].CURTAIN_HEIGHT;
+        transCookies[i].orderNumber = item.ORDER_NO;
+        transCookies[i].lineNo = orderBody[i].LINE_NO;
+        transCookies[i].activityId = orderBody[i].curtains[0].activityId;
+        transCookies[i].quantity = orderBody[i].QTY_REQUIRED;
+        var price = 0;
+        for (let j = 0; j < orderBody[i].curtains.length; j++) {
+          price += this.oneTotal(orderBody[i].curtains[j]);
+        }
+        transCookies[i].price = price;
+        transCookies[i].splitShipment = orderBody[i].PART_SEND_ID;
+        transCookies[i].activityName = orderBody[i].PROMOTION;
+        transCookies[i].unit = orderBody[i].UNIT;
+        transCookies[i].item = orderBody[i].item;
+      }
+      sessionStorage.setItem("shopping", JSON.stringify(transCookies));
+      sessionStorage.setItem("shoppingHead", JSON.stringify(item));
+      Cookies.set("cur_status", 3);
+      Cookies.set("new_cur_status", 1);
+      this.addTab("order/checkOrder");
+    },
+    //一个子件的总价
+    oneTotal(row) {
+      var price = 0;
+      if (row.DOSAGE) {
+        price = row.PRICE;
+        //最小下单量 帘头1.帘身，窗纱4
+        var DOSAGE = row.DOSAGE;
+        if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < 1) {
+          DOSAGE = 1;
+        } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4) {
+          DOSAGE = 4;
+        }
+        price = price.mul(DOSAGE)
+      }
+      return price;
     },
     //查看审核
     toCheckExamine(value, ID, status) {
@@ -474,7 +515,6 @@ export default {
       getAllOrders(data).then((res) => {
         this.count = res.count;
         this.data = res.data;
-        console.log(res.data)
         this.$root.$emit("refreshBadgeIcon", "orderDeal");
       });
     },
@@ -544,36 +584,35 @@ export default {
           cancelOrderNew({
             cid: Cookies.get("cid"),
             orderNo: pushOrderNum,
-          })
-            .then((res) => {
-              if (pushOrderNum.slice(0, 1) == "X") {
-                this.$confirm("作废成功，是否退回数据到购物车？", "提示", {
-                  confirmButtonText: "是",
-                  cancelButtonText: "否",
-                  type: "warning",
-                })
-                  .then(() => {
-                    var data3 = {
-                      orderNo: pushOrderNum,
-                    };
-                    copyCartItem(data3).then((res) => {
-                      this.$alert("复制成功，请到购物车中查看", "提示", {
-                        confirmButtonText: "确定",
-                        type: "success",
-                      });
-                      this.$root.$emit("refreshBadgeIcon", "curtainCount");
+          }).then((res) => {
+            if (pushOrderNum.slice(0, 1) == "X" || pushOrderNum.slice(0, 1) == "N") {
+              this.$confirm("作废成功，是否退回数据到购物车？", "提示", {
+                confirmButtonText: "是",
+                cancelButtonText: "否",
+                type: "warning",
+              })
+                .then(() => {
+                  var data3 = {
+                    orderNo: pushOrderNum,
+                  };
+                  copyCartItem(data3).then((res) => {
+                    this.$alert("复制成功，请到购物车中查看", "提示", {
+                      confirmButtonText: "确定",
+                      type: "success",
                     });
-                  })
-                  .catch(() => { });
-              } else {
-                this.$alert("删除成功", "提示", {
-                  confirmButtonText: "确定",
-                  type: "success",
-                });
-              }
-              this.refresh();
-              this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
-            })
+                    this.$root.$emit("refreshBadgeIcon", "curtainCount");
+                  });
+                })
+                .catch(() => { });
+            } else {
+              this.$alert("作废成功", "提示", {
+                confirmButtonText: "确定",
+                type: "success",
+              });
+            }
+            this.refresh();
+            this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
+          })
             .catch((res) => {
               this.$alert("删除失败,请刷新订单", "提示", {
                 confirmButtonText: "确定",

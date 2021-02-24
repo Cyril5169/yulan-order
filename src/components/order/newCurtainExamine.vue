@@ -321,6 +321,7 @@ export default {
       Cookies.set("ORDER_NO", val);
       Cookies.set("CURTAIN_STATUS_ID", -1);
       Cookies.set("status_ID", -2);
+      Cookies.set("isExamine", "true");
       this.addTab("order/checkExamine");
     },
     _back(item) {

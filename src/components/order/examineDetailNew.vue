@@ -634,7 +634,6 @@ export default {
         this.ruleForm = res.data[0];
         this.getCustomer();
         for (let i = 0; i < this.ruleForm.ORDERBODY.length; i++) {
-          this.ruleForm.ORDERBODY[i].checkStatus = "未修改";
           this.expands.push(this.ruleForm.ORDERBODY[i].LINE_NO);
         }
         this.dealCurtainData();
@@ -1622,7 +1621,7 @@ export default {
         .then(() => {
           updateCurtainOrder(data)
             .then((res) => {
-              this.$alert("操作成功,已将该订单退回给客户进行确认", "提示", {
+              this.$alert("操作成功,已将该订单退回给客户进行修改", "提示", {
                 confirmButtonText: "确定",
                 type: "success",
               });

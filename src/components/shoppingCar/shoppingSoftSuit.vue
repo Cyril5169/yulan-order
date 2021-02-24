@@ -530,6 +530,7 @@ export default {
         JSON.stringify(this.multipleSelection)
       );
       Cookies.set("cur_status", 0);
+      Cookies.set("new_cur_status", 0);
       this.addTab("order/checkOrder");
     },
     //收起不能

@@ -361,6 +361,7 @@ export default {
       }
       sessionStorage.setItem("shopping", JSON.stringify(this.multipleSelection));
       Cookies.set("cur_status", 3);
+      Cookies.set("new_cur_status", 0);
       this.addTab("order/checkOrder");
     },
     //收起不能

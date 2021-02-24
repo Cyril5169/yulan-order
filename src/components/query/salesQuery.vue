@@ -317,9 +317,6 @@ export default {
 .diagTable .el-table th.is-leaf {
   border-color: black;
 }
-#areaQuery .el-dialog__body {
-  padding: 20px;
-}
 .transferP .el-transfer-panel .el-transfer-panel__header {
   height: 30px;
   line-height: 30px;

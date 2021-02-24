@@ -14,6 +14,10 @@
           :preview-src-list="fileList2"></el-image>
       </div>
     </el-dialog>
+    <el-dialog v-if="newCurtainDetailVisible" title="窗帘详情" :visible.sync="newCurtainDetailVisible" width="1200px" top="5vh"
+      :close-on-click-modal="false">
+      <newCurtainOrderDetail :ORDERBODY="selectOrderDetail" :ruleForm="ruleForm" />
+    </el-dialog>
 
     <div slot="header">
       <span class="headSpan">订单详情</span>
@@ -114,7 +118,12 @@
             <el-button @click="openDialog(scope.row, scope.$index)" type="primary" size="mini">查看详情</el-button>
           </template>
         </el-table-column>
-        <el-table-column v-if="check_CURTAIN_STATUS_ID == 1 && isX" align="center" prop="checkStatus" label="是否修改" width="80">
+        <el-table-column v-if="isN" align="center" label="窗帘详情" width="105">
+          <template slot-scope="scope">
+            <el-button @click="openNewCurtain(scope.row, scope.$index)" type="primary" size="mini">查看详情</el-button>
+          </template>
+        </el-table-column>
+        <el-table-column v-if="check_CURTAIN_STATUS_ID == 1 && (isX || isN)" align="center" prop="checkStatus" label="是否修改" width="80">
         </el-table-column>
       </el-table>
 
@@ -124,10 +133,10 @@
         <el-button v-if="check_CURTAIN_STATUS_ID == 2" @click="_pass()" size="medium" type="success">确认兰居修改</el-button>
         <el-button :disabled="exButton" v-if="check_CURTAIN_STATUS_ID == 1" @click="LjExamine()" size="medium" type="success">确认修改
         </el-button>
-        <el-button v-if="
-            (check_CURTAIN_STATUS_ID == 0 || check_CURTAIN_STATUS_ID == 4) &&
-              check_STATUS_ID == 0
-          " @click="summitCurtain" size="medium" type="primary">提交订单</el-button>
+        <el-button v-if="(check_CURTAIN_STATUS_ID == 0 || check_CURTAIN_STATUS_ID == 4) && check_STATUS_ID == 0 && isX"
+          @click="summitCurtain" size="medium" type="primary">提交订单</el-button>
+        <el-button v-if="(check_CURTAIN_STATUS_ID == 0 || check_CURTAIN_STATUS_ID == 4) && check_STATUS_ID == 0 && isN"
+          @click="summitNewCurtain" size="medium" type="primary">提交订单</el-button>
         <el-button v-if="check_STATUS_ID == 5 || check_STATUS_ID == 6" @click="refreshPay()" size="medium" type="danger" plain>
           提交订单</el-button>
       </div>
@@ -189,10 +198,11 @@ import {
   updateCurtainOrderStatus,
   settlementAgain
 } from "@/api/orderListASP";
+import { downLoadFile } from "@/common/js/downLoadFile";
 import { mapMutations, mapActions } from "vuex";
 import Cookies from "js-cookie";
 import DetailCurtainTable from "../detail/detailCurtainTable";
-import { downLoadFile } from "@/common/js/downLoadFile";
+import NewCurtainOrderDetail from "./newCurtainOrderDetail";
 
 export default {
   name: "examineDatail",
@@ -201,13 +211,13 @@ export default {
     return {
       button_1: true,
       deleteIds: [],
-      defeatButton: false,
       exButton: true,
       ljsuggestion: "", //兰居审核意见
       cyLineNo: 0,
       allCurtains: [],
       headerData: {},
       isX: false,
+      isN: false,
       curtainData: "",
       Initial_balance: 0,
       renderArray: [],
@@ -217,6 +227,7 @@ export default {
       check_STATUS_ID: "",
       orderNum: "",
       detailVisible: false,
+      newCurtainDetailVisible: false,
       buyUserPictureVisible: false,
       fileList: [],
       fileList2: [],
@@ -232,10 +243,12 @@ export default {
         ORDERBODY: [],
       },
       showExportProduct: false,
+      selectOrderDetail: {}
     };
   },
   components: {
     DetailCurtainTable,
+    NewCurtainOrderDetail
   },
   filters: {
     priceFilter(value) {
@@ -267,25 +280,6 @@ export default {
       s = s < 10 ? "0" + s : s;
       return y + "-" + MM + "-" + d + " " + h + ":" + m + ":" + s;
     },
-  },
-  created: function () {
-    this.orderNum = Cookies.get("ORDER_NO");
-    this.isX = this.orderNum.slice(0, 1) == "X";
-    this.check_CURTAIN_STATUS_ID = Cookies.get("CURTAIN_STATUS_ID");
-    this.check_STATUS_ID = Cookies.get("status_ID");
-    this.getDetail();
-    if (this.isShowButton != undefined) {
-      this.button_1 = this.isShowButton;
-    }
-  },
-  activated() {
-    if (this.isShowButton != undefined) {
-      this.orderNum = Cookies.get("ORDER_NO");
-      this.isX = this.orderNum.slice(0, 1) == "X";
-      this.check_CURTAIN_STATUS_ID = Cookies.get("CURTAIN_STATUS_ID");
-      this.check_STATUS_ID = Cookies.get("status_ID");
-      this.getDetail();
-    }
   },
   methods: {
     formatRole: function (row, column) {
@@ -347,8 +341,55 @@ export default {
       sessionStorage.setItem("shopping", JSON.stringify(transCookies));
       sessionStorage.setItem("shoppingHead", JSON.stringify(item));
       Cookies.set("cur_status", 3);
+      Cookies.set("new_cur_status", 0);
       this.addTab("order/checkOrder");
       this.closeTab("order/checkExamine");
+    },
+    summitNewCurtain() {
+      var item = this.ruleForm;
+      let orderBody = item.ORDERBODY;
+      let transCookies = [];
+      for (let i = 0; i < orderBody.length; i++) {
+        transCookies[i] = new Object();
+        transCookies[i].width = orderBody[i].CURTAIN_WIDTH;
+        transCookies[i].height = orderBody[i].CURTAIN_HEIGHT;
+        transCookies[i].orderNumber = item.ORDER_NO;
+        transCookies[i].lineNo = orderBody[i].LINE_NO;
+        transCookies[i].activityId = orderBody[i].curtains[0].activityId;
+        transCookies[i].quantity = orderBody[i].QTY_REQUIRED;
+        //重新计算价格
+        var price = 0;
+        for (let j = 0; j < orderBody[i].curtains.length; j++) {
+          price += this.oneTotal(orderBody[i].curtains[j]);
+        }
+        transCookies[i].price = price;
+        transCookies[i].splitShipment = orderBody[i].PART_SEND_ID;
+        transCookies[i].activityName = orderBody[i].PROMOTION;
+        transCookies[i].unit = orderBody[i].UNIT;
+        transCookies[i].item = orderBody[i].item;
+      }
+      sessionStorage.setItem("shopping", JSON.stringify(transCookies));
+      sessionStorage.setItem("shoppingHead", JSON.stringify(item));
+      Cookies.set("cur_status", 3);
+      Cookies.set("new_cur_status", 1);
+      this.addTab("order/checkOrder");
+      this.closeTab("order/checkExamine");
+    },
+    //一个子件的总价
+    oneTotal(row) {
+      var price = 0;
+      if (row.DOSAGE) {
+        price = row.PRICE;
+        //最小下单量 帘头1.帘身，窗纱4
+        var DOSAGE = row.DOSAGE;
+        if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < 1) {
+          DOSAGE = 1;
+        } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4) {
+          DOSAGE = 4;
+        }
+        price = price.mul(DOSAGE)
+      }
+      return price;
     },
     //客户修改
     LjExamine() {
@@ -471,27 +512,23 @@ export default {
       this.headerData.activityId = tab.curtains[0].activityId;
       this.headerData.activityName = tab.PROMOTION;
     },
+    openNewCurtain(tab, index) {
+      this.newCurtainDetailVisible = true;
+      this.selectOrderDetail = tab;
+      this.tableIndex = index;
+      this.cyLineNo = index + 1;
+    },
     //保存修改
     saveChange() {
-      this.renderArray = this.ruleForm.ORDERBODY[this.tableIndex];
-      this.renderArray.checkStatus = "已修改";
-      this.Render();
+      this.ruleForm.ORDERBODY[this.tableIndex].checkStatus = "已修改";
       this.detailVisible = false;
       this.exButton = false;
-      this.defeatButton = true;
-    },
-    //渲染
-    Render() {
-      this.$set(this.ruleForm.ORDERBODY, this.tableIndex, this.renderArray);
-      this.passORback = true;
     },
     getDetail() {
       getOrderDetails({ orderNo: this.orderNum }).then((res) => {
         this.ruleForm = res.data[0];
-        if (
-          this.ruleForm.CUSTOMER_CODE == "C01613" ||
-          this.ruleForm.CUSTOMER_CODE == "C01613A"
-        ) {
+        console.log(res)
+        if (this.ruleForm.CUSTOMER_CODE == "C01613" || this.ruleForm.CUSTOMER_CODE == "C01613A") {
           this.showExportProduct = true;
         }
         if (this.ruleForm.BUYUSER_PICTURE) {
@@ -504,7 +541,7 @@ export default {
           }
         }
         for (let i = 0; i < this.ruleForm.ORDERBODY.length; i++) {
-          this.ruleForm.ORDERBODY[i].checkStatus = "未修改";
+          this.$set(this.ruleForm.ORDERBODY[i], "checkStatus", "未修改");
         }
         var recordData = {
           orderNo: this.orderNum,
@@ -534,13 +571,12 @@ export default {
         });
         this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
         this.addTab("order/myOrder");
-      })
-        .catch((res) => {
-          this.$alert("提交失败！" + res.msg, "提示", {
-            confirmButtonText: "确定",
-            type: "warning",
-          });
+      }).catch((res) => {
+        this.$alert("提交失败！" + res.msg, "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
         });
+      });
     },
     handleImgClick(index) {
       let tempImgList = [...this.fileList];
@@ -559,26 +595,24 @@ export default {
           confirmButtonText: "确定",
           type: "warning",
         }
-      )
-        .then(() => {
-          ljExportProductExcel({
-            cid: Cookies.get("cid"),
-            orderNo: this.orderNum,
-          }).then((res) => {
-            if (res.msg) {
-              downLoadFile(
-                this.Global.baseUrl + `DownLoadAPI/DownloadFile?path=${res.msg}`
-              );
-              this.closeToTab({
-                oldUrl: "order/checkExamine",
-                newUrl: "order/examine",
-              });
-            }
-          });
-        })
-        .catch(() => {
-          return;
+      ).then(() => {
+        ljExportProductExcel({
+          cid: Cookies.get("cid"),
+          orderNo: this.orderNum,
+        }).then((res) => {
+          if (res.msg) {
+            downLoadFile(
+              this.Global.baseUrl + `DownLoadAPI/DownloadFile?path=${res.msg}`
+            );
+            this.closeToTab({
+              oldUrl: "order/checkExamine",
+              newUrl: "order/examine",
+            });
+          }
         });
+      }).catch(() => {
+        return;
+      });
     },
     //合计行显示
     getSummaries({ columns, data }) {
@@ -624,6 +658,27 @@ export default {
     },
     ...mapMutations("navTabs", ["addTab"]),
     ...mapActions("navTabs", ["closeTab", "closeToTab"]),
+  },
+  created: function () {
+    this.orderNum = Cookies.get("ORDER_NO");
+    this.isX = this.orderNum.slice(0, 1) == "X";
+    this.isN = this.orderNum.slice(0, 1) == "N";
+    this.check_CURTAIN_STATUS_ID = Cookies.get("CURTAIN_STATUS_ID");
+    this.check_STATUS_ID = Cookies.get("status_ID");
+    this.getDetail();
+    if (this.isShowButton != undefined) {
+      this.button_1 = this.isShowButton;
+    }
+  },
+  activated() {
+    if (this.isShowButton != undefined) {
+      this.orderNum = Cookies.get("ORDER_NO");
+      this.isX = this.orderNum.slice(0, 1) == "X";
+      this.isN = this.orderNum.slice(0, 1) == "N";
+      this.check_CURTAIN_STATUS_ID = Cookies.get("CURTAIN_STATUS_ID");
+      this.check_STATUS_ID = Cookies.get("status_ID");
+      this.getDetail();
+    }
   },
 };
 </script>
@@ -681,8 +736,5 @@ export default {
   background: #f0f9eb;
   color: tomato;
   text-decoration: line-through;
-}
-.centerCard .el-dialog__body {
-  padding: 10px;
 }
 </style>

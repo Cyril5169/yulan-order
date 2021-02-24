@@ -345,7 +345,4 @@ export default {
 .el-table .success-row {
   background: #f0f9eb;
 }
-.centerCard .el-dialog__body {
-  padding: 10px;
-}
 </style>

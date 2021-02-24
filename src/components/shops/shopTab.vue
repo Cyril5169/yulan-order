@@ -423,9 +423,6 @@ export default {
 #storeTable .el-table__header-wrapper {
   display: none;
 }
-#storeTable .el-dialog__body {
-  padding: 20px;
-}
 #shopTabCon .el-tabs__header {
   margin: 0;
 }

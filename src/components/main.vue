@@ -886,7 +886,7 @@ export default {
         }
         this.refreshMoneyClass = "el-icon-refresh-left";
       }).catch((err) => {
-          console.log(err);
+        console.log(err);
       });
     },
     lastClick() {
@@ -1394,7 +1394,10 @@ export default {
   padding: 10px !important;
 }
 .el-dialog__body {
-  padding: 20px !important;
+  padding: 10px !important;
+}
+.el-dialog__header {
+  padding: 10px !important;
 }
 .el-table td,
 .el-table th {

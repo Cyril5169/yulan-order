@@ -29,14 +29,14 @@
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
                            .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
-          <!-- 暗槽高 -->              
+          <!-- 暗槽高 -->
           <span style="margin-left:20px;">暗槽高<span style="color:red;">*</span>：</span>
           <el-input style="width:60px;" size="mini" v-model="curtainHeadData.ancaoHeight" @input="changeAncaoHeight" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
                            .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
-          <!-- 活动 -->                 
+          <!-- 活动 -->
           <span style="margin-left:20px;">活动：</span>
           <el-select size="mini" style="width:220px" :disabled="activityOptions.length == 1" v-model="curtainHeadData.activityId"
             :placeholder="activityOptions.length == 1? '无可选活动': '请选择活动'">
@@ -241,8 +241,8 @@
                 <span
                   v-if="scope.row.curtain_level == 0 && scope.row.TOTAL_ENABLE == 1">{{scope.row.DOSAGE}}{{scope.row.UNIT_NAME}}</span>
                 <span v-else-if="scope.row.TOTAL_ENABLE == 2">
-                  <el-input v-model="scope.row.DOSAGE" style="width:40px;" size="mini"
-                    @input="changeLSArea($event, scope.$index)" oninput="value=value.replace(/[^\d.]/g,'')
+                  <el-input v-model="scope.row.DOSAGE" style="width:40px;" size="mini" @input="changeLSArea($event, scope.$index)"
+                    oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
@@ -390,6 +390,7 @@ import {
 import { GetPromotionByItem } from "@/api/orderListASP";
 import Cookies from "js-cookie";
 import Axios from "axios";
+import { mapActions } from "vuex";
 
 export default {
   data() {
@@ -526,6 +527,7 @@ export default {
     },
   },
   methods: {
+    ...mapActions("navTabs", ["closeToTab"]),
     //PartType字典
     getPartTypeData() {
       GetPartTypeDataTabale().then((res) => {
@@ -1473,10 +1475,17 @@ export default {
         commodities: details,
         salPromotion: this.salPromotion
       }).then(res => {
-        this.$alert("成功加入购物车！如需继续下单请修改相关信息后再次添加！", "提示", {
-          confirmButtonText: "确定",
-          type: "success",
-        });
+        this.$confirm("成功加入购物车！如需继续下单请修改相关信息后再次添加！", "提示", {
+          confirmButtonText: "继续下单",
+          cancelButtonText: "前往购物车",
+          type: "warning",
+        }).then(() => { })
+          .catch(() => {
+            this.closeToTab({
+              oldUrl: "shops/newCurtainShops",
+              newUrl: "shoppingCar/shopping?newCurtain",
+            });
+          });
         this.$root.$emit("refreshBadgeIcon", "newCurtainCount");
       }).catch(res => {
         console.log(res);

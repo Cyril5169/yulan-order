@@ -1285,9 +1285,6 @@ export default {
             oldUrl: "shops/shoppingCurtainDetail",
             newUrl: "shoppingCar/shopping?curtain",
           });
-          this.$router.push({
-            path: "/shoppingCar/shopping?curtain",
-          });
         })
         .catch((err) => {
           this.$alert(err.msg, "提示", {

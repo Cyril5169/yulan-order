@@ -232,8 +232,8 @@
           <template slot-scope="scope">
             <!-- 只有部件显示用量 -->
             <span
-              v-if="scope.row.curtain_level == 0 && scope.row.TOTAL_ENABLE == 1 || isCheck || isExamine">{{scope.row.DOSAGE}}{{scope.row.UNIT_NAME}}</span>
-            <span v-else-if="scope.row.TOTAL_ENABLE == 2">
+              v-if="scope.row.curtain_level == 0 && scope.row.TOTAL_ENABLE == 1 && (isCheck || isExamine)">{{scope.row.DOSAGE}}{{scope.row.UNIT_NAME}}</span>
+            <span v-else-if="scope.row.TOTAL_ENABLE == 2 && (!isCheck && !isExamine)">
               <el-input v-model="scope.row.DOSAGE" style="width:40px;" size="mini" @input="changeLSArea($event, scope.$index)"
                 oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')

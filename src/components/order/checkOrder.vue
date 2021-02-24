@@ -128,8 +128,7 @@
               <el-option v-for="(item, index) in city" :key="index" :label="item.regionName" :value="item.regionId">
               </el-option>
             </el-select>
-            <el-select @change="printfCountry2" style="width:150px;" v-model="buyUserModel.COUNTRY_ID"
-              placeholder="请选择县区">
+            <el-select @change="printfCountry2" style="width:150px;" v-model="buyUserModel.COUNTRY_ID" placeholder="请选择县区">
               <el-option v-for="(item, index) in country" :key="index" :label="item.regionName" :value="item.regionId">
               </el-option>
             </el-select>
@@ -205,8 +204,7 @@
           <br />
           <span>选择地区：</span>
           <el-select @change="getCity3" style="width:250px;" v-model="ctm_order.buyUserArea1" placeholder="请选择省份">
-            <el-option v-for="(item, index) in provinceData" :key="index" :label="item.regionName"
-              :value="item.regionName">
+            <el-option v-for="(item, index) in provinceData" :key="index" :label="item.regionName" :value="item.regionName">
             </el-option>
           </el-select>
           <el-select @change="getCountry3" style="width:250px;" v-model="ctm_order.buyUserArea2" placeholder="请选择城市">
@@ -214,8 +212,7 @@
             </el-option>
           </el-select>
           <el-select style="width:250px;" v-model="ctm_order.buyUserArea3" placeholder="请选择县区">
-            <el-option v-for="(item, index) in countryData" :key="index" :label="item.regionName"
-              :value="item.regionName">
+            <el-option v-for="(item, index) in countryData" :key="index" :label="item.regionName" :value="item.regionName">
             </el-option>
           </el-select>
           <br />
@@ -228,17 +225,17 @@
             <span style="font-size:13px;color:grey;vertical-align:middle;">(消费者在门店的订货单)</span>
           </div>
           <el-upload class="upload-de" style="display:inline-block;vertical-align:middle;margin-top:10px;"
-            :action="Global.baseUrl + '/CTM_ORDER/UploadBuyUserFiles'" list-type="picture-card"
-            :on-change="handleChange" :on-preview="handlePictureCardPreview" :on-remove="handleRemove"
-            :before-upload="beforeAvatarUpload" :file-list="fileList" :data="{ cid: cid }">
+            :action="Global.baseUrl + '/CTM_ORDER/UploadBuyUserFiles'" list-type="picture-card" :on-change="handleChange"
+            :on-preview="handlePictureCardPreview" :on-remove="handleRemove" :before-upload="beforeAvatarUpload"
+            :file-list="fileList" :data="{ cid: cid }">
             <i class="el-icon-plus"></i>
           </el-upload>
         </fieldset>
 
         <fieldset>
           <legend>备注信息</legend>
-          <el-input type="textarea" maxlength="140" style="width:100%" :autosize="{ minRows: 3, maxRow: 4 }"
-            resize="none" v-model="ctm_order.notes" placeholder="请输入订单备注(140字符以内，任何发货信息写在备注无效！)"></el-input>
+          <el-input type="textarea" maxlength="140" style="width:100%" :autosize="{ minRows: 3, maxRow: 4 }" resize="none"
+            v-model="ctm_order.notes" placeholder="请输入订单备注(140字符以内，任何发货信息写在备注无效！)"></el-input>
           <span style="color:#ccc">{{ ctm_order.notes | calLength }}/140</span>
         </fieldset>
         <!-- <div v-if="packingShow">
@@ -395,11 +392,9 @@ import Cookies from "js-cookie";
 import { addAddress } from "@/api/orderList";
 import { usetheCoupon } from "@/api/orderList";
 import { querycharge } from "@/api/orderList";
-import { queryCash } from "@/api/orderList";
 import { searchTickets } from "@/api/orderList";
 import { deleteAddress } from "@/api/orderList";
 import { editAddress } from "@/api/orderList";
-import { submitOrder } from "@/api/orderList";
 import { CouponbackRecord } from "@/api/orderList";
 import {
   orderSettlement,
@@ -454,7 +449,6 @@ export default {
       useTable: [],
       backTable: [],
       couponStatus: [false, false],
-      Initial_balance: "",
       product_group_tpye: "", //类型
       //获取地址
       transferData: [],
@@ -1153,11 +1147,9 @@ export default {
             this.ctm_order.reciverArea1 = this.data[0].province;
             this.ctm_order.reciverArea2 = this.data[0].city;
             this.ctm_order.reciverArea3 = this.data[0].country;
-            this.ctm_order.allAddress = `${
-              this.ctm_order.reciverArea1 ? this.ctm_order.reciverArea1 : ""
-            }${this.ctm_order.reciverArea2 ? this.ctm_order.reciverArea2 : ""}${
-              this.ctm_order.reciverArea3 ? this.ctm_order.reciverArea3 : ""
-            }${this.ctm_order.postAddress}`;
+            this.ctm_order.allAddress = `${this.ctm_order.reciverArea1 ? this.ctm_order.reciverArea1 : ""
+              }${this.ctm_order.reciverArea2 ? this.ctm_order.reciverArea2 : ""}${this.ctm_order.reciverArea3 ? this.ctm_order.reciverArea3 : ""
+              }${this.ctm_order.postAddress}`;
           }
         })
         .catch((error) => {
@@ -1197,11 +1189,9 @@ export default {
         this.ctm_order.reciverArea1 = this.data[0].province;
         this.ctm_order.reciverArea2 = this.data[0].city;
         this.ctm_order.reciverArea3 = this.data[0].country;
-        this.ctm_order.allAddress = `${
-          this.ctm_order.reciverArea1 ? this.ctm_order.reciverArea1 : ""
-        }${this.ctm_order.reciverArea2 ? this.ctm_order.reciverArea2 : ""}${
-          this.ctm_order.reciverArea3 ? this.ctm_order.reciverArea3 : ""
-        }${this.ctm_order.postAddress}`;
+        this.ctm_order.allAddress = `${this.ctm_order.reciverArea1 ? this.ctm_order.reciverArea1 : ""
+          }${this.ctm_order.reciverArea2 ? this.ctm_order.reciverArea2 : ""}${this.ctm_order.reciverArea3 ? this.ctm_order.reciverArea3 : ""
+          }${this.ctm_order.postAddress}`;
         if (this.data[0].addressId == 0) {
           this.ctm_order.postAddressModified = "0";
           this.ctm_order.allAddress = this.data[0].postAddress;
@@ -1213,90 +1203,100 @@ export default {
     //窗帘
     payNew() {
       if (!this.checkPay()) return;
-      var url = "/order/getResidemoney.do";
-      var data = {
-        cid: Cookies.get("cid"),
+      var getPush3 = JSON.parse(sessionStorage.getItem("shopping"));
+      var deleteArray = [];
+      for (var i = 0; i < getPush3.length; i++) {
+        deleteArray[i] = getPush3[i].cartItemId;
+      }
+      this.ctm_order.allSpend = this.totalPrice;
+      var data2 = {
+        product_group_tpye: this.newCurtainStatus == "1" ? "EE" : this.product_group_tpye, //产品类别
+        promotion_cost: this.totalPrice, //活动价格【】
+        cid: Cookies.get("cid"), //登录用户账号
         companyId: Cookies.get("companyId"),
+        rebateY: this.rebateY, //年优惠券编号，有则传，无则传空串
+        rebateM: this.rebateM, //月优惠券编号
+        arrearsFlag: this.arrearsFlag,
+        ctm_order: this.ctm_order,
+        ctm_orders: this.order_details,
+        cartItemIDs: deleteArray,
       };
-      //每次提交的时候判断一下余额
-      queryCash(url, data).then((res) => {
-        this.Initial_balance = res.data;
-        var getPush3 = JSON.parse(sessionStorage.getItem("shopping"));
-        var deleteArray = [];
-        for (var i = 0; i < getPush3.length; i++) {
-          deleteArray[i] = getPush3[i].cartItemId;
-        }
-        this.ctm_order.allSpend = this.totalPrice;
-        var data2 = {
-          product_group_tpye: this.newCurtainStatus == "1" ? "EE" : this.product_group_tpye, //产品类别
-          promotion_cost: this.totalPrice, //活动价格【】
-          cid: Cookies.get("cid"), //登录用户账号
-          companyId: Cookies.get("companyId"),
-          rebateY: this.rebateY, //年优惠券编号，有则传，无则传空串
-          rebateM: this.rebateM, //月优惠券编号
-          arrearsFlag: this.arrearsFlag,
-          ctm_order: this.ctm_order,
-          ctm_orders: this.order_details,
-          cartItemIDs: deleteArray,
-        };
-        orderSettlement(data2)
-          .then((res) => {
-            this.afterPay();
-            this.$root.$emit("refreshBadgeIcon", "curtainCount");
-          })
-          .catch((res) => {
-            this.$alert("提交失败:" + res.msg, "提示", {
-              confirmButtonText: "确定",
-              type: "warning",
-            });
+      orderSettlement(data2).then((res) => {
+        this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
+        this.$root.$emit("refreshBadgeIcon", "curtainCount");
+        if (res.msg) {
+          this.$alert(res.msg, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
           });
-      });
+        } else {
+          this.$alert("提交成功", "提示", {
+            confirmButtonText: "确定",
+            type: "success",
+          });
+        }
+        //跳转到我的订单
+        this.closeToTab({
+          oldUrl: "order/checkOrder",
+          newUrl: "order/myOrder",
+        });
+      })
+        .catch((res) => {
+          this.$alert("提交失败:" + res.msg, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+        });
     },
     //提交结算
     payIt() {
       if (!this.checkPay()) return;
-      var url = "/order/getResidemoney.do";
-      var data = {
-        cid: Cookies.get("cid"),
+      //删除购物车数据
+      var deleteArray = [];
+      var getPush3 = JSON.parse(sessionStorage.getItem("shopping"));
+      for (var i = 0; i < getPush3.length; i++) {
+        deleteArray[i] = getPush3[i].id;
+      }
+      this.ctm_order.allSpend = this.totalPrice;
+      var data2 = {
+        product_group_tpye: this.product_group_tpye, //产品类别，从购物车出获取
+        promotion_cost: this.totalPrice, //活动价格【】
+        cid: Cookies.get("cid"), //登录用户账号
         companyId: Cookies.get("companyId"),
+        rebateY: this.rebateY, //年优惠券编号，有则传，无则传空串
+        rebateM: this.rebateM, //月优惠券编号
+        arrearsFlag: this.arrearsFlag,
+        ctm_order: this.ctm_order,
+        ctm_orders: this.order_details,
+        cartItemIDs: deleteArray,
       };
-      //每次提交的时候判断一下余额
-      queryCash(url, data).then((res) => {
-        this.Initial_balance = res.data;
-        var url2 = "/order/orderCount.do";
-        //删除购物车数据
-        var deleteArray = [];
-        var getPush3 = JSON.parse(sessionStorage.getItem("shopping"));
-        for (var i = 0; i < getPush3.length; i++) {
-          deleteArray[i] = getPush3[i].id;
-        }
-        this.ctm_order.allSpend = this.totalPrice;
-        var data2 = {
-          product_group_tpye: this.product_group_tpye, //产品类别，从购物车出获取
-          promotion_cost: this.totalPrice, //活动价格【】
-          cid: Cookies.get("cid"), //登录用户账号
-          companyId: Cookies.get("companyId"),
-          rebateY: this.rebateY, //年优惠券编号，有则传，无则传空串
-          rebateM: this.rebateM, //月优惠券编号
-          arrearsFlag: this.arrearsFlag,
-          ctm_order: this.ctm_order,
-          ctm_orders: this.order_details,
-          cartItemIDs: deleteArray,
-        };
-        //submitOrder(url2, data2)
-        normalOrderSettlement(data2)
-          .then((res) => {
-            this.afterPay();
-            this.$root.$emit("refreshBadgeIcon", "wallCount");
-            this.$root.$emit("refreshBadgeIcon", "softCount");
-          })
-          .catch((res) => {
-            this.$alert("提交失败:" + res.msg, "提示", {
-              confirmButtonText: "确定",
-              type: "warning",
-            });
+      normalOrderSettlement(data2).then((res) => {
+        this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
+        this.$root.$emit("refreshBadgeIcon", "wallCount");
+        this.$root.$emit("refreshBadgeIcon", "softCount");
+        if (res.msg) {
+          this.$alert(res.msg, "提示", {
+            confirmButtonText: "确定",
+            type: "success",
           });
-      });
+        } else {
+          this.$alert("提交成功", "提示", {
+            confirmButtonText: "确定",
+            type: "success",
+          });
+        }
+        //跳转到我的订单
+        this.closeToTab({
+          oldUrl: "order/checkOrder",
+          newUrl: "order/myOrder",
+        });
+      })
+        .catch((res) => {
+          this.$alert("提交失败:" + res.msg, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+        });
     },
     checkPay() {
       if (
@@ -1349,37 +1349,6 @@ export default {
         }
       }
       return true;
-    },
-    afterPay() {
-      //活动类型"N"或者应付为0不需要判断余额
-      if (
-        this.allSpend == 0 ||
-        this.arrearsFlag == "N" ||
-        this.allSpend <= this.Initial_balance
-      ) {
-        this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
-        this.$root.$emit("refreshBadgeIcon", "curtainCount");
-        this.$alert("提交成功", "提示", {
-          confirmButtonText: "确定",
-          type: "success",
-        });
-      } else {
-        this.$alert(
-          "余额不足，当前订单还需充值" +
-            Math.round((this.allSpend - this.Initial_balance).mul(100)) / 100 +
-            "元才能提交",
-          "提示",
-          {
-            confirmButtonText: "确定",
-            type: "warning",
-          }
-        );
-      }
-      //跳转到我的订单
-      this.closeToTab({
-        oldUrl: "order/checkOrder",
-        newUrl: "order/myOrder",
-      });
     },
     //查询经办人
     chargeQuery() {
@@ -1632,19 +1601,15 @@ export default {
       this.buyUserVisible = true;
     },
     splitAddress(row) {
-      var address = `${row.PROVINCE ? row.PROVINCE : ""}${
-        row.CITY ? row.CITY : ""
-      }${row.COUNTRY ? row.COUNTRY : ""}${
-        row.POST_ADDRESS ? row.POST_ADDRESS : ""
-      }`;
+      var address = `${row.PROVINCE ? row.PROVINCE : ""}${row.CITY ? row.CITY : ""
+        }${row.COUNTRY ? row.COUNTRY : ""}${row.POST_ADDRESS ? row.POST_ADDRESS : ""
+        }`;
       return address;
     },
     splitAddress2(row) {
-      var address = `${row.buyUserArea1 ? row.buyUserArea1 : ""}${
-        row.buyUserArea2 ? row.buyUserArea2 : ""
-      }${row.buyUserArea3 ? row.buyUserArea3 : ""}${
-        row.buyUserPostAddress ? row.buyUserPostAddress : ""
-      }`;
+      var address = `${row.buyUserArea1 ? row.buyUserArea1 : ""}${row.buyUserArea2 ? row.buyUserArea2 : ""
+        }${row.buyUserArea3 ? row.buyUserArea3 : ""}${row.buyUserPostAddress ? row.buyUserPostAddress : ""
+        }`;
       return address;
     },
     addBuyUserShow() {

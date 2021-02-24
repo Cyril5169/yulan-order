@@ -263,7 +263,6 @@ import {
   getPackByCustomer
 } from "@/api/areaInfoASP";
 import { getOrderByAreaCustomer } from "@/api/orderInfoASP";
-import { getUserMoney } from "@/api/user";
 import { GetOrderAndTaskByCustomer, getCustomerInfo } from "@/api/orderListASP";
 
 export default {

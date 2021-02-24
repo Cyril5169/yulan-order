@@ -178,12 +178,7 @@
 
 <script>
 import {
-  queryCash,
-  payAgain,
-} from "@/api/orderList";
-import {
   updateCurtainOrder,
-  InsertOperationRecord,
   getOperationRecord,
   getOrderDetails,
   GetCtmOrder,
@@ -192,6 +187,7 @@ import {
   GetOrderUseRebate,
   ljExportProductExcel,
   updateCurtainOrderStatus,
+  settlementAgain
 } from "@/api/orderListASP";
 import { mapMutations, mapActions } from "vuex";
 import Cookies from "js-cookie";
@@ -528,122 +524,23 @@ export default {
       }
     },
     refreshPay() {
-      var url = "/order/getResidemoney.do";
-      var data = {
+      settlementAgain({
         cid: Cookies.get("cid"),
-        companyId: Cookies.get("companyId"),
-      };
-      //每次重新提交的时候判断一下余额
-      queryCash(url, data).then(async (res) => {
-        this.Initial_balance = res.data;
-        if (
-          this.ruleForm.ALL_SPEND > this.Initial_balance &&
-          this.check_STATUS_ID == 5
-        ) {
-          //欠款可提交的话可以跳过判断
-          this.$alert(
-            "余额不足，当前订单还需充值" +
-            (this.ruleForm.ALL_SPEND - this.Initial_balance) +
-            "元才能提交",
-            "提示",
-            {
-              confirmButtonText: "确定",
-              type: "warning",
-            }
-          );
-        } else {
-          if (this.ruleForm.STATUS_ID == 5 || this.ruleForm.STATUS_ID == 6) {
-            //欠款可提交判断活动和优惠券是否过期
-            for (var i = 0; i < this.ruleForm.ORDERBODY.length; i++) {
-              if (
-                this.ruleForm.ORDERBODY[i].PROMOTION_TYPE &&
-                this.ruleForm.ORDERBODY[i].PROMOTION_TYPE != " "
-              ) {
-                var res = await GetPromotionByTypeAndId({
-                  proType: this.ruleForm.ORDERBODY[i].PROMOTION_TYPE,
-                  pId: this.ruleForm.ORDERBODY[i].P_ID,
-                  cid: Cookies.get("cid"),
-                });
-                if (!res.data) {
-                  this.$alert(
-                    `活动‘${this.ruleForm.ORDERBODY[i].PROMOTION}’不存在`,
-                    "提示",
-                    {
-                      confirmButtonText: "确定",
-                      type: "success",
-                    }
-                  );
-                  return;
-                }
-                var dateEnd = new Date(res.data.DATE_END);
-                dateEnd = dateEnd.setDate(dateEnd.getDate() + 1);
-                if (new Date(dateEnd) < new Date() || res.data.USE_ID == "0") {
-                  this.$alert(
-                    `活动‘${this.ruleForm.ORDERBODY[i].PROMOTION}’已过期，请删除订单后重新下单`,
-                    "提示",
-                    {
-                      confirmButtonText: "确定",
-                      type: "success",
-                    }
-                  );
-                  return;
-                }
-              }
-              if (
-                this.ruleForm.ORDERBODY[i].BACK_Y > 0 ||
-                this.ruleForm.ORDERBODY[i].BACK_M > 0
-              ) {
-                var res = await GetOrderUseRebate({
-                  orderNo: this.ruleForm.ORDERBODY[i].ORDER_NO,
-                  lineNo: this.ruleForm.ORDERBODY[i].LINE_NO,
-                });
-                if (res.data.length == 0) {
-                  this.$alert(`优惠券不存在`, "提示", {
-                    confirmButtonText: "确定",
-                    type: "success",
-                  });
-                  return;
-                }
-                for (var j = 0; j < res.data.length; j++) {
-                  if (new Date(res.data[j].DATE_END) < new Date()) {
-                    this.$alert(`优惠券已过期，请删除订单后重新下单`, "提示", {
-                      confirmButtonText: "确定",
-                      type: "success",
-                    });
-                    return;
-                  }
-                }
-              }
-            }
-          }
-          var url2 = "/order/putAgainOrder.do";
-          var data2 = {
-            cid: Cookies.get("cid"),
-            orderNo: this.orderNum,
-          };
-          payAgain(url2, data2)
-            .then((res) => {
-              var recordData = {
-                ORDER_NO: this.orderNum,
-                OPERATION_PERSON: Cookies.get("cid"),
-                OPERATION_NAME: "重新提交",
-              };
-              InsertOperationRecord(recordData); //插入操作记录
-              this.$alert("提交成功", "提示", {
-                confirmButtonText: "确定",
-                type: "success",
-              });
-              this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
-              this.addTab("order/myOrder");
-            })
-            .catch((res) => {
-              this.$alert("操作失败，请稍后重试", "提示", {
-                confirmButtonText: "确定",
-                type: "warning",
-              });
-            });
-        }
-      });
+        orderNo: this.orderNum,
+      }).then((res) => {
+        this.$alert("提交成功", "提示", {
+          confirmButtonText: "确定",
+          type: "success",
+        });
+        this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
+        this.addTab("order/myOrder");
+      })
+        .catch((res) => {
+          this.$alert("提交失败！" + res.msg, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+        });
     },
     handleImgClick(index) {
       let tempImgList = [...this.fileList];

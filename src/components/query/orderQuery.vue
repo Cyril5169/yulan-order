@@ -206,8 +206,7 @@ import {
   getCustomerDataForOrder
 } from "@/api/areaInfoASP";
 import { getOrderByAreaCustomer } from "@/api/orderInfoASP";
-import { getUserMoney } from "@/api/user";
-import { GetOrderAndTaskByCustomer, getCustomerInfo } from "@/api/orderListASP";
+import { GetOrderAndTaskByCustomer, getCustomerInfo, getResideMonery } from "@/api/orderListASP";
 
 export default {
   data() {
@@ -514,11 +513,7 @@ export default {
       this.orderVisible = true;
     },
     async getCustomerInfo(val) {
-      var data = {
-        cid: "",
-        companyId: val.CUSTOMER_CODE
-      };
-      var res = await getUserMoney(data);
+      var res = await getResideMonery({companyId: val.CUSTOMER_CODE});
       this.moneySituation = res.data;
       var url = "/order/findRebate.do";
       var res2 = await manageCoupon(url, data);

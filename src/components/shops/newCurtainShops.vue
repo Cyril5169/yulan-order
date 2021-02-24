@@ -64,8 +64,7 @@
                 <span v-if="scope.row.curtain_level > 0">
                   <span :style="{'padding-left': scope.row.curtain_level * 16 + 'px'}"></span>
                 </span>
-                <span :class="{'delete-cls': !scope.row.curtain_choose}"
-                  :style="{'font-weight': scope.row.curtain_level==0?'bold':''}">{{transPartTypeCode(scope.row.NC_PART_TYPECODE)}}</span>
+                <span>{{transPartTypeCode(scope.row.NC_PART_TYPECODE)}}</span>
               </template>
             </el-table-column>
             <el-table-column label="编码" width="140" header-align="center" prop="ITEM_NO">
@@ -73,12 +72,11 @@
                 <!-- 标定 -->
                 <template v-if="scope.row.ITEM_NO">
                   <!-- 是否可替换 -->
-                  <a v-if="scope.row.NCT_CHANGE == 1 && scope.row.NCM_CHANGE == 1" class="a-link"
-                    :class="{'delete-cls': !scope.row.curtain_choose}"
+                  <a v-if="itemCanChange(scope.row)" class="a-link" :class="{'delete-cls': !scope.row.curtain_choose}"
                     @click="exchangeModelOrItem(scope.row)">{{scope.row.ITEM_NO}}</a>
                   <span v-else :class="{'delete-cls': !scope.row.curtain_choose}">{{scope.row.ITEM_NO}}</span>
                   <!-- 是否可删/是否默认勾选 -->
-                  <el-checkbox v-if="scope.row.NCT_DELETE > 0 && scope.row.NCM_DELETE > 0" v-model="scope.row.curtain_choose"
+                  <el-checkbox v-if="itemCanDelete(scope.row)" v-model="scope.row.curtain_choose"
                     @change="onCheckChange($event, scope.row)"></el-checkbox>
                 </template>
                 <template v-else-if="scope.row.NC_PART_TYPECODE == 'LBT'">
@@ -276,8 +274,8 @@
             </el-table-column>
             <el-table-column label="备注" align="center">
               <template slot-scope="scope">
-                <el-input v-if="scope.row.ITEM_NO" v-model="scope.row.curtain_note" size="mini" type="textarea" resize="none"
-                  :autosize="{ maxRows: 6 }" clearable></el-input>
+                <el-input v-if="scope.row.ITEM_NO" :disabled="scope.row.NCM_KAIKOU != 'SK'" v-model="scope.row.curtain_note"
+                  size="mini" type="textarea" resize="none" :autosize="{ maxRows: 6 }" clearable></el-input>
               </template>
             </el-table-column>
           </el-table>
@@ -312,8 +310,7 @@
                     <span v-if="scope.row.curtain_level > 0">
                       <span :style="{'padding-left': scope.row.curtain_level * 16 + 'px'}"></span>
                     </span>
-                    <span
-                      :style="{'font-weight': scope.row.curtain_level==0?'bold':''}">{{transPartTypeCode(scope.row.NC_PART_TYPECODE)}}</span>
+                    <span>{{transPartTypeCode(scope.row.NC_PART_TYPECODE)}}</span>
                   </template>
                 </el-table-column>
                 <el-table-column label="编码" width="170" header-align="center" prop="ITEM_NO">
@@ -730,6 +727,7 @@ export default {
       }
       return originData;
     },
+    //查找库存
     getStoreData(originData) {
       for (var i = 0; i < originData.length; i++) {
         if (!originData[i].ITEM_NO) continue;
@@ -785,10 +783,11 @@ export default {
       }
       return price;
     },
-    convertNumber(val){
-      if(typeof val === 'number' && !isNaN(val)) return val;
-      if(typeof val === 'string'){
-        if(Number(val) != NaN) return Number(val);
+    //转换数字
+    convertNumber(val) {
+      if (typeof val === 'number' && !isNaN(val)) return val;
+      if (typeof val === 'string') {
+        if (Number(val) != NaN) return Number(val);
       }
       return 0;
     },
@@ -838,7 +837,7 @@ export default {
       var curtain_left_fillet = this.convertNumber(oneCurtain.curtain_left_fillet);
       var curtain_right_fillet = this.convertNumber(oneCurtain.curtain_right_fillet);
       if (oneCurtain.NC_PART_TYPECODE == "LT") {
-      //计算帘头用量 帘头用量=（帘头宽+左转角+右转角）*帘头高
+        //计算帘头用量 帘头用量=（帘头宽+左转角+右转角）*帘头高
         oneCurtain.curtain_area = this.dosageFilter((curtain_width + curtain_left_fillet + curtain_right_fillet) * curtain_height);
       } else {
         oneCurtain.curtain_area = this.dosageFilter(curtain_width * curtain_height);
@@ -894,9 +893,9 @@ export default {
         price = this.calculatePromotionPrice(row);
         //最小下单量 帘头1.帘身，窗纱4
         var curtain_area = this.convertNumber(row.curtain_area);
-        if(row.NC_PART_TYPECODE == 'LT' && curtain_area < 1){
+        if (row.NC_PART_TYPECODE == 'LT' && curtain_area < 1) {
           curtain_area = 1;
-        }else if((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'CS') && curtain_area < 4){
+        } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'CS') && curtain_area < 4) {
           curtain_area = 4;
         }
         price = price.mul(curtain_area)
@@ -944,10 +943,30 @@ export default {
         }
       }
     },
+    //是否可改
+    itemCanChange(row) {
+      var canChange = true;
+      if (row.curtain_level == 0) {
+        canChange = row.NCT_CHANGE == 1;
+      } else {
+        canChange = row.NCT_CHANGE == 1 && row.NCM_CHANGE == 1;
+      }
+      return canChange;
+    },
+    //是否可删
+    itemCanDelete(row) {
+      var canDelete = true;
+      if (row.curtain_level == 0) {
+        canDelete = row.NCT_CHANGE > 0;
+      } else {
+        canDelete = row.NCT_CHANGE > 0 && row.NCM_CHANGE > 0;
+      }
+      return canDelete;
+    },
     //勾选的联动处理
     onCheckChange(checked, row) {
-      if (!row.ITEM_NO) return;
-      var childrenCurtain = this.curtainData.filter((item) => item.NCM_PID == row.NC_MODEL_ID);
+      //if (!row.ITEM_NO) return;
+      var childrenCurtain = this.curtainData.filter((item) => item.NCM_PID == row.NC_MODEL_ID && row.NC_MODEL_ID != 0);
       var fatherCurtain = this.curtainData.filter((item) => item.NC_MODEL_ID == row.NCM_PID && item.NC_MODEL_ID != 0);
       if (childrenCurtain.length) {
         //自身作为父节点，勾选或者取消，子节点应该同步
@@ -1028,6 +1047,15 @@ export default {
             fatherCurtain.curtain_choose = checked;
         }
       }
+      //帘身取消勾选，同时取消里衬布
+      if (row.NC_PART_TYPECODE == 'LS' && !checked) {
+        var LCBITEM = this.curtainData.filter((item) => item.NC_PART_TYPECODE == "LCB");
+        for (var j = 0; j < LCBITEM.length; j++) {
+          //假设有多个里衬布的情况
+          LCBITEM[j].curtain_choose = checked;
+          this.onCheckChange(checked, LCBITEM[j]);
+        }
+      }
     },
     //点击显示可替换列表
     exchangeModelOrItem(row) {
@@ -1055,10 +1083,10 @@ export default {
           if (defaultModel.length) {
             this.exchangeModelTemplate = defaultModel[0];
           }
-          //添加层级数据
           for (var i = 0; i < this.exchangeModelList.length; i++) {
             var curtain_list = this.exchangeModelList[i].curtain_model;
             for (var j = 0; j < curtain_list.length; j++) {
+              //添加层级数据
               var level = 0;
               var NCM_PID = curtain_list[j].NCM_PID;
               while (NCM_PID != 0) {
@@ -1069,6 +1097,8 @@ export default {
                 }
               }
               this.$set(curtain_list[j], "curtain_level", level);
+              //勾选
+              this.$set(curtain_list[j], "curtain_choose", true);
               //单价
               var price = this.getPrice(this.customerType, curtain_list[j]);
               this.$set(curtain_list[j], "curtain_price", price);
@@ -1175,10 +1205,10 @@ export default {
         if (originData[i].HEIGHT_ENABLE > 0) {
           var height = this.convertNumber(this.curtainHeadData.height);
           var ancaoHeight = this.convertNumber(this.curtainHeadData.ancaoHeight);
-          if(originData[i].NC_PART_TYPECODE == 'LT'){
+          if (originData[i].NC_PART_TYPECODE == 'LT') {
             //计算帘头高 帘头的高 =（成品高-暗槽高度）÷0.1*0.0235-0.11 结果保留两位
             curtain_height = this.dosageFilter((height - ancaoHeight) * 10 * 0.0235 - 0.11);
-          }else{
+          } else {
             curtain_height = this.dosageFilter(height * originData[i].NCM_HEIGHT_RATIO);
           }
         }
@@ -1498,9 +1528,11 @@ export default {
     },
     tableRowClassName({ row, rowIndex }) {
       if (row.curtain_level == 0) {
-        return 'bold-row';
+        if (!row.curtain_choose) return 'bold-row delete-row-cls';
+        else return 'bold-row';
       } else {
-        return 'fade-row'
+        if (!row.curtain_choose) return 'fade-row delete-row-cls';
+        else return 'fade-row';
       }
       return '';
     }
@@ -1585,9 +1617,6 @@ export default {
 .model-exchange-now {
   background: #409eff;
 }
-.model-exchange-now:hover {
-  border: none;
-}
 .model-exchange-inner {
   background-color: white;
   display: flex;
@@ -1657,10 +1686,15 @@ export default {
 .index-badge .el-badge__content {
   background: gray;
 }
-.el-table .bold-row {
+.curtain-list .el-table .bold-row {
   font-weight: bold;
 }
-.el-table .fade-row {
+.curtain-list .el-table .fade-row {
   color: #b0b4bb;
+}
+.curtain-list .el-table .delete-row-cls {
+  color: tomato;
+  text-decoration: line-through;
+  cursor: unset;
 }
 </style>

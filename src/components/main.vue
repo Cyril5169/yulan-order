@@ -24,10 +24,10 @@
                 asideStatus? "菜单展开" : "菜单收起"
               }}</span>
             </li>
-              <li title="公告" @click="addTab('notification/notificationMain')">
-                <i class="el-icon-bell headIcon2"></i>
-                <span class="ml10 mr10 headSpan2">公告</span>
-              </li>
+            <li title="公告" @click="addTab('notification/notificationMain')">
+              <i class="el-icon-bell headIcon2"></i>
+              <span class="ml10 mr10 headSpan2">公告</span>
+            </li>
           </ul>
           <ul class="r">
             <li>
@@ -151,14 +151,13 @@ import { mapMutations, mapActions, mapState } from "vuex";
 import menuTree from "./menuTree";
 import studyContextDetail from "./studyContext/studyContextDetail";
 import hotSale from "./shops/hotSale";
-import { getUserMoney } from "@/api/user";
 import { getAllRefund } from "@/api/refund";
 import { getIconNumber } from "@/api/painting";
 import { checkBill } from "@/api/orderList";
 import { GetNewNotification, InserFlag } from "@/api/notificationASP";
 import { GetCustomerMustWriteStudy } from "@/api/studyASP";
 import { QueryWebMenuByUserId } from "@/api/webMenuASP";
-import { getAllOrders, GetBalancePeriod } from "@/api/orderListASP";
+import { getAllOrders, GetBalancePeriod, getResideMonery } from "@/api/orderListASP";
 import { GetCartItemCount } from "@/api/shopASP";
 import { GetAllCompensationOld } from "@/api/paymentASP";
 import { ChangePassword } from "@/api/webUserASP";
@@ -875,28 +874,20 @@ export default {
     async refreshUserMoney() {
       this.refreshMoneyClass = "el-icon-loading";
       this.moneySituation = "";
-      getUserMoney(
-        {
-          cid: this.cid,
-          companyId: Cookies.get("companyId"),
-        },
-        { loading: false } //传入参数控制页面是否loading
-      )
-        .then((res) => {
-          if (this.isManager != "1") {
-            if (res.data < 0) {
-              this.moneySituation = "当前余额不足，请尽快打款";
-            } else {
-              this.moneySituation = "当前余额充足，请继续保持";
-            }
+      getResideMonery({ companyId: Cookies.get("companyId") }, { loading: false }).then((res) => {
+        if (this.isManager != "1") {
+          if (res.data < 0) {
+            this.moneySituation = "当前余额不足，请尽快打款";
           } else {
-            this.moneySituation = "当前余额 " + res.data + "元";
+            this.moneySituation = "当前余额充足，请继续保持";
           }
-          this.refreshMoneyClass = "el-icon-refresh-left";
-        })
-        .catch((err) => {
+        } else {
+          this.moneySituation = "当前余额 " + res.data + "元";
+        }
+        this.refreshMoneyClass = "el-icon-refresh-left";
+      }).catch((err) => {
           console.log(err);
-        });
+      });
     },
     lastClick() {
       this.lastClickTime = new Date().getTime();
@@ -1162,7 +1153,7 @@ export default {
           break;
         case "newCurtainCount":
           this.newCurtainCountIcon();
-          break;  
+          break;
         case "softCount":
           this.softCountIcon();
           break;

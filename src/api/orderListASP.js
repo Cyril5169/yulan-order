@@ -304,3 +304,19 @@ export function ljExportProductExcel(data, config = {}) {
         return Promise.reject(err);
     })
 }
+//用户余额
+export function getResideMonery(data, config = {}) {
+    return post('/CTM_ORDER/getResideMonery', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+//重新提交
+export function settlementAgain(data, config = {}) {
+    return post('/CTM_ORDER/settlementAgain', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}

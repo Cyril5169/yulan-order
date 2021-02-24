@@ -163,8 +163,8 @@ import {
   GetPromotionByType,
   GetPromotionByTypeAndId,
   GetOrderUseRebate,
+  settlementAgain
 } from "@/api/orderListASP";
-import { payAgain, queryCash } from "@/api/orderList";
 import { mapMutations, mapActions } from "vuex";
 import Cookies from "js-cookie";
 import shipment from "./shipment";
@@ -410,6 +410,8 @@ export default {
     },
   },
   methods: {
+    ...mapMutations("navTabs", ["addTab"]),
+    ...mapActions("navTabs", ["closeTab", "closeToTab"]),
     //窗帘提交订单
     summitCurtain(item) {
       let orderBody = item.ORDERBODY;
@@ -603,119 +605,24 @@ export default {
         .catch(() => { });
     },
     refreshPay(item) {
-      var url = "/order/getResidemoney.do";
-      var data = {
+      settlementAgain({
         cid: Cookies.get("cid"),
-        companyId: Cookies.get("companyId"),
-      };
-      //每次重新提交的时候判断一下余额
-      queryCash(url, data).then(async (res) => {
-        this.Initial_balance = res.data;
-        var url2 = "/order/putAgainOrder.do";
-        var data2 = {
-          cid: Cookies.get("cid"),
-          orderNo: item.ORDER_NO,
-        };
-        if (item.ALL_SPEND > this.Initial_balance && item.STATUS_ID == 5) {
-          //欠款可提交的话可以跳过判断
-          this.$alert(
-            "余额不足，当前订单还需充值" +
-            (item.ALL_SPEND - this.Initial_balance).toFixed(2) +
-            "元才能提交",
-            "提示",
-            {
-              confirmButtonText: "确定",
-              type: "warning",
-            }
-          );
-        } else {
-          if (item.STATUS_ID == 5 || item.STATUS_ID == 6) {
-            //欠款可提交判断活动和优惠券是否过期
-            for (var i = 0; i < item.ORDERBODY.length; i++) {
-              if (item.ORDERBODY[i].PROMOTION_TYPE) {
-                var res = await GetPromotionByTypeAndId({
-                  proType: item.ORDERBODY[i].PROMOTION_TYPE,
-                  pId: item.ORDERBODY[i].P_ID,
-                  cid: Cookies.get("cid"),
-                });
-                if (!res.data) {
-                  this.$alert(
-                    `活动‘${item.ORDERBODY[i].PROMOTION}’不存在`,
-                    "提示",
-                    {
-                      confirmButtonText: "确定",
-                      type: "success",
-                    }
-                  );
-                  return;
-                }
-                var dateEnd = new Date(res.data.DATE_END);
-                dateEnd = dateEnd.setDate(dateEnd.getDate() + 1);
-                if (new Date(dateEnd) < new Date() || res.data.USE_ID == "0") {
-                  this.$alert(
-                    `活动‘${item.ORDERBODY[i].PROMOTION}’已过期，请删除订单后重新下单`,
-                    "提示",
-                    {
-                      confirmButtonText: "确定",
-                      type: "success",
-                    }
-                  );
-                  return;
-                }
-              }
-              if (
-                item.ORDERBODY[i].BACK_Y > 0 ||
-                item.ORDERBODY[i].BACK_M > 0
-              ) {
-                var res = await GetOrderUseRebate({
-                  orderNo: item.ORDERBODY[i].ORDER_NO,
-                  lineNo: item.ORDERBODY[i].LINE_NO,
-                });
-                if (res.data.length == 0) {
-                  this.$alert(`优惠券不存在`, "提示", {
-                    confirmButtonText: "确定",
-                    type: "success",
-                  });
-                  return;
-                }
-                for (var j = 0; j < res.data.length; j++) {
-                  if (new Date(res.data[j].DATE_END) < new Date()) {
-                    this.$alert(`优惠券已过期，请删除订单后重新下单`, "提示", {
-                      confirmButtonText: "确定",
-                      type: "success",
-                    });
-                    return;
-                  }
-                }
-              }
-            }
-          }
-          payAgain(url2, data2)
-            .then((res) => {
-              var recordData = {
-                ORDER_NO: item.ORDER_NO,
-                OPERATION_PERSON: Cookies.get("cid"),
-                OPERATION_NAME: "重新提交",
-              };
-              InsertOperationRecord(recordData); //插入操作记录
-              this.$alert("提交成功", "提示", {
-                confirmButtonText: "确定",
-                type: "success",
-              });
-              this.refresh();
-              this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
-            })
-            .catch((res) => {
-              this.$alert("操作失败，请稍后重试", "提示", {
-                confirmButtonText: "确定",
-                type: "warning",
-              });
-            });
-        }
-      });
+        orderNo: item.ORDER_NO,
+      }).then((res) => {
+        this.$alert("提交成功", "提示", {
+          confirmButtonText: "确定",
+          type: "success",
+        });
+        this.refresh();
+        this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
+      })
+        .catch((res) => {
+          this.$alert("提交失败！" + res.msg, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+        });
     },
-    ...mapMutations("navTabs", ["addTab"]),
-    ...mapActions("navTabs", ["closeTab", "closeToTab"]),
     //隔行变色
     tableRowClassName({ row, rowIndex }) {
       if (row.STATUS_ID == "3") {

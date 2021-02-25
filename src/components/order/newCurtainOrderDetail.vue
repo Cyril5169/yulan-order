@@ -33,7 +33,7 @@
       <!-- 活动 -->
       <span style="margin-left:20px;">活动：</span>
       <span>{{orderDetail.PROMOTION ? orderDetail.PROMOTION: '无'}}</span>
-      <!-- <el-select size="mini" style="width:220px" :disabled="activityOptions.length == 1" v-model="curtainHeadData.activityId"
+      <!-- <el-select size="mini" style="width:220px" :disabled="activityOptions.length == 1" v-model="orderDetail.activityId"
         :placeholder="activityOptions.length == 1? '无可选活动': '请选择活动'">
         <el-option v-for="item in activityOptions" :key="item.P_ID"
           :label="item.ORDER_TYPE? item.ORDER_TYPE + ' -- ' + item.ORDER_NAME : item.ORDER_NAME" :value="item.P_ID">
@@ -370,7 +370,7 @@
 <script>
 import Cookies from "js-cookie";
 import Axios from "axios";
-import { GetPromotionByItem } from "@/api/orderListASP";
+import { getItemById, GetPromotionByItem } from "@/api/orderListASP";
 import {
   GetAsyncItemData,
   GetPartTypeDataTabale,
@@ -381,7 +381,7 @@ import {
 } from "@/api/newCurtainASP";
 
 export default {
-  props: ["ORDERBODY", "ruleForm"],
+  props: ["ORDERBODY", "ruleForm", "originDelete"],
   data() {
     return {
       cid: Cookies.get("cid"), //cid
@@ -405,13 +405,12 @@ export default {
       limit: 50,
       totalNumber: 0,
       oldCurtainData: [],
-      newCurtainData: [],
-      deleteIds: []
+      newCurtainData: []
     }
   },
   computed: {
     salPromotion() {
-      var selectActivity = this.activityOptions.filter((item) => item.P_ID == this.orderDetail.ACTIVITY_ID);
+      var selectActivity = this.activityOptions.filter((item) => item.P_ID == this.orderDetail.P_ID);
       if (selectActivity.length) {
         return selectActivity[0];
       } else {
@@ -422,14 +421,37 @@ export default {
       var totalMoney = 0;
       //找到勾选的
       for (var i = 0; i < this.orderDetail.curtains.length; i++) {
-        if (this.orderDetail.curtains[i].curtain_choose == true && this.orderDetail.curtains[i].curtain_level == 0) {
-          totalMoney = totalMoney.add(this.oneTotal(this.orderDetail.curtains[i]));
+        var oneCurtain = this.orderDetail.curtains[i];
+        if (oneCurtain.curtain_choose == true && oneCurtain.curtain_level == 0) {
+          totalMoney = totalMoney.add(this.oneTotal(oneCurtain));
         }
       }
       return totalMoney * this.orderDetail.QTY_REQUIRED;
     },
+    oneTotalNoPromotion() {
+      var totalMoney = 0;
+      //找到勾选的
+      for (var i = 0; i < this.orderDetail.curtains.length; i++) {
+        var oneCurtain = this.orderDetail.curtains[i];
+        if (oneCurtain.curtain_choose == true && oneCurtain.curtain_level == 0) {
+          totalMoney = totalMoney.add(this.oneTotal(oneCurtain, false));
+        }
+      }
+      return totalMoney;
+    },
     chooseCurtainData() {
       return this.orderDetail.curtains.filter((item) => item.curtain_choose);
+    },
+    deleteCurtainData() {
+      var deleteIds = [];
+      for (var i = 0; i < this.oldCurtainData.length; i++) {
+        var oldOneCurtain = this.oldCurtainData[i];
+        var hasThis = this.chooseCurtainData.filter(item => item.ID == oldOneCurtain.ID);
+        if (!hasThis.length) {
+          if (oldOneCurtain.ID) deleteIds.push(oldOneCurtain);
+        }
+      }
+      return deleteIds;
     },
   },
   filters: {
@@ -566,22 +588,27 @@ export default {
     //获得活动
     getActivity() {
       this.activityOptions = [];
-      GetPromotionByItem(
-        {
-          cid: this.cid,
-          customerType: this.customerType,
-          itemNo: this.orderDetail.ITEM_NO,
-          itemVersion: this.orderDetail.ITEM_VERSION,
-          productType: this.orderDetail.PRODUCT_TYPE,
-          productBrand: this.orderDetail.PRODUCT_BRAND,
-        },
+      getItemById(
+        { itemNo: this.orderDetail.ITEM_NO },
         { loading: false }
-      ).then((res) => {
-        this.activityOptions = res.data;
-        this.activityOptions.push({
-          ORDER_TYPE: "",
-          ORDER_NAME: "不参与活动",
-          P_ID: null,
+      ).then((itemRes) => {
+        GetPromotionByItem(
+          {
+            cid: this.cid,
+            customerType: this.customerType,
+            itemNo: itemRes.data.ITEM_NO,
+            itemVersion: itemRes.data.ITEM_VERSION,
+            productType: itemRes.data.PRODUCT_TYPE,
+            productBrand: itemRes.data.PRODUCT_BRAND,
+          },
+          { loading: false }
+        ).then((res) => {
+          this.activityOptions = res.data;
+          this.activityOptions.push({
+            ORDER_TYPE: "",
+            ORDER_NAME: "不参与活动",
+            P_ID: null,
+          });
         });
       });
     },
@@ -600,15 +627,22 @@ export default {
             level++;
           }
         }
-        this.$set(detail.curtains[j], "curtain_level", level);
-        //选中标识(这里既然有那肯定都是选中的)
-        this.$set(detail.curtains[j], "curtain_choose", true);
+        this.$set(oneCurtain, "curtain_level", level);
+        //选中标识
+        var defaultChoose = true;
+        if (this.originDelete && this.originDelete.indexOf(oneCurtain.ID) > -1) {
+          defaultChoose = false;
+        }
+        this.$set(oneCurtain, "curtain_choose", defaultChoose);
         //库存
-        this.$set(detail.curtains[j], "curtain_store", "");
-        //push到olddata中，用来对比
-        this.oldCurtainData.push(JSON.parse(JSON.stringify(detail.curtains[j])))
+        this.$set(oneCurtain, "curtain_store", "");
       }
       detail.curtains = this.getStoreData(detail.curtains);
+
+      for (var j = 0; j < detail.curtains_origin.length; j++) {
+        //push到olddata中，用来对比
+        this.oldCurtainData.push(JSON.parse(JSON.stringify(detail.curtains_origin[j])))
+      }
 
       //把change的数据也加上各个字段
       for (var j = 0; j < detail.curtain_change.length; j++) {
@@ -623,33 +657,33 @@ export default {
             level++;
           }
         }
-        this.$set(detail.curtain_change[j], "curtain_level", level);
+        this.$set(oneCurtain, "curtain_level", level);
         //选中标识
-        this.$set(detail.curtain_change[j], "curtain_choose", true);
+        this.$set(oneCurtain, "curtain_choose", true);
         //单价
-        var price = this.getPrice(this.cus_customerType, detail.curtain_change[j]);
-        this.$set(detail.curtain_change[j], "PRICE", price);
+        var price = this.getPrice(this.cus_customerType, oneCurtain);
+        this.$set(oneCurtain, "PRICE", price);
         //宽
         var curtain_width = 0;
-        if (detail.curtain_change[j].WIDTH_ENABLE > 0) {
-          curtain_width = this.dosageFilter(detail.CURTAIN_WIDTH * detail.curtain_change[j].NCM_WIDTH_RATIO);
+        if (oneCurtain.WIDTH_ENABLE > 0) {
+          curtain_width = this.dosageFilter(detail.CURTAIN_WIDTH * oneCurtain.NCM_WIDTH_RATIO);
         }
-        this.$set(detail.curtain_change[j], "curtain_width", curtain_width);
+        this.$set(oneCurtain, "curtain_width", curtain_width);
         //高
         var curtain_height = 0;
-        if (detail.curtain_change[j].HEIGHT_ENABLE > 0) {
-          if (detail.curtain_change[j].NC_PART_TYPECODE == 'LT') {
+        if (oneCurtain.HEIGHT_ENABLE > 0) {
+          if (oneCurtain.NC_PART_TYPECODE == 'LT') {
             //计算帘头高 帘头的高 =（成品高-暗槽高度）÷0.1*0.0235-0.11 结果保留两位
             curtain_height = this.dosageFilter((detail.CURTAIN_HEIGHT - detail.ANCAO_HEIGHT) * 10 * 0.0235 - 0.11);
           } else {
-            curtain_height = this.dosageFilter(detail.CURTAIN_HEIGHT * detail.curtain_change[j].NCM_HEIGHT_RATIO);
+            curtain_height = this.dosageFilter(detail.CURTAIN_HEIGHT * oneCurtain.NCM_HEIGHT_RATIO);
           }
         }
         //总数（面积）
         var dosage = this.dosageFilter(curtain_width * curtain_height);
-        if (detail.curtain_change[j].NC_PART_TYPECODE == "GBD") dosage = 1; //挂绑带默认为1
-        this.$set(detail.curtain_change[j], "DOSAGE", dosage);
-        if (detail.curtain_change[j].NC_PART_TYPECODE == "LS") {
+        if (oneCurtain.NC_PART_TYPECODE == "GBD") dosage = 1; //挂绑带默认为1
+        this.$set(oneCurtain, "DOSAGE", dosage);
+        if (oneCurtain.NC_PART_TYPECODE == "LS") {
           //改变里衬布的
           var LCBITEM = detail.curtain_change.filter((item) => item.NC_PART_TYPECODE == "LCB");
           for (var k = 0; k < LCBITEM.length; k++) {
@@ -658,15 +692,15 @@ export default {
           }
         }
         //左转角
-        this.$set(detail.curtain_change[j], "LEFT_FILLET", 0);
+        this.$set(oneCurtain, "LEFT_FILLET", 0);
         //右转角
-        this.$set(detail.curtain_change[j], "RIGHT_FILLET", 0);
+        this.$set(oneCurtain, "RIGHT_FILLET", 0);
         //库存
-        this.$set(detail.curtain_change[j], "curtain_store", "");
+        this.$set(oneCurtain, "curtain_store", "");
         //客户备注
-        this.$set(detail.curtain_change[j], "curtain_note", "");
+        this.$set(oneCurtain, "curtain_note", "");
         //说明
-        this.$set(detail.curtain_change[j], "ILLUSTRATE", "");
+        this.$set(oneCurtain, "ILLUSTRATE", "");
       }
       detail.curtain_change = this.getStoreData(detail.curtain_change);
     },
@@ -674,7 +708,7 @@ export default {
     dealInsertData(data) {
       var returnData = {
         ...data,
-        ORDER_NO: this.orderNumber,
+        ORDER_NO: this.orderDetail.ORDER_NO,
         ORDER_ITEM_ID: this.orderDetail.curtains[0].ORDER_ITEM_ID,
         PRICE: data.PRICE,
         ITEM_ID: data.ITEM_NO,
@@ -703,11 +737,12 @@ export default {
     //查找库存
     getStoreData(originData) {
       for (var i = 0; i < originData.length; i++) {
-        if (!originData[i].ITEM_NO) continue;
+        var oneCurtain = originData[i];
+        if (!oneCurtain.ITEM_NO) continue;
         //库存
         var postData = {
           token: "兰居尚品",
-          code: originData[i].ITEM_NO,
+          code: oneCurtain.ITEM_NO,
         };
         Axios.post("http://ljsp.ubxiu.com:8098/api/getXXDMX", postData, {
           params: postData,
@@ -767,7 +802,7 @@ export default {
     //改变成品宽
     changeHeadWidth(val) {
       for (var i = 0; i < this.orderDetail.curtains.length; i++) {
-        var oneCurtain = this.orderDetail.curtains[i];
+        var oneCurtain = oneCurtain;
         if (oneCurtain.WIDTH_ENABLE > 0) {
           var width = this.convertNumber(this.orderDetail.CURTAIN_WIDTH);
           oneCurtain.WIDTH = this.dosageFilter(width * oneCurtain.NCM_WIDTH_RATIO);
@@ -778,7 +813,7 @@ export default {
     //改变成品高
     changeHeadHeight(val) {
       for (var i = 0; i < this.orderDetail.curtains.length; i++) {
-        var oneCurtain = this.orderDetail.curtains[i];
+        var oneCurtain = oneCurtain;
         if (oneCurtain.HEIGHT_ENABLE > 0) {
           var height = this.convertNumber(this.orderDetail.CURTAIN_HEIGHT);
           var ancaoHeight = this.convertNumber(this.orderDetail.ANCAO_HEIGHT);
@@ -795,7 +830,7 @@ export default {
     //改变暗槽高
     changeAncaoHeight(val) {
       for (var i = 0; i < this.orderDetail.curtains.length; i++) {
-        var oneCurtain = this.orderDetail.curtains[i];
+        var oneCurtain = oneCurtain;
         if (oneCurtain.NC_PART_TYPECODE == 'LT') {
           var height = this.convertNumber(this.orderDetail.CURTAIN_HEIGHT);
           var ancaoHeight = this.convertNumber(this.orderDetail.ANCAO_HEIGHT);
@@ -864,10 +899,10 @@ export default {
       return this.dosageFilter(price);
     },
     //一个子件的总价
-    oneTotal(row) {
+    oneTotal(row, calculatePromotion = true) {
       var price = 0;
       if (row.DOSAGE) {
-        price = this.calculatePromotionPrice(row);
+        price = calculatePromotion ? this.calculatePromotionPrice(row) : row.PRICE;
         //最小下单量 帘头1.帘身，窗纱4
         var DOSAGE = this.convertNumber(row.DOSAGE);
         if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < 1) {
@@ -1063,9 +1098,10 @@ export default {
           for (var i = 0; i < this.exchangeModelList.length; i++) {
             var curtain_list = this.exchangeModelList[i].curtain_model;
             for (var j = 0; j < curtain_list.length; j++) {
+              var oneCurtain = curtain_list[j];
               //添加层级数据
               var level = 0;
-              var NCM_PID = curtain_list[j].NCM_PID;
+              var NCM_PID = oneCurtain.NCM_PID;
               while (NCM_PID != 0) {
                 var temp = curtain_list.filter((item) => item.NC_MODEL_ID == NCM_PID);
                 if (temp.length) {
@@ -1073,12 +1109,12 @@ export default {
                   level++;
                 }
               }
-              this.$set(curtain_list[j], "curtain_level", level);
+              this.$set(oneCurtain, "curtain_level", level);
               //勾选
-              this.$set(curtain_list[j], "curtain_choose", true);
+              this.$set(oneCurtain, "curtain_choose", true);
               //单价
-              var price = this.getPrice(this.customerType, curtain_list[j]);
-              this.$set(curtain_list[j], "PRICE", price);
+              var price = this.getPrice(this.customerType, oneCurtain);
+              this.$set(oneCurtain, "PRICE", price);
             }
             //库存
             curtain_list = this.getStoreData(curtain_list);
@@ -1116,6 +1152,7 @@ export default {
           //第二步，把当前选中的push进去
           var curtain_temp = this.getOtherCurtainMsgForExchange(model.curtain_model);
           for (var i = 0; i < curtain_temp.length; i++) {
+            curtain_temp[i] = this.dealInsertData(curtain_temp[i]);
             var oneCurtain = curtain_temp[i];
             if (oneCurtain.NC_PART_TYPECODE == "LBT") {
               //先看父节点需不需要加载出拉边条
@@ -1159,41 +1196,42 @@ export default {
     //添加其他没有的数据
     getOtherCurtainMsgForExchange(originData) {
       for (var i = 0; i < originData.length; i++) {
+        var oneCurtain = originData[i];
         //默认选中
         var defaultChose = false;
-        if (originData[i].curtain_level == 0) {
+        if (oneCurtain.curtain_level == 0) {
           //根节点的由父节点控制
-          defaultChose = originData[i].NCT_DELETE < 2;
+          defaultChose = oneCurtain.NCT_DELETE < 2;
         } else {
           //子节点综合父节点考虑
-          defaultChose = originData[i].NCT_DELETE < 2 && originData[i].NCM_DELETE < 2;
+          defaultChose = oneCurtain.NCT_DELETE < 2 && oneCurtain.NCM_DELETE < 2;
         }
-        this.$set(originData[i], "curtain_choose", defaultChose);
+        this.$set(oneCurtain, "curtain_choose", defaultChose);
         //宽
         var curtain_width = 0;
-        if (originData[i].WIDTH_ENABLE > 0) {
+        if (oneCurtain.WIDTH_ENABLE > 0) {
           var width = this.convertNumber(this.orderDetail.CURTAIN_WIDTH);
-          curtain_width = this.dosageFilter(width * originData[i].NCM_WIDTH_RATIO);
+          curtain_width = this.dosageFilter(width * oneCurtain.NCM_WIDTH_RATIO);
         }
-        this.$set(originData[i], "curtain_width", curtain_width);
+        this.$set(oneCurtain, "curtain_width", curtain_width);
         //高
         var curtain_height = 0;
-        if (originData[i].HEIGHT_ENABLE > 0) {
+        if (oneCurtain.HEIGHT_ENABLE > 0) {
           var height = this.convertNumber(this.orderDetail.CURTAIN_HEIGHT);
           var ancaoHeight = this.convertNumber(this.orderDetail.ANCAO_HEIGHT);
-          if (originData[i].NC_PART_TYPECODE == 'LT') {
+          if (oneCurtain.NC_PART_TYPECODE == 'LT') {
             //计算帘头高 帘头的高 =（成品高-暗槽高度）÷0.1*0.0235-0.11 结果保留两位
             curtain_height = this.dosageFilter((height - ancaoHeight) * 10 * 0.0235 - 0.11);
           } else {
-            curtain_height = this.dosageFilter(height * originData[i].NCM_HEIGHT_RATIO);
+            curtain_height = this.dosageFilter(height * oneCurtain.NCM_HEIGHT_RATIO);
           }
         }
-        this.$set(originData[i], "curtain_height", curtain_height);
+        this.$set(oneCurtain, "curtain_height", curtain_height);
         //总数（面积）由于开始左右转角都是0，所以不用按公式
         var dosage = this.dosageFilter(curtain_width * curtain_height);
-        if (originData[i].NC_PART_TYPECODE == "GBD") dosage = 1; //挂绑带默认为1
-        this.$set(originData[i], "DOSAGE", dosage);
-        if (originData[i].NC_PART_TYPECODE == "LS") {
+        if (oneCurtain.NC_PART_TYPECODE == "GBD") dosage = 1; //挂绑带默认为1
+        this.$set(oneCurtain, "DOSAGE", dosage);
+        if (oneCurtain.NC_PART_TYPECODE == "LS") {
           //改变里衬布的
           var LCBITEM = originData.filter((item) => item.NC_PART_TYPECODE == "LCB");
           for (var j = 0; j < LCBITEM.length; j++) {
@@ -1202,13 +1240,13 @@ export default {
           }
         }
         //左转角
-        this.$set(originData[i], "LEFT_FILLET", 0);
+        this.$set(oneCurtain, "LEFT_FILLET", 0);
         //右转角
-        this.$set(originData[i], "RIGHT_FILLET", 0);
+        this.$set(oneCurtain, "RIGHT_FILLET", 0);
         //客户备注
-        this.$set(originData[i], "curtain_note", "");
+        this.$set(oneCurtain, "curtain_note", "");
         //说明
-        this.$set(originData[i], "ILLUSTRATE", "");
+        this.$set(oneCurtain, "ILLUSTRATE", "");
       }
       return originData;
     },
@@ -1278,7 +1316,120 @@ export default {
         this.getRemark();
       }).catch(() => { });
     },
-    resolveModify() { },
+    beforeModify() {
+      //表头
+      if (!this.orderDetail.CURTAIN_WIDTH || Number(this.orderDetail.CURTAIN_WIDTH) == 0) {
+        this.$alert("请填写帘款【成品宽】", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
+        return false;
+      }
+      if (!this.orderDetail.CURTAIN_HEIGHT || Number(this.orderDetail.CURTAIN_HEIGHT) == 0) {
+        this.$alert("请填写帘款【成品高】", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
+        return false;
+      }
+      if (!this.orderDetail.ANCAO_HEIGHT) {
+        this.$alert("请填写帘款【暗槽】", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
+        return false;
+      }
+      if (!this.orderDetail.CURTAIN_ROOM_NAME) {
+        this.$alert("请填写帘款【位置】", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
+        return false;
+      }
+      if (!this.orderDetail.QTY_REQUIRED || Number(this.orderDetail.QTY_REQUIRED) == 0) {
+        this.$alert("请填写帘款【套数】", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
+        return false;
+      }
+      //只看选中的
+      for (var i = 0; i < this.chooseCurtainData.length; i++) {
+        var oneCurtain = this.chooseCurtainData[i];
+        //编码
+        if (!oneCurtain.ITEM_NO) {
+          this.$alert(`${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}没有对应的编码，请检查！`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return false;
+        }
+        //宽高
+        if (oneCurtain.WIDTH_ENABLE == 2 && (!oneCurtain.WIDTH || Number(oneCurtain.WIDTH) == 0)) {
+          this.$alert(`请填写${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【宽】`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return false;
+        }
+        if (oneCurtain.HEIGHT_ENABLE == 2 && (!oneCurtain.HEIGHT || Number(oneCurtain.HEIGHT) == 0)) {
+          this.$alert(`请填写${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【高】`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return false;
+        }
+        if (Number(oneCurtain.HEIGHT) < 0) {
+          this.$alert(`${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【高】不能小于0`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return false;
+        }
+        //么术贴
+        if (oneCurtain.TIE_ENABLE == 2 && !oneCurtain.MESUTIE) {
+          this.$alert(`请选择${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【么术贴】`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return false;
+        }
+        //打开方式
+        if (oneCurtain.KAIKOU_ENABLE == 2 && !oneCurtain.KAIKOU) {
+          this.$alert(`请选择${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【打开方式】`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return false;
+        }
+        //工艺方式
+        if (oneCurtain.OPERATION_ENABLE == 2 && !oneCurtain.OPERATION) {
+          this.$alert(`请选择${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【工艺方式】`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return false;
+        }
+        //包边方式
+        if (oneCurtain.BIAN_ENABLE == 2 && !oneCurtain.BIAN) {
+          this.$alert(`请选择${this.transPartTypeCode(oneCurtain.NC_PART_TYPECODE)}【包边方式】`, "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return false;
+        }
+      }
+      return true;
+    },
+    resolveModify() {
+      //修改之前的验证
+      if (!this.beforeModify()) return;
+      this.orderDetail.checkStatus = "已修改";
+      this.orderDetail.UNIT_PRICE = this.oneTotalNoPromotion;
+      this.orderDetail.PROMOTION_COST = this.allTotal;
+      this.orderDetail.FINAL_COST = this.orderDetail.PROMOTION_COST - this.orderDetail.BACK_Y - this.orderDetail.BACK_M;
+      this.$emit("resolveModify", this.orderDetail, this.deleteCurtainData)
+    },
     //获得窗帘的说明
     getRemark(index) {
       var curtains = [];

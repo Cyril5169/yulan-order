@@ -439,8 +439,9 @@ export default {
       var totalMoney = 0;
       //找到勾选的
       for (var i = 0; i < this.curtainData.length; i++) {
-        if (this.curtainData[i].curtain_choose == true && this.curtainData[i].curtain_level == 0) {
-          totalMoney = totalMoney.add(this.oneTotal(this.curtainData[i]));
+        var oneCurtain = this.curtainData[i];
+        if (oneCurtain.curtain_choose == true && oneCurtain.curtain_level == 0) {
+          totalMoney = totalMoney.add(this.oneTotal(oneCurtain));
         }
       }
       return totalMoney * this.curtainHeadData.setNum;
@@ -689,12 +690,13 @@ export default {
     getCurtainOtherMsg(originData, originLevel) {
       //除了后台查出来的数据以外前端需要的数据
       for (var i = 0; i < originData.length; i++) {
-        if (!originData[i].ITEM_NO) continue;
+        var oneCurtain = originData[i];
+        if (!oneCurtain.ITEM_NO) continue;
         //窗帘层级
         var level = 0;
         if (originLevel != undefined) level = originLevel;
         else {
-          var NCM_PID = originData[i].NCM_PID;
+          var NCM_PID = oneCurtain.NCM_PID;
           while (NCM_PID != 0) {
             var temp = originData.filter((item) => item.NC_MODEL_ID == NCM_PID);
             if (temp.length) {
@@ -703,49 +705,50 @@ export default {
             }
           }
         }
-        this.$set(originData[i], "curtain_level", level);
+        this.$set(oneCurtain, "curtain_level", level);
         //默认选中
         var defaultChose = false;
-        if (originData[i].curtain_level == 0) {
+        if (oneCurtain.curtain_level == 0) {
           //根节点的由父节点控制
-          defaultChose = originData[i].NCT_DELETE < 2;
+          defaultChose = oneCurtain.NCT_DELETE < 2;
         } else {
           //子节点综合父节点考虑
-          defaultChose = originData[i].NCT_DELETE < 2 && originData[i].NCM_DELETE < 2;
+          defaultChose = oneCurtain.NCT_DELETE < 2 && oneCurtain.NCM_DELETE < 2;
         }
-        this.$set(originData[i], "curtain_choose", defaultChose);
+        this.$set(oneCurtain, "curtain_choose", defaultChose);
         //单价
-        var price = this.getPrice(this.customerType, originData[i]);
-        this.$set(originData[i], "PRICE", price);
+        var price = this.getPrice(this.customerType, oneCurtain);
+        this.$set(oneCurtain, "PRICE", price);
         //宽
-        this.$set(originData[i], "curtain_width", 0);
+        this.$set(oneCurtain, "curtain_width", 0);
         //高
-        this.$set(originData[i], "curtain_height", 0);
+        this.$set(oneCurtain, "curtain_height", 0);
         //总数（面积）
         var dosage = 0;
-        if (originData[i].NC_PART_TYPECODE == "GBD") dosage = 1; //挂绑带默认为1
-        this.$set(originData[i], "DOSAGE", dosage);
+        if (oneCurtain.NC_PART_TYPECODE == "GBD") dosage = 1; //挂绑带默认为1
+        this.$set(oneCurtain, "DOSAGE", dosage);
         //左转角
-        this.$set(originData[i], "LEFT_FILLET", 0);
+        this.$set(oneCurtain, "LEFT_FILLET", 0);
         //右转角
-        this.$set(originData[i], "RIGHT_FILLET", 0);
+        this.$set(oneCurtain, "RIGHT_FILLET", 0);
         //库存
-        this.$set(originData[i], "curtain_store", "");
+        this.$set(oneCurtain, "curtain_store", "");
         //客户备注
-        this.$set(originData[i], "curtain_note", "");
+        this.$set(oneCurtain, "curtain_note", "");
         //说明
-        this.$set(originData[i], "ILLUSTRATE", "");
+        this.$set(oneCurtain, "ILLUSTRATE", "");
       }
       return originData;
     },
     //查找库存
     getStoreData(originData) {
       for (var i = 0; i < originData.length; i++) {
-        if (!originData[i].ITEM_NO) continue;
+        var oneCurtain = originData[i];
+        if (!oneCurtain.ITEM_NO) continue;
         //库存
         var postData = {
           token: "兰居尚品",
-          code: originData[i].ITEM_NO,
+          code: oneCurtain.ITEM_NO,
         };
         Axios.post("http://ljsp.ubxiu.com:8098/api/getXXDMX", postData, {
           params: postData,
@@ -1101,9 +1104,10 @@ export default {
           for (var i = 0; i < this.exchangeModelList.length; i++) {
             var curtain_list = this.exchangeModelList[i].curtain_model;
             for (var j = 0; j < curtain_list.length; j++) {
+              var oneCurtain = curtain_list[j];
               //添加层级数据
               var level = 0;
-              var NCM_PID = curtain_list[j].NCM_PID;
+              var NCM_PID = oneCurtain.NCM_PID;
               while (NCM_PID != 0) {
                 var temp = curtain_list.filter((item) => item.NC_MODEL_ID == NCM_PID);
                 if (temp.length) {
@@ -1111,12 +1115,12 @@ export default {
                   level++;
                 }
               }
-              this.$set(curtain_list[j], "curtain_level", level);
+              this.$set(oneCurtain, "curtain_level", level);
               //勾选
-              this.$set(curtain_list[j], "curtain_choose", true);
+              this.$set(oneCurtain, "curtain_choose", true);
               //单价
-              var price = this.getPrice(this.customerType, curtain_list[j]);
-              this.$set(curtain_list[j], "PRICE", price);
+              var price = this.getPrice(this.customerType, oneCurtain);
+              this.$set(oneCurtain, "PRICE", price);
             }
             //库存
             curtain_list = this.getStoreData(curtain_list);
@@ -1197,41 +1201,42 @@ export default {
     //添加其他没有的数据
     getOtherCurtainMsgForExchange(originData) {
       for (var i = 0; i < originData.length; i++) {
+        var oneCurtain = originData[i];
         //默认选中
         var defaultChose = false;
-        if (originData[i].curtain_level == 0) {
+        if (oneCurtain.curtain_level == 0) {
           //根节点的由父节点控制
-          defaultChose = originData[i].NCT_DELETE < 2;
+          defaultChose = oneCurtain.NCT_DELETE < 2;
         } else {
           //子节点综合父节点考虑
-          defaultChose = originData[i].NCT_DELETE < 2 && originData[i].NCM_DELETE < 2;
+          defaultChose = oneCurtain.NCT_DELETE < 2 && oneCurtain.NCM_DELETE < 2;
         }
-        this.$set(originData[i], "curtain_choose", defaultChose);
+        this.$set(oneCurtain, "curtain_choose", defaultChose);
         //宽
         var curtain_width = 0;
-        if (originData[i].WIDTH_ENABLE > 0) {
+        if (oneCurtain.WIDTH_ENABLE > 0) {
           var width = this.convertNumber(this.curtainHeadData.width);
-          curtain_width = this.dosageFilter(width * originData[i].NCM_WIDTH_RATIO);
+          curtain_width = this.dosageFilter(width * oneCurtain.NCM_WIDTH_RATIO);
         }
-        this.$set(originData[i], "curtain_width", curtain_width);
+        this.$set(oneCurtain, "curtain_width", curtain_width);
         //高
         var curtain_height = 0;
-        if (originData[i].HEIGHT_ENABLE > 0) {
+        if (oneCurtain.HEIGHT_ENABLE > 0) {
           var height = this.convertNumber(this.curtainHeadData.height);
           var ancaoHeight = this.convertNumber(this.curtainHeadData.ancaoHeight);
-          if (originData[i].NC_PART_TYPECODE == 'LT') {
+          if (oneCurtain.NC_PART_TYPECODE == 'LT') {
             //计算帘头高 帘头的高 =（成品高-暗槽高度）÷0.1*0.0235-0.11 结果保留两位
             curtain_height = this.dosageFilter((height - ancaoHeight) * 10 * 0.0235 - 0.11);
           } else {
-            curtain_height = this.dosageFilter(height * originData[i].NCM_HEIGHT_RATIO);
+            curtain_height = this.dosageFilter(height * oneCurtain.NCM_HEIGHT_RATIO);
           }
         }
-        this.$set(originData[i], "curtain_height", curtain_height);
+        this.$set(oneCurtain, "curtain_height", curtain_height);
         //总数（面积）由于开始左右转角都是0，所以不用按公式
         var dosage = this.dosageFilter(curtain_width * curtain_height);
-        if (originData[i].NC_PART_TYPECODE == "GBD") dosage = 1; //挂绑带默认为1
-        this.$set(originData[i], "DOSAGE", dosage);
-        if (originData[i].NC_PART_TYPECODE == "LS") {
+        if (oneCurtain.NC_PART_TYPECODE == "GBD") dosage = 1; //挂绑带默认为1
+        this.$set(oneCurtain, "DOSAGE", dosage);
+        if (oneCurtain.NC_PART_TYPECODE == "LS") {
           //改变里衬布的
           var LCBITEM = originData.filter((item) => item.NC_PART_TYPECODE == "LCB");
           for (var j = 0; j < LCBITEM.length; j++) {
@@ -1240,13 +1245,13 @@ export default {
           }
         }
         //左转角
-        this.$set(originData[i], "LEFT_FILLET", 0);
+        this.$set(oneCurtain, "LEFT_FILLET", 0);
         //右转角
-        this.$set(originData[i], "RIGHT_FILLET", 0);
+        this.$set(oneCurtain, "RIGHT_FILLET", 0);
         //客户备注
-        this.$set(originData[i], "curtain_note", "");
+        this.$set(oneCurtain, "curtain_note", "");
         //说明
-        this.$set(originData[i], "ILLUSTRATE", "");
+        this.$set(oneCurtain, "ILLUSTRATE", "");
       }
       return originData;
     },

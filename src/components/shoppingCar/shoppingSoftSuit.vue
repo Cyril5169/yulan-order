@@ -101,9 +101,7 @@
 <script>
 import Cookies from "js-cookie";
 import { mapMutations } from "vuex";
-import { updateShoppingCar } from "@/api/shop";
-import { GetCartItem } from "@/api/shopASP";
-import { deleteItems, deleteGroup } from "@/api/delete";
+import { GetCartItem, DeleteCommodities, DeleteCartItems } from "@/api/shopASP";
 
 export default {
   name: "ShoppingSoftSuit",
@@ -171,121 +169,6 @@ export default {
       }
       return [];
     },
-    //计算每件商品的小计:长乘高
-    squareChange(value, index, groupIndex, flag) {
-      return;
-      var re = /^[1-9]\d*$/;
-      if (re.test(value) === false) {
-        this.$alert("请填写正确的数字", "提示", {
-          type: "warning",
-          confirmButtonText: "确定",
-        });
-        if (flag === 0) {
-          this.shopsData[groupIndex].commodities[index].width = "";
-        } else {
-          this.shopsData[groupIndex].commodities[index].height = "";
-        }
-        return;
-      }
-      if (flag === 0) {
-        updateShoppingCar({
-          commodityID: this.shopsData[groupIndex].commodities[index].id,
-          activityID: this.shopsData[groupIndex].commodities[index].activityId,
-          quantity: "",
-          width: value,
-          height: this.shopsData[groupIndex].commodities[index].height,
-          remark: this.shopsData[groupIndex].commodities[index].remark,
-        })
-          .then((res) => { })
-          .catch((err) => {
-            console.log(err);
-          });
-      } else {
-        updateShoppingCar({
-          commodityID: this.shopsData[groupIndex].commodities[index].id,
-          activityID: this.shopsData[groupIndex].commodities[index].activityId,
-          quantity: "",
-          width: this.shopsData[groupIndex].commodities[index].width,
-          height: value,
-          remark: this.shopsData[groupIndex].commodities[index].remark,
-        })
-          .then((res) => { })
-          .catch((err) => {
-            console.log(err);
-          });
-      }
-      for (var i = 0; i < this.shopsData.length; i++) {
-        var selected =
-          this.multipleSelection.length &&
-          this.multipleSelection.indexOf(
-            this.shopsData[i].commodities[index]
-          ) !== -1;
-        if (selected === true) break;
-      }
-      if (selected === true) {
-        var total = 0;
-        if (this.multipleSelection[i].quantity)
-          total += parseFloat(
-            this.multipleSelection[i].price * this.multipleSelection[i].quantity
-          );
-        else {
-          total += parseFloat(
-            this.multipleSelection[i].width *
-            this.multipleSelection[i].height *
-            this.multipleSelection[i].price
-          );
-        }
-        this.totalMoney = total;
-      }
-    },
-    //计算每件商品的小计:非长乘高
-    numberChange(value, index, groupIndex) {
-      return;
-      var re = /^[1-9]\d*$/;
-      if (re.test(value) === false) {
-        this.$alert("请填写正确的数字", "提示", {
-          type: "warning",
-          confirmButtonText: "确定",
-        });
-        this.shopsData[groupIndex].commodities[index].quantity = "";
-        return;
-      }
-      updateShoppingCar({
-        commodityID: this.shopsData[groupIndex].commodities[index].id,
-        activityID: this.shopsData[groupIndex].commodities[index].activityId,
-        quantity: this.shopsData[groupIndex].commodities[index].quantity,
-        width: "",
-        height: "",
-        remark: this.shopsData[groupIndex].commodities[index].remark,
-      })
-        .then((res) => { })
-        .catch((err) => {
-          console.log(err);
-        });
-      for (var i = 0; i < this.shopsData.length; i++) {
-        var selected =
-          this.multipleSelection.length &&
-          this.multipleSelection.indexOf(
-            this.shopsData[i].commodities[index]
-          ) !== -1;
-        if (selected === true) break;
-      }
-      if (selected === true) {
-        var total = 0;
-        if (this.multipleSelection[i].quantity)
-          total += parseFloat(
-            this.multipleSelection[i].price * this.multipleSelection[i].quantity
-          );
-        else {
-          total += parseFloat(
-            this.multipleSelection[i].width *
-            this.multipleSelection[i].height *
-            this.multipleSelection[i].price
-          );
-        }
-        this.totalMoney = total;
-      }
-    },
     //监测选中项的变化
     handleSelectionChange(val) {
       //当已有选项时，只能选当前组其他项，不可选其他组，若选其他组，原有组清空
@@ -320,8 +203,7 @@ export default {
       this.multipleSelection = val;
       for (var i = 0; i < this.multipleSelection.length; i++) {
         let _data = this.multipleSelection[i];
-        var quantity =
-          _data.quantity | this.dosageFilter(_data.width.mul(_data.height));
+        var quantity = _data.quantity | this.dosageFilter(_data.width.mul(_data.height));
         let sub = _data.price.mul(_data.quantity);
         total += sub;
         totalPrice += this.calculatePromotionPrice(_data);
@@ -390,31 +272,27 @@ export default {
       }
     },
     //删除单件商品
-    deleteSingle(data) {
+    deleteSingle(item) {
       this.$confirm("是否删除选中的商品？删除后将不可恢复！", "提示", {
         confirmButtonText: "确定删除",
         cancelButtonText: "我再想想",
         type: "warning",
-      })
-        .then(() => {
-          let _data = [];
-          _data.push(data.id);
-          deleteItems(_data)
-            .then((res) => {
-              this.$alert("删除成功", "提示", {
-                confirmButtonText: "确定",
-                type: "success",
-              });
-              this.init();
-            })
-            .catch((err) => {
-              this.$alert("删除失败", "提示", {
-                confirmButtonText: "确定",
-                type: "warning",
-              });
-            });
-        })
-        .catch(() => { });
+      }).then(() => {
+        let data = [];
+        data.push(item.id);
+        DeleteCommodities({ commodityIds: data }).then((res) => {
+          this.$alert("删除成功", "提示", {
+            confirmButtonText: "确定",
+            type: "success",
+          });
+          this.init();
+        }).catch((err) => {
+          this.$alert("删除失败", "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+        });
+      }).catch(() => { });
     },
     //删除选中项
     deleteChoose(index) {
@@ -434,28 +312,24 @@ export default {
         confirmButtonText: "确定删除",
         cancelButtonText: "我再想想",
         type: "warning",
-      })
-        .then(() => {
-          var data = [];
-          for (var i = 0; i < this.multipleSelection.length; i++) {
-            data.push(this.multipleSelection[i].id);
-          }
-          deleteItems(data)
-            .then((res) => {
-              this.$alert("删除成功", "提示", {
-                confirmButtonText: "确定",
-                type: "success",
-              });
-              this.init();
-            })
-            .catch((err) => {
-              this.$alert("删除失败", "提示", {
-                confirmButtonText: "确定",
-                type: "warning",
-              });
-            });
-        })
-        .catch(() => { });
+      }).then(() => {
+        var data = [];
+        for (var i = 0; i < this.multipleSelection.length; i++) {
+          data.push(this.multipleSelection[i].id);
+        }
+        DeleteCommodities({ commodityIds: data }).then((res) => {
+          this.$alert("删除成功", "提示", {
+            confirmButtonText: "确定",
+            type: "success",
+          });
+          this.init();
+        }).catch((err) => {
+          this.$alert("删除失败", "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+        });
+      }).catch(() => { });
     },
     //删除一整个分组
     deleteOneGroup(index) {
@@ -466,26 +340,21 @@ export default {
       })
         .then(() => {
           var data = [];
-          for (var i = 0; i < this.multipleSelection.length; i++) {
-            data.push(this.multipleSelection[i].id);
-          }
-          deleteGroup([this.shopsData[index].cartItemId])
-            .then((res) => {
-              this.activityData = [];
-              this.init();
-              this.$alert("删除成功", "提示", {
-                confirmButtonText: "确定",
-                type: "success",
-              });
-            })
-            .catch((err) => {
-              this.$alert("删除失败", "提示", {
-                confirmButtonText: "确定",
-                type: "warning",
-              });
+          data.push(this.shopsData[index].cartItemId)
+          DeleteCartItems({ cartItemIds: data }).then((res) => {
+            this.activityData = [];
+            this.init();
+            this.$alert("删除成功", "提示", {
+              confirmButtonText: "确定",
+              type: "success",
             });
-        })
-        .catch(() => { });
+          }).catch((err) => {
+            this.$alert("删除失败", "提示", {
+              confirmButtonText: "确定",
+              type: "warning",
+            });
+          });
+        }).catch(() => { });
     },
     //判断结算
     handleCommit() {

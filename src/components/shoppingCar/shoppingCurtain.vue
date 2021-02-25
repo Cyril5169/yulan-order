@@ -110,8 +110,7 @@
 
 <script>
 import Cookies from "js-cookie";
-import { deleteTheGroup, alterCount } from "@/api/curtain";
-import { GetCartItem } from "@/api/shopASP";
+import { GetCartItem, DeleteCartItems } from "@/api/shopASP";
 import { mapMutations } from "vuex";
 
 export default {
@@ -235,43 +234,28 @@ export default {
         },
       });
     },
-    //删除一整个表格
-    deleteTable(index) {
-      this.shopsData.splice(index, 1);
-      this.activityData.splice(index, 1);
-      for (let i = index; i < this.shopsData.length; i++) {
-        for (let j = 0; j < this.shopsData[i].curtainCartItems.length; j++) {
-          this.shopsData[i].curtainCartItems[j].index--;
-        }
-      }
-    },
     //删除单件商品
-    deleteSingle(data) {
-      let _index = data.index;
+    deleteSingle(item) {
       this.$confirm("是否删除选中的商品？删除后将不可恢复！", "提示", {
         confirmButtonText: "确定删除",
         cancelButtonText: "我再想想",
         type: "warning",
-      })
-        .then(() => {
-          let _data = [];
-          _data.push(data.cartItemId);
-          deleteTheGroup(_data)
-            .then((res) => {
-              this.$alert("删除成功", "提示", {
-                confirmButtonText: "确定",
-                type: "success",
-              });
-              this.init();
-            })
-            .catch((err) => {
-              this.$alert("发生错误，删除失败", "提示", {
-                confirmButtonText: "确定",
-                type: "warning",
-              });
-            });
-        })
-        .catch(() => { });
+      }).then(() => {
+        let data = [];
+        data.push(item.cartItemId);
+        DeleteCartItems({ cartItemIds: data }).then((res) => {
+          this.$alert("删除成功", "提示", {
+            confirmButtonText: "确定",
+            type: "success",
+          });
+          this.init();
+        }).catch((err) => {
+          this.$alert("发生错误，删除失败", "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+        });
+      }).catch(() => { });
     },
     //删除选中项
     deleteChoose() {
@@ -282,27 +266,24 @@ export default {
         type: "warning",
       })
         .then(() => {
-          let obj = [];
+          let data = [];
           let _index = this.multipleSelection[0].index;
           for (let i = 0; i < this.multipleSelection.length; i++) {
-            obj.push(this.multipleSelection[i].cartItemId);
+            data.push(this.multipleSelection[i].cartItemId);
           }
-          deleteTheGroup(obj)
-            .then((res) => {
-              this.$alert("删除成功", "提示", {
-                confirmButtonText: "确定",
-                type: "success",
-              });
-              this.init();
-            })
-            .catch((err) => {
-              this.$alert("发生错误，删除失败", "提示", {
-                confirmButtonText: "确定",
-                type: "warning",
-              });
+          DeleteCartItems({ cartItemIds: data }).then((res) => {
+            this.$alert("删除成功", "提示", {
+              confirmButtonText: "确定",
+              type: "success",
             });
-        })
-        .catch(() => { });
+            this.init();
+          }).catch((err) => {
+            this.$alert("发生错误，删除失败", "提示", {
+              confirmButtonText: "确定",
+              type: "warning",
+            });
+          });
+        }).catch(() => { });
     },
     //删除分组
     deleteOneGroup(index) {
@@ -310,32 +291,27 @@ export default {
         confirmButtonText: "确定删除",
         cancelButtonText: "我再想想",
         type: "warning",
-      })
-        .then(() => {
-          let obj = [];
-          let multipleTable = "multipleTable" + index;
-          for (let i = 0; i < this.shopsData[index].curtainCartItems.length; i++) {
-            obj.push(this.shopsData[index].curtainCartItems[i].cartItemId);
-          }
-          deleteTheGroup(obj)
-            .then((res) => {
-              this.deleteTable(index);
-              this.$refs[multipleTable].clearSelection();
-              this.$alert("删除成功", "提示", {
-                confirmButtonText: "确定",
-                type: "success",
-              });
-            })
-            .catch((err) => {
-              this.$alert("删除失败", "提示", {
-                confirmButtonText: "确定",
-                type: "warning",
-              }).then(() => {
-                this.$refs[multipleTable].clearSelection();
-              });
-            });
-        })
-        .catch(() => { });
+      }).then(() => {
+        let data = [];
+        let multipleTable = "multipleTable" + index;
+        for (let i = 0; i < this.shopsData[index].curtainCartItems.length; i++) {
+          data.push(this.shopsData[index].curtainCartItems[i].cartItemId);
+        }
+        DeleteCartItems({ cartItemIds: data }).then((res) => {
+          this.$alert("删除成功", "提示", {
+            confirmButtonText: "确定",
+            type: "success",
+          });
+          this.init();
+        }).catch((err) => {
+          this.$alert("删除失败", "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          }).then(() => {
+            this.$refs[multipleTable].clearSelection();
+          });
+        });
+      }).catch(() => { });
     },
     //新建一个方法，不动原来的
     handleCommitNew() {

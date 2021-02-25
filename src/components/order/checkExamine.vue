@@ -16,7 +16,8 @@
     </el-dialog>
     <el-dialog v-if="newCurtainDetailVisible" title="窗帘详情" :visible.sync="newCurtainDetailVisible" width="1200px" top="5vh"
       :close-on-click-modal="false">
-      <newCurtainOrderDetail :ORDERBODY="selectOrderDetail" :ruleForm="ruleForm" />
+      <newCurtainOrderDetail :ORDERBODY="selectOrderDetail" :ruleForm="ruleForm" :originDelete="originDelete"
+        @resolveModify="resolveModify" />
     </el-dialog>
 
     <div slot="header">
@@ -123,7 +124,8 @@
             <el-button @click="openNewCurtain(scope.row, scope.$index)" type="primary" size="mini">查看详情</el-button>
           </template>
         </el-table-column>
-        <el-table-column v-if="check_CURTAIN_STATUS_ID == 1 && (isX || isN)" align="center" prop="checkStatus" label="是否修改" width="80">
+        <el-table-column v-if="check_CURTAIN_STATUS_ID == 1 && (isX || isN)" align="center" prop="checkStatus" label="是否修改"
+          width="80">
         </el-table-column>
       </el-table>
 
@@ -131,8 +133,10 @@
         <el-button v-if="check_CURTAIN_STATUS_ID == 2" @click="_defeat()" size="medium" type="warning">退回兰居修改
         </el-button>
         <el-button v-if="check_CURTAIN_STATUS_ID == 2" @click="_pass()" size="medium" type="success">确认兰居修改</el-button>
-        <el-button :disabled="exButton" v-if="check_CURTAIN_STATUS_ID == 1" @click="LjExamine()" size="medium" type="success">确认修改
-        </el-button>
+        <el-button :disabled="!modifyBtnVisible" v-if="check_CURTAIN_STATUS_ID == 1 && isX" @click="LjExamine()" size="medium"
+          type="success">确认修改</el-button>
+        <el-button :disabled="!modifyBtnVisible" v-if="check_CURTAIN_STATUS_ID == 1 && isN" @click="customerChange" size="medium"
+          type="success">确认修改</el-button>
         <el-button v-if="(check_CURTAIN_STATUS_ID == 0 || check_CURTAIN_STATUS_ID == 4) && check_STATUS_ID == 0 && isX"
           @click="summitCurtain" size="medium" type="primary">提交订单</el-button>
         <el-button v-if="(check_CURTAIN_STATUS_ID == 0 || check_CURTAIN_STATUS_ID == 4) && check_STATUS_ID == 0 && isN"
@@ -198,6 +202,7 @@ import {
   updateCurtainOrderStatus,
   settlementAgain
 } from "@/api/orderListASP";
+import { newCurtainUpdateCurtainOrder } from "@/api/newCurtainASP";
 import { downLoadFile } from "@/common/js/downLoadFile";
 import { mapMutations, mapActions } from "vuex";
 import Cookies from "js-cookie";
@@ -211,7 +216,6 @@ export default {
     return {
       button_1: true,
       deleteIds: [],
-      exButton: true,
       ljsuggestion: "", //兰居审核意见
       cyLineNo: 0,
       allCurtains: [],
@@ -243,7 +247,10 @@ export default {
         ORDERBODY: [],
       },
       showExportProduct: false,
-      selectOrderDetail: {}
+      selectOrderDetail: {},
+      newCurtainData: [],
+      deleteCurtainData: [],
+      originDelete: []
     };
   },
   components: {
@@ -280,6 +287,15 @@ export default {
       s = s < 10 ? "0" + s : s;
       return y + "-" + MM + "-" + d + " " + h + ":" + m + ":" + s;
     },
+  },
+  computed: {
+    modifyBtnVisible() {
+      var visible = true;
+      for (var i = 0; i < this.ruleForm.ORDERBODY.length; i++) {
+        if (this.ruleForm.ORDERBODY[i].checkStatus == "未修改") visible = false;
+      }
+      return visible;
+    }
   },
   methods: {
     formatRole: function (row, column) {
@@ -515,19 +531,22 @@ export default {
     openNewCurtain(tab, index) {
       this.newCurtainDetailVisible = true;
       this.selectOrderDetail = tab;
+      this.originDelete = [];
+      if (this.deleteCurtainData && this.deleteCurtainData[index]) {
+        for (var i = 0; i < this.deleteCurtainData[index].length; i++) {
+          this.originDelete.push(this.deleteCurtainData[index][i].ID)
+        }
+      }
       this.tableIndex = index;
-      this.cyLineNo = index + 1;
     },
     //保存修改
     saveChange() {
       this.ruleForm.ORDERBODY[this.tableIndex].checkStatus = "已修改";
       this.detailVisible = false;
-      this.exButton = false;
     },
     getDetail() {
       getOrderDetails({ orderNo: this.orderNum }).then((res) => {
         this.ruleForm = res.data[0];
-        console.log(res)
         if (this.ruleForm.CUSTOMER_CODE == "C01613" || this.ruleForm.CUSTOMER_CODE == "C01613A") {
           this.showExportProduct = true;
         }
@@ -612,6 +631,56 @@ export default {
         });
       }).catch(() => {
         return;
+      });
+    },
+    resolveModify(data, deleteIds) {
+      this.$set(this.ruleForm.ORDERBODY, this.tableIndex, data);
+      this.deleteCurtainData[this.tableIndex] = deleteIds;
+      this.newCurtainDetailVisible = false;
+    },
+    getCurtainData() {
+      this.newCurtainData = [];
+      this.deleteIds = [];
+      for (var i = 0; i < this.ruleForm.ORDERBODY.length; i++) {
+        var detail = this.ruleForm.ORDERBODY[i];
+        for (var j = 0; j < detail.curtains.length; j++) {
+          var oneCurtain = detail.curtains[j];
+          if (oneCurtain.curtain_choose) {
+            oneCurtain.ITEM_ID = oneCurtain.ITEM_NO;
+            this.newCurtainData.push(JSON.parse(JSON.stringify(oneCurtain)))
+          }
+        }
+      }
+      for (var i = 0; i < this.deleteCurtainData.length; i++) {
+        for (var j = 0; j < this.deleteCurtainData[i].length; j++) {
+          this.deleteIds.push(this.deleteCurtainData[i][j]);
+        }
+      }
+
+    },
+    customerChange() {
+      //拼接删除的数据
+      this.getCurtainData();
+      console.log(this.newCurtainData, this.deleteIds)
+      newCurtainUpdateCurtainOrder({
+        cid: Cookies.get("cid"),
+        curtainStatusId: "0",
+        orderHead: this.ruleForm,
+        orderDetails: this.ruleForm.ORDERBODY,
+        allCurtains: this.newCurtainData,
+        deleteIds: this.deleteIds
+      }).then((res) => {
+        this.$alert("操作成功,请提交结算再次审核", "提示", {
+          confirmButtonText: "确定",
+          type: "success",
+        });
+        this.check_CURTAIN_STATUS_ID = "0";
+        this.getDetail();
+      }).catch((res) => {
+        this.$alert("操作失败:" + res.msg, "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
       });
     },
     //合计行显示

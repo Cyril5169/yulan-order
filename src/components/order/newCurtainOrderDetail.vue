@@ -33,8 +33,7 @@
       <!-- 活动 -->
       <span style="margin-left:10px;">活动：</span>
       <span>{{orderDetail.PROMOTION ? orderDetail.PROMOTION: '无'}}</span>
-      <!-- <el-select size="mini" style="width:220px" :disabled="activityOptions.length == 1" v-model="orderDetail.activityId"
-        :placeholder="activityOptions.length == 1? '无可选活动': '请选择活动'">
+      <!-- <el-select size="mini" style="width:220px" v-model="orderDetail.activityId">
         <el-option v-for="item in activityOptions" :key="item.P_ID"
           :label="item.ORDER_TYPE? item.ORDER_TYPE + ' -- ' + item.ORDER_NAME : item.ORDER_NAME" :value="item.P_ID">
         </el-option>
@@ -286,7 +285,7 @@
         </span>
       </div>
       <div style="text-align:center;margin:20px 0;">
-        <el-button type="primary" width="130px" @click="resolveModify">确认修改</el-button>
+        <el-button type="primary" width="130px" @click="resolveModify" v-if="!isCheck && !isExamine">确认修改</el-button>
       </div>
     </div>
     <!-- 替换组件 -->
@@ -426,7 +425,8 @@ export default {
           totalMoney = totalMoney.add(this.oneTotal(oneCurtain));
         }
       }
-      return totalMoney * this.orderDetail.QTY_REQUIRED;
+      totalMoney = totalMoney * this.orderDetail.QTY_REQUIRED;
+      return totalMoney;
     },
     oneTotalNoPromotion() {
       var totalMoney = 0;
@@ -440,6 +440,10 @@ export default {
       return totalMoney;
     },
     chooseCurtainData() {
+      for (var i = 0; i < this.orderDetail.curtains.length; i++) {
+        var oneCurtain = this.orderDetail.curtains[i];
+        oneCurtain.ITEM_ID = oneCurtain.ITEM_NO;
+      }
       return this.orderDetail.curtains.filter((item) => item.curtain_choose);
     },
     deleteCurtainData() {
@@ -603,7 +607,7 @@ export default {
         this.activityOptions.push({
           ORDER_TYPE: "",
           ORDER_NAME: "不参与活动",
-          P_ID: null,
+          P_ID: "",
         });
       });
     },
@@ -928,6 +932,7 @@ export default {
           var lbtItem = this.orderDetail.curtain_change.filter((item) => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
           if (lbtItem.length) {
             lbtItem = lbtItem[0]; //只取第一个拉边条（按理应该只有一个）
+            lbtItem = this.dealInsertData(lbtItem);
             this.orderDetail.curtains.push({ ...lbtItem });
             //强制改成对应的ITEM_NO
             this.orderDetail.curtains[this.orderDetail.curtains.length - 1].ITEM_NO = mlList[mlList.length - 1].MATERIAL_NO;
@@ -1008,6 +1013,7 @@ export default {
                 );
                 if (lbtItem.length) {
                   lbtItem = lbtItem[0]; //只取第一个拉边条（按理应该只有一个）
+                  lbtItem = this.dealInsertData(lbtItem);
                   this.orderDetail.curtains.push({ ...lbtItem });
                   //强制改成对应的ITEM_NO
                   this.orderDetail.curtains[this.orderDetail.curtains.length - 1].ITEM_NO = mlList[mlList.length - 1].MATERIAL_NO;
@@ -1285,7 +1291,8 @@ export default {
         if (originItem.length) {
           originItem = originItem[0];
           originItem.ITEM_NO = item.ITEM_NO;
-          originItem.NOTE = item.NOTE;
+          originItem.ITEM_ID = item.ITEM_NO;
+          originItem.CURTAIN_ITEM_NAME = item.NOTE;
           originItem.MATERIAL_NO = item.MATERIAL_NO;
         }
         //替换拉边条
@@ -1327,8 +1334,8 @@ export default {
         });
         return false;
       }
-      if (!this.orderDetail.ANCAO_HEIGHT) {
-        this.$alert("请填写帘款【暗槽】", "提示", {
+      if (this.orderDetail.ANCAO_HEIGHT === "" || this.orderDetail.ANCAO_HEIGHT === null) {
+        this.$alert("请填写帘款【暗槽高】", "提示", {
           confirmButtonText: "确定",
           type: "warning",
         });
@@ -1349,6 +1356,13 @@ export default {
         return false;
       }
       //只看选中的
+      if (!this.chooseCurtainData.length) {
+        this.$alert("请至少选择一个明细！", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
+        return false;
+      }
       for (var i = 0; i < this.chooseCurtainData.length; i++) {
         var oneCurtain = this.chooseCurtainData[i];
         //编码

@@ -1315,7 +1315,8 @@ export default {
         if (originItem.length) {
           originItem = originItem[0];
           originItem.ITEM_NO = item.ITEM_NO;
-          originItem.NOTE = item.NOTE;
+          originItem.ITEM_ID = item.ITEM_NO;
+          originItem.CURTAIN_ITEM_NAME = item.NOTE;
           originItem.MATERIAL_NO = item.MATERIAL_NO;
         }
         //替换拉边条
@@ -1366,6 +1367,13 @@ export default {
     },
     //数据有效性判断
     beforeChangeData() {
+      if (!this.newCurtainData.length) {
+        this.$alert("请至少选择一个明细！", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
+        return false;
+      }
       for (var i = 0; i < this.newCurtainData.length; i++) {
         var oneCurtain = this.newCurtainData[i];
         //编码

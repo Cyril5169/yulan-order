@@ -38,8 +38,7 @@
                            .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
           <!-- 活动 -->
           <span style="margin-left:10px;">活动：</span>
-          <el-select size="mini" style="width:220px" :disabled="activityOptions.length == 1" v-model="curtainHeadData.activityId"
-            :placeholder="activityOptions.length == 1? '无可选活动': '请选择活动'">
+          <el-select size="mini" style="width:220px" v-model="curtainHeadData.activityId">
             <el-option v-for="item in activityOptions" :key="item.P_ID"
               :label="item.ORDER_TYPE? item.ORDER_TYPE + ' -- ' + item.ORDER_NAME : item.ORDER_NAME" :value="item.P_ID">
             </el-option>
@@ -444,7 +443,8 @@ export default {
           totalMoney = totalMoney.add(this.oneTotal(oneCurtain));
         }
       }
-      return totalMoney * this.curtainHeadData.setNum;
+      totalMoney = totalMoney * this.curtainHeadData.setNum;
+      return totalMoney;
     },
     chooseCurtainData() {
       return this.curtainData.filter((item) => item.curtain_choose);
@@ -658,12 +658,6 @@ export default {
         },
         { loading: false }
       ).then((res) => {
-        this.activityOptions = res.data;
-        this.activityOptions.push({
-          ORDER_TYPE: "",
-          ORDER_NAME: "不参与活动",
-          P_ID: null,
-        });
         var defaultSel = {
           pri: 0,
           id: 0,
@@ -680,10 +674,16 @@ export default {
             defaultSel.id = res.data[j].P_ID;
           }
         }
-
         if (defaultSel.pri != 0) {
           this.curtainHeadData.activityId = defaultSel.id;
         }
+        
+        this.activityOptions = res.data;
+        this.activityOptions.push({
+          ORDER_TYPE: "",
+          ORDER_NAME: "不参与活动",
+          P_ID: "",
+        });
       });
     },
     //添加其他没有的字段
@@ -1338,8 +1338,8 @@ export default {
         });
         return false;
       }
-      if (!this.curtainHeadData.ancaoHeight) {
-        this.$alert("请填写帘款【暗槽】", "提示", {
+      if (this.curtainHeadData.ancaoHeight === "" || this.curtainHeadData.ancaoHeight === null) {
+        this.$alert("请填写帘款【暗槽高】", "提示", {
           confirmButtonText: "确定",
           type: "warning",
         });
@@ -1360,6 +1360,13 @@ export default {
         return false;
       }
       //只看选中的
+      if (!this.chooseCurtainData.length) {
+        this.$alert("请至少选择一个明细！", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
+        return false;
+      }
       for (var i = 0; i < this.chooseCurtainData.length; i++) {
         var oneCurtain = this.chooseCurtainData[i];
         //编码

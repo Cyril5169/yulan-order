@@ -14,13 +14,14 @@ export function tabsName(index) {
     case "detail/detailWallPaper":
       return "墙纸详情";
     case "detail/detailCurtain":
+    case "shoppingCar/shoppingNewCurtainEdit":
       return "窗帘详情";
     case "detail/detailSoftSuit":
       return "软装详情";
     case "order/examineDetailNew":
       return "审核详情";
     case "order/newCurtainExamineDetail":
-        return "新窗帘审核详情";  
+      return "新窗帘审核详情";
     case "order/checkExamine":
       return "订单详情";
     case "myZone/myCoupon":

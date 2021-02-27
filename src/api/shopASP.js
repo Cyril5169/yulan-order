@@ -46,7 +46,7 @@ export function DeleteCommodities(data, config = {}) {
         return Promise.reject(err);
     })
 }
-//删除窗帘购物车
+//删除窗帘购物车或墙纸，软装购物车组
 export function DeleteCartItems(data, config = {}) {
     return post('/CART_ITEM/DeleteCartItems', data, config).then((res) => {
         return Promise.resolve(res);

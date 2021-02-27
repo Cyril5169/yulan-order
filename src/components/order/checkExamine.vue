@@ -73,6 +73,21 @@
           玉兰处理说明：
           <span class="zoomRight">{{ ruleForm.YULAN_NOTES }}</span>
         </span>
+        <template v-if="isN">
+          <br />
+          <span class="zoomLeft">
+            交货日期：
+            <span class="zoomRight">
+              <span class="zoomRight">{{ ruleForm.JIAOHUO_DATE | datatrans }}</span>
+            </span>
+          </span>
+          <span class="zoomLeft">
+            兰居处理说明：
+            <span class="zoomRight">
+              <span class="zoomRight">{{ ruleForm.LANJU_NOTE }}</span>
+            </span>
+          </span>
+        </template>
       </div>
       <el-table border :show-summary="ruleForm.ORDERBODY.length > 1" :summary-method="getSummaries" :data="ruleForm.ORDERBODY"
         style="width: 100%" :row-class-name="tableRowClassName">

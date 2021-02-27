@@ -42,8 +42,8 @@
             content="作废订单" placement="top">
             <i style="float:right;cursor: pointer;" class="el-icon-delete" @click="deleteOrder(item.ORDER_NO)"></i>
           </el-tooltip>
-          <el-tooltip v-if="item.STATUS_ID == 3 && (item.ORDER_NO.slice(0, 1) == 'X' || item.ORDER_NO.slice(0, 1) == 'N')"
-            class="item" effect="dark" content="退回数据到购物车" placement="top">
+          <el-tooltip v-if="item.ORDER_NO.slice(0, 1) == 'X' || item.ORDER_NO.slice(0, 1) == 'N'"
+            class="item" effect="dark" content="复制数据到购物车" placement="top">
             <i style="float:right;cursor: pointer;" class="el-icon-sell" @click="copyCart(item.ORDER_NO)"></i>
           </el-tooltip>
           <a v-if="
@@ -586,7 +586,7 @@ export default {
             orderNo: pushOrderNum,
           }).then((res) => {
             if (pushOrderNum.slice(0, 1) == "X" || pushOrderNum.slice(0, 1) == "N") {
-              this.$confirm("作废成功，是否退回数据到购物车？", "提示", {
+              this.$confirm("作废成功，是否复制数据到购物车？", "提示", {
                 confirmButtonText: "是",
                 cancelButtonText: "否",
                 type: "warning",
@@ -624,7 +624,7 @@ export default {
         .catch((err) => { });
     },
     copyCart(orderNo) {
-      this.$confirm("是否退回数据到购物车？", "提示", {
+      this.$confirm("是否复制数据到购物车？", "提示", {
         confirmButtonText: "是",
         cancelButtonText: "否",
         type: "warning",

@@ -163,9 +163,7 @@ export default {
       var itemVersion = this.data.item.itemVersion
         ? this.data.item.itemVersion
         : "";
-      //findItemActivity({
       GetPromotionByItem({
-        //CID: this.cid,
         cid: this.cid,
         customerType: this.customerType,
         itemNo: this.data.item.itemNo,

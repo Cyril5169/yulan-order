@@ -22,6 +22,7 @@ import ImageShop from '@/components/design/imageShop'
 import LanJu from '@/components/design/lanJu'
 import DetailWallPaper from '@/components/detail/detailWallPaper'
 import DetailCurtain from '@/components/detail/detailCurtain'
+import shoppingNewCurtainEdit from '@/components/shoppingCar/shoppingNewCurtainEdit'
 import DetailSoftSuit from '@/components/detail/detailSoftSuit'
 import ShoppingCurtainDetail from '@/components/shops/shoppingCurtainDetail'
 import checkOrder from '@/components/order/checkOrder'
@@ -183,6 +184,14 @@ const router = new Router({
           path: '/detail/detailCurtain',
           name: 'detailCurtain',
           component: DetailCurtain,
+          meta: {
+            returnMain: true//该页面刷新回到主界面
+          }
+        },
+        {
+          path: '/shoppingCar/shoppingNewCurtainEdit',
+          name: 'shoppingNewCurtainEdit',
+          component: shoppingNewCurtainEdit,
           meta: {
             returnMain: true//该页面刷新回到主界面
           }

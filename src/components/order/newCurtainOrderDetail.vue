@@ -15,7 +15,7 @@
                            .replace('$#$', '.')
                            .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
       <!-- 成品高 -->
-      <span style="margin-left:20px;">成品高<span style="color:red;">*</span>：</span>
+      <span style="margin-left:10px;">成品高<span style="color:red;">*</span>：</span>
       <span v-if="isCheck || isExamine">{{orderDetail.CURTAIN_HEIGHT}}</span>
       <el-input v-else style="width:60px;" size="mini" v-model="orderDetail.CURTAIN_HEIGHT" @input="changeHeadHeight" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
@@ -23,7 +23,7 @@
                            .replace('$#$', '.')
                            .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
       <!-- 暗槽高 -->
-      <span style="margin-left:20px;">暗槽高<span style="color:red;">*</span>：</span>
+      <span style="margin-left:10px;">暗槽高<span style="color:red;">*</span>：</span>
       <span v-if="isCheck || isExamine">{{orderDetail.ANCAO_HEIGHT}}</span>
       <el-input v-else style="width:60px;" size="mini" v-model="orderDetail.ANCAO_HEIGHT" @input="changeAncaoHeight" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
@@ -31,7 +31,7 @@
                            .replace('$#$', '.')
                            .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
       <!-- 活动 -->
-      <span style="margin-left:20px;">活动：</span>
+      <span style="margin-left:10px;">活动：</span>
       <span>{{orderDetail.PROMOTION ? orderDetail.PROMOTION: '无'}}</span>
       <!-- <el-select size="mini" style="width:220px" :disabled="activityOptions.length == 1" v-model="orderDetail.activityId"
         :placeholder="activityOptions.length == 1? '无可选活动': '请选择活动'">
@@ -40,11 +40,11 @@
         </el-option>
       </el-select> -->
       <!-- 位置 -->
-      <span style="margin-left:20px;">位置<span style="color:red;">*</span>：</span>
+      <span style="margin-left:10px;">位置<span style="color:red;">*</span>：</span>
       <span v-if="isCheck || isExamine">{{orderDetail.CURTAIN_ROOM_NAME}}</span>
       <el-input v-else style="width:100px;" v-model="orderDetail.CURTAIN_ROOM_NAME" size="mini"></el-input>
       <!-- 套数 -->
-      <span style="margin-left:20px;">套数<span style="color:red;">*</span>：</span>
+      <span style="margin-left:10px;">套数<span style="color:red;">*</span>：</span>
       <span v-if="isCheck || isExamine">{{orderDetail.QTY_REQUIRED}}</span>
       <el-input v-else style="width:50px;" v-model="orderDetail.QTY_REQUIRED" size="mini"
         oninput="value=value.replace(/[^\d]/g,'')">
@@ -370,7 +370,7 @@
 <script>
 import Cookies from "js-cookie";
 import Axios from "axios";
-import { getItemById, GetPromotionByItem } from "@/api/orderListASP";
+import { GetPromotionByItem } from "@/api/orderListASP";
 import {
   GetAsyncItemData,
   GetPartTypeDataTabale,
@@ -588,27 +588,22 @@ export default {
     //获得活动
     getActivity() {
       this.activityOptions = [];
-      getItemById(
-        { itemNo: this.orderDetail.ITEM_NO },
+      GetPromotionByItem(
+        {
+          cid: this.cid,
+          customerType: this.customerType,
+          itemNo: this.orderDetail.ITEM_NO,
+          itemVersion: this.orderDetail.ITEM_VERSION,
+          productType: this.orderDetail.PRODUCT_TYPE,
+          productBrand: this.orderDetail.PRODUCT_BRAND,
+        },
         { loading: false }
-      ).then((itemRes) => {
-        GetPromotionByItem(
-          {
-            cid: this.cid,
-            customerType: this.customerType,
-            itemNo: itemRes.data.ITEM_NO,
-            itemVersion: itemRes.data.ITEM_VERSION,
-            productType: itemRes.data.PRODUCT_TYPE,
-            productBrand: itemRes.data.PRODUCT_BRAND,
-          },
-          { loading: false }
-        ).then((res) => {
-          this.activityOptions = res.data;
-          this.activityOptions.push({
-            ORDER_TYPE: "",
-            ORDER_NAME: "不参与活动",
-            P_ID: null,
-          });
+      ).then((res) => {
+        this.activityOptions = res.data;
+        this.activityOptions.push({
+          ORDER_TYPE: "",
+          ORDER_NAME: "不参与活动",
+          P_ID: null,
         });
       });
     },

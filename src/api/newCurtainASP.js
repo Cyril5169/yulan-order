@@ -56,3 +56,11 @@ export function newCurtainUpdateCurtainOrder(data, config = {}) {
       return Promise.reject(err);
   })
 }
+//购物车窗帘详情
+export function GetNewCurtainDetail(data, config = {}) {
+  return post('/CART_ITEM/GetNewCurtainDetail', data, config).then((res) => {
+      return Promise.resolve(res);
+  }).catch((err) => {
+      return Promise.reject(err);
+  })
+}

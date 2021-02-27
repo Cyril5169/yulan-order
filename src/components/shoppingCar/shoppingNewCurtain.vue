@@ -57,7 +57,7 @@
             </el-table-column>
             <el-table-column label="操作" width="180" align="center">
               <template slot-scope="scope1">
-                <a class="link-detail" @click="handleDetails(scope1.$index, scope1.row)" v-if="canShowDetail(scope1.row)">查看详情</a>
+                <a class="link-detail" @click="handleDetails(scope1.row)" v-if="canShowDetail(scope1.row)">查看详情</a>
                 <a class="link-delete" @click="deleteSingle(scope1.row)">删除商品</a>
               </template>
             </el-table-column>
@@ -193,15 +193,15 @@ export default {
     canShowDetail(row) {
       return (!row.salPromotion || (row.salPromotion && row.salPromotion.MODIFY_FLAG != "N"));
     },
-    //查看详情(TODO)
-    handleDetails(index, data) {
-      // this.addTab("detail/detailCurtain");
-      // this.$router.push({
-      //   name: `detailCurtain`,
-      //   params: {
-      //     curtain: data,
-      //   },
-      // });
+    //查看详情
+    handleDetails(data) {
+      this.addTab("shoppingCar/shoppingNewCurtainEdit");
+      this.$router.push({
+        name: `shoppingNewCurtainEdit`,
+        params: {
+          curtain: data,
+        },
+      });
     },
     //删除单件商品
     deleteSingle(item) {

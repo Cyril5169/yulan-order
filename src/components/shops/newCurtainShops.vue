@@ -23,21 +23,21 @@
                            .replace('$#$', '.')
                            .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
           <!-- 成品高 -->
-          <span style="margin-left:20px;">成品高<span style="color:red;">*</span>：</span>
+          <span style="margin-left:10px;">成品高<span style="color:red;">*</span>：</span>
           <el-input style="width:60px;" size="mini" v-model="curtainHeadData.height" @input="changeHeadHeight" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
                            .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
           <!-- 暗槽高 -->
-          <span style="margin-left:20px;">暗槽高<span style="color:red;">*</span>：</span>
+          <span style="margin-left:10px;">暗槽高<span style="color:red;">*</span>：</span>
           <el-input style="width:60px;" size="mini" v-model="curtainHeadData.ancaoHeight" @input="changeAncaoHeight" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
                            .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"></el-input>
           <!-- 活动 -->
-          <span style="margin-left:20px;">活动：</span>
+          <span style="margin-left:10px;">活动：</span>
           <el-select size="mini" style="width:220px" :disabled="activityOptions.length == 1" v-model="curtainHeadData.activityId"
             :placeholder="activityOptions.length == 1? '无可选活动': '请选择活动'">
             <el-option v-for="item in activityOptions" :key="item.P_ID"
@@ -45,10 +45,10 @@
             </el-option>
           </el-select>
           <!-- 位置 -->
-          <span style="margin-left:20px;">位置<span style="color:red;">*</span>：</span>
+          <span style="margin-left:10px;">位置<span style="color:red;">*</span>：</span>
           <el-input style="width:100px;" v-model="curtainHeadData.location" size="mini"></el-input>
           <!-- 套数 -->
-          <span style="margin-left:20px;">套数<span style="color:red;">*</span>：</span>
+          <span style="margin-left:10px;">套数<span style="color:red;">*</span>：</span>
           <el-input style="width:50px;" v-model="curtainHeadData.setNum" size="mini" oninput="value=value.replace(/[^\d]/g,'')">
           </el-input>
         </div>

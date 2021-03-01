@@ -857,6 +857,7 @@ export default {
         for (var i = 0; i < LCBITEM.length; i++) {
           //假设有多个里衬布的情况
           LCBITEM[i].DOSAGE = oneCurtain.DOSAGE;
+          this.getRemark(this.curtainHeadData.curtains.indexOf(LCBITEM[i]));
         }
       }
       this.getRemark(index);
@@ -870,6 +871,7 @@ export default {
         for (var i = 0; i < LCBITEM.length; i++) {
           //假设有多个里衬布的情况
           LCBITEM[i].DOSAGE = oneCurtain.DOSAGE;
+          this.getRemark(this.curtainHeadData.curtains.indexOf(LCBITEM[i]));
         }
       }
       this.getRemark(index);
@@ -900,11 +902,11 @@ export default {
       var price = 0;
       if (row.DOSAGE) {
         price = calculatePromotion ? this.calculatePromotionPrice(row) : row.PRICE;
-        //最小下单量 帘头1.帘身，窗纱4
+        //最小下单量 帘头1.帘身里衬，窗纱4
         var DOSAGE = this.convertNumber(row.DOSAGE);
         if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < 1) {
           DOSAGE = 1;
-        } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4) {
+        } else if ((row.NC_PART_TYPECODE == 'LS'|| row.NC_PART_TYPECODE == 'LCB' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4) {
           DOSAGE = 4;
         }
         price = price.mul(DOSAGE)
@@ -1454,7 +1456,7 @@ export default {
       }
       for (var i = 0; i < curtains.length; i++) {
         var oneCurtain = curtains[i];
-        //最小下单量。帘头1.帘身，窗纱4
+        //最小下单量。帘头1.帘身里衬，窗纱4
         if (oneCurtain.NC_PART_TYPECODE == 'LT') {
           if (oneCurtain.DOSAGE < 1) {
             if (oneCurtain.ILLUSTRATE.indexOf('不足1平方米。按1平方米下单量收费;') == -1) {
@@ -1464,7 +1466,7 @@ export default {
             oneCurtain.ILLUSTRATE = oneCurtain.ILLUSTRATE.replace('不足1平方米。按1平方米下单量收费;', '');
           }
         }
-        if (oneCurtain.NC_PART_TYPECODE == 'LS' || oneCurtain.NC_PART_TYPECODE == 'CS') {
+        if (oneCurtain.NC_PART_TYPECODE == 'LS'|| oneCurtain.NC_PART_TYPECODE == 'LCB' || oneCurtain.NC_PART_TYPECODE == 'CS') {
           if (oneCurtain.DOSAGE < 4) {
             if (oneCurtain.ILLUSTRATE.indexOf('不足4平方米。按4平方米下单量收费;') == -1) {
               oneCurtain.ILLUSTRATE += '不足4平方米。按4平方米下单量收费;';

@@ -411,11 +411,11 @@ export default {
       var price = 0;
       if (row.DOSAGE) {
         price = row.PRICE;
-        //最小下单量 帘头1.帘身，窗纱4
+        //最小下单量 帘头1.帘身里衬，窗纱4
         var DOSAGE = row.DOSAGE;
         if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < 1) {
           DOSAGE = 1;
-        } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4) {
+        } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'LCB' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4) {
           DOSAGE = 4;
         }
         price = price.mul(DOSAGE)

@@ -144,9 +144,9 @@
 import { getOrderlist, getExamineOrder } from "@/api/orderList";
 import {
   getCurtainOrders,
-  updateCurtainOrder,
-  ljExportProductExcel,
+  updateCurtainOrder
 } from "@/api/orderListASP";
+import { newCurtainExportProductExcel } from "@/api/newCurtainASP";
 import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
 import Cookies from "js-cookie";
@@ -374,7 +374,6 @@ export default {
         });
     },
     exportProductExcel(item) {
-      return;
       this.$confirm(
         "此功能只适用于导出测试账号订单，导出模板后订单状态将变成已完成状态，请慎重操作，是否确认导出？",
         "提示",
@@ -384,7 +383,7 @@ export default {
         }
       )
         .then(() => {
-          ljExportProductExcel({
+          newCurtainExportProductExcel({
             cid: Cookies.get("cid"),
             orderNo: item.ORDER_NO,
           }).then((res) => {

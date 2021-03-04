@@ -1,7 +1,7 @@
 import { get, post, patch, put } from './httpASP'
 
 //parttype字典
-export function GetPartTypeDataTabale(data, config = {}) {
+export function GetPartTypeDataTable(data, config = {}) {
   return post('/NEWCURTAIN_PART_TYPE/GetDataTable', data, config).then((res) => {
       return Promise.resolve(res);
   }).catch((err) => {
@@ -67,6 +67,14 @@ export function newCurtainUpdateCurtainOrder(data, config = {}) {
 //购物车窗帘详情
 export function GetNewCurtainDetail(data, config = {}) {
   return post('/CART_ITEM/GetNewCurtainDetail', data, config).then((res) => {
+      return Promise.resolve(res);
+  }).catch((err) => {
+      return Promise.reject(err);
+  })
+}
+//导出生产模板
+export function newCurtainExportProductExcel(data, config = {}) {
+  return post('/CTM_ORDER/newCurtainExportProductExcel', data, config).then((res) => {
       return Promise.resolve(res);
   }).catch((err) => {
       return Promise.reject(err);

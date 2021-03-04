@@ -217,7 +217,7 @@ import {
   updateCurtainOrderStatus,
   settlementAgain
 } from "@/api/orderListASP";
-import { newCurtainUpdateCurtainOrder } from "@/api/newCurtainASP";
+import { newCurtainUpdateCurtainOrder, newCurtainExportProductExcel } from "@/api/newCurtainASP";
 import { downLoadFile } from "@/common/js/downLoadFile";
 import { mapMutations, mapActions } from "vuex";
 import Cookies from "js-cookie";
@@ -630,20 +630,37 @@ export default {
           type: "warning",
         }
       ).then(() => {
-        ljExportProductExcel({
-          cid: Cookies.get("cid"),
-          orderNo: this.orderNum,
-        }).then((res) => {
-          if (res.msg) {
-            downLoadFile(
-              this.Global.baseUrl + `DownLoadAPI/DownloadFile?path=${res.msg}`
-            );
-            this.closeToTab({
-              oldUrl: "order/checkExamine",
-              newUrl: "order/examine",
-            });
-          }
-        });
+        if (this.isX) {
+          ljExportProductExcel({
+            cid: Cookies.get("cid"),
+            orderNo: this.orderNum,
+          }).then((res) => {
+            if (res.msg) {
+              downLoadFile(
+                this.Global.baseUrl + `DownLoadAPI/DownloadFile?path=${res.msg}`
+              );
+              this.closeToTab({
+                oldUrl: "order/checkExamine",
+                newUrl: "order/examine",
+              });
+            }
+          });
+        } else if (this.isN) {
+          newCurtainExportProductExcel({
+            cid: Cookies.get("cid"),
+            orderNo: this.orderNum,
+          }).then((res) => {
+            if (res.msg) {
+              downLoadFile(
+                this.Global.baseUrl + `DownLoadAPI/DownloadFile?path=${res.msg}`
+              );
+              this.closeToTab({
+                oldUrl: "order/checkExamine",
+                newUrl: "order/examine",
+              });
+            }
+          });
+        }
       }).catch(() => {
         return;
       });

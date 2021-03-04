@@ -225,11 +225,11 @@
                 <div class="manufacturing-ct"
                   v-if="scope.row.NCM_NOTE || scope.row.NCM_JOINT || scope.row.NCM_WRINKLE || scope.row.NCM_MAKETYPE ">
                   <span>【说明】: <template v-if="scope.row.NCM_MAKETYPE">{{scope.row.NCM_MAKETYPE | makeType_filter}}<template
-                        v-if="scope.row.NCM_JOINT || scope.row.NCM_WRINKLE || scope.row.NCM_MAKETYPE">、</template></template>
+                        v-if="scope.row.NCM_JOINT || scope.row.NCM_WRINKLE || scope.row.NCM_NOTE">、</template></template>
                     <template v-if="scope.row.NCM_JOINT">{{scope.row.NCM_JOINT | joint_filter}}<template
-                        v-if="scope.row.NCM_WRINKLE || scope.row.NCM_MAKETYPE">、</template></template>
+                        v-if="scope.row.NCM_WRINKLE || scope.row.NCM_NOTE">、</template></template>
                     <template v-if="scope.row.NCM_WRINKLE">{{scope.row.NCM_WRINKLE }}褶<template
-                        v-if="scope.row.NCM_MAKETYPE">、</template></template>
+                        v-if="scope.row.NCM_NOTE">、</template></template>
                     <template v-if="scope.row.NCM_NOTE">{{scope.row.NCM_NOTE }}</template></span>
                 </div>
               </template>
@@ -334,11 +334,11 @@
                 <el-table-column label="说明" header-align="center" prop="NOTE">
                   <template slot-scope="scope">
                     <template v-if="scope.row.NCM_MAKETYPE">{{scope.row.NCM_MAKETYPE | makeType_filter}}<template
-                        v-if="scope.row.NCM_JOINT || scope.row.NCM_WRINKLE || scope.row.NCM_MAKETYPE">、</template></template>
+                        v-if="scope.row.NCM_JOINT || scope.row.NCM_WRINKLE || scope.row.NCM_NOTE">、</template></template>
                     <template v-if="scope.row.NCM_JOINT">{{scope.row.NCM_JOINT | joint_filter}}<template
-                        v-if="scope.row.NCM_WRINKLE || scope.row.NCM_MAKETYPE">、</template></template>
+                        v-if="scope.row.NCM_WRINKLE || scope.row.NCM_NOTE">、</template></template>
                     <template v-if="scope.row.NCM_WRINKLE">{{scope.row.NCM_WRINKLE }}褶<template
-                        v-if="scope.row.NCM_MAKETYPE">、</template></template>
+                        v-if="scope.row.NCM_NOTE">、</template></template>
                     <template v-if="scope.row.NCM_NOTE">{{scope.row.NCM_NOTE }}</template>
                   </template>
                 </el-table-column>
@@ -380,7 +380,7 @@
 <script>
 import {
   GetAsyncItemData,
-  GetPartTypeDataTabale,
+  GetPartTypeDataTable,
   GetCurtainTemplateAndModel,
   GetExchangeModel,
   GetExchangeModelItem,
@@ -531,7 +531,7 @@ export default {
     ...mapActions("navTabs", ["closeToTab"]),
     //PartType字典
     getPartTypeData() {
-      GetPartTypeDataTabale().then((res) => {
+      GetPartTypeDataTable().then((res) => {
         this.curtainPartTypeData = res.data;
       });
     },

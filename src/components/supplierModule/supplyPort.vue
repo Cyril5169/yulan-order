@@ -418,7 +418,7 @@
 
             </div>
 
-            <el-table @selection-change="handleSelectionChange" class="th-font14" border :data="pur_headData"
+            <el-table @selection-change="handleSelectionChange" size="small" border :data="pur_headData"
               style="width: 100%" highlight-current-row>
               <el-table-column v-if="false" type="selection" width="55">
               </el-table-column>
@@ -475,7 +475,7 @@
               <el-button @click="checkNoPrint()" size="small" style="margin-left:8px" class="button_1">查看全部未打印
               </el-button>
             </div>
-            <el-table border :data="pur_headData" class="th-font14" style="width: 100%" cellpadding="0"
+            <el-table border :data="pur_headData" size="small" style="width: 100%" cellpadding="0"
               highlight-current-row>
               <el-table-column label=" " type="index" :index="indexMethod">
               </el-table-column>
@@ -530,7 +530,7 @@
               <el-button @click="SelectClick()" size="small" style="margin-left:8px" class="button_2">搜索</el-button>
 
             </div>
-            <el-table border :data="pur_headData" class="th-font14" style="width: 100% margin:6px" cellpadding="0"
+            <el-table border :data="pur_headData" size="small" style="width: 100% margin:6px" cellpadding="0"
               highlight-current-row>
               <el-table-column label=" " type="index" :index="indexMethod">
               </el-table-column>
@@ -587,7 +587,7 @@
               <el-button @click="checkNoPrint()" size="small" style="margin-left:8px" class="button_1">查看全部未打印
               </el-button>
             </div>
-            <el-table border :data="pur_headData" class="th-font14" style="width: 100%" cellpadding="0"
+            <el-table border :data="pur_headData" size="small" style="width: 100%" cellpadding="0"
               highlight-current-row>
               <el-table-column label=" " type="index" :index="indexMethod">
               </el-table-column>
@@ -1420,13 +1420,6 @@ export default {
 }
 .th-font16 {
   font-size: 16px;
-  font-weight: bold;
-}
-.th-font14 {
-  font-size: 12px;
-}
-.th-font14-bold {
-  font-size: 14px;
   font-weight: bold;
 }
 .button_1 {

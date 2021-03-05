@@ -508,24 +508,24 @@ export default {
       currentIndex: -1,
       pickerOptions: {
         shortcuts: [{
-          text: '明天',
-          onClick(picker) {
-            const date = new Date();
-            date.setTime(date.getTime() + 3600 * 1000 * 24);
-            picker.$emit('pick', date);
-          }
-        }, {
-          text: '一周后',
+          text: '7天后',
           onClick(picker) {
             const date = new Date();
             date.setTime(date.getTime() + 3600 * 1000 * 24 * 7);
             picker.$emit('pick', date);
           }
         }, {
-          text: '一月后',
+          text: '10天后',
           onClick(picker) {
             const date = new Date();
-            date.setTime(date.getTime() + 3600 * 1000 * 24 * 30);
+            date.setTime(date.getTime() + 3600 * 1000 * 24 * 10);
+            picker.$emit('pick', date);
+          }
+        }, {
+          text: '15天后',
+          onClick(picker) {
+            const date = new Date();
+            date.setTime(date.getTime() + 3600 * 1000 * 24 * 15);
             picker.$emit('pick', date);
           }
         }]

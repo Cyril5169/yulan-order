@@ -80,3 +80,11 @@ export function newCurtainExportProductExcel(data, config = {}) {
       return Promise.reject(err);
   })
 }
+//采购单明细（工单）
+export function GetPurOrderDetails(data, config = {}) {
+  return post('/PUR_HEAD/GetPurOrderDetails', data, config).then((res) => {
+      return Promise.resolve(res);
+  }).catch((err) => {
+      return Promise.reject(err);
+  })
+}

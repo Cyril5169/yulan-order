@@ -249,7 +249,7 @@
       <hr />
       <!-- 软装 -->
       <div style="width:100%" v-if="orderNoPreFix == 'Y'">
-        <el-table :data="gridData" border class="tb_font13" :summary-method="getYSummaries" key="checkY">
+        <el-table :data="gridData" border class="tb_font13" show-summary :summary-method="getYSummaries" key="checkY">
           <el-table-column type="index" label=" " align="center" :index="indexMethod" width="40">
           </el-table-column>
           <el-table-column prop="ITEM_NO" label="物料号" align="center" width="120"></el-table-column>
@@ -475,7 +475,120 @@
       <!-- 新窗帘 -->
       <div style="width:100%" v-if="orderNoPreFix == 'N'">
         <el-table border :data="gridData" :row-class-name="headTableRowClassName" :expand-row-keys="expands" :row-key="getRowKeys"
-          key="checkN">
+          key="checkN" class="checkN">
+          <el-table-column width="1" type="expand">
+            <template slot-scope="scopeHead">
+              <div class="curtain-list">
+                <el-table :data="scopeHead.row.curtains" ref="curtainTable" class="curtain-table" border
+                  :row-class-name="tableRowClassName" show-summary :summary-method="getNSummaries">
+                  <el-table-column label="部件" width="80" header-align="center" prop="NC_PART_TYPECODE">
+                    <template slot-scope="scope">
+                      <!-- 树缩进 -->
+                      <span v-if="scope.row.curtain_level > 0">
+                        <span :style="{'padding-left': scope.row.curtain_level * 16 + 'px'}"></span>
+                      </span>
+                      <span>{{transPartTypeCode(scope.row.NC_PART_TYPECODE)}}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="编码" width="140" header-align="center" prop="ITEM_NO">
+                  </el-table-column>
+                  <el-table-column label="名称" width="80" header-align="center" prop="CURTAIN_ITEM_NAME">
+                  </el-table-column>
+                  <el-table-column label="制造说明" width="250" header-align="center">
+                    <template slot-scope="scope">
+                      <!-- N个配置项逐个检测 -->
+                      <!-- 宽，高 -->
+                      <div class="manufacturing-ct" v-if="scope.row.WIDTH_ENABLE > 0 || scope.row.HEIGHT_ENABLE > 0">
+                        <template v-if="scope.row.WIDTH_ENABLE == 1 || scope.row.WIDTH_ENABLE == 2">
+                          <span>【宽】: {{ scope.row.WIDTH }}m</span>
+                        </template>
+                        <template v-if="scope.row.HEIGHT_ENABLE == 1 || scope.row.HEIGHT_ENABLE == 2">
+                          <span>【高】: {{ scope.row.HEIGHT }}m</span>
+                        </template>
+                      </div>
+                      <!-- 左右转角 -->
+                      <div class="manufacturing-ct" v-if="scope.row.LEFT_ENABLE > 0 || scope.row.RIGHT_ENABLE > 0">
+                        <template v-if="scope.row.LEFT_ENABLE == 1 || scope.row.LEFT_ENABLE == 2">
+                          <span>【左转角】: {{ scope.row.LEFT_FILLET }}m</span>
+                        </template>
+                        <template v-if="scope.row.RIGHT_ENABLE == 1 || scope.row.RIGHT_ENABLE == 2">
+                          <span>【右转角】: {{ scope.row.RIGHT_FILLET }}m</span>
+                        </template>
+                      </div>
+                      <!-- 么术贴 -->
+                      <div class="manufacturing-ct" v-if="scope.row.TIE_ENABLE > 0">
+                        <template v-if="scope.row.TIE_ENABLE == 1 || scope.row.TIE_ENABLE == 2">
+                          <span>【么术贴】: {{ scope.row.MESUTIE | meshutie_filter}}</span>
+                        </template>
+                      </div>
+                      <!-- 打开方式 -->
+                      <div class="manufacturing-ct" v-if="scope.row.KAIKOU_ENABLE > 0">
+                        <template v-if="scope.row.KAIKOU_ENABLE == 1 || scope.row.KAIKOU_ENABLE == 2">
+                          <span>【打开方式】: {{ scope.row.KAIKOU | kaikou_filter }}</span>
+                        </template>
+                      </div>
+                      <!-- 工艺方式 -->
+                      <div class="manufacturing-ct" v-if="scope.row.OPERATION_ENABLE > 0">
+                        <template v-if="scope.row.OPERATION_ENABLE == 1 || scope.row.OPERATION_ENABLE == 2">
+                          <span>【工艺方式】: {{ scope.row.OPERATION | operation_filter }}</span>
+                        </template>
+                      </div>
+                      <!-- 包边方式 -->
+                      <div class="manufacturing-ct" v-if="scope.row.BIAN_ENABLE > 0">
+                        <template v-if="scope.row.BIAN_ENABLE == 1 || scope.row.BIAN_ENABLE == 2">
+                          <span>【包边方式】: {{ scope.row.BIAN | bian_filter }}</span>
+                        </template>
+                      </div>
+                      <!-- 说明 -->
+                      <div class="manufacturing-ct"
+                        v-if="scope.row.NCM_NOTE || scope.row.JOINT || scope.row.WRINKLE || scope.row.MAKETYPE ">
+                        <span>【说明】: <template v-if="scope.row.MAKETYPE">{{scope.row.MAKETYPE | makeType_filter}}<template
+                              v-if="scope.row.JOINT || scope.row.WRINKLE || scope.row.NCM_NOTE">、</template></template>
+                          <template v-if="scope.row.JOINT">{{scope.row.JOINT | joint_filter}}<template
+                              v-if="scope.row.WRINKLE || scope.row.NCM_NOTE">、</template></template>
+                          <template v-if="scope.row.WRINKLE">{{scope.row.WRINKLE }}褶<template
+                              v-if="scope.row.NCM_NOTE">、</template></template>
+                          <template v-if="scope.row.NCM_NOTE">{{scope.row.NCM_NOTE }}</template></span>
+                      </div>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="褶数" width="50" align="center" prop="ZE_QTY">
+                  </el-table-column>
+                  <el-table-column label="用量" width="100" align="center" prop="DOSAGE">
+                    <template slot-scope="scope">
+                      <span v-if="scope.row.NC_PART_TYPECODE != 'LBT'">
+                        {{scope.row.DOSAGE}}{{scope.row.UNIT_NAME}}
+                      </span>
+                      <span v-else>-</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="含税单价" width="80" align="center" prop="PRICE_TAXIN">
+                    <template slot-scope="scope">
+                      <!-- 只有部件算钱 -->
+                      <span v-if="scope.row.curtain_level == 0">{{scope.row.PRICE_TAXIN | numFilter}}</span>
+                      <span v-else>-</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="金额" width="80" align="center" prop="TOTAL_MONEY">
+                    <template slot-scope="scope">
+                      <!-- 只有部件算钱 -->
+                      <span v-if="scope.row.curtain_level == 0">{{ scope.row.TOTAL_MONEY | numFilter }}</span>
+                      <span v-else>-</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="说明" width="100" header-align="center" prop="ILLUSTRATE">
+                    <template slot-scope="scope">
+                      <span style="color:red;font-size:12px;"> {{ scope.row.ILLUSTRATE }}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="客户备注" align="center" prop="NOTE">
+                  </el-table-column>
+                  <el-table-column label="兰居意见" header-align="center" prop="SUGGESTION">
+                  </el-table-column>
+                </el-table>
+              </div>
+            </template>
+          </el-table-column>
           <el-table-column align="center" prop="LINE_NO" label="序号" width="40"></el-table-column>
           <el-table-column align="center" prop="ITEM_NO" label="款号" width="100"></el-table-column>
           <el-table-column align="center" prop="BRAND_NAME" label="品牌" width="90"></el-table-column>
@@ -494,6 +607,9 @@
           <el-table-column prop="PROMOTION" align="center" label="活动" show-overflow-tooltip></el-table-column>
           <el-table-column align="center" prop="NOTES" label="备注"></el-table-column>
         </el-table>
+        <div>
+          <span style="font-size:16px;margin-left: 725px;">总金额：{{newCurtainTotalMoney}}</span></span>
+        </div>
         <hr />
         <div style="margin-top:10px" class="th-font16">
           <div>
@@ -864,6 +980,146 @@
             <el-table-column prop="name11" label="生产备注"></el-table-column>
           </el-table>
         </div>
+        <!-- 新窗帘 -->
+        <div v-if="orderNoPreFix == 'N'">
+          <el-table border :data="gridData" :row-class-name="headTableRowClassName" :expand-row-keys="expands"
+            :row-key="getRowKeys" key="checkN" class="checkN">
+            <el-table-column width="1" type="expand">
+              <template slot-scope="scopeHead">
+                <div class="curtain-list">
+                  <el-table :data="scopeHead.row.curtains" ref="curtainTable" class="curtain-table" border
+                    :row-class-name="tableRowClassName" show-summary :summary-method="getNSummaries">
+                    <el-table-column label="部件" width="80" header-align="center" prop="NC_PART_TYPECODE">
+                      <template slot-scope="scope">
+                        <!-- 树缩进 -->
+                        <span v-if="scope.row.curtain_level > 0">
+                          <span :style="{'padding-left': scope.row.curtain_level * 16 + 'px'}"></span>
+                        </span>
+                        <span>{{transPartTypeCode(scope.row.NC_PART_TYPECODE)}}</span>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="编码" width="140" header-align="center" prop="ITEM_NO">
+                    </el-table-column>
+                    <el-table-column label="名称" width="80" header-align="center" prop="CURTAIN_ITEM_NAME">
+                    </el-table-column>
+                    <el-table-column label="制造说明" width="250" header-align="center">
+                      <template slot-scope="scope">
+                        <!-- N个配置项逐个检测 -->
+                        <!-- 宽，高 -->
+                        <div class="manufacturing-ct" v-if="scope.row.WIDTH_ENABLE > 0 || scope.row.HEIGHT_ENABLE > 0">
+                          <template v-if="scope.row.WIDTH_ENABLE == 1 || scope.row.WIDTH_ENABLE == 2">
+                            <span>【宽】: {{ scope.row.WIDTH }}m</span>
+                          </template>
+                          <template v-if="scope.row.HEIGHT_ENABLE == 1 || scope.row.HEIGHT_ENABLE == 2">
+                            <span>【高】: {{ scope.row.HEIGHT }}m</span>
+                          </template>
+                        </div>
+                        <!-- 左右转角 -->
+                        <div class="manufacturing-ct" v-if="scope.row.LEFT_ENABLE > 0 || scope.row.RIGHT_ENABLE > 0">
+                          <template v-if="scope.row.LEFT_ENABLE == 1 || scope.row.LEFT_ENABLE == 2">
+                            <span>【左转角】: {{ scope.row.LEFT_FILLET }}m</span>
+                          </template>
+                          <template v-if="scope.row.RIGHT_ENABLE == 1 || scope.row.RIGHT_ENABLE == 2">
+                            <span>【右转角】: {{ scope.row.RIGHT_FILLET }}m</span>
+                          </template>
+                        </div>
+                        <!-- 么术贴 -->
+                        <div class="manufacturing-ct" v-if="scope.row.TIE_ENABLE > 0">
+                          <template v-if="scope.row.TIE_ENABLE == 1 || scope.row.TIE_ENABLE == 2">
+                            <span>【么术贴】: {{ scope.row.MESUTIE | meshutie_filter}}</span>
+                          </template>
+                        </div>
+                        <!-- 打开方式 -->
+                        <div class="manufacturing-ct" v-if="scope.row.KAIKOU_ENABLE > 0">
+                          <template v-if="scope.row.KAIKOU_ENABLE == 1 || scope.row.KAIKOU_ENABLE == 2">
+                            <span>【打开方式】: {{ scope.row.KAIKOU | kaikou_filter }}</span>
+                          </template>
+                        </div>
+                        <!-- 工艺方式 -->
+                        <div class="manufacturing-ct" v-if="scope.row.OPERATION_ENABLE > 0">
+                          <template v-if="scope.row.OPERATION_ENABLE == 1 || scope.row.OPERATION_ENABLE == 2">
+                            <span>【工艺方式】: {{ scope.row.OPERATION | operation_filter }}</span>
+                          </template>
+                        </div>
+                        <!-- 包边方式 -->
+                        <div class="manufacturing-ct" v-if="scope.row.BIAN_ENABLE > 0">
+                          <template v-if="scope.row.BIAN_ENABLE == 1 || scope.row.BIAN_ENABLE == 2">
+                            <span>【包边方式】: {{ scope.row.BIAN | bian_filter }}</span>
+                          </template>
+                        </div>
+                        <!-- 说明 -->
+                        <div class="manufacturing-ct"
+                          v-if="scope.row.NCM_NOTE || scope.row.JOINT || scope.row.WRINKLE || scope.row.MAKETYPE ">
+                          <span>【说明】: <template v-if="scope.row.MAKETYPE">{{scope.row.MAKETYPE | makeType_filter}}<template
+                                v-if="scope.row.JOINT || scope.row.WRINKLE || scope.row.NCM_NOTE">、</template></template>
+                            <template v-if="scope.row.JOINT">{{scope.row.JOINT | joint_filter}}<template
+                                v-if="scope.row.WRINKLE || scope.row.NCM_NOTE">、</template></template>
+                            <template v-if="scope.row.WRINKLE">{{scope.row.WRINKLE }}褶<template
+                                v-if="scope.row.NCM_NOTE">、</template></template>
+                            <template v-if="scope.row.NCM_NOTE">{{scope.row.NCM_NOTE }}</template></span>
+                        </div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="褶数" width="50" align="center" prop="ZE_QTY">
+                    </el-table-column>
+                    <el-table-column label="用量" width="100" align="center" prop="DOSAGE">
+                      <template slot-scope="scope">
+                        <span v-if="scope.row.NC_PART_TYPECODE != 'LBT'">
+                          {{scope.row.DOSAGE}}{{scope.row.UNIT_NAME}}
+                        </span>
+                        <span v-else>-</span>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="含税单价" width="80" align="center" prop="PRICE_TAXIN">
+                      <template slot-scope="scope">
+                        <!-- 只有部件算钱 -->
+                        <span v-if="scope.row.curtain_level == 0">{{scope.row.PRICE_TAXIN | numFilter}}</span>
+                        <span v-else>-</span>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="金额" width="80" align="center" prop="TOTAL_MONEY">
+                      <template slot-scope="scope">
+                        <!-- 只有部件算钱 -->
+                        <span v-if="scope.row.curtain_level == 0">{{ scope.row.TOTAL_MONEY | numFilter }}</span>
+                        <span v-else>-</span>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="说明" width="100" header-align="center" prop="ILLUSTRATE">
+                      <template slot-scope="scope">
+                        <span style="color:red;font-size:12px;"> {{ scope.row.ILLUSTRATE }}</span>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="客户备注" align="center" prop="NOTE">
+                    </el-table-column>
+                    <el-table-column label="兰居意见" header-align="center" prop="SUGGESTION">
+                    </el-table-column>
+                  </el-table>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column align="center" prop="LINE_NO" label="序号" width="40"></el-table-column>
+            <el-table-column align="center" prop="ITEM_NO" label="款号" width="100"></el-table-column>
+            <el-table-column align="center" prop="BRAND_NAME" label="品牌" width="90"></el-table-column>
+            <el-table-column align="center" prop="TYPE_NAME" label="类型" width="90"></el-table-column>
+            <el-table-column prop="PRODUCTION_VERSION" align="center" label="所属版本" width="90"></el-table-column>
+            <el-table-column label="销售状态" align="center" width="90">
+              <template slot-scope="scope">
+                <span>{{ scope.row.SALE_ID | transSaleId }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column align="center" prop="CURTAIN_WIDTH" label="成品宽" width="80"></el-table-column>
+            <el-table-column align="center" prop="CURTAIN_HEIGHT" label="成品高" width="80"></el-table-column>
+            <el-table-column align="center" prop="ANCAO_HEIGHT" label="暗槽高" width="80"></el-table-column>
+            <el-table-column align="center" prop="CURTAIN_ROOM_NAME" label="位置" width="100"></el-table-column>
+            <el-table-column align="center" prop="QTY_REQUIRED" label="套数" width="70"></el-table-column>
+            <el-table-column prop="PROMOTION" align="center" label="活动" show-overflow-tooltip></el-table-column>
+            <el-table-column align="center" prop="NOTES" label="备注"></el-table-column>
+          </el-table>
+          <div>
+            <span style="font-size:16px;margin-left: 725px;">总金额：{{newCurtainTotalMoney}}</span></span>
+          </div>
+          <hr />
+        </div>
       </div>
     </el-dialog>
   </el-card>
@@ -951,7 +1207,8 @@ export default {
       orderNoPreFix: "",
       checkVisible: false,
       checkedVisible: false,
-      expands: []
+      expands: [],
+      newCurtainTotalMoney: 0
     };
   },
   filters: {
@@ -1461,7 +1718,7 @@ export default {
       this.checkVisible = false;
       this.checkedVisible = false;
     },
-    //确认之前要检查是否填好必要的信息
+    //手动确认订单
     SubmitVue() {
       this.pur_headForm.SUPPLY_CHECK_NOTES = this.supply_check_notes;
       if (this.orderNoPreFix == "X" || this.orderNoPreFix == "N") {
@@ -1485,7 +1742,7 @@ export default {
             //同步布精灵数据
             if (res.data.length) {
               await this.asyncBuJingLing([
-                { PUR_NO: res.data[0].PUR_NO, data: res.data },
+                { PUR_NO: res.data[0].PUR_NO, data: res.data, newcurtaindata: this.gridData },
               ]);
             }
             this.checkedVisible = true;
@@ -1553,10 +1810,10 @@ export default {
         type: "warning",
       })
         .then(() => {
-          GetBJLData({ PUR_NO: row.PUR_NO, flag: row.ORDER_NO.substring(0, 1) }).then(async (res) => {
-            if (res.data.length) {
+          GetBJLData({ ORDER_NO: row.ORDER_NO, PUR_NO: row.PUR_NO }).then(async (res) => {
+            if (res.data.data && res.data.data.length) {
               await this.asyncBuJingLing([
-                { PUR_NO: row.PUR_NO, data: res.data },
+                { PUR_NO: row.PUR_NO, data: res.data.data, newcurtaindata: res.data.newcurtaindata },
               ]);
               this.autoSearch();
             } else {
@@ -1579,93 +1836,242 @@ export default {
           target: document.querySelector(".loading-area"), //设置加载动画区域
         });
         var failPur = "";
+        //循环有多少个采购单
         for (var i = 0; i < pruData.length; i++) {
           //一个单n个位置的窗帘就要post n次
           var onedata = pruData[i].data;
           var oneFail = "";
           if (onedata.length) {
-            //通过位置查找窗帘
-            var placeList = this.groupBy(onedata, "CL_PLACE_ID");
-            for (var p = 0; p < placeList.length; p++) {
-              var oneplace = placeList[p].value;
-              //每个窗帘post数据
-              var detailData = [];
-              for (var d = 0; d < oneplace.length; d++) {
-                var detail = oneplace[d];
-                var onedetail = {
-                  buwei: detail.CL_NAME,
-                  leibie: detail.MNAME,
-                  code: detail.ITEM_NO,
-                  danwei: detail.UNIT_NAME,
-                  price: detail.PRICE_TAXIN,
-                  guige: detail.FIX_GRADE,
-                  shuliang: detail.QTY_PUR,
-                  shenhe2Des: detail.PRODUCT_NOTE,
-                  beizhu: detail.NOTES,
-                };
-                detailData.push(onedetail);
-              }
-              //找各种款式
-              var ltlist = oneplace.filter((item) => item.CL_NAME == "lt");
-              var lslist = oneplace.filter((item) => item.CL_NAME == "ls");
-              var shalist = oneplace.filter((item) => item.CL_NAME == "sha");
-
-              var postdata = {
-                token: "ljsp-bjl",
-                cpPlaceId: detail.CL_PLACE_ID,
-                custmorname: oneplace[0].CUSTOMER_NAME,
-                sortname: oneplace[0].CUSTOMER_CODE,
-                tempCustmorjc: oneplace[0].LINKMAN,
-                tempPhone: oneplace[0].LINKTEL,
-                tempAddress: oneplace[0].POST_ADDRESS,
-                templatename: oneplace[0].CL_ITEM_NO,
-                liantou: ltlist.length > 0,
-                lianshen: lslist.length > 0,
-                chuangsha: shalist.length > 0,
-                liantouHeight: null,
-                liantouWidth: oneplace[0].QTY_PUR,
-                liantouLeft: 0,
-                liantouRight: 0,
-                liantouMoshutie: "--",
-                lianshenHeight: oneplace[0].CL_HIGH,
-                lianshenWidth: oneplace[0].CL_WIDTH,
-                lianshenOpen: "--",
-                lianshenType: "--",
-                chuangshaHeight: oneplace[0].CL_HIGH,
-                chuangshaWidth: oneplace[0].CL_WIDTH,
-                chuangshaOpen: "--",
-                chuangshaType: "--",
-                subcustmorname: detail.PUR_NO,
-                zswz: oneplace[0].CL_PLACE,
-                onlineDanhao: oneplace[0].ORDER_NO,
-                data: JSON.stringify(detailData),
-                //新窗帘新增
-              };
-              Axios.defaults.withCredentials = false;
-              try {
-                var resB = await Axios.post(
-                  "http://ljsp.ubxiu.com:8098/syn/add",
-                  //"http://buyisoft.utools.club/syn/add",
-                  postdata,
-                  { params: postdata, loading: false }
-                );
-                if (resB.data.state == "ok") {
-                } else {
-                  var msg =
-                    pruData[i].PUR_NO +
-                    "位置:" +
-                    oneplace[0].CL_PLACE +
-                    "同步失败;";
-                  failPur += msg;
-                  oneFail += msg;
+            var orderNo = onedata[0].ORDER_NO;
+            if (orderNo.substring(0, 1) == "X") {
+              //旧窗帘
+              //通过位置查找窗帘
+              var placeList = this.groupBy(onedata, "CL_PLACE_ID");
+              for (var p = 0; p < placeList.length; p++) {
+                var oneplace = placeList[p].value;
+                //每个窗帘post数据
+                var detailData = [];
+                for (var d = 0; d < oneplace.length; d++) {
+                  var detail = oneplace[d];
+                  var onedetail = {
+                    buwei: detail.CL_NAME,
+                    leibie: detail.MNAME,
+                    code: detail.ITEM_NO,
+                    danwei: detail.UNIT_NAME,
+                    price: detail.PRICE_TAXIN,
+                    guige: detail.FIX_GRADE,
+                    shuliang: detail.QTY_PUR,
+                    shenhe2Des: detail.PRODUCT_NOTE,
+                    beizhu: detail.NOTES,
+                  };
+                  detailData.push(onedetail);
                 }
-              } catch (err) {
-                this.$message({
-                  message: "同步失败!",
-                  type: "error",
-                  duration: 1000,
-                });
-                return;
+                //找各种款式
+                var ltlist = oneplace.filter((item) => item.CL_NAME == "lt");
+                var lslist = oneplace.filter((item) => item.CL_NAME == "ls");
+                var shalist = oneplace.filter((item) => item.CL_NAME == "sha");
+
+                var postdata = {
+                  token: "ljsp-bjl",
+                  cpPlaceId: detail.CL_PLACE_ID,
+                  custmorname: oneplace[0].CUSTOMER_NAME,
+                  sortname: oneplace[0].CUSTOMER_CODE,
+                  tempCustmorjc: oneplace[0].LINKMAN,
+                  tempPhone: oneplace[0].LINKTEL,
+                  tempAddress: oneplace[0].POST_ADDRESS,
+                  templatename: oneplace[0].CL_ITEM_NO,
+                  liantou: ltlist.length > 0,
+                  lianshen: lslist.length > 0,
+                  chuangsha: shalist.length > 0,
+                  liantouHeight: null,
+                  liantouWidth: oneplace[0].QTY_PUR,
+                  liantouLeft: 0,
+                  liantouRight: 0,
+                  liantouMoshutie: "--",
+                  lianshenHeight: oneplace[0].CL_HIGH,
+                  lianshenWidth: oneplace[0].CL_WIDTH,
+                  lianshenOpen: "--",
+                  lianshenType: "--",
+                  chuangshaHeight: oneplace[0].CL_HIGH,
+                  chuangshaWidth: oneplace[0].CL_WIDTH,
+                  chuangshaOpen: "--",
+                  chuangshaType: "--",
+                  subcustmorname: detail.PUR_NO,
+                  zswz: oneplace[0].CL_PLACE,
+                  onlineDanhao: oneplace[0].ORDER_NO,
+                  data: JSON.stringify(detailData)
+                };
+                Axios.defaults.withCredentials = false;
+                try {
+                  var resB = await Axios.post(
+                    "http://ljsp.ubxiu.com:8098/syn/add",
+                    //"http://buyisoft.utools.club/syn/add",
+                    //"http://buyisoft.cn.utools.club/syn/add",
+                    postdata,
+                    { params: postdata, loading: false }
+                  );
+                  if (resB.data.state == "ok") {
+                  } else {
+                    var msg = pruData[i].PUR_NO + "位置:" + oneplace[0].CL_PLACE + "同步失败;";
+                    failPur += msg;
+                    oneFail += msg;
+                  }
+                } catch (err) {
+                  this.$message({
+                    message: "同步失败!",
+                    type: "error",
+                    duration: 1000,
+                  });
+                  return;
+                }
+              }
+            }
+            else if (orderNo.substring(0, 1) == "N") {
+              //新窗帘
+              var orderDetailData = pruData[i].newcurtaindata;
+              //一个明细就是一个位置
+              for (var j = 0; j < orderDetailData.length; j++) {
+                var oneOrderDetail = orderDetailData[j];
+                var oneplace = orderDetailData[j].curtains;
+                var detailData = [];
+                for (var d = 0; d < oneplace.length; d++) {
+                  var detail = oneplace[d];
+                  //找各种款式
+                  var ltlist = oneplace.filter((item) => item.NC_PART_TYPECODE == "LT");
+                  var lslist = oneplace.filter((item) => item.NC_PART_TYPECODE == "LS");
+                  var shalist = oneplace.filter((item) => item.NC_PART_TYPECODE == "CS");
+                  var typeCode = detail.NC_PART_TYPECODE;
+                  if (detail.NCM_PID != 0) {
+                    //找父节点
+                    var fatherCurtain = oneplace.filter(item => item.NC_MODEL_ID == detail.NCM_PID);
+                    if (fatherCurtain.length) {
+                      typeCode = fatherCurtain[0].NC_PART_TYPECODE;
+                    }
+                  } else if (typeCode != "LT" || typeCode != "LS" || typeCode != "CS") {
+                    if (typeCode == "LCB") {
+                      typeCode = "LS";
+                    } else if (typeCode == "GBD") {
+                      if (lslist.length) {
+                        typeCode = "LS";
+                      } else if (shalist.length) {
+                        typeCode = "CS";
+                      } else if (ltlist.length) {
+                        typeCode = "LT";
+                      }
+                    }
+                  }
+                  var onedetail = {
+                    buwei: typeCode,
+                    leibie: detail.CURTAIN_ITEM_NAME,
+                    code: detail.ITEM_NO,
+                    danwei: detail.UNIT_NAME,
+                    price: detail.PRICE_TAXIN,
+                    guige: detail.FIX_GRADE,
+                    shuliang: detail.DOSAGE,
+                    shenhe2Des: detail.PRODUCT_NOTE,
+                    beizhu: detail.NOTE + detail.ILLUSTRATE,
+                    zheshu: detail.ZE_QTY
+                  };
+                  detailData.push(onedetail);
+                }
+                var ltHeight = 0;
+                var ltWidth = 0;
+                var ltLeft = 0;
+                var ltRight = 0;
+                var ltMesutie = "";
+                if (ltlist.length) {
+                  ltHeight = ltlist[0].HEIGHT;
+                  ltWidth = ltlist[0].WIDTH;
+                  ltLeft = ltlist[0].LEFT_FILLET;
+                  ltRight = ltlist[0].RIGHT_FILLET;
+                  ltMesutie = this.$options.filters.meshutie_filter(ltlist[0].MESUTIE);
+                }
+                var lsHeight = 0;
+                var lsWidth = 0;
+                var lsOpen = "";
+                var lsOperation = "";
+                var lsZe = 0;
+                if (lslist.length) {
+                  lsHeight = lslist[0].HEIGHT;
+                  lsWidth = lslist[0].WIDTH;
+                  lsOpen = this.$options.filters.kaikou_filter(lslist[0].KAIKOU);
+                  lsOperation = this.$options.filters.operation_filter(lslist[0].OPERATION);
+                  lsZe = lslist[0].ZE_QTY;
+                }
+                var shaHeight = 0;
+                var shaWidth = 0;
+                var shaOpen = "";
+                var shaOperation = "";
+                var shaZe = 0;
+                if (shalist.length) {
+                  shaHeight = shalist[0].HEIGHT;
+                  shaWidth = shalist[0].WIDTH;
+                  shaOpen = this.$options.filters.kaikou_filter(shalist[0].KAIKOU);
+                  shaOperation = this.$options.filters.operation_filter(shalist[0].OPERATION);
+                  shaZe = shalist[0].ZE_QTY;
+                }
+
+                var postdata = {
+                  token: "ljsp-bjl",
+                  cpPlaceId: oneOrderDetail.LINE_NO,
+                  custmorname: oneOrderDetail.CUSTOMER_NAME,
+                  sortname: oneOrderDetail.CUSTOMER_CODE,
+                  tempCustmorjc: oneOrderDetail.LINKPERSON,
+                  tempPhone: oneOrderDetail.TELEPHONE,
+                  tempAddress: oneOrderDetail.POST_ADDRESS,
+                  templatename: oneOrderDetail.ITEM_NO,
+                  liantou: ltlist.length > 0,
+                  lianshen: lslist.length > 0,
+                  chuangsha: shalist.length > 0,
+                  liantouHeight: ltHeight,
+                  liantouWidth: ltWidth,
+                  liantouLeft: ltLeft,
+                  liantouRight: ltRight,
+                  liantouMoshutie: ltMesutie,
+                  lianshenHeight: lsHeight,
+                  lianshenWidth: lsWidth,
+                  lianshenOpen: lsOpen,
+                  lianshenType: lsOperation,
+                  chuangshaHeight: shaHeight,
+                  chuangshaWidth: shaWidth,
+                  chuangshaOpen: shaOpen,
+                  chuangshaType: shaOperation,
+                  subcustmorname: pruData[i].PUR_NO,
+                  zswz: oneOrderDetail.CURTAIN_ROOM_NAME,
+                  onlineDanhao: oneOrderDetail.ORDER_NO,
+                  data: JSON.stringify(detailData),
+                  //新窗帘新增
+                  orderVolume: oneOrderDetail.QTY_REQUIRED,
+                  beizhu: oneOrderDetail.NOTES + oneOrderDetail.YULAN_NOTES,
+                  jiaofuriqi: oneOrderDetail.JIAOHUO_DATE,
+                  lianshenZhewei: lsZe,
+                  chuangshaZhewei: shaZe,
+                  goodSize: "W" + oneOrderDetail.CURTAIN_WIDTH.toString() + "_H" + oneOrderDetail.CURTAIN_HEIGHT.toString() + "_AC" + oneOrderDetail.ANCAO_HEIGHT.toString()
+                };
+                //console.log(postdata)
+                Axios.defaults.withCredentials = false;
+                try {
+                  var resB = await Axios.post(
+                    "http://ljsp.ubxiu.com:8098/syn/add",
+                    //"http://buyisoft.utools.club/syn/add",
+                    //"http://buyisoft.cn.utools.club/syn/add",
+                    postdata,
+                    { params: postdata, loading: false }
+                  );
+                  if (resB.data.state == "ok") {
+                  } else {
+                    var msg = pruData[i].PUR_NO + "位置:" + oneOrderDetail.LINE_NO + "同步失败;";
+                    failPur += msg;
+                    oneFail += msg;
+                  }
+                } catch (err) {
+                  this.$message({
+                    message: "同步失败!",
+                    type: "error",
+                    duration: 1000,
+                  });
+                  return;
+                }
               }
             }
           }
@@ -1703,7 +2109,7 @@ export default {
         check_flag: this.check_flag,
         beginTime: this.getBegintime(this.date1),
         finishTime: this.getEndtime(this.date2),
-        purNo: this.purNo,
+        po: this.purNo,
         bill_type: this.bill_type,
       };
       GetRelativePo(data).then(
@@ -1714,7 +2120,6 @@ export default {
             item.PRINTED = item.PRINTED === "1" ? true : false;
           });
         }
-        //传入参数控制页面是否loading
       );
     },
     //查询未打印的单据
@@ -1925,13 +2330,29 @@ export default {
             this.checkedVisible = true;
           }
         } else if (this.orderNoPreFix == "N") {
+          this.expands = []
           GetPurOrderDetails({ orderNo: row.ORDER_NO, purNo: row.PUR_NO }).then(res => {
             this.gridData = res.data;
             for (let i = 0; i < this.gridData.length; i++) {
-              if (this.expands.indexOf(this.gridData[i].LINE_NO) == -1)
-                this.expands.push(this.gridData[i].LINE_NO);
+              var detail = this.gridData[i];
+              if (this.expands.indexOf(detail.LINE_NO) == -1)
+                this.expands.push(detail.LINE_NO);
+              for (var j = 0; j < detail.curtains.length; j++) {
+                var oneCurtain = detail.curtains[j];
+                //窗帘层级
+                var level = 0;
+                var NCM_PID = oneCurtain.NCM_PID;
+                while (NCM_PID != 0) {
+                  var temp = detail.curtains.filter((item) => item.NC_MODEL_ID == NCM_PID);
+                  if (temp.length) {
+                    NCM_PID = temp[0].NCM_PID;
+                    level++;
+                  }
+                }
+                this.$set(oneCurtain, "curtain_level", level);
+              }
             }
-
+            this.newCurtainTotalMoney = this.getNSummariesAll();
             if (row.SUPPLY_CHECK_FLAG === "0") {
               this.checkVisible = true;
             } else {
@@ -1978,11 +2399,70 @@ export default {
 
       return sums;
     },
+    getNSummaries(param) {
+      const { columns, data } = param;
+      const sums = [];
+      columns.forEach((column, index) => {
+        if (index === 6) {
+          sums[index] = '小计';
+          return;
+        }
+        if (index == 7) {
+          const values = data.map(item => Number(item[column.property]));
+          if (!values.every(value => isNaN(value))) {
+            sums[index] = values.reduce((prev, curr) => {
+              const value = Number(curr);
+              if (!isNaN(value)) {
+                return prev.add(curr);
+              } else {
+                return prev;
+              }
+            }, 0);
+            sums[index] = this.numFilterMethod(sums[index]);
+          } else {
+            sums[index] = 'N/A';
+          }
+        }
+      });
+
+      return sums;
+    },
+    getNSummariesAll(param) {
+      var totalMoney = 0;
+      const values = this.gridData.map(item => item.curtains);
+      var columCol = [
+        {}, {}, {}, {}, {}, {}, {},
+        {
+          property: 'TOTAL_MONEY'
+        }
+      ]
+
+      totalMoney = values.reduce((prev, curr) => {
+        var currVal = this.getNSummaries({ columns: columCol, data: curr });
+        const value = Number(currVal[7]);
+        if (!isNaN(value)) {
+          return prev.add(currVal[7]);
+        } else {
+          return prev;
+        }
+      }, 0);
+      totalMoney = this.numFilterMethod(totalMoney);
+
+      return totalMoney;
+    },
     getRowKeys(row) {
       return row.LINE_NO;
     },
     headTableRowClassName({ row, rowIndex }) {
       return "success-row";
+    },
+    tableRowClassName({ row, rowIndex }) {
+      if (row.curtain_level == 0) {
+        return 'bold-row';
+      } else {
+        return 'fade-row';
+      }
+      return '';
     },
   },
   created() {
@@ -2109,6 +2589,9 @@ td {
   margin: -1px 0 0 -1px;
   display: block;
 }
+.manufacturing-ct {
+  margin-bottom: 0;
+}
 </style>
 <style>
 .tb_font13 .el-input__inner {
@@ -2141,5 +2624,21 @@ td {
   top: 180px;
   margin-left: 900px;
   z-index: 9999;
+}
+.checkN .el-icon-arrow-right:before {
+  content: "";
+}
+.curtain-list .el-table td,
+.curtain-list .el-table th {
+  padding: 1px 0 !important;
+}
+.curtain-list .el-table .cell {
+  padding: 0 2px !important;
+}
+.curtain-list .el-table .bold-row {
+  font-weight: bold;
+}
+.curtain-list .el-table .fade-row {
+  color: #b0b4bb;
 }
 </style>

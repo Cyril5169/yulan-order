@@ -630,6 +630,7 @@ export default {
       });
     },
     getDetail() {
+      this.expands = [];
       getOrderDetails({ orderNo: Cookies.get("ORDER_NO") }).then((res) => {
         this.ruleForm = res.data[0];
         this.getCustomer();

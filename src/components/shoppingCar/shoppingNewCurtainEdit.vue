@@ -271,19 +271,19 @@
               <span style="color:red;font-size:12px;"> {{ scope.row.ILLUSTRATE }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="备注" align="center">
+          <el-table-column label="备注" align="center" prop="NOTE">
             <template slot-scope="scope">
               <el-input v-if="scope.row.ITEM_NO " :disabled="scope.row.KAIKOU != 'SK'" v-model="scope.row.NOTE" size="mini"
                 type="textarea" resize="none" :autosize="{ maxRows: 6 }" clearable></el-input>
             </template>
           </el-table-column>
         </el-table>
-        <div style="position: relative;">
-          <span v-if="isManager != '0'" style="font-size:16px;position:absolute;left: 820px;">
+        <div>
+          <span v-if="isManager != '0'" style="font-size:16px;margin-left: 820px;">
             总计：<span style="color:red;">￥{{ allTotal | dosageFilter }}</span>
           </span>
         </div>
-        <div style="text-align:center;margin:20px 0;">
+        <div style="text-align:center;margin:0 0 20px 0;">
           <el-button type="primary" width="130px" @click="resolveModify">确认修改</el-button>
           <el-button type="info" style="margin-left: 20px;" width="130px" @click.native="closeTable">
             返回

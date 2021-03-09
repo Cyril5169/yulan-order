@@ -222,10 +222,10 @@
                   </div>
                 </template>
               </el-table-column>
-              <el-table-column label="褶数" width="50" align="center" prop="FU_QTY">
+              <el-table-column label="褶数" width="50" align="center" prop="ZE_QTY">
                 <template slot-scope="scope">
                   <el-input v-if="(scope.row.curtain_level != 0 && scope.row.NC_PART_TYPECODE != 'LBT') 
-                      || (scope.row.curtain_level == 0 && scope.row.NC_PART_TYPECODE != 'LT')" v-model="scope.row.FU_QTY"
+                      || (scope.row.curtain_level == 0 && scope.row.NC_PART_TYPECODE != 'LT')" v-model="scope.row.ZE_QTY"
                     style="width:40px;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
@@ -235,9 +235,9 @@
                   <span v-else>-</span>
                 </template>
               </el-table-column>
-              <!-- <el-table-column label="幅数" width="50" align="center" prop="ZE_QTY">
+              <!-- <el-table-column label="幅数" width="50" align="center" prop="FU_QTY">
                 <template slot-scope="scope">
-                  <el-input v-model="scope.row.ZE_QTY" style="width:40px;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
+                  <el-input v-model="scope.row.FU_QTY" style="width:40px;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
@@ -278,14 +278,14 @@
                   <span style="color:red;font-size:12px;"> {{ scope.row.ILLUSTRATE }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="客户备注" align="center">
+              <el-table-column label="客户备注" align="center" prop="NOTE">
                 <template slot-scope="scope">
                   <el-input v-if="scope.row.NC_PART_TYPECODE != 'LBT'" v-model="scope.row.NOTE" size="mini" type="textarea"
                     resize="none" :autosize="{ maxRows: 6 }" clearable></el-input>
                   <span v-else>-</span>
                 </template>
               </el-table-column>
-              <el-table-column label="兰居意见" header-align="center">
+              <el-table-column label="兰居意见" header-align="center" prop="SUGGESTION">
                 <template slot-scope="scope">
                   <el-input v-if="scope.row.NC_PART_TYPECODE != 'LBT'" v-model="scope.row.SUGGESTION" size="mini" type="textarea"
                     resize="none" :autosize="{ maxRows: 6 }" clearable></el-input>
@@ -314,10 +314,7 @@
       <el-table-column prop="PROMOTION" align="center" label="活动" show-overflow-tooltip></el-table-column>
       <el-table-column label="总价" align="center" width="130">
         <template slot-scope="scope">
-          <span>{{
-                    (scope.row.UNIT_PRICE * scope.row.QTY_REQUIRED)
-                      | dosageFilter
-                  }}</span>
+          <span>{{ (scope.row.UNIT_PRICE * scope.row.QTY_REQUIRED) | dosageFilter }}</span>
           <span v-if="dosageFilter(allTotal(scope.$index)) != scope.row.UNIT_PRICE"
             style="color:red;">({{allTotal(scope.$index) | dosageFilter}})</span>
         </template>
@@ -689,6 +686,7 @@ export default {
       });
     },
     getDetail() {
+      this.expands = [];
       getOrderDetails({ orderNo: this.orderNumber }).then((res) => {
         this.ruleForm = res.data[0];
         if (this.ruleForm.JIAOHUO_DATE == '9999/12/31 00:00:00') this.ruleForm.JIAOHUO_DATE = "";
@@ -933,7 +931,7 @@ export default {
         var DOSAGE = this.convertNumber(row.DOSAGE);
         if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < 1) {
           DOSAGE = 1;
-        } else if ((row.NC_PART_TYPECODE == 'LS'|| row.NC_PART_TYPECODE == 'LCB' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4) {
+        } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'LCB' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4) {
           DOSAGE = 4;
         }
         price = price.mul(DOSAGE)
@@ -1608,7 +1606,7 @@ export default {
             oneCurtain.ILLUSTRATE = oneCurtain.ILLUSTRATE.replace('不足1平方米。按1平方米下单量收费;', '');
           }
         }
-        if (oneCurtain.NC_PART_TYPECODE == 'LS'|| oneCurtain.NC_PART_TYPECODE == 'LCB' || oneCurtain.NC_PART_TYPECODE == 'CS') {
+        if (oneCurtain.NC_PART_TYPECODE == 'LS' || oneCurtain.NC_PART_TYPECODE == 'LCB' || oneCurtain.NC_PART_TYPECODE == 'CS') {
           if (oneCurtain.DOSAGE < 4) {
             if (oneCurtain.ILLUSTRATE.indexOf('不足4平方米。按4平方米下单量收费;') == -1) {
               oneCurtain.ILLUSTRATE += '不足4平方米。按4平方米下单量收费;';

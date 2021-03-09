@@ -285,12 +285,12 @@
               </template>
             </el-table-column>
           </el-table>
-          <div style="position: relative;">
-            <span v-if="isManager != '0'" style="font-size:16px;position:absolute;left: 940px;">
+          <div>
+            <span v-if="isManager != '0'" style="font-size:16px;margin-left: 940px;">
               总计：<span style="color:red;">￥{{ allTotal | dosageFilter }}</span>
             </span>
           </div>
-          <div style="text-align:center;margin:20px 0;">
+          <div style="text-align:center;margin:0 0 20px 0;">
             <el-button type="danger" width="130px" @click="addCurtainToShoppingCar">加入购物车</el-button>
           </div>
         </div>
@@ -331,7 +331,7 @@
                     <span v-else>-</span>
                   </template>
                 </el-table-column>
-                <el-table-column label="说明" header-align="center" prop="NOTE">
+                <el-table-column label="说明" header-align="center">
                   <template slot-scope="scope">
                     <template v-if="scope.row.NCM_MAKETYPE">{{scope.row.NCM_MAKETYPE | makeType_filter}}<template
                         v-if="scope.row.NCM_JOINT || scope.row.NCM_WRINKLE || scope.row.NCM_NOTE">、</template></template>

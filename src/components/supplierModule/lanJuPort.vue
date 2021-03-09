@@ -2154,15 +2154,17 @@ export default {
     },
     downLoadX() {
       var PUR_NO = this.pur_headForm.PUR_NO;
-      downLoadFile(
-        this.Global.baseUrl + `PUR_HEAD/CreateExcel?PUR_NO=${PUR_NO}`
-      );
+
     },
     downLoadY() {
       var PUR_NO = this.pur_headForm.PUR_NO;
-      downLoadFile(
-        this.Global.baseUrl + `PUR_HEAD/CreateExcelY?PUR_NO=${PUR_NO}`
-      );
+      if (this.orderNoPreFix == "Y") {
+        downLoadFile(this.Global.baseUrl + `PUR_HEAD/CreateExcelY?PUR_NO=${PUR_NO}`);
+      } else if (this.orderNoPreFix == "X") {
+        downLoadFile(this.Global.baseUrl + `PUR_HEAD/CreateExcel?PUR_NO=${PUR_NO}`);
+      } else if (this.orderNoPreFix == "N") {
+        downLoadFile(this.Global.baseUrl + `PUR_HEAD/CreateExcelN?PUR_NO=${PUR_NO}`);
+      }
     },
     downLoadAll() {
       var cid = this.companyId;

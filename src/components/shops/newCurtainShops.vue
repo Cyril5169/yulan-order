@@ -397,7 +397,7 @@ export default {
       cid: Cookies.get("cid"), //cid
       customerType: Cookies.get("customerType"), //客户类型
       isManager: Cookies.get("isManager"), //是否为管理员
-      searchKey: "DL407209K1",
+      searchKey: "BQ507420K1",
       templateData: [], //查出来的原始数据
       curtainHeadData: {}, //帘款数据（没有拉边条）
       curtainDataOrigin: [], //拼接好的原始数据
@@ -560,6 +560,7 @@ export default {
     },
     //搜索窗帘
     searchCurtain() {
+      if(!this.searchKey) return;
       this.templateData = [];
       this.curtainHeadData = {};
       this.curtainData = [];

@@ -89,6 +89,7 @@ export default {
             choose: true,
             suggestion: "",
             inlineNo: _dataCom.inlineNo,
+            curtain_store: '' //库存
           };
           _arr.push(obj);
         }
@@ -117,7 +118,6 @@ export default {
       //保存数据
       sessionStorage.setItem("curtainDetail", JSON.stringify(_arr));
       Cookies.set("curtainHead", this.headerData);
-      console.log(_data);
     },
     //根据中文名称获取itemType
     getItemType(partName) {

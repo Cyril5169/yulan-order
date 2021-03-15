@@ -10,7 +10,7 @@
       <el-tab-pane label="软装" name="softSuit">
         <ShoppingSoftSuit v-if="activeName =='softSuit'"></ShoppingSoftSuit>
       </el-tab-pane>
-      <el-tab-pane label="全新定制窗帘" name="newCurtain">
+      <el-tab-pane label="全新定型窗帘" name="newCurtain">
         <ShoppingNewCurtain v-if="activeName =='newCurtain'"></ShoppingNewCurtain>
       </el-tab-pane>
     </el-tabs>

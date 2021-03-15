@@ -248,7 +248,7 @@
       </div>
       <hr />
       <!-- 软装 -->
-      <div style="width:100%" v-if="orderNoPreFix == 'Y'">
+      <div style="width:100%" v-if="orderNoPreFix != 'X' && orderNoPreFix != 'N'">
         <el-table :data="gridData" border class="tb_font13" show-summary :summary-method="getYSummaries" key="checkY">
           <el-table-column type="index" label=" " align="center" :index="indexMethod" width="40">
           </el-table-column>
@@ -796,7 +796,7 @@
         </table>
         <!-- 下面列表 -->
         <!-- 软装 -->
-        <div v-if="orderNoPreFix == 'Y'">
+        <div v-if="orderNoPreFix != 'X' && orderNoPreFix != 'N'">
           <el-table :data="gridData" border show-summary :summary-method="getYSummaries" key="checkedY">
             <el-table-column type="index" label=" " align="center" :index="indexMethod" width="40">
             </el-table-column>
@@ -2158,7 +2158,7 @@ export default {
     },
     downLoadY() {
       var PUR_NO = this.pur_headForm.PUR_NO;
-      if (this.orderNoPreFix == "Y") {
+      if (this.orderNoPreFix != "X" || this.orderNoPreFix != "N") {
         downLoadFile(this.Global.baseUrl + `PUR_HEAD/CreateExcelY?PUR_NO=${PUR_NO}`);
       } else if (this.orderNoPreFix == "X") {
         downLoadFile(this.Global.baseUrl + `PUR_HEAD/CreateExcel?PUR_NO=${PUR_NO}`);

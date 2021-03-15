@@ -173,20 +173,6 @@
               {{ scope.row.dosage === "" ? "" : scope.row.unit }}
             </span>
             <span v-else-if="customerType === '110'">
-              <!-- <el-input v-if="scope.row.itemType != 'lt'" style="width: 75%;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
-                                .replace(/^\./g, '').replace(/\.{2,}/g, '.')
-                                .replace('.', '$#$').replace(/\./g, '')
-                                .replace('$#$', '.')
-                                .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 2)"
-                v-model="scope.row.dosage">
-              </el-input>
-              <el-input v-else style="width: 75%;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
-                                .replace(/^\./g, '').replace(/\.{2,}/g, '.')
-                                .replace('.', '$#$').replace(/\./g, '')
-                                .replace('$#$', '.')
-                                .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"
-                v-model="scope.row.dosage">
-              </el-input> -->
               <el-input style="width: 75%;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
                                 .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                                 .replace('.', '$#$').replace(/\./g, '')
@@ -213,6 +199,7 @@
             </span>
           </template>
         </el-table-column>
+        <el-table-column label="库存" width="60" align="center" prop="curtain_store"></el-table-column>
         <el-table-column v-if="isManager != '0' ||  (isManager == '0' && check_CURTAIN_STATUS_ID == -1)" label="总价" align="center"
           width="60">
           <template slot-scope="scope">
@@ -378,7 +365,7 @@ import {
 import { UpdateCartItem } from "@/api/shopASP";
 import Cookies from "js-cookie";
 import { mapMutations, mapActions } from "vuex";
-import { mapState } from "vuex";
+import Axios from "axios";
 
 export default {
   name: "detailCurtainTable",
@@ -885,6 +872,8 @@ export default {
         this.data[this.chooseIndex].certainHeightWidth = null;
         this.data[this.chooseIndex].item.itemNo = this.itemNo;
         this.judgeTip(this.data[this.chooseIndex], this.chooseIndex);
+        //库存
+        this.data = this.getStoreData(this.data);
         return;
       }
       if (data.fixType === "01") {
@@ -917,7 +906,6 @@ export default {
           itemType: this.data[index].itemType,
           fixType: _fixType,
         };
-        //changeDosageByNo(obj)
         GetDosageByNo(obj)
           .then((res) => {
             if (res.data.length == 0) {
@@ -943,6 +931,8 @@ export default {
             }
             this.data[this.chooseIndex].item.itemNo = this.itemNo;
             this.judgeTip(this.data[this.chooseIndex], this.chooseIndex);
+            //库存
+            this.data = this.getStoreData(this.data);
           })
           .catch((err) => {
             console.log(err);
@@ -950,6 +940,8 @@ export default {
       } else if (status1) {
         this.data[this.chooseIndex].item.itemNo = this.itemNo;
         this.judgeTip(this.data[this.chooseIndex], this.chooseIndex);
+        //库存
+        this.data = this.getStoreData(this.data);
         if (this.data[this.chooseIndex].item.itemNo === "GY-003") {
           this.data[this.chooseIndex].dosage = this.curtainData[
             this.chooseIndex
@@ -1578,14 +1570,55 @@ export default {
       }
       return this.dosageFilter(price);
     },
+    //查找库存
+    getStoreData(originData) {
+      for (var i = 0; i < originData.length; i++) {
+        var oneCurtain = originData[i];
+        if (!oneCurtain.item.itemNo) continue;
+        //库存
+        var postData = {
+          token: "兰居尚品",
+          code: oneCurtain.item.itemNo,
+        };
+        Axios.post("http://ljsp.ubxiu.com:8098/api/getXXDMX", postData, {
+          params: postData,
+          loading: false,
+        }).then((res) => {
+          if (res.data && res.data.data) {
+            var store_charge = "";
+            if (res.data.data.kucun == null || res.data.data.dinghuoshu == null
+              || res.data.data.ddz == null || res.data.data.xiaxian == null)
+              return;
+            var store_num = res.data.data.kucun - res.data.data.dinghuoshu - res.data.data.ddz;
+            var xiaxian = res.data.data.xiaxian;
+            if (store_num >= xiaxian) {
+              store_charge = "充足"
+            } else if (store_num > 0 && store_num < xiaxian) {
+              store_charge = "量少待查";
+            } else if (store_num < 0) {
+              store_charge = "欠料待审";
+            }
+            var data = originData.filter((item) => item.ITEM_NO == res.data.data.code);
+            if (data.length) {
+              for (var j = 0; j < data.length; j++) {
+                data[j].curtain_store = store_charge;
+              }
+            }
+          }
+        }).catch(res => { });
+      }
+      return originData;
+    },
   },
-  activated: function () {
+  activated() {
     this.getActivity();
     //按规则排序
     this.curtainData.sort(function (a, b) {
       let rule = ["lt", "ls", "lspb", "sha", "pjb"];
       return rule.indexOf(a.itemType) - rule.indexOf(b.itemType);
     });
+    //获得库存
+    this.curtainData = this.getStoreData(this.curtainData);
     this.data = JSON.parse(JSON.stringify(this.curtainData));
     this.oldData = JSON.parse(JSON.stringify(this.curtainData));
     this.getOldData(this.headerData);

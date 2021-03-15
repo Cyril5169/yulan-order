@@ -149,20 +149,6 @@
           <template slot-scope="scope">
             <span v-if="scope.row.itemType === 'lspb'">--</span>
             <span v-else-if="scope.row.modifyFlag === 'Y'">
-              <!-- <el-input v-if="scope.row.itemType != 'lt'" style="width: 70%;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
-                                .replace(/^\./g, '').replace(/\.{2,}/g, '.')
-                                .replace('.', '$#$').replace(/\./g, '')
-                                .replace('$#$', '.')
-                                .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 2)"
-                v-model="scope.row.dosage">
-              </el-input>
-              <el-input v-else style="width: 70%;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
-                                .replace(/^\./g, '').replace(/\.{2,}/g, '.')
-                                .replace('.', '$#$').replace(/\./g, '')
-                                .replace('$#$', '.')
-                                .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"
-                v-model="scope.row.dosage">
-              </el-input> -->
               <el-input style="width: 70%;" size="mini" oninput="value=value.replace(/[^\d.]/g,'')
                                 .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                                 .replace('.', '$#$').replace(/\./g, '')
@@ -178,6 +164,7 @@
             </span>
           </template>
         </el-table-column>
+        <el-table-column label="库存" width="60" align="center" prop="curtain_store"></el-table-column>
         <el-table-column v-if="isManager != '0'" label="总价" align="center" width="60">
           <template slot-scope="scope">
             <span>
@@ -225,8 +212,21 @@
       </el-table>
       <div v-if="isManager != '0'" style="font-size:16px;margin-top:10px;">总计：<span
           style="color:red;">￥{{allTotal | dosageFilter}}</span></div>
+      <div style="text-align: center;" class="mt20">
+        <el-button type="danger" class="mr20" width="130px" @click="addCurtainToShoppingCar">
+          保存至购物车
+        </el-button>
+        <el-button type="info" class="ml20" width="130px" @click.native="
+              closeToTab({
+                oldUrl: 'shops/shoppingCurtainDetail',
+                newUrl: 'shops/curtain'
+              })
+            ">
+          返回
+        </el-button>
+      </div>
 
-      <!--  -->
+      <!-- 替换列表 -->
       <el-dialog width="65%" :visible.sync="dialogTableVisible" :close-on-click-modal="false" :close-on-press-escape="false"
         :show-close="false">
         <div slot="title">
@@ -261,19 +261,6 @@
           <el-button class="ml10" type="danger" @click="dialogTableVisible = false" plain>取消</el-button>
         </footer>
       </el-dialog>
-      <div style="text-align: center;" class="mt20">
-        <el-button type="danger" class="mr20" width="130px" @click="addCurtainToShoppingCar">
-          保存至购物车
-        </el-button>
-        <el-button type="info" class="ml20" width="130px" @click.native="
-              closeToTab({
-                oldUrl: 'shops/shoppingCurtainDetail',
-                newUrl: 'shops/curtain'
-              })
-            ">
-          返回
-        </el-button>
-      </div>
     </el-card>
   </div>
 </template>
@@ -291,7 +278,7 @@ import { GetDosageAll, GetDosageByNo } from "@/api/itemInfoASP";
 import { getItemById, GetPromotionByItem } from "@/api/orderListASP";
 import Cookies from "js-cookie";
 import { mapMutations, mapActions } from "vuex";
-import { mapState } from "vuex";
+import Axios from "axios";
 
 export default {
   name: "shoppingCurtainDetail",
@@ -364,16 +351,50 @@ export default {
       part2: [],
     };
   },
-  created() {
-    if (
-      Cookies.get("curtainMsg") !== undefined &&
-      Cookies.get("curtainMsg") !== null
-    ) {
-      this.message = JSON.parse(Cookies.get("curtainMsg"));
-      this.getActivity();
-      this.getPJB();
-      this.getDetail();
-    }
+  computed: {
+    salPromotion() {
+      var selectActivity = this.activityOptions.filter((item) => item.P_ID == this.message.activityId);
+      if (selectActivity.length) {
+        return selectActivity[0];
+      } else {
+        return {};
+      }
+    },
+    allTotal() {
+      //找到勾选的
+      let _curtainData = JSON.parse(JSON.stringify(this.curtainData));
+      for (let i = 0; i < _curtainData.length; i++) {
+        switch (_curtainData[i].itemType) {
+          case "lt":
+            if (this.chooseBig[0] === false) {
+              _curtainData.splice(i--, 1);
+            }
+            break;
+          case "ls":
+            if (this.chooseBig[1] === false) {
+              _curtainData.splice(i--, 1);
+            }
+            break;
+          case "lspb":
+            if (this.chooseBig[2] === false) {
+              _curtainData.splice(i--, 1);
+            }
+            break;
+          case "sha":
+            if (this.chooseBig[3] === false) {
+              _curtainData.splice(i--, 1);
+            }
+            break;
+        }
+      }
+      let totalMoney = 0;
+      for (let i = 0; i < _curtainData.length; i++) {
+        if (_curtainData[i].choose != false) {
+          totalMoney = totalMoney.add(this.oneTotal(_curtainData[i]));
+        }
+      }
+      return totalMoney;
+    },
   },
   methods: {
     ...mapActions("navTabs", ["closeToTab"]),
@@ -619,10 +640,13 @@ export default {
           changeFlag: data.itemList[i].itemMLGY.changeFlag, //物料是可以替换，Y可替换，N不可替换
           choose: true, //是否选中，默认选中了
           inlineNo: data.itemList[i].itemMLGY.no, //编号
+          curtain_store: '' //库存
         };
         this.curtainData.push(obj);
         this.getDosage(obj, i);
       }
+      //获得库存
+      this.curtainData = this.getStoreData(this.curtainData);
     },
     //获取窗帘大类用量
     getDosage(data, index) {
@@ -787,6 +811,8 @@ export default {
         if (this.curtainData[this.chooseIndex].itemType === "lspb") {
           this.curtainData[this.chooseIndex].itemNo = this.itemNo;
           this.judgeTip(this.curtainData[this.chooseIndex], this.chooseIndex);
+          //库存
+          this.curtainData = this.getStoreData(this.curtainData);
           return;
         }
         //修改用量
@@ -826,6 +852,8 @@ export default {
             }
             this.curtainData[this.chooseIndex].itemNo = this.itemNo;
             this.judgeTip(_data, this.chooseIndex);
+            //库存
+            this.curtainData = this.getStoreData(this.curtainData);
           })
           .catch((err) => {
             console.log(err);
@@ -835,6 +863,8 @@ export default {
       else if (status1) {
         this.curtainData[this.chooseIndex].itemNo = this.itemNo;
         this.judgeTip(this.curtainData[this.chooseIndex], this.chooseIndex);
+        //库存
+        this.curtainData = this.getStoreData(this.curtainData);
         if (this.curtainData[this.chooseIndex].itemNo === "GY-003") {
           this.curtainData[this.chooseIndex].dosage = this.allData.GY;
         } else {
@@ -1032,7 +1062,6 @@ export default {
         default:
           this.curtainData[index].tip = "";
       }
-      //return this.curtainData[index].tip;
     },
     //通过数据动态获取行数数据
     getSpanArr(msg) {
@@ -1351,51 +1380,56 @@ export default {
       }
       return this.dosageFilter(price);
     },
+    //查找库存
+    getStoreData(originData) {
+      for (var i = 0; i < originData.length; i++) {
+        var oneCurtain = originData[i];
+        if (!oneCurtain.itemNo) continue;
+        //库存
+        var postData = {
+          token: "兰居尚品",
+          code: oneCurtain.itemNo,
+        };
+        Axios.post("http://ljsp.ubxiu.com:8098/api/getXXDMX", postData, {
+          params: postData,
+          loading: false,
+        }).then((res) => {
+          if (res.data && res.data.data) {
+            var store_charge = "";
+            if (res.data.data.kucun == null || res.data.data.dinghuoshu == null
+              || res.data.data.ddz == null || res.data.data.xiaxian == null)
+              return;
+            var store_num = res.data.data.kucun - res.data.data.dinghuoshu - res.data.data.ddz;
+            var xiaxian = res.data.data.xiaxian;
+            if (store_num >= xiaxian) {
+              store_charge = "充足"
+            } else if (store_num > 0 && store_num < xiaxian) {
+              store_charge = "量少待查";
+            } else if (store_num < 0) {
+              store_charge = "欠料待审";
+            }
+            var data = originData.filter((item) => item.ITEM_NO == res.data.data.code);
+            if (data.length) {
+              for (var j = 0; j < data.length; j++) {
+                data[j].curtain_store = store_charge;
+              }
+            }
+          }
+        }).catch(res => { });
+      }
+      return originData;
+    },
   },
-  computed: {
-    salPromotion() {
-      var selectActivity = this.activityOptions.filter((item) => item.P_ID == this.message.activityId);
-      if (selectActivity.length) {
-        return selectActivity[0];
-      } else {
-        return {};
-      }
-    },
-    allTotal() {
-      //找到勾选的
-      let _curtainData = JSON.parse(JSON.stringify(this.curtainData));
-      for (let i = 0; i < _curtainData.length; i++) {
-        switch (_curtainData[i].itemType) {
-          case "lt":
-            if (this.chooseBig[0] === false) {
-              _curtainData.splice(i--, 1);
-            }
-            break;
-          case "ls":
-            if (this.chooseBig[1] === false) {
-              _curtainData.splice(i--, 1);
-            }
-            break;
-          case "lspb":
-            if (this.chooseBig[2] === false) {
-              _curtainData.splice(i--, 1);
-            }
-            break;
-          case "sha":
-            if (this.chooseBig[3] === false) {
-              _curtainData.splice(i--, 1);
-            }
-            break;
-        }
-      }
-      let totalMoney = 0;
-      for (let i = 0; i < _curtainData.length; i++) {
-        if (_curtainData[i].choose != false) {
-          totalMoney = totalMoney.add(this.oneTotal(_curtainData[i]));
-        }
-      }
-      return totalMoney;
-    },
+  created() {
+    if (
+      Cookies.get("curtainMsg") !== undefined &&
+      Cookies.get("curtainMsg") !== null
+    ) {
+      this.message = JSON.parse(Cookies.get("curtainMsg"));
+      this.getActivity();
+      this.getPJB();
+      this.getDetail();
+    }
   },
 };
 </script>

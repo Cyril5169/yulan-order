@@ -188,7 +188,7 @@
       </div>
       <el-divider></el-divider>
       <div style="margin-top:0px;">
-        <span style="margin-left:10px;color:red;">法律效力：本订单是双方合作协议不可分割的一部分，是乙方向甲方订货的凭证，具法力效力。</span>
+        <span style="margin-left:10px;color:red;">注意：本订单是双方合作协议不可分割的一部分，是乙方向甲方订货的凭证，具有法律效力。</span>
       </div>
       <div v-if="operationRecords.length > 0" style="width:800px;margin-bottom:20px;">
         <h1 style="margin-left:10px;">处理记录：</h1>

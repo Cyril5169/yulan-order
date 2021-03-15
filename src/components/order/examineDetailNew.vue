@@ -275,6 +275,7 @@
                   </span>
                 </template>
               </el-table-column>
+              <el-table-column label="库存" width="60" align="center" prop="curtain_store"></el-table-column>
               <el-table-column label="制造说明" width="100" header-align="center" align="center">
                 <template slot-scope="scope1">
                   <div v-if="tableStatus === 3">
@@ -443,7 +444,7 @@
           >订单修改说明：当修改数量不超过200卷时，双方可通过电话在原订单上进行修改，当修改数量超过200卷时，乙方应向甲方提供书面修改说明。</span
         >
         <br /> -->
-      <span style="margin-left:10px;color:red;">法律效力：本订单是双方合作协议不可分割的一部分，是乙方向甲方订货的凭证，具法力效力。</span>
+      <span style="margin-left:10px;color:red;">注意：本订单是双方合作协议不可分割的一部分，是乙方向甲方订货的凭证，具有法律效力。</span>
       <el-divider></el-divider>
     </div>
     <div v-if="operationRecords.length > 0" style="width:800px;margin-bottom:20px;">
@@ -476,6 +477,8 @@ import {
 } from "@/api/orderListASP";
 import { mapActions } from "vuex";
 import Cookies from "js-cookie";
+import Axios from "axios";
+
 export default {
   name: "examineDatail",
   data() {
@@ -687,6 +690,7 @@ export default {
         let smallChoose = [];
         for (let cur = 0; cur < data.curtains.length; cur++) {
           this.$set(data.curtains[cur], "choose", true);
+          this.$set(data.curtains[cur], "curtain_store", "");
           smallChoose.push(true);
           data.curtains[cur].productType = data.curtains[cur].item.productType;
           data.curtains[cur].itemType = data.curtains[cur].curtainPartName;
@@ -700,6 +704,8 @@ export default {
           let rule = ["lt", "ls", "lspb", "sha", "pjb"];
           return rule.indexOf(a.itemType) - rule.indexOf(b.itemType);
         });
+        //获得库存
+        data.curtains = this.getStoreData(data.curtains);
         if (data.LJ_SUGGESTION == " ") data.LJ_SUGGESTION = "";
         //合并单元格数据
         this.getSpanArr(data.curtains);
@@ -1062,9 +1068,7 @@ export default {
         this.dialogTableVisible = false;
         return;
       }
-      let _productType = this.allCurtaindata[this.chooseRowIndex][
-        this.chooseIndex
-      ].productType;
+      let _productType = this.allCurtaindata[this.chooseRowIndex][this.chooseIndex].productType;
       let status = _productType === "ML" ? true : false;
       let status1 = _productType === "GY" ? true : false;
       this.dialogTableVisible = false;
@@ -1073,28 +1077,20 @@ export default {
         if (v.itemNo === this.itemNo) return v;
       });
       var price = this.getPrice(this.cus_customerType, data);
-      this.allCurtaindata[this.chooseRowIndex][
-        this.chooseIndex
-      ].curtainItemName = data.note;
-      this.allCurtaindata[this.chooseRowIndex][this.chooseIndex].specification =
-        data.fixGrade / 1000;
+      this.allCurtaindata[this.chooseRowIndex][this.chooseIndex].curtainItemName = data.note;
+      this.allCurtaindata[this.chooseRowIndex][this.chooseIndex].specification = data.fixGrade / 1000;
       this.allCurtaindata[this.chooseRowIndex][this.chooseIndex].price = price;
       let theFixType;
-      if (
-        this.allCurtaindata[this.chooseRowIndex][this.chooseIndex].itemType ===
-        "lspb"
-      ) {
-        this.allCurtaindata[this.chooseRowIndex][
-          this.chooseIndex
-        ].certainHeightWidth = null;
-        this.allCurtaindata[this.chooseRowIndex][
-          this.chooseIndex
-        ].item.itemNo = this.itemNo;
+      if (this.allCurtaindata[this.chooseRowIndex][this.chooseIndex].itemType === "lspb") {
+        this.allCurtaindata[this.chooseRowIndex][this.chooseIndex].certainHeightWidth = null;
+        this.allCurtaindata[this.chooseRowIndex][this.chooseIndex].item.itemNo = this.itemNo;
         this.judgeTip(
           this.allCurtaindata[this.chooseRowIndex][this.chooseIndex],
           this.chooseIndex,
           this.chooseRowIndex
         );
+        //库存
+        this.allCurtaindata[this.chooseRowIndex] = this.getStoreData(this.allCurtaindata[this.chooseRowIndex]);
         return;
       }
       if (data.fixType === "01") {
@@ -1102,12 +1098,8 @@ export default {
       } else if (data.fixType === "02") {
         theFixType = 0;
       }
-      this.allCurtaindata[this.chooseRowIndex][
-        this.chooseIndex
-      ].certainHeightWidth = theFixType;
-      this.compareData[this.chooseRowIndex][
-        this.chooseIndex
-      ].certainHeightWidth = theFixType;
+      this.allCurtaindata[this.chooseRowIndex][this.chooseIndex].certainHeightWidth = theFixType;
+      this.compareData[this.chooseRowIndex][this.chooseIndex].certainHeightWidth = theFixType;
       let _headerData = this.ruleForm.headerData[this.chooseRowIndex];
       let _outsourcingBoxWidth =
         _headerData.outsourcingBoxExist === 0
@@ -1146,9 +1138,7 @@ export default {
               });
               return;
             }
-            let _data = this.allCurtaindata[this.chooseRowIndex][
-              this.chooseIndex
-            ];
+            let _data = this.allCurtaindata[this.chooseRowIndex][this.chooseIndex];
             let keys;
             // if (_data.itemType == "lt")
             //   keys = Math.round(res.data[0].dosage * 100) / 100;
@@ -1164,31 +1154,28 @@ export default {
             else if (_data.productType === "ML") {
               this.updateDosage(_data.itemType, keys, -1);
             }
-            this.allCurtaindata[this.chooseRowIndex][
-              this.chooseIndex
-            ].item.itemNo = this.itemNo;
+            this.allCurtaindata[this.chooseRowIndex][this.chooseIndex].item.itemNo = this.itemNo;
             this.judgeTip(
               this.allCurtaindata[this.chooseRowIndex][this.chooseIndex],
               this.chooseIndex,
               this.chooseRowIndex
             );
+            //库存
+            this.allCurtaindata[this.chooseRowIndex] = this.getStoreData(this.allCurtaindata[this.chooseRowIndex]);
           })
           .catch((err) => {
             console.log(err);
           });
       } else if (status1) {
-        this.allCurtaindata[this.chooseRowIndex][
-          this.chooseIndex
-        ].item.itemNo = this.itemNo;
+        this.allCurtaindata[this.chooseRowIndex][this.chooseIndex].item.itemNo = this.itemNo;
         this.judgeTip(
           this.allCurtaindata[this.chooseRowIndex][this.chooseIndex],
           this.chooseIndex,
           this.chooseRowIndex
         );
-        if (
-          this.allCurtaindata[this.chooseRowIndex][this.chooseIndex].item
-            .itemNo === "GY-003"
-        ) {
+        //库存
+        this.allCurtaindata[this.chooseRowIndex] = this.getStoreData(this.allCurtaindata[this.chooseRowIndex]);
+        if (this.allCurtaindata[this.chooseRowIndex][this.chooseIndex].item.itemNo === "GY-003") {
           GetDosageByNo(obj).then((res) => {
             this.allCurtaindata[this.chooseRowIndex][this.chooseIndex].dosage =
               Math.round(res.data[0].dosage * 100) / 100;
@@ -1201,16 +1188,13 @@ export default {
           ) {
             if (
               this.allCurtaindata[this.chooseRowIndex][i].itemType ===
-              this.allCurtaindata[this.chooseRowIndex][this.chooseIndex]
-                .itemType &&
+              this.allCurtaindata[this.chooseRowIndex][this.chooseIndex].itemType &&
               i !== this.chooseIndex
             ) {
               if (
                 this.allCurtaindata[this.chooseRowIndex][i].productType === "ML"
               ) {
-                this.allCurtaindata[this.chooseRowIndex][
-                  this.chooseIndex
-                ].dosage = this.allCurtaindata[this.chooseRowIndex][i].dosage;
+                this.allCurtaindata[this.chooseRowIndex][this.chooseIndex].dosage = this.allCurtaindata[this.chooseRowIndex][i].dosage;
                 break;
               }
             }
@@ -1714,7 +1698,46 @@ export default {
     changeFix() {
       this.isFixed2 = !this.isFixed2;
       window.localStorage.setItem("curtainFixed", this.isFixed2);
-    }
+    },
+    //查找库存
+    getStoreData(originData) {
+      for (var i = 0; i < originData.length; i++) {
+        var oneCurtain = originData[i];
+        if (!oneCurtain.item.itemNo) continue;
+        //库存
+        var postData = {
+          token: "兰居尚品",
+          code: oneCurtain.item.itemNo,
+        };
+        Axios.post("http://ljsp.ubxiu.com:8098/api/getXXDMX", postData, {
+          params: postData,
+          loading: false,
+        }).then((res) => {
+          if (res.data && res.data.data) {
+            var store_charge = "";
+            if (res.data.data.kucun == null || res.data.data.dinghuoshu == null
+              || res.data.data.ddz == null || res.data.data.xiaxian == null)
+              return;
+            var store_num = res.data.data.kucun - res.data.data.dinghuoshu - res.data.data.ddz;
+            var xiaxian = res.data.data.xiaxian;
+            if (store_num >= xiaxian) {
+              store_charge = "充足"
+            } else if (store_num > 0 && store_num < xiaxian) {
+              store_charge = "量少待查";
+            } else if (store_num < 0) {
+              store_charge = "欠料待审";
+            }
+            var data = originData.filter((item) => item.ITEM_NO == res.data.data.code);
+            if (data.length) {
+              for (var j = 0; j < data.length; j++) {
+                data[j].curtain_store = store_charge;
+              }
+            }
+          }
+        }).catch(res => { });
+      }
+      return originData;
+    },
   },
   created() {
     this.orderNumber = Cookies.get("ORDER_NO");

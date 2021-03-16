@@ -2,11 +2,7 @@
   <div class="curtainTable">
     <el-card shadow="never">
       <div style="margin-bottom:10px;">活动：<el-select v-if="tableStatus === 0" size="small" style="width:250px"
-          :disabled="activityOptions.length == 1" v-model="headerData.activityId" :placeholder="
-                  activityOptions.length == 1
-                    ? '无可选活动'
-                    : '请选择活动'
-                ">
+          v-model="headerData.activityId" :placeholder="activityOptions.length == 1? '无可选活动': '请选择活动'">
           <el-option v-for="item in activityOptions" :key="item.P_ID"
             :label="item.ORDER_TYPE? item.ORDER_TYPE + ' -- ' + item.ORDER_NAME : item.ORDER_NAME" :value="item.P_ID">
           </el-option>
@@ -1586,11 +1582,11 @@ export default {
         }).then((res) => {
           if (res.data && res.data.data) {
             var store_charge = "";
-            if (res.data.data.kucun == null || res.data.data.dinghuoshu == null
-              || res.data.data.ddz == null || res.data.data.xiaxian == null)
-              return;
-            var store_num = res.data.data.kucun - res.data.data.dinghuoshu - res.data.data.ddz;
-            var xiaxian = res.data.data.xiaxian;
+            var ddz = 0;
+            var kucun = res.data.data.kucun ? res.data.data.kucun : 0;
+            var dinghuoshu = res.data.data.kucun ? res.data.data.kucun : 0;
+            var xiaxian = res.data.data.xiaxian ? res.data.data.xiaxian : 0;
+            var store_num = kucun - dinghuoshu;
             if (store_num >= xiaxian) {
               store_charge = "充足"
             } else if (store_num > 0 && store_num < xiaxian) {

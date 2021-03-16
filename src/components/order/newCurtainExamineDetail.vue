@@ -833,11 +833,11 @@ export default {
         }).then((res) => {
           if (res.data && res.data.data) {
             var store_charge = "";
-            if (res.data.data.kucun == null || res.data.data.dinghuoshu == null
-              || res.data.data.ddz == null || res.data.data.xiaxian == null)
-              return;
-            var store_num = res.data.data.kucun - res.data.data.dinghuoshu - res.data.data.ddz;
-            var xiaxian = res.data.data.xiaxian;
+            var ddz = 0;
+            var kucun = res.data.data.kucun ? res.data.data.kucun : 0;
+            var dinghuoshu = res.data.data.kucun ? res.data.data.kucun : 0;
+            var xiaxian = res.data.data.xiaxian ? res.data.data.xiaxian : 0;
+            var store_num = kucun - dinghuoshu;
             if (store_num >= xiaxian) {
               store_charge = "充足"
             } else if (store_num > 0 && store_num < xiaxian) {

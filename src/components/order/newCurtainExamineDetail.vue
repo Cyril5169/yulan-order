@@ -1004,7 +1004,6 @@ export default {
     },
     //勾选的联动处理
     onCheckChange(checked, row, index) {
-      //if (!row.ITEM_NO) return;
       this.currentIndex = index;
       var childrenCurtain = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NCM_PID == row.NC_MODEL_ID && row.NC_MODEL_ID != 0);
       var fatherCurtain = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NC_MODEL_ID == row.NCM_PID && item.NC_MODEL_ID != 0);

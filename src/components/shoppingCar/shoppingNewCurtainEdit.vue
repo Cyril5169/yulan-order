@@ -978,7 +978,6 @@ export default {
     },
     //勾选的联动处理
     onCheckChange(checked, row) {
-      //if (!row.ITEM_NO) return;
       var childrenCurtain = this.curtainHeadData.curtains.filter((item) => item.NCM_PID == row.NC_MODEL_ID && row.NC_MODEL_ID != 0);
       var fatherCurtain = this.curtainHeadData.curtains.filter((item) => item.NC_MODEL_ID == row.NCM_PID && item.NC_MODEL_ID != 0);
       if (childrenCurtain.length) {

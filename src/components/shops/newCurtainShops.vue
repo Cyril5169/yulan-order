@@ -610,6 +610,7 @@ export default {
           }
           this.curtainDataOrigin = this.getCurtainOtherMsg(curtain_temp);
           this.curtainDataOrigin = this.getStoreData(this.curtainDataOrigin);
+          console.log(this.curtainDataOrigin)
           //处理拉边条数据
           for (var i = 0; i < this.curtainDataOrigin.length; i++) {
             var oneCurtain = this.curtainDataOrigin[i];
@@ -692,7 +693,7 @@ export default {
       //除了后台查出来的数据以外前端需要的数据
       for (var i = 0; i < originData.length; i++) {
         var oneCurtain = originData[i];
-        if (!oneCurtain.ITEM_NO) continue;
+        if (!oneCurtain.ITEM_NO && oneCurtain.NC_PART_TYPECODE != 'LBT') continue;
         //窗帘层级
         var level = 0;
         if (originLevel != undefined) level = originLevel;
@@ -757,7 +758,6 @@ export default {
           loading: false,
         }).then((res) => {
           if (res.data && res.data.data) {
-            console.log(res.data.data)
             var store_charge = "";
             var ddz = 0;
             var kucun = res.data.data.kucun ? res.data.data.kucun : 0;
@@ -988,7 +988,6 @@ export default {
     },
     //勾选的联动处理
     onCheckChange(checked, row) {
-      //if (!row.ITEM_NO) return;
       var childrenCurtain = this.curtainData.filter((item) => item.NCM_PID == row.NC_MODEL_ID && row.NC_MODEL_ID != 0);
       var fatherCurtain = this.curtainData.filter((item) => item.NC_MODEL_ID == row.NCM_PID && item.NC_MODEL_ID != 0);
       if (childrenCurtain.length) {

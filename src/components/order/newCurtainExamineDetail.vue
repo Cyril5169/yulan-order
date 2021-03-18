@@ -1829,18 +1829,20 @@ export default {
   padding: 0 5px !important;
   height: 20px !important;
 }
-.index-badge .el-badge__content {
-  background: gray;
-}
-.curtain-list .el-table .bold-row {
+.curtain-list .el-table .bold-row,
+.model-exchange-inner .el-table .bold-row {
   font-weight: bold;
 }
-.curtain-list .el-table .fade-row {
+.curtain-list .el-table .fade-row,
+.model-exchange-inner .el-table .fade-row {
   color: #b0b4bb;
 }
 .curtain-list .el-table .delete-row-cls {
   color: tomato !important;
   text-decoration: line-through;
   cursor: unset;
+}
+.index-badge .el-badge__content {
+  background: gray;
 }
 </style>

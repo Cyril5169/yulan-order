@@ -546,7 +546,7 @@ export default {
     },
     //远程模糊搜索前5条数据
     querySearchAsync(queryString, cb) {
-      GetAsyncItemData({ condition: this.searchKey }, { loading: false }).then(
+      GetAsyncItemData({ condition: this.searchKey.toUpperCase() }, { loading: false }).then(
         (res) => {
           var results = [];
           for (var i = 0; i < res.data.length; i++) {
@@ -560,7 +560,7 @@ export default {
     },
     //搜索窗帘
     searchCurtain() {
-      if(!this.searchKey) return;
+      if (!this.searchKey) return;
       this.templateData = [];
       this.curtainHeadData = {};
       this.curtainData = [];
@@ -678,7 +678,7 @@ export default {
         if (defaultSel.pri != 0) {
           this.curtainHeadData.activityId = defaultSel.id;
         }
-        
+
         this.activityOptions = res.data;
         this.activityOptions.push({
           ORDER_TYPE: "",
@@ -918,7 +918,7 @@ export default {
         var DOSAGE = this.convertNumber(row.DOSAGE);
         if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < 1) {
           DOSAGE = 1;
-        } else if ((row.NC_PART_TYPECODE == 'LS'|| row.NC_PART_TYPECODE == 'LCB' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4) {
+        } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'LCB' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4) {
           DOSAGE = 4;
         }
         price = price.mul(DOSAGE)
@@ -1532,7 +1532,7 @@ export default {
             oneCurtain.ILLUSTRATE = oneCurtain.ILLUSTRATE.replace('不足1平方米。按1平方米下单量收费;', '');
           }
         }
-        if (oneCurtain.NC_PART_TYPECODE == 'LS'|| oneCurtain.NC_PART_TYPECODE == 'LCB' || oneCurtain.NC_PART_TYPECODE == 'CS') {
+        if (oneCurtain.NC_PART_TYPECODE == 'LS' || oneCurtain.NC_PART_TYPECODE == 'LCB' || oneCurtain.NC_PART_TYPECODE == 'CS') {
           if (oneCurtain.DOSAGE < 4) {
             if (oneCurtain.ILLUSTRATE.indexOf('不足4平方米。按4平方米下单量收费;') == -1) {
               oneCurtain.ILLUSTRATE += '不足4平方米。按4平方米下单量收费;';
@@ -1721,18 +1721,20 @@ export default {
   padding: 0 5px !important;
   height: 20px !important;
 }
-.index-badge .el-badge__content {
-  background: gray;
-}
-.curtain-list .el-table .bold-row {
+.curtain-list .el-table .bold-row,
+.model-exchange-inner .el-table .bold-row {
   font-weight: bold;
 }
-.curtain-list .el-table .fade-row {
+.curtain-list .el-table .fade-row,
+.model-exchange-inner .el-table .fade-row {
   color: #b0b4bb;
 }
 .curtain-list .el-table .delete-row-cls {
   color: tomato !important;
   text-decoration: line-through;
   cursor: unset;
+}
+.index-badge .el-badge__content {
+  background: gray;
 }
 </style>

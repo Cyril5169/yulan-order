@@ -1576,6 +1576,7 @@ export default {
           token: "兰居尚品",
           code: oneCurtain.item.itemNo,
         };
+        Axios.defaults.withCredentials = false;
         Axios.post("http://ljsp.ubxiu.com:8098/api/getXXDMX", postData, {
           params: postData,
           loading: false,
@@ -1584,7 +1585,7 @@ export default {
             var store_charge = "";
             var ddz = 0;
             var kucun = res.data.data.kucun ? res.data.data.kucun : 0;
-            var dinghuoshu = res.data.data.kucun ? res.data.data.kucun : 0;
+            var dinghuoshu = res.data.data.dinghuoshu ? res.data.data.dinghuoshu : 0;
             var xiaxian = res.data.data.xiaxian ? res.data.data.xiaxian : 0;
             var store_num = kucun - dinghuoshu;
             if (store_num >= xiaxian) {

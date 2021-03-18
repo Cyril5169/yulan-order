@@ -1866,10 +1866,40 @@ export default {
                   };
                   detailData.push(onedetail);
                 }
+                console.log(oneplace)
                 //找各种款式
                 var ltlist = oneplace.filter((item) => item.CL_NAME == "lt");
                 var lslist = oneplace.filter((item) => item.CL_NAME == "ls");
                 var shalist = oneplace.filter((item) => item.CL_NAME == "sha");
+
+                var lsHeight = 0;
+                var lsWidth = 0;
+                var lsOpen = "";
+                var lsOperation = "";
+                if (lslist.length) {
+                  lsHeight = lslist[0].HEIGHT;
+                  lsWidth = lslist[0].WIDTH;
+                  lsOpen = this.$options.filters.kaikou_filter(lslist[0].PRODUCT_NOTE);
+                  //工艺方式
+                  var operationForLs = lslist.filter(item => item.ITEM_NO.indexOf('GY') > -1);
+                  if(operationForLs.length){
+                    lsOperation = operationForLs[0].MNAME;
+                  }
+                }
+                var shaHeight = 0;
+                var shaWidth = 0;
+                var shaOpen = "";
+                var shaOperation = "";
+                if (shalist.length) {
+                  shaHeight = shalist[0].HEIGHT;
+                  shaWidth = shalist[0].WIDTH;
+                  shaOpen = this.$options.filters.kaikou_filter(shalist[0].PRODUCT_NOTE);
+                  //工艺方式
+                  var operationForSha = shalist.filter(item => item.ITEM_NO.indexOf('GY') > -1);
+                  if(operationForSha.length){
+                    shaOperation = operationForSha[0].MNAME;
+                  }
+                }
 
                 var postdata = {
                   token: "ljsp-bjl",
@@ -1890,12 +1920,12 @@ export default {
                   liantouMoshutie: "--",
                   lianshenHeight: oneplace[0].CL_HIGH,
                   lianshenWidth: oneplace[0].CL_WIDTH,
-                  lianshenOpen: "--",
-                  lianshenType: "--",
+                  lianshenOpen: lsOpen,
+                  lianshenType: lsOperation,
                   chuangshaHeight: oneplace[0].CL_HIGH,
                   chuangshaWidth: oneplace[0].CL_WIDTH,
-                  chuangshaOpen: "--",
-                  chuangshaType: "--",
+                  chuangshaOpen: shaOpen,
+                  chuangshaType: shaOperation,
                   subcustmorname: detail.PUR_NO,
                   zswz: oneplace[0].CL_PLACE,
                   onlineDanhao: oneplace[0].ORDER_NO,

@@ -62,11 +62,7 @@
       </el-table-column>
       <el-table-column width="100px" label="操作" align="center">
         <template slot-scope="scope">
-          <a class="mr10" @click="seeStore(scope)">
-            查看库存
-          </a>
-          <iframe v-if="scope.row.ITEM_NO == currentItemNo" :src="storeUrl(scope.row.ITEM_NO)" style="display:none;"
-            frameborder="0"></iframe>
+          <a class="mr10" @click="seeStore(scope)">查看库存</a>
         </template>
       </el-table-column>
       <el-table-column width="100px;" type="expand">
@@ -114,8 +110,6 @@
 </template>
 
 <script>
-import { findItemActivity } from "@/api/findActivity";
-import { checkStore } from "@/api/searchStore";
 import { addShoppingCar } from "@/api/shop";
 import { GetPromotionByItem } from "@/api/orderListASP";
 import Axios from "axios";
@@ -153,25 +147,9 @@ export default {
       dialogTableVisible: false,
       disableFlag: false, //判断是否禁用选择框
       minimumPurchaseShow: false,
-      currentItemNo: "",
     };
   },
   props: ["tableData", "numberList"],
-  filters: {
-    calLength(str) {
-      var len = 0;
-      for (var i = 0; i < str.length; i++) {
-        var c = str.charCodeAt(i);
-        //单字节加1
-        if ((c >= 0x0001 && c <= 0x007e) || (0xff60 <= c && c <= 0xff9f)) {
-          len++;
-        } else {
-          len += 2;
-        }
-      }
-      return len;
-    },
-  },
   methods: {
     //给库存表格切换不同的颜色
     rowClass(row, index) {
@@ -192,9 +170,6 @@ export default {
     getRowKeys(row) {
       return row.ITEM_NO;
     },
-    storeUrl(IID) {
-      return `http://www.luxlano.com/ddkc/ecqueryItemStock.asp?IID=${IID}`;
-    },
     //展开行
     expandChange(row) {
       this.clearMsg();
@@ -205,7 +180,6 @@ export default {
       row.MINIMUM_PURCHASE == 0
         ? (this.minimumPurchaseShow = false)
         : (this.minimumPurchaseShow = true);
-      //findItemActivity({
       GetPromotionByItem({
         cid: this.cid,
         customerType: this.customerType,
@@ -385,10 +359,11 @@ export default {
           return "";
       }
     },
+    storeUrl(IID) {
+      return `http://www.luxlano.com/ddkc/ecqueryItemStock.asp?IID=${IID}`;
+    },
     //查看该商品的库存
     seeStore(scope) {
-      this.currentItemNo = scope.row.ITEM_NO;
-      this.dialogTableVisible = true;
       //生成库存表格，依次是类别、编号、尺寸、库存信息
       this.produceStore[0].body = scope.row.NOTE ? scope.row.NOTE : "暂无数据";
       this.produceStore[1].body = scope.row.ITEM_NO
@@ -396,11 +371,22 @@ export default {
         : "暂无数据";
       this.produceStore[2].body = scope.row.FIX_GRADE / 1000;
       this.produceStore[3].body = "查询中...";
-    },
-    showStoreData() {
-      this.produceStore[3].body = this.storeMsg.length
-        ? this.storeMsg[0]
-        : "暂无数据";
+      this.dialogTableVisible = true;
+      var postData = {
+        token: "兰居尚品",
+        code: scope.row.ITEM_NO,
+      };
+      Axios.defaults.withCredentials = false;
+      Axios.post(`http://ljsp.ubxiu.com:8098/api/getXXDMX`, postData,
+        { params: postData, loading: false }).then(res => {
+          if (res.data && res.data.data) {
+            var kucun = res.data.data.kucun ? res.data.data.kucun : 0;
+            var dinghuoshu = res.data.data.dinghuoshu ? res.data.data.dinghuoshu : 0;
+            this.produceStore[3].body = kucun - dinghuoshu;
+          } else {
+            this.produceStore[3].body = "暂无数据";
+          }
+        });
     },
   },
   mounted() {

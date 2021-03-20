@@ -487,6 +487,7 @@ export default {
       Cookies.set("ORDER_NO", value);
       Cookies.set("CURTAIN_STATUS_ID", ID);
       Cookies.set("status_ID", status);
+      Cookies.set("isExamine", "false");
       this.addTab("order/checkExamine");
     },
     //订单获取

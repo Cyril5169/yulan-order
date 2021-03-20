@@ -66,7 +66,8 @@
                   <!-- 标定 -->
                   <template v-if="scope.row.ITEM_NO">
                     <!-- 是否可替换 -->
-                    <a v-if="itemCanChange(scope.row)" class="a-link" :class="{'delete-cls': !scope.row.curtain_choose}"
+                    <a v-if="itemCanChange(scope.row, scopeHead.$index)" class="a-link"
+                      :class="{'delete-cls': !scope.row.curtain_choose}"
                       @click="exchangeModelOrItem(scope.row, scopeHead.$index)">{{scope.row.ITEM_NO}}</a>
                     <span v-else :class="{'delete-cls': !scope.row.curtain_choose}">{{scope.row.ITEM_NO}}</span>
                     <!-- 是否可删/是否默认勾选 -->
@@ -658,7 +659,7 @@ export default {
     //PartType字典Filter
     transPartTypeCode(val) {
       var name = val;
-      var typeCode = this.curtainPartTypeData.filter((item) => item.NC_PART_TYPECODE == val);
+      var typeCode = this.curtainPartTypeData.filter(item => item.NC_PART_TYPECODE == val);
       if (typeCode.length) {
         name = typeCode[0].NC_PART_NAME;
       }
@@ -704,13 +705,23 @@ export default {
     dealCurtainData() {
       for (var i = 0; i < this.ruleForm.ORDERBODY.length; i++) {
         var detail = this.ruleForm.ORDERBODY[i];
+
+        //看是标定还是非标定
+        var isStandard = true;
+        var headData = detail.curtain_template.filter(item => item.NC_PART_TYPECODE == "LK");
+        if (headData.length) {
+          //是否标定
+          isStandard = headData[0].NCT_STANDARD != 'N';
+        }
+        this.$set(detail, "isStandard", isStandard);
+        
         for (var j = 0; j < detail.curtains.length; j++) {
           var oneCurtain = detail.curtains[j];
           //窗帘层级
           var level = 0;
           var NCM_PID = oneCurtain.NCM_PID;
           while (NCM_PID != 0) {
-            var temp = detail.curtains.filter((item) => item.NC_MODEL_ID == NCM_PID);
+            var temp = detail.curtains.filter(item => item.NC_MODEL_ID == NCM_PID);
             if (temp.length) {
               NCM_PID = temp[0].NCM_PID;
               level++;
@@ -733,7 +744,7 @@ export default {
           var level = 0;
           var NCM_PID = oneCurtain.NCM_PID;
           while (NCM_PID != 0) {
-            var temp = detail.curtain_change.filter((item) => item.NC_MODEL_ID == NCM_PID);
+            var temp = detail.curtain_change.filter(item => item.NC_MODEL_ID == NCM_PID);
             if (temp.length) {
               NCM_PID = temp[0].NCM_PID;
               level++;
@@ -767,7 +778,7 @@ export default {
           this.$set(oneCurtain, "DOSAGE", dosage);
           if (oneCurtain.NC_PART_TYPECODE == "LS") {
             //改变里衬布的
-            var LCBITEM = detail.curtain_change.filter((item) => item.NC_PART_TYPECODE == "LCB");
+            var LCBITEM = detail.curtain_change.filter(item => item.NC_PART_TYPECODE == "LCB");
             for (var k = 0; k < LCBITEM.length; k++) {
               //假设有多个里衬布的情况
               LCBITEM[k].DOSAGE = dosage;
@@ -822,6 +833,7 @@ export default {
       for (var i = 0; i < originData.length; i++) {
         var oneCurtain = originData[i];
         if (!oneCurtain.ITEM_NO) continue;
+        if (oneCurtain.curtain_level == 0) continue;
         //库存
         var postData = {
           token: "兰居尚品",
@@ -846,7 +858,7 @@ export default {
             } else if (store_num < 0) {
               store_charge = "欠料待审";
             }
-            var data = originData.filter((item) => item.ITEM_NO == res.data.data.code);
+            var data = originData.filter(item => item.ITEM_NO == res.data.data.code);
             if (data.length) {
               for (var j = 0; j < data.length; j++) {
                 data[j].curtain_store = store_charge;
@@ -899,7 +911,7 @@ export default {
       }
       if (oneCurtain.NC_PART_TYPECODE == "LS") {
         //改变里衬布的
-        var LCBITEM = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter((item) => item.NC_PART_TYPECODE == "LCB");
+        var LCBITEM = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter(item => item.NC_PART_TYPECODE == "LCB");
         for (var i = 0; i < LCBITEM.length; i++) {
           //假设有多个里衬布的情况
           LCBITEM[i].DOSAGE = oneCurtain.DOSAGE;
@@ -914,7 +926,7 @@ export default {
       var oneCurtain = this.ruleForm.ORDERBODY[this.currentIndex].curtains[index1];
       if (oneCurtain.NC_PART_TYPECODE == "LS") {
         //改变里衬布的
-        var LCBITEM = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter((item) => item.NC_PART_TYPECODE == "LCB");
+        var LCBITEM = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter(item => item.NC_PART_TYPECODE == "LCB");
         for (var i = 0; i < LCBITEM.length; i++) {
           //假设有多个里衬布的情况
           LCBITEM[i].DOSAGE = oneCurtain.DOSAGE;
@@ -945,18 +957,17 @@ export default {
       if (common == "4B" && row.BIAN != "4B") {
         //显示拉边条
         //先看看当前数据有没有这个拉边条，有的话应该是bug
-        var lbtItemNow = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter((item) => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
+        var lbtItemNow = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter(item => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
         if (lbtItemNow.length) return;
         //找到最大序号的面料,并且是要勾选的
-        var mlList = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter(
-          (item) =>
-            item.NCM_PID == row.NC_MODEL_ID &&
-            item.NC_PART_TYPECODE != "LBT" &&
-            item.curtain_choose
+        var mlList = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter(item =>
+          item.NCM_PID == row.NC_MODEL_ID &&
+          item.NC_PART_TYPECODE != "LBT" &&
+          item.curtain_choose
         );
         if (mlList.length) {
           //在修改后的数据中找到拉边条数据并push进去
-          var lbtItem = this.ruleForm.ORDERBODY[this.currentIndex].curtain_change.filter((item) => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
+          var lbtItem = this.ruleForm.ORDERBODY[this.currentIndex].curtain_change.filter(item => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
           if (lbtItem.length) {
             lbtItem = lbtItem[0]; //只取第一个拉边条（按理应该只有一个）
             lbtItem = this.dealInsertData(lbtItem);
@@ -975,7 +986,7 @@ export default {
       } else if (common == "3B" && row.BIAN == "4B") {
         //去掉拉边条
         //找到有没有拉边条
-        var lbtItem = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
+        var lbtItem = this.ruleForm.ORDERBODY[index].curtains.filter(item => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
         //应该只有一个拉边条，但是循环一下，保险
         for (var i = 0; i < lbtItem.length; i++) {
           this.ruleForm.ORDERBODY[index].curtains.splice(this.ruleForm.ORDERBODY[index].curtains.indexOf(lbtItem[i]), 1);
@@ -983,12 +994,19 @@ export default {
       }
     },
     //是否可改
-    itemCanChange(row) {
+    itemCanChange(row, index) {
       var canChange = true;
       if (row.curtain_level == 0) {
         canChange = row.NCT_CHANGE == 1;
       } else {
-        canChange = row.NCT_CHANGE == 1 && row.NCM_CHANGE == 1;
+        var isStandardLT = false;
+        if (!this.ruleForm.ORDERBODY[index].isStandard) {
+          //非标定帘款的标定帘头的子件可修改
+          var fatherCurtain = this.ruleForm.ORDERBODY[index].curtains.filter(item => item.NC_MODEL_ID == row.NCM_PID && item.NC_MODEL_ID != 0);
+          if (fatherCurtain.length && fatherCurtain[0].NC_PART_TYPECODE == 'LT' && fatherCurtain[0].NCM_STANDARD != 'N')
+            isStandardLT = true;
+        }
+        canChange = row.NCT_CHANGE == 1 && row.NCM_CHANGE == 1 || isStandardLT;
       }
       return canChange;
     },
@@ -1005,8 +1023,8 @@ export default {
     //勾选的联动处理
     onCheckChange(checked, row, index) {
       this.currentIndex = index;
-      var childrenCurtain = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NCM_PID == row.NC_MODEL_ID && row.NC_MODEL_ID != 0);
-      var fatherCurtain = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NC_MODEL_ID == row.NCM_PID && item.NC_MODEL_ID != 0);
+      var childrenCurtain = this.ruleForm.ORDERBODY[index].curtains.filter(item => item.NCM_PID == row.NC_MODEL_ID && row.NC_MODEL_ID != 0);
+      var fatherCurtain = this.ruleForm.ORDERBODY[index].curtains.filter(item => item.NC_MODEL_ID == row.NCM_PID && item.NC_MODEL_ID != 0);
       if (childrenCurtain.length) {
         //自身作为父节点，勾选或者取消，子节点应该同步
         for (var i = 0; i < childrenCurtain.length; i++) {
@@ -1024,17 +1042,17 @@ export default {
           //勾选上的时候看需不需要加载自己的拉边条，看自己是不是最大排序的那个
           //从父节点看是否需要加载
           if (fatherCurtain.BIAN_ENABLE > 0 && fatherCurtain.BIAN == "4B") {
-            var mlList = this.ruleForm.ORDERBODY[index].curtains.filter((item) =>
+            var mlList = this.ruleForm.ORDERBODY[index].curtains.filter(item =>
               item.NCM_PID == row.NCM_PID &&
               item.NC_PART_TYPECODE != "LBT" &&
               item.curtain_choose
             );
             if (mlList.length && mlList[mlList.length - 1].ITEM_NO == row.ITEM_NO) {
               //先看看当前数据有没有拉边条，有的话应该是全选的时候这一条还没勾选上的时候上一条数据加载的
-              var lbtItemNow = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NCM_PID == row.NCM_PID && item.NC_PART_TYPECODE == "LBT");
+              var lbtItemNow = this.ruleForm.ORDERBODY[index].curtains.filter(item => item.NCM_PID == row.NCM_PID && item.NC_PART_TYPECODE == "LBT");
               if (lbtItemNow.length == 0) {
                 //在修改后的数据中找到拉边条数据并push进去
-                var lbtItem = this.ruleForm.ORDERBODY[index].curtain_change.filter((item) =>
+                var lbtItem = this.ruleForm.ORDERBODY[index].curtain_change.filter(item =>
                   item.NCM_PID == row.NCM_PID &&
                   item.NC_PART_TYPECODE == "LBT"
                 );
@@ -1062,10 +1080,10 @@ export default {
           //取消勾选删掉对应的拉边条，并找有没有其他
           //从父节点看是否需要删除
           if (fatherCurtain.BIAN_ENABLE > 0 && fatherCurtain.BIAN == "4B") {
-            var lbtItem = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NCM_PID == row.NCM_PID && item.NC_PART_TYPECODE == "LBT");
+            var lbtItem = this.ruleForm.ORDERBODY[index].curtains.filter(item => item.NCM_PID == row.NCM_PID && item.NC_PART_TYPECODE == "LBT");
             if (lbtItem.length) {
               //继续找到最大的面料对应的拉边条
-              var mlList = this.ruleForm.ORDERBODY[index].curtains.filter((item) =>
+              var mlList = this.ruleForm.ORDERBODY[index].curtains.filter(item =>
                 item.NCM_PID == row.NCM_PID &&
                 item.NC_PART_TYPECODE != "LBT" &&
                 item.curtain_choose
@@ -1082,14 +1100,14 @@ export default {
             }
           }
           //子节点取消勾选，如果同级没有其他勾选了，父节点取消勾选
-          var brotherCurtain = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NCM_PID == row.NCM_PID && item.curtain_choose);
+          var brotherCurtain = this.ruleForm.ORDERBODY[index].curtains.filter(item => item.NCM_PID == row.NCM_PID && item.curtain_choose);
           if (brotherCurtain.length == 0)
             fatherCurtain.curtain_choose = checked;
         }
       }
       //帘身取消勾选，同时取消里衬布
       if (row.NC_PART_TYPECODE == 'LS' && !checked) {
-        var LCBITEM = this.ruleForm.ORDERBODY[index].curtains.filter((item) => item.NC_PART_TYPECODE == "LCB");
+        var LCBITEM = this.ruleForm.ORDERBODY[index].curtains.filter(item => item.NC_PART_TYPECODE == "LCB");
         for (var j = 0; j < LCBITEM.length; j++) {
           //假设有多个里衬布的情况
           LCBITEM[j].curtain_choose = checked;
@@ -1120,7 +1138,7 @@ export default {
         if (res.data.length > 0 || (res.data.length == 1 && res.data[0].NC_MODEL_ID != this.exchangeModelNow.NC_MODEL_ID)) {
           this.exchangeModelList = res.data;
           //默认数据
-          var defaultModel = this.ruleForm.ORDERBODY[this.currentIndex].curtain_template.filter((item) =>
+          var defaultModel = this.ruleForm.ORDERBODY[this.currentIndex].curtain_template.filter(item =>
             item.NC_TEMPLATE_ID == this.exchangeModelNow.NC_TEMPLATE_ID);
           if (defaultModel.length) {
             this.exchangeModelTemplate = defaultModel[0];
@@ -1133,7 +1151,7 @@ export default {
               var level = 0;
               var NCM_PID = oneCurtain.NCM_PID;
               while (NCM_PID != 0) {
-                var temp = curtain_list.filter((item) => item.NC_MODEL_ID == NCM_PID);
+                var temp = curtain_list.filter(item => item.NC_MODEL_ID == NCM_PID);
                 if (temp.length) {
                   NCM_PID = temp[0].NCM_PID;
                   level++;
@@ -1162,7 +1180,7 @@ export default {
     //点击替换组件
     onChangeModelClick(model) {
       if (model.NC_MODEL_ID == this.exchangeModelNow.NC_MODEL_ID) return;
-      var selectModel = model.curtain_model.filter((item) => item.NC_MODEL_ID == model.NC_MODEL_ID);
+      var selectModel = model.curtain_model.filter(item => item.NC_MODEL_ID == model.NC_MODEL_ID);
       if (selectModel.length) {
         selectModel = selectModel[0];
         var msg = "";
@@ -1177,9 +1195,9 @@ export default {
           type: "warning",
         }).then(() => {
           //替换当前，第一步，把当前的删掉
-          this.ruleForm.ORDERBODY[this.currentIndex].curtains = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter((item) =>
+          this.ruleForm.ORDERBODY[this.currentIndex].curtains = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter(item =>
             item.NC_TEMPLATE_ID != this.exchangeModelNow.NC_TEMPLATE_ID);
-          this.ruleForm.ORDERBODY[this.currentIndex].curtain_change = this.ruleForm.ORDERBODY[this.currentIndex].curtain_change.filter((item) =>
+          this.ruleForm.ORDERBODY[this.currentIndex].curtain_change = this.ruleForm.ORDERBODY[this.currentIndex].curtain_change.filter(item =>
             item.NC_TEMPLATE_ID != this.exchangeModelNow.NC_TEMPLATE_ID);
           //第二步，把当前选中的push进去
           var curtain_temp = this.getOtherCurtainMsgForExchange(model.curtain_model);
@@ -1188,14 +1206,14 @@ export default {
             var oneCurtain = curtain_temp[i];
             if (oneCurtain.NC_PART_TYPECODE == "LBT") {
               //先看父节点需不需要加载出拉边条
-              var fatherCurtain = curtain_temp.filter((item) =>
+              var fatherCurtain = curtain_temp.filter(item =>
                 item.NC_MODEL_ID == oneCurtain.NCM_PID &&
                 item.BIAN_ENABLE > 0 &&
                 item.NCM_BIAN == "4B"
               );
               if (fatherCurtain.length) {
                 //如果需要加载，看排序最大的面料对应的拉边条,并且是要勾选的
-                var mlList = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter((item) =>
+                var mlList = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter(item =>
                   item.NCM_PID == oneCurtain.NCM_PID &&
                   item.NC_PART_TYPECODE != "LBT" &&
                   item.curtain_choose
@@ -1258,7 +1276,7 @@ export default {
         this.$set(oneCurtain, "DOSAGE", dosage);
         if (oneCurtain.NC_PART_TYPECODE == "LS") {
           //改变里衬布的
-          var LCBITEM = originData.filter((item) => item.NC_PART_TYPECODE == "LCB");
+          var LCBITEM = originData.filter(item => item.NC_PART_TYPECODE == "LCB");
           for (var j = 0; j < LCBITEM.length; j++) {
             //假设有多个里衬布的情况
             LCBITEM[j].DOSAGE = dosage;
@@ -1288,7 +1306,7 @@ export default {
           this.exchangeItemList = res.data;
           this.totalNumber = res.count;
           //默认物料(从替换后的找)
-          var defaultItem = this.ruleForm.ORDERBODY[this.currentIndex].curtain_change.filter((item) => item.NC_MODEL_ID == this.exchangeItemNow.NC_MODEL_ID);
+          var defaultItem = this.ruleForm.ORDERBODY[this.currentIndex].curtain_change.filter(item => item.NC_MODEL_ID == this.exchangeItemNow.NC_MODEL_ID);
           if (defaultItem.length) {
             this.exchangeItemDefault = defaultItem[0];
           }
@@ -1311,7 +1329,7 @@ export default {
         type: "warning",
       }).then(() => {
         //替换只是更换item，现在只需要替换字段ITEM_NO，NOTE和拉边条MATERIAL_NO
-        var originItem = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter((item) => item.NC_MODEL_ID == this.exchangeItemNow.NC_MODEL_ID);
+        var originItem = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter(item => item.NC_MODEL_ID == this.exchangeItemNow.NC_MODEL_ID);
         if (originItem.length) {
           originItem = originItem[0];
           originItem.ITEM_NO = item.ITEM_NO;
@@ -1321,14 +1339,14 @@ export default {
         }
         //替换拉边条
         //如果需要加载，看自身是不是勾选中排序最大的
-        var mlList = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter((item) =>
+        var mlList = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter(item =>
           item.NCM_PID == originItem.NCM_PID &&
           item.NC_PART_TYPECODE != "LBT" &&
           item.curtain_choose
         );
         if (mlList.length && mlList[mlList.length - 1].ITEM_NO == originItem.ITEM_NO) {
           //改变拉边条数据
-          var lbtItem = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter((item) =>
+          var lbtItem = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter(item =>
             item.NCM_PID == originItem.NCM_PID &&
             item.NC_PART_TYPECODE == "LBT"
           );
@@ -1596,6 +1614,7 @@ export default {
       }
       for (var i = 0; i < curtains.length; i++) {
         var oneCurtain = curtains[i];
+        if (!oneCurtain.ITEM_NO) continue;
         //最小下单量。帘头1.帘身里衬，窗纱4
         if (oneCurtain.NC_PART_TYPECODE == 'LT') {
           if (oneCurtain.DOSAGE < 1) {
@@ -1605,8 +1624,7 @@ export default {
           } else {
             oneCurtain.ILLUSTRATE = oneCurtain.ILLUSTRATE.replace('不足1平方米。按1平方米下单量收费;', '');
           }
-        }
-        if (oneCurtain.NC_PART_TYPECODE == 'LS' || oneCurtain.NC_PART_TYPECODE == 'LCB' || oneCurtain.NC_PART_TYPECODE == 'CS') {
+        } else if (oneCurtain.NC_PART_TYPECODE == 'LS' || oneCurtain.NC_PART_TYPECODE == 'LCB' || oneCurtain.NC_PART_TYPECODE == 'CS') {
           if (oneCurtain.DOSAGE < 4) {
             if (oneCurtain.ILLUSTRATE.indexOf('不足4平方米。按4平方米下单量收费;') == -1) {
               oneCurtain.ILLUSTRATE += '不足4平方米。按4平方米下单量收费;';

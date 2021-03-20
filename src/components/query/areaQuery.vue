@@ -251,7 +251,6 @@
 </template>
 
 <script>
-import checkExamine from "../order/checkExamine";
 import Cookies from "js-cookie";
 import {
   getAreaCode,
@@ -333,9 +332,6 @@ export default {
       orderHead: {},
       orderDetailList: []
     };
-  },
-  components: {
-    checkExamine
   },
   filters: {
     transStatus(value) {

@@ -1406,7 +1406,7 @@ export default {
             } else if (store_num < 0) {
               store_charge = "欠料待审";
             }
-            var data = originData.filter((item) => item.ITEM_NO == res.data.data.code);
+            var data = originData.filter((item) => item.itemNo == res.data.data.code);
             if (data.length) {
               for (var j = 0; j < data.length; j++) {
                 data[j].curtain_store = store_charge;

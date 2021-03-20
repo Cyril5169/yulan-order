@@ -781,6 +781,9 @@ export default {
       this.getDetail();
     }
   },
+  destroyed() {
+    Cookies.remove("isExamine");
+  }
 };
 </script>
 

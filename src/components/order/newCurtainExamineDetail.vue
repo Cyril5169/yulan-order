@@ -1274,7 +1274,7 @@ export default {
         }
 
         //窗纱没有配布也没有下脚时
-        if (!pbCommodity.length && !xjCommodity.length) {
+        if (!pbCommodity.ID && !xjCommodity.ID) {
           //主布用量 = (窗纱高 + 高度折边用量) * 主布幅数(进位取整)
           zbCommodity.DOSAGE = this.dosageFilter((oneCurtain.HEIGHT + HightBianParam.NCP_VALUE) * Math.ceil(zbCommodity.FU_QTY));
         }

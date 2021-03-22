@@ -152,11 +152,11 @@
                     </template>
                     <template v-else-if="scope.row.TIE_ENABLE == 2">
                       <span>【么术贴】: </span>
-                      <el-dropdown trigger="click">
+                      <el-dropdown trigger="click" @command="handleMesutieCommand($event, scope.$index, scopeHead.$index)">
                         <a class="a-userset">{{ scope.row.MESUTIE? scope.row.MESUTIE : '请选择' | meshutie_filter}}</a>
                         <el-dropdown-menu slot="dropdown">
-                          <el-dropdown-item @click.native="scope.row.MESUTIE = 'ZC'">正车</el-dropdown-item>
-                          <el-dropdown-item @click.native="scope.row.MESUTIE = 'FC'">反车</el-dropdown-item>
+                          <el-dropdown-item command="ZC">正车</el-dropdown-item>
+                          <el-dropdown-item command="FC">反车</el-dropdown-item>
                         </el-dropdown-menu>
                       </el-dropdown>
                     </template>
@@ -168,12 +168,12 @@
                     </template>
                     <template v-else-if="scope.row.KAIKOU_ENABLE == 2">
                       <span>【打开方式】: </span>
-                      <el-dropdown trigger="click">
+                      <el-dropdown trigger="click" @command="handleKaikouCommand($event, scope.$index, scopeHead.$index)">
                         <a class="a-userset">{{ scope.row.KAIKOU? scope.row.KAIKOU : '请选择' | kaikou_filter}}</a>
                         <el-dropdown-menu slot="dropdown">
-                          <el-dropdown-item @click.native="scope.row.KAIKOU = 'TK'">对开</el-dropdown-item>
-                          <el-dropdown-item @click.native="scope.row.KAIKOU = 'DK'">单开</el-dropdown-item>
-                          <el-dropdown-item @click.native="scope.row.KAIKOU = 'SK'">特殊开</el-dropdown-item>
+                          <el-dropdown-item command="TK">对开</el-dropdown-item>
+                          <el-dropdown-item command="DK">单开</el-dropdown-item>
+                          <el-dropdown-item command="SK">特殊开</el-dropdown-item>
                         </el-dropdown-menu>
                       </el-dropdown>
                     </template>
@@ -185,11 +185,11 @@
                     </template>
                     <template v-else-if="scope.row.OPERATION_ENABLE == 2">
                       <span>【工艺方式】: </span>
-                      <el-dropdown trigger="click">
+                      <el-dropdown trigger="click" @command="handleOperationCommand($event, scope.$index, scopeHead.$index)">
                         <a class="a-userset">{{ scope.row.OPERATION? scope.row.OPERATION : '请选择' | operation_filter}}</a>
                         <el-dropdown-menu slot="dropdown">
-                          <el-dropdown-item @click.native="scope.row.OPERATION = 'GDZ'">固定褶</el-dropdown-item>
-                          <el-dropdown-item @click.native="scope.row.OPERATION = 'DQ'">打圈</el-dropdown-item>
+                          <el-dropdown-item command="GDZ">固定褶</el-dropdown-item>
+                          <el-dropdown-item command="DQ">打圈</el-dropdown-item>
                         </el-dropdown-menu>
                       </el-dropdown>
                     </template>
@@ -201,11 +201,11 @@
                     </template>
                     <template v-else-if="scope.row.BIAN_ENABLE == 2">
                       <span>【包边方式】: </span>
-                      <el-dropdown trigger="click" @command="handleBianCommand($event, scope.row, scopeHead.$index)">
+                      <el-dropdown trigger="click" @command="handleBianCommand($event, scope.$index, scopeHead.$index)">
                         <a class="a-userset">{{ scope.row.BIAN? scope.row.BIAN : '请选择' | bian_filter}}</a>
                         <el-dropdown-menu slot="dropdown">
-                          <el-dropdown-item @click.native="scope.row.BIAN = '4B'" command="4B">4S边</el-dropdown-item>
-                          <el-dropdown-item @click.native="scope.row.BIAN = '3B'" command="3B">3.0边</el-dropdown-item>
+                          <el-dropdown-item command="4B">4S边</el-dropdown-item>
+                          <el-dropdown-item command="3B">3.0边</el-dropdown-item>
                         </el-dropdown-menu>
                       </el-dropdown>
                     </template>
@@ -467,6 +467,7 @@ import {
   GetExchangeModel,
   GetExchangeModelItem,
   newCurtainUpdateCurtainOrder,
+  GetNewCurtainParams
 } from "@/api/newCurtainASP";
 
 export default {
@@ -491,6 +492,8 @@ export default {
       isFixed2: !window.localStorage.getItem("curtainFixed") ||
         window.localStorage.getItem("curtainFixed") == "true",
       curtainPartTypeData: [],
+      curtainParamsData: [],
+      curtainParamsList: {},
       drawerShow: false,
       drawerShow2: false,
       exchangeModelList: [],
@@ -665,6 +668,91 @@ export default {
       }
       return name;
     },
+    //参数
+    getCurtainParams() {
+      GetNewCurtainParams().then((res) => {
+        this.curtainParamsData = res.data;
+        //找参数
+        //倍数
+        var multipleParam = this.curtainParamsData.filter(item => item.NCP_TYPE == 'MULTIPLE');
+        if (multipleParam.length) multipleParam = multipleParam[0];
+        else console.log('没有倍数');
+        //片数 对开
+        var TKPianParam = this.curtainParamsData.filter(item => item.NCP_TYPE == 'PIANCOUNT' && item.NCP_CODE == 'TK');
+        if (TKPianParam.length) TKPianParam = TKPianParam[0];
+        else console.log('没有片数-对开');
+        //片数 单开
+        var DKPianParam = this.curtainParamsData.filter(item => item.NCP_TYPE == 'PIANCOUNT' && item.NCP_CODE == 'DK');
+        if (DKPianParam.length) DKPianParam = DKPianParam[0];
+        else console.log('没有片数-单开');
+        //片数 特殊开
+        var SKPianParam = this.curtainParamsData.filter(item => item.NCP_TYPE == 'PIANCOUNT' && item.NCP_CODE == 'SK');
+        if (SKPianParam.length) SKPianParam = SKPianParam[0];
+        else console.log('没有片数-特殊开');
+        //边用量 4S
+        var FSBianParam = this.curtainParamsData.filter(item => item.NCP_TYPE == 'BIANUSE' && item.NCP_CODE == '4B');
+        if (FSBianParam.length) FSBianParam = FSBianParam[0];
+        else console.log('没有边用量-4S');
+        //边用量 3.0
+        var TBBianParam = this.curtainParamsData.filter(item => item.NCP_TYPE == 'BIANUSE' && item.NCP_CODE == '3B');
+        if (TBBianParam.length) TBBianParam = TBBianParam[0];
+        else console.log('没有边用量-3S');
+        //高度折边用量 4S
+        var HFSBianParam = this.curtainParamsData.filter(item => item.NCP_TYPE == 'HEIGHTBIANUSE' && item.NCP_CODE == '4B');
+        if (HFSBianParam.length) HFSBianParam = HFSBianParam[0];
+        else console.log('没有高度折边用量-4S');
+        //高度折边用量 3.0
+        var HTBBianParam = this.curtainParamsData.filter(item => item.NCP_TYPE == 'HEIGHTBIANUSE' && item.NCP_CODE == '3B');
+        if (HTBBianParam.length) HTBBianParam = HTBBianParam[0];
+        else console.log('没有高度折边用量-3S');
+        //完整褶用量 固定褶
+        var GDZZheParam = this.curtainParamsData.filter(item => item.NCP_TYPE == 'ALLZHEUSE' && item.NCP_CODE == 'GDZ');
+        if (GDZZheParam.length) GDZZheParam = GDZZheParam[0];
+        else console.log('没有完整褶用量 固定褶');
+        //完整褶用量 打圈
+        var DQZheParam = this.curtainParamsData.filter(item => item.NCP_TYPE == 'ALLZHEUSE' && item.NCP_CODE == 'DQ');
+        if (DQZheParam.length) DQZheParam = DQZheParam[0];
+        else console.log('没有完整褶用量 打圈');
+        //2.8宽幅最大褶数 固定褶
+        var WGDZMaxZheParam = this.curtainParamsData.filter(item => item.NCP_TYPE == '28WIDTHZHE' && item.NCP_CODE == 'GDZ');
+        if (WGDZMaxZheParam.length) WGDZMaxZheParam = WGDZMaxZheParam[0];
+        else console.log('没有2.8宽幅最大褶数 固定褶');
+        //2.8宽幅最大褶数 打圈
+        var WDQMaxZheParam = this.curtainParamsData.filter(item => item.NCP_TYPE == '28WIDTHZHE' && item.NCP_CODE == 'DQ');
+        if (WDQMaxZheParam.length) WDQMaxZheParam = WDQMaxZheParam[0];
+        else console.log('没有2.8宽幅最大褶数 打圈');
+        //1.4窄幅最大褶数 固定褶
+        var GDZMaxZheParam = this.curtainParamsData.filter(item => item.NCP_TYPE == '14ZHE' && item.NCP_CODE == 'GDZ');
+        if (GDZMaxZheParam.length) GDZMaxZheParam = GDZMaxZheParam[0];
+        else console.log('没有1.4宽幅最大褶数 固定褶');
+        //1.4窄宽幅最大褶数 打圈
+        var DQMaxZheParam = this.curtainParamsData.filter(item => item.NCP_TYPE == '14ZHE' && item.NCP_CODE == 'DQ');
+        if (DQMaxZheParam.length) DQMaxZheParam = DQMaxZheParam[0];
+        else console.log('没有1.4宽幅最大褶数 打圈');
+        //下脚高
+        var xiajiaoHeightParam = this.curtainParamsData.filter(item => item.NCP_TYPE == 'XIAJIAOHEIGHT');
+        if (xiajiaoHeightParam.length) xiajiaoHeightParam = xiajiaoHeightParam[0];
+        else console.log('没有下脚高');
+
+        this.curtainParamsList = {
+          multipleParam: multipleParam,
+          TKPianParam: TKPianParam,
+          DKPianParam: DKPianParam,
+          SKPianParam: SKPianParam,
+          FSBianParam: FSBianParam,
+          TBBianParam: TBBianParam,
+          HFSBianParam: HFSBianParam,
+          HTBBianParam: HTBBianParam,
+          GDZZheParam: GDZZheParam,
+          DQZheParam: DQZheParam,
+          WGDZMaxZheParam: WGDZMaxZheParam,
+          WDQMaxZheParam: WDQMaxZheParam,
+          GDZMaxZheParam: GDZMaxZheParam,
+          DQMaxZheParam: DQMaxZheParam,
+          xiajiaoHeightParam: xiajiaoHeightParam
+        }
+      });
+    },
     allTotal(index) {
       let totalMoney = 0;
       for (var i = 0; i < this.ruleForm.ORDERBODY[index].curtains.length; i++) {
@@ -714,7 +802,7 @@ export default {
           isStandard = headData[0].NCT_STANDARD != 'N';
         }
         this.$set(detail, "isStandard", isStandard);
-        
+
         for (var j = 0; j < detail.curtains.length; j++) {
           var oneCurtain = detail.curtains[j];
           //窗帘层级
@@ -919,6 +1007,279 @@ export default {
         }
       }
       this.getRemark(index1);
+      //计算明细用量
+      this.calculateChildrenDosage(index1);
+    },
+    //计算明细用量
+    calculateChildrenDosage(index) {
+      var orderDetail = this.ruleForm.ORDERBODY[this.currentIndex];
+      var curtains = this.ruleForm.ORDERBODY[this.currentIndex].curtains;
+      var oneCurtain = this.ruleForm.ORDERBODY[this.currentIndex].curtains[index];
+
+      //for (var i = 0; i < curtains.length; i++) {
+      //var oneCurtain = curtains[i];
+      //集中参数
+      //片数
+      var pianParam = null;
+      if (oneCurtain.KAIKOU == 'TK') pianParam = this.curtainParamsList.TKPianParam;
+      else if (oneCurtain.KAIKOU == 'DK') pianParam = this.curtainParamsList.DKPianParam;
+      else if (oneCurtain.KAIKOU == 'SK') pianParam = this.curtainParamsList.SKPianParam;
+      //边用量
+      var bianParam = null;
+      if (oneCurtain.BIAN == '4B') bianParam = this.curtainParamsList.FSBianParam;
+      else if (oneCurtain.BIAN == '3B') bianParam = this.curtainParamsList.TBBianParam;
+      //高度折边用量
+      var HightBianParam = null;
+      if (oneCurtain.BIAN == '4B') HightBianParam = this.curtainParamsList.HFSBianParam;
+      else if (oneCurtain.BIAN == '3B') HightBianParam = this.curtainParamsList.HTBBianParam;
+      //完整褶用量
+      var zheParam = null;
+      if (oneCurtain.OPERATION == 'GDZ') zheParam = this.curtainParamsList.GDZZheParam;
+      else if (oneCurtain.OPERATION == 'DQ') zheParam = this.curtainParamsList.DQZheParam;
+      //最大褶数
+      var maxzheParam = null;
+
+      var width = this.convertNumber(oneCurtain.WIDTH);
+      var height = this.convertNumber(oneCurtain.HEIGHT);
+      //帘身明细计算
+      if (oneCurtain.NC_PART_TYPECODE == 'LS') {
+        //单片褶数 = 四舍五入(帘身宽 * 倍数 / 片数 / 完整褶用量, 0)
+        var singleZhe = Math.round(width * this.curtainParamsList.multipleParam.NCP_VALUE / pianParam.NCP_VALUE / zheParam.NCP_VALUE);
+        oneCurtain.ZE_QTY = singleZhe;
+        var pb1Zhe = 0;
+        var pb2Zhe = 0;
+
+        //帘身-配布1
+        var pb1Commodity = curtains.filter(item => item.NCM_PID == oneCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == "PB1");
+        if (pb1Commodity.length) {
+          pb1Commodity = pb1Commodity[0];
+          if (pb1Commodity.FIX_GRADE > 1600) {
+            //2.8宽幅
+            if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.WGDZMaxZheParam;
+            else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.WDQMaxZheParam;
+          } else {
+            //1.4窄幅
+            if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.GDZMaxZheParam;
+            else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.DQMaxZheParam;
+          }
+          //配布1褶数 = 配布1下单褶数 * 片数
+          pb1Zhe = pb1Commodity.WRINKLE;
+          pb1Commodity.ZE_QTY = pb1Commodity.WRINKLE * pianParam.NCP_VALUE;
+          //幅数和用量区分定宽定高
+          if (orderDetail.FIX_TYPE == "01") {
+            //定宽
+            //配布1幅数 = 配布1褶数 / 最大褶数
+            pb1Commodity.FU_QTY = this.dosageFilter(pb1Commodity.ZE_QTY / maxzheParam.NCP_VALUE);
+            //配布1用量 = （帘身高 + 高度折边用量）* 配布1幅数（进位取整）
+            pb1Commodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * Math.ceil(pb1Commodity.FU_QTY));
+          }
+          else if (orderDetail.FIX_TYPE == "02") {
+            //定高
+            //配布1用量 = 配布1褶数 * 完整褶用量 + 边用量 * 片数
+            pb1Commodity.DOSAGE = this.dosageFilter(pb1Commodity.ZE_QTY * zheParam.NCP_VALUE + bianParam.NCP_VALUE * pianParam.NCP_VALUE);
+          }
+        }
+
+        //帘身-配布2
+        var pb2Commodity = curtains.filter(item => item.NCM_PID == oneCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == "PB2");
+        if (pb2Commodity.length) {
+          pb2Commodity = pb2Commodity[0];
+          if (pb2Commodity.FIX_GRADE > 1600) {
+            //2.8宽幅
+            if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.WGDZMaxZheParam;
+            else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.WDQMaxZheParam;
+          } else {
+            //1.4窄幅
+            if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.GDZMaxZheParam;
+            else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.DQMaxZheParam;
+          }
+          //配布2褶数 = 配布2下单褶数 * 片数
+          pb2Zhe = pb2Commodity.WRINKLE;
+          pb2Commodity.ZE_QTY = pb2Commodity.WRINKLE * pianParam.NCP_VALUE;
+          //幅数和用量区分定宽定高
+          if (orderDetail.FIX_TYPE == "01") {
+            //定宽
+            //配布2幅数 = 配布2褶数 / 最大褶数
+            pb2Commodity.FU_QTY = this.dosageFilter(pb2Commodity.ZE_QTY / maxzheParam.NCP_VALUE);
+            //配布2用量 = （帘身高 + 高度折边用量）* 配布2幅数（进位取整）
+            pb2Commodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * Math.ceil(pb2Commodity.FU_QTY));
+          }
+          else if (orderDetail.FIX_TYPE == "02") {
+            //定高
+            //配布2用量 = 配布2褶数 * 完整褶用量
+            pb2Commodity.DOSAGE = this.dosageFilter(pb2Commodity.ZE_QTY * zheParam.NCP_VALUE);
+          }
+        }
+
+        //帘身-主布
+        var zbCommodity = curtains.filter(item => item.NCM_PID == oneCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == "ZB");
+        if (zbCommodity.length) {
+          zbCommodity = zbCommodity[0];
+          if (zbCommodity.FIX_GRADE > 1600) {
+            //2.8宽幅
+            if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.WGDZMaxZheParam;
+            else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.WDQMaxZheParam;
+          } else {
+            //1.4窄幅
+            if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.GDZMaxZheParam;
+            else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.DQMaxZheParam;
+          }
+          //主布褶数 = （单片褶数 - 配布1下单褶数 - 配布2下单褶数）* 片数
+          zbCommodity.ZE_QTY = (singleZhe - pb1Zhe - pb2Zhe) * pianParam.NCP_VALUE;
+          //幅数和用量区分定宽定高
+          if (orderDetail.FIX_TYPE == "01") {
+            //定宽
+            //主布幅数 = 主布褶数 / 最大褶数
+            zbCommodity.FU_QTY = this.dosageFilter(zbCommodity.ZE_QTY / maxzheParam.NCP_VALUE);
+            //主布用量 = （帘身高 + 高度折边用量）* 主布幅数（进位取整）
+            zbCommodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * Math.ceil(zbCommodity.FU_QTY));
+          }
+          else if (orderDetail.FIX_TYPE == "02") {
+            //定高
+            //主布用量 = 主布褶数 * 完整褶用量 + 边用量（有配布*1，无配布*2） * 片数
+            var pbCount = 2;
+            if (pb1Commodity.length || pb2Commodity.length) pbCount = 1;
+            zbCommodity.DOSAGE = this.dosageFilter(zbCommodity.ZE_QTY * zheParam.NCP_VALUE + bianParam.NCP_VALUE * pbCount * pianParam.NCP_VALUE);
+          }
+        }
+
+        //帘身-花边
+        var hbCommodity = curtains.filter(item => item.NCM_PID == oneCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == "XHB");
+        if (hbCommodity.length) {
+          hbCommodity = hbCommodity[0];
+          if (hbCommodity.JOINT == "SP") {
+            //竖拼花边用量 = （帘身高 + 高度折边用量）* 片数
+            hbCommodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * pianParam.NCP_VALUE);
+          }
+          else if (hbCommodity.JOINT == "HP") {
+            //横拼花边用量 = （单片褶数 * 固定褶用量 + 边用量 * 2）* 片数
+            hbCommodity.DOSAGE = this.dosageFilter((singleZhe * zheParam.NCP_VALUE + bianParam.NCP_VALUE * 2) * pianParam.NCP_VALUE);
+          }
+        }
+
+        //里衬
+        var lcbCommodity = curtains.filter(item => item.NC_PART_TYPECODE == "LCB");
+        if (lcbCommodity.length) {
+          lcbCommodity = lcbCommodity[0];
+          //找里衬下面的主布
+          var lczbCommodity = curtains.filter(item => item.NCM_PID == lcbCommodity.NC_MODEL_ID && item.NC_PART_TYPECODE == "ZB");
+          if (lczbCommodity.length) {
+            lczbCommodity = lczbCommodity[0];
+            //里衬褶数 = 单片褶数 * 片数
+            lczbCommodity.ZE_QTY = singleZhe * pianParam.NCP_VALUE;
+            //里衬用量
+            if (orderDetail.CURTAIN_HEIGHT > 2.7) {
+              //帘身高>2.7定宽 = (帘身高 + 高度折边用量- 0.03) * 进位取整(里衬褶数 / 最大褶数)
+              lczbCommodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE - 0.03) * Math.ceil(lczbCommodity.ZE_QTY / maxzheParam.NCP_VALUE));
+            }
+            else {
+              //帘身高<=2.7定高 = 里衬褶数 * 完整褶用量
+              lczbCommodity.DOSAGE = this.dosageFilter(lczbCommodity.ZE_QTY * zheParam.NCP_VALUE);
+            }
+          }
+        }
+      }
+      //窗纱明细计算
+      else if (oneCurtain.NC_PART_TYPECODE == 'CS') {
+        //单片褶数 = 四舍五入(窗纱宽 * 倍数 / 片数 / 完整褶用量, 0)
+        var singleZhe = Math.round(width * this.curtainParamsList.multipleParam.NCP_VALUE / pianParam.NCP_VALUE / zheParam.NCP_VALUE);
+        oneCurtain.ZE_QTY = singleZhe;
+
+        //窗纱-主布
+        var zbCommodity = curtains.filter(item => item.NCM_PID == oneCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == "ZB");
+        if (zbCommodity.length) {
+          zbCommodity = zbCommodity[0];
+          if (zbCommodity.FIX_GRADE > 1600) {
+            //2.8宽幅
+            if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.WGDZMaxZheParam;
+            else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.WDQMaxZheParam;
+          } else {
+            //1.4窄幅
+            if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.GDZMaxZheParam;
+            else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.DQMaxZheParam;
+          }
+          //主布褶数 = 单片褶数 * 片数
+          zbCommodity.ZE_QTY = singleZhe * pianParam.NCP_VALUE;
+          //幅数和用量区分定宽定高
+          if (orderDetail.FIX_TYPE == "01") {
+            //定宽
+            //主布幅数 = 主布褶数 / 最大褶数
+            zbCommodity.FU_QTY = this.dosageFilter(zbCommodity.ZE_QTY / maxzheParam.NCP_VALUE);
+            //主布用量 = （窗纱高 + 高度折边用量）* 0.8 * 主布幅数（进位取整）
+            zbCommodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * 0.8 * Math.ceil(zbCommodity.FU_QTY));
+          }
+          else if (orderDetail.FIX_TYPE == "02") {
+            //定高
+            //主布用量 = 主布褶数 * 完整褶用量 + 边用量 * 2 * 片数
+            zbCommodity.DOSAGE = this.dosageFilter(zbCommodity.ZE_QTY * zheParam.NCP_VALUE + bianParam.NCP_VALUE * 2 * pianParam.NCP_VALUE);
+          }
+        }
+
+        //窗纱-配布
+        var pbCommodity = curtains.filter(item => item.NCM_PID == oneCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == "PB");
+        if (pbCommodity.length) {
+          pbCommodity = pbCommodity[0];
+          //配布褶数 = 主布褶数
+          pbCommodity.ZE_QTY = zbCommodity.ZE_QTY;
+          //幅数和用量区分定宽定高
+          if (orderDetail.FIX_TYPE == "01") {
+            //定宽
+            //配布幅数 = 主布幅数
+            pbCommodity.FU_QTY = zbCommodity.FU_QTY;
+            //配布用量 = 窗纱高 / 5 * 配布幅数（进位取整）
+            pbCommodity.DOSAGE = this.dosageFilter(height / 5 * Math.ceil(pbCommodity.FU_QTY));
+          }
+          else if (orderDetail.FIX_TYPE == "02") {
+            //定高
+            //配布用量 = 主布用量 / 2
+            pbCommodity.DOSAGE = this.dosageFilter(zbCommodity.DOSAGE / 2);
+          }
+        }
+
+        //窗纱-花边
+        var hbCommodity = curtains.filter(item => item.NCM_PID == oneCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == "XHB");
+        if (hbCommodity.length) {
+          hbCommodity = hbCommodity[0];
+          if (hbCommodity.JOINT == "SP") {
+            //竖拼花边用量 = （窗纱高 + 高度折边用量）* 片数
+            hbCommodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * pianParam.NCP_VALUE);
+          }
+          else if (hbCommodity.JOINT == "HP") {
+            //横拼花边用量 = （单片褶数 * 固定褶用量 + 边用量 * 2）* 片数
+            hbCommodity.DOSAGE = this.dosageFilter((singleZhe * zheParam.NCP_VALUE + bianParam.NCP_VALUE * 2) * pianParam.NCP_VALUE);
+          }
+        }
+
+        //窗纱-下脚配布
+        var xjCommodity = curtains.filter(item => item.NCM_PID == oneCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == "XJ");
+        if (xjCommodity.length) {
+          xjCommodity = xjCommodity[0];
+          //下脚配布褶数 = 主布褶数
+          xjCommodity.ZE_QTY = zbCommodity.ZE_QTY;
+          //幅数和用量区分定宽定高
+          if (orderDetail.FIX_TYPE == "01") {
+            //定宽
+            //下脚配布幅数 = 主布幅数
+            xjCommodity.FU_QTY = zbCommodity.FU_QTY;
+            //下脚配布用量 = 0.23 * 下脚配布幅数（进位取整）
+            xjCommodity.DOSAGE = this.dosageFilter(0.23 * Math.ceil(xjCommodity.FU_QTY));
+            //有下脚时，主布用量 = （窗纱高 - 下脚高）* 主布幅数（进位取整）
+            zbCommodity.DOSAGE = this.dosageFilter((height - this.curtainParamsList.xiajiaoHeightParam.NCP_VALUE) * Math.ceil(zbCommodity.FU_QTY));
+          }
+          else if (orderDetail.FIX_TYPE == "02") {
+            //定高
+            //下脚配布用量 = 主布用量 / 2
+            xjCommodity.DOSAGE = this.dosageFilter(zbCommodity.DOSAGE / 2);
+          }
+        }
+
+        //窗纱没有配布也没有下脚时
+        if (!pbCommodity.length && !xjCommodity.length) {
+          //主布用量 = (窗纱高 + 高度折边用量) * 主布幅数(进位取整)
+          zbCommodity.DOSAGE = this.dosageFilter((oneCurtain.HEIGHT + HightBianParam.NCP_VALUE) * Math.ceil(zbCommodity.FU_QTY));
+        }
+      }
+      //}
     },
     //直接改变帘身用量
     changeLSArea(val, index1, index) {
@@ -951,23 +1312,44 @@ export default {
       }
       return price;
     },
-    //处理拉边条
-    handleBianCommand(common, row, index) {
+    //改变么术贴
+    handleMesutieCommand(common, index1, index) {
       this.currentIndex = index;
-      if (common == "4B" && row.BIAN != "4B") {
+      var oneCurtain = this.ruleForm.ORDERBODY[this.currentIndex].curtains[index1];
+      oneCurtain.MESUTIE = common;
+    },
+    //改变打开方式改变明细用量
+    handleKaikouCommand(common, index1, index) {
+      this.currentIndex = index;
+      var oneCurtain = this.ruleForm.ORDERBODY[this.currentIndex].curtains[index1];
+      oneCurtain.KAIKOU = common;
+      this.calculateChildrenDosage(index1);
+    },
+    //改变工艺方式改变明细用量
+    handleOperationCommand(common, index1, index) {
+      this.currentIndex = index;
+      var oneCurtain = this.ruleForm.ORDERBODY[this.currentIndex].curtains[index1];
+      oneCurtain.OPERATION = common;
+      this.calculateChildrenDosage(index1);
+    },
+    //处理拉边条和明细用量
+    handleBianCommand(common, index1, index) {
+      this.currentIndex = index;
+      var oneCurtain = this.ruleForm.ORDERBODY[this.currentIndex].curtains[index1];
+      if (common == "4B" && oneCurtain.BIAN != "4B") {
         //显示拉边条
         //先看看当前数据有没有这个拉边条，有的话应该是bug
-        var lbtItemNow = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter(item => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
+        var lbtItemNow = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter(item => item.NCM_PID == oneCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
         if (lbtItemNow.length) return;
         //找到最大序号的面料,并且是要勾选的
         var mlList = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter(item =>
-          item.NCM_PID == row.NC_MODEL_ID &&
+          item.NCM_PID == oneCurtain.NC_MODEL_ID &&
           item.NC_PART_TYPECODE != "LBT" &&
           item.curtain_choose
         );
         if (mlList.length) {
           //在修改后的数据中找到拉边条数据并push进去
-          var lbtItem = this.ruleForm.ORDERBODY[this.currentIndex].curtain_change.filter(item => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
+          var lbtItem = this.ruleForm.ORDERBODY[this.currentIndex].curtain_change.filter(item => item.NCM_PID == oneCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
           if (lbtItem.length) {
             lbtItem = lbtItem[0]; //只取第一个拉边条（按理应该只有一个）
             lbtItem = this.dealInsertData(lbtItem);
@@ -983,15 +1365,18 @@ export default {
             });
           }
         }
-      } else if (common == "3B" && row.BIAN == "4B") {
+      } else if (common == "3B" && oneCurtain.BIAN == "4B") {
         //去掉拉边条
         //找到有没有拉边条
-        var lbtItem = this.ruleForm.ORDERBODY[index].curtains.filter(item => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
+        var lbtItem = this.ruleForm.ORDERBODY[index].curtains.filter(item => item.NCM_PID == oneCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
         //应该只有一个拉边条，但是循环一下，保险
         for (var i = 0; i < lbtItem.length; i++) {
           this.ruleForm.ORDERBODY[index].curtains.splice(this.ruleForm.ORDERBODY[index].curtains.indexOf(lbtItem[i]), 1);
         }
       }
+      oneCurtain.BIAN = common;
+      //计算明细用量
+      this.calculateChildrenDosage(index1);
     },
     //是否可改
     itemCanChange(row, index) {
@@ -1635,7 +2020,6 @@ export default {
         }
       }
     },
-    //隔行变色
     headTableRowClassName({ row, rowIndex }) {
       return "success-row";
     },
@@ -1668,6 +2052,7 @@ export default {
   mounted() {
     this.orderNumber = Cookies.get("NEW_ORDER_NO");
     this.getPartTypeData();
+    this.getCurtainParams();
     this.getDetail();
 
     window.addEventListener("scroll", this.handleScroll, true);

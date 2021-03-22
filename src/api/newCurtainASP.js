@@ -8,6 +8,14 @@ export function GetPartTypeDataTable(data, config = {}) {
       return Promise.reject(err);
   })
 }
+//params集合
+export function GetNewCurtainParams(data, config = {}) {
+  return post('/NEWCURTAIN_PARAM/GetNewCurtainParams', data, config).then((res) => {
+      return Promise.resolve(res);
+  }).catch((err) => {
+      return Promise.reject(err);
+  })
+}
 //通过帘款获得窗帘结构
 export function GetCurtainTemplateAndModel(data, config = {}) {
   return post('/NEWCURTAIN_TEMPLATE/GetCurtainTemplateAndModel', data, config).then((res) => {

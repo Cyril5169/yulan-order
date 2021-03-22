@@ -161,11 +161,11 @@
                   </template>
                   <template v-else-if="scope.row.TIE_ENABLE == 2">
                     <span>【么术贴】: </span>
-                    <el-dropdown trigger="click">
+                    <el-dropdown trigger="click" @command="handleMesutieCommand($event, scope.$index)">
                       <a class="a-userset">{{ scope.row.NCM_MESUTIE? scope.row.NCM_MESUTIE : '请选择' | meshutie_filter}}</a>
                       <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item @click.native="scope.row.NCM_MESUTIE = 'ZC'">正车</el-dropdown-item>
-                        <el-dropdown-item @click.native="scope.row.NCM_MESUTIE = 'FC'">反车</el-dropdown-item>
+                        <el-dropdown-item command="ZC">正车</el-dropdown-item>
+                        <el-dropdown-item command="FC">反车</el-dropdown-item>
                       </el-dropdown-menu>
                     </el-dropdown>
                   </template>
@@ -177,12 +177,12 @@
                   </template>
                   <template v-else-if="scope.row.KAIKOU_ENABLE == 2">
                     <span>【打开方式】: </span>
-                    <el-dropdown trigger="click">
+                    <el-dropdown trigger="click" @command="handleKaikouCommand($event, scope.$index)">
                       <a class="a-userset">{{ scope.row.NCM_KAIKOU? scope.row.NCM_KAIKOU : '请选择' | kaikou_filter}}</a>
                       <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item @click.native="scope.row.NCM_KAIKOU = 'TK'">对开</el-dropdown-item>
-                        <el-dropdown-item @click.native="scope.row.NCM_KAIKOU = 'DK'">单开</el-dropdown-item>
-                        <el-dropdown-item @click.native="scope.row.NCM_KAIKOU = 'SK'">特殊开</el-dropdown-item>
+                        <el-dropdown-item command="TK">对开</el-dropdown-item>
+                        <el-dropdown-item command="DK">单开</el-dropdown-item>
+                        <el-dropdown-item command="SK">特殊开</el-dropdown-item>
                       </el-dropdown-menu>
                     </el-dropdown>
                   </template>
@@ -194,11 +194,11 @@
                   </template>
                   <template v-else-if="scope.row.OPERATION_ENABLE == 2">
                     <span>【工艺方式】: </span>
-                    <el-dropdown trigger="click">
+                    <el-dropdown trigger="click" @command="handleOperationCommand($event, scope.$index)">
                       <a class="a-userset">{{ scope.row.NCM_OPERATION? scope.row.NCM_OPERATION : '请选择' | operation_filter}}</a>
                       <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item @click.native="scope.row.NCM_OPERATION = 'GDZ'">固定褶</el-dropdown-item>
-                        <el-dropdown-item @click.native="scope.row.NCM_OPERATION = 'DQ'">打圈</el-dropdown-item>
+                        <el-dropdown-item command="GDZ">固定褶</el-dropdown-item>
+                        <el-dropdown-item command="DQ">打圈</el-dropdown-item>
                       </el-dropdown-menu>
                     </el-dropdown>
                   </template>
@@ -210,11 +210,11 @@
                   </template>
                   <template v-else-if="scope.row.BIAN_ENABLE == 2">
                     <span>【包边方式】: </span>
-                    <el-dropdown trigger="click" @command="handleBianCommand($event, scope.row)">
+                    <el-dropdown trigger="click" @command="handleBianCommand($event, scope.$index)">
                       <a class="a-userset">{{ scope.row.NCM_BIAN? scope.row.NCM_BIAN : '请选择' | bian_filter}}</a>
                       <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item @click.native="scope.row.NCM_BIAN = '4B'" command="4B">4S边</el-dropdown-item>
-                        <el-dropdown-item @click.native="scope.row.NCM_BIAN = '3B'" command="3B">3.0边</el-dropdown-item>
+                        <el-dropdown-item command="4B">4S边</el-dropdown-item>
+                        <el-dropdown-item command="3B">3.0边</el-dropdown-item>
                       </el-dropdown-menu>
                     </el-dropdown>
                   </template>
@@ -395,7 +395,7 @@ export default {
       cid: Cookies.get("cid"), //cid
       customerType: Cookies.get("customerType"), //客户类型
       isManager: Cookies.get("isManager"), //是否为管理员
-      searchKey: "DL4FBK1",
+      searchKey: "BQ507420K1",
       templateData: [], //查出来的原始数据
       curtainHeadData: {}, //帘款数据（没有拉边条）
       curtainDataOrigin: [], //拼接好的原始数据
@@ -924,22 +924,38 @@ export default {
       }
       return price;
     },
+    //改变么术贴
+    handleMesutieCommand(common, index) {
+      var oneCurtain = this.curtainData[index];
+      oneCurtain.NCM_MESUTIE = common;
+    },
+    //改变打开方式
+    handleKaikouCommand(common, index) {
+      var oneCurtain = this.curtainData[index];
+      oneCurtain.NCM_KAIKOU = common;
+    },
+    //改变工艺方式
+    handleOperationCommand(common, index) {
+      var oneCurtain = this.curtainData[index];
+      oneCurtain.NCM_OPERATION = common;
+    },
     //处理拉边条
-    handleBianCommand(common, row) {
-      if (common == "4B" && row.NCM_BIAN != "4B") {
+    handleBianCommand(common, index) {
+      var oneCurtain = this.curtainData[index];
+      if (common == "4B" && oneCurtain.NCM_BIAN != "4B") {
         //显示拉边条
         //先看看当前数据有没有这个拉边条，有的话应该是bug
-        var lbtItemNow = this.curtainData.filter(item => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
+        var lbtItemNow = this.curtainData.filter(item => item.NCM_PID == oneCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
         if (lbtItemNow.length) return;
         //找到最大序号的面料,并且是要勾选的
         var mlList = this.curtainData.filter(item =>
-          item.NCM_PID == row.NC_MODEL_ID &&
+          item.NCM_PID == oneCurtain.NC_MODEL_ID &&
           item.NC_PART_TYPECODE != "LBT" &&
           item.curtain_choose
         );
         if (mlList.length) {
           //在修改后的数据中找到拉边条数据并push进去
-          var lbtItem = this.curtainDataChange.filter(item => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
+          var lbtItem = this.curtainDataChange.filter(item => item.NCM_PID == oneCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
           if (lbtItem.length) {
             lbtItem = lbtItem[0]; //只取第一个拉边条（按理应该只有一个）
             this.curtainData.push({ ...lbtItem });
@@ -954,15 +970,16 @@ export default {
             });
           }
         }
-      } else if (common == "3B" && row.NCM_BIAN == "4B") {
+      } else if (common == "3B" && oneCurtain.NCM_BIAN == "4B") {
         //去掉拉边条
         //找到有没有拉边条
-        var lbtItem = this.curtainData.filter(item => item.NCM_PID == row.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
+        var lbtItem = this.curtainData.filter(item => item.NCM_PID == oneCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
         //应该只有一个拉边条，但是循环一下，保险
         for (var i = 0; i < lbtItem.length; i++) {
           this.curtainData.splice(this.curtainData.indexOf(lbtItem[i]), 1);
         }
       }
+      oneCurtain.NCM_BIAN = common;
     },
     //是否可改
     itemCanChange(row) {

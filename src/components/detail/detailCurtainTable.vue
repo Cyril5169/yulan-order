@@ -1589,7 +1589,7 @@ export default {
             var xiaxian = res.data.data.xiaxian ? res.data.data.xiaxian : 0;
             var store_num = kucun - dinghuoshu;
             if (store_num >= xiaxian) {
-              store_charge = "充足"
+              store_charge = "充足";
             } else if (store_num > 0 && store_num < xiaxian) {
               store_charge = "量少待查";
             } else if (store_num < 0) {

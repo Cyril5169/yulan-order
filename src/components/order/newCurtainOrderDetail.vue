@@ -1150,7 +1150,7 @@ export default {
       this.exchangeModelList = [];
       GetExchangeModel({
         NC_TEMPLATE_ID: this.exchangeModelNow.NC_TEMPLATE_ID,
-        condition: this.modelCondition
+        condition: this.modelCondition.toUpperCase()
       }).then((res) => {
         if (res.data.length > 0 || (res.data.length == 1 && res.data[0].NC_MODEL_ID != this.exchangeModelNow.NC_MODEL_ID)) {
           this.exchangeModelList = res.data;
@@ -1315,7 +1315,7 @@ export default {
       this.exchangeItemList = [];
       GetExchangeModelItem({
         NC_MODEL_ID: this.exchangeItemNow.NC_MODEL_ID,
-        condition: this.itemCondition,
+        condition: this.itemCondition.toUpperCase(),
         page: this.currentPage,
         limit: this.limit,
       }).then((res) => {
@@ -1497,6 +1497,8 @@ export default {
     //获得窗帘的说明
     getRemark(index) {
       var curtains = [];
+       var orderDetail = this.orderDetail;
+      var allCurtains = orderDetail.curtains;
       if (index == undefined) {
         curtains = this.orderDetail.curtains;
       } else {
@@ -1521,6 +1523,44 @@ export default {
             }
           } else {
             oneCurtain.ILLUSTRATE = oneCurtain.ILLUSTRATE.replace('不足4平方米。按4平方米下单量收费;', '');
+          }
+          if (orderDetail.FIX_TYPE == '02') {
+            var height = this.convertNumber(oneCurtain.HEIGHT);
+            var childrenCurtain = allCurtains.filter(item =>
+              item.NCM_PID == oneCurtain.NC_MODEL_ID
+              && ((oneCurtain.NC_PART_TYPECODE == 'LS' && (item.NC_PART_TYPECODE == 'ZB' || item.NC_PART_TYPECODE == 'PB1' || item.NC_PART_TYPECODE == 'PB2'))
+                || (oneCurtain.NC_PART_TYPECODE == 'CS' && (item.NC_PART_TYPECODE == 'ZB' || item.NC_PART_TYPECODE == 'PB')))
+            );
+            for (var j = 0; j < childrenCurtain.length; j++) {
+              var oneChildren = childrenCurtain[j];
+              if (height > 2.8) {
+                if (oneChildren.ILLUSTRATE.indexOf('超高;') == -1) {
+                  oneChildren.ILLUSTRATE += '超高;';
+                }
+              } else {
+                oneChildren.ILLUSTRATE = oneChildren.ILLUSTRATE.replace('超高;', '');
+              }
+            }
+            if (oneCurtain.NC_PART_TYPECODE == 'LS') {
+              //联动里衬
+              var lcbCurtain = allCurtains.filter(item => item.NC_PART_TYPECODE == 'LCB');
+              if (lcbCurtain.length) {
+                lcbCurtain = lcbCurtain[0];
+                var lcbChildrenCurtain = allCurtains.filter(item => item.NCM_PID == lcbCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == 'ZB');
+                if (lcbChildrenCurtain.length) {
+                  for (var j = 0; j < lcbChildrenCurtain.length; j++) {
+                    var oneChildren = lcbChildrenCurtain[j];
+                    if (height > 2.8) {
+                      if (oneChildren.ILLUSTRATE.indexOf('超高;') == -1) {
+                        oneChildren.ILLUSTRATE += '超高;';
+                      }
+                    } else {
+                      oneChildren.ILLUSTRATE = oneChildren.ILLUSTRATE.replace('超高;', '');
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }

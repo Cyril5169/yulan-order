@@ -1140,7 +1140,7 @@ export default {
       this.exchangeModelList = [];
       GetExchangeModel({
         NC_TEMPLATE_ID: this.exchangeModelNow.NC_TEMPLATE_ID,
-        condition: this.modelCondition
+        condition: this.modelCondition.toUpperCase()
       }).then((res) => {
         if (res.data.length > 0 || (res.data.length == 1 && res.data[0].NC_MODEL_ID != this.exchangeModelNow.NC_MODEL_ID)) {
           this.exchangeModelList = res.data;
@@ -1312,7 +1312,7 @@ export default {
       this.exchangeItemList = [];
       GetExchangeModelItem({
         NC_MODEL_ID: this.exchangeItemNow.NC_MODEL_ID,
-        condition: this.itemCondition,
+        condition: this.itemCondition.toUpperCase(),
         page: this.currentPage,
         limit: this.limit,
       }).then((res) => {
@@ -1582,6 +1582,44 @@ export default {
             }
           } else {
             oneCurtain.ILLUSTRATE = oneCurtain.ILLUSTRATE.replace('不足4平方米。按4平方米下单量收费;', '');
+          }
+          if (this.curtainHeadData.FIX_TYPE == '02') {
+            var height = this.convertNumber(oneCurtain.curtain_height);
+            var childrenCurtain = this.curtainData.filter(item =>
+              item.NCM_PID == oneCurtain.NC_MODEL_ID
+              && ((oneCurtain.NC_PART_TYPECODE == 'LS' && (item.NC_PART_TYPECODE == 'ZB' || item.NC_PART_TYPECODE == 'PB1' || item.NC_PART_TYPECODE == 'PB2'))
+                || (oneCurtain.NC_PART_TYPECODE == 'CS' && (item.NC_PART_TYPECODE == 'ZB' || item.NC_PART_TYPECODE == 'PB')))
+            );
+            for (var j = 0; j < childrenCurtain.length; j++) {
+              var oneChildren = childrenCurtain[j];
+              if (height > 2.8) {
+                if (oneChildren.ILLUSTRATE.indexOf('超高;') == -1) {
+                  oneChildren.ILLUSTRATE += '超高;';
+                }
+              } else {
+                oneChildren.ILLUSTRATE = oneChildren.ILLUSTRATE.replace('超高;', '');
+              }
+            }
+            if (oneCurtain.NC_PART_TYPECODE == 'LS') {
+              //联动里衬
+              var lcbCurtain = this.curtainData.filter(item => item.NC_PART_TYPECODE == 'LCB');
+              if (lcbCurtain.length) {
+                lcbCurtain = lcbCurtain[0];
+                var lcbChildrenCurtain = this.curtainData.filter(item => item.NCM_PID == lcbCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == 'ZB');
+                if (lcbChildrenCurtain.length) {
+                  for (var j = 0; j < lcbChildrenCurtain.length; j++) {
+                    var oneChildren = lcbChildrenCurtain[j];
+                    if (height > 2.8) {
+                      if (oneChildren.ILLUSTRATE.indexOf('超高;') == -1) {
+                        oneChildren.ILLUSTRATE += '超高;';
+                      }
+                    } else {
+                      oneChildren.ILLUSTRATE = oneChildren.ILLUSTRATE.replace('超高;', '');
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }

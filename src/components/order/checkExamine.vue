@@ -77,15 +77,11 @@
           <br />
           <span class="zoomLeft">
             交货日期：
-            <span class="zoomRight">
-              <span class="zoomRight">{{ ruleForm.JIAOHUO_DATE | datatrans }}</span>
-            </span>
+            <span class="zoomRight">{{ ruleForm.JIAOHUO_DATE | datatrans }}</span>
           </span>
           <span class="zoomLeft">
             兰居处理说明：
-            <span class="zoomRight">
-              <span class="zoomRight">{{ ruleForm.LANJU_NOTE }}</span>
-            </span>
+            <span class="zoomRight">{{ ruleForm.LANJU_NOTE }}</span>
           </span>
         </template>
       </div>

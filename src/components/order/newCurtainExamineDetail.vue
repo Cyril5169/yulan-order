@@ -74,15 +74,15 @@
                     <el-checkbox v-if="itemCanDelete(scope.row)" v-model="scope.row.curtain_choose"
                       @change="onCheckChange($event, scope.row, scopeHead.$index)"></el-checkbox>
                   </template>
+                  <template v-else-if="scope.row.NC_PART_TYPECODE == 'LBT'">
+                    <span style="color:red;">未维护数据!</span>
+                  </template>
                   <!-- 没有模板，非标定 -->
-                  <template v-else-if="scope.row.curtain_level == 0">
+                  <template v-else>
                     <a class="a-link" :class="{'delete-cls': !scope.row.curtain_choose}"
                       @click="exchangeModelOrItem(scope.row, scopeHead.$index)">请选择</a>
                     <el-checkbox v-model="scope.row.curtain_choose" @change="onCheckChange($event, scope.row, scopeHead.$index)">
                     </el-checkbox>
-                  </template>
-                  <template v-else>
-                    <span style="color:red;">未维护数据!</span>
                   </template>
                 </template>
               </el-table-column>
@@ -1091,30 +1091,36 @@ export default {
         var pb1Commodity = curtains.filter(item => item.NCM_PID == oneCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == "PB1");
         if (pb1Commodity.length) {
           pb1Commodity = pb1Commodity[0];
-          if (pb1Commodity.FIX_GRADE > 1600) {
-            //2.8宽幅
-            if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.WGDZMaxZheParam;
-            else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.WDQMaxZheParam;
+          if (pb1Commodity.ITEM_NO) {
+            if (pb1Commodity.FIX_GRADE > 1600) {
+              //2.8宽幅
+              if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.WGDZMaxZheParam;
+              else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.WDQMaxZheParam;
+            } else {
+              //1.4窄幅
+              if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.GDZMaxZheParam;
+              else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.DQMaxZheParam;
+            }
+            //配布1褶数 = 配布1下单褶数 * 片数
+            pb1Zhe = pb1Commodity.WRINKLE;
+            pb1Commodity.ZE_QTY = pb1Commodity.WRINKLE * pianParam.NCP_VALUE;
+            //幅数和用量区分定宽定高
+            if (orderDetail.FIX_TYPE == "01") {
+              //定宽
+              //配布1幅数 = 配布1褶数 / 最大褶数
+              pb1Commodity.FU_QTY = this.dosageFilter(pb1Commodity.ZE_QTY / maxzheParam.NCP_VALUE);
+              //配布1用量 = （帘身高 + 高度折边用量）* 配布1幅数（进位取整）
+              pb1Commodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * Math.ceil(pb1Commodity.FU_QTY));
+            }
+            else if (orderDetail.FIX_TYPE == "02") {
+              //定高
+              //配布1用量 = 配布1褶数 * 完整褶用量
+              pb1Commodity.DOSAGE = this.dosageFilter(pb1Commodity.ZE_QTY * zheParam.NCP_VALUE);
+            }
           } else {
-            //1.4窄幅
-            if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.GDZMaxZheParam;
-            else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.DQMaxZheParam;
-          }
-          //配布1褶数 = 配布1下单褶数 * 片数
-          pb1Zhe = pb1Commodity.WRINKLE;
-          pb1Commodity.ZE_QTY = pb1Commodity.WRINKLE * pianParam.NCP_VALUE;
-          //幅数和用量区分定宽定高
-          if (orderDetail.FIX_TYPE == "01") {
-            //定宽
-            //配布1幅数 = 配布1褶数 / 最大褶数
-            pb1Commodity.FU_QTY = this.dosageFilter(pb1Commodity.ZE_QTY / maxzheParam.NCP_VALUE);
-            //配布1用量 = （帘身高 + 高度折边用量）* 配布1幅数（进位取整）
-            pb1Commodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * Math.ceil(pb1Commodity.FU_QTY));
-          }
-          else if (orderDetail.FIX_TYPE == "02") {
-            //定高
-            //配布1用量 = 配布1褶数 * 完整褶用量 + 边用量 * 片数
-            pb1Commodity.DOSAGE = this.dosageFilter(pb1Commodity.ZE_QTY * zheParam.NCP_VALUE + bianParam.NCP_VALUE * pianParam.NCP_VALUE);
+            pb1Commodity.ZE_QTY = 0;
+            pb1Commodity.FU_QTY = 0;
+            pb1Commodity.DOSAGE = 0;
           }
         }
 
@@ -1122,30 +1128,36 @@ export default {
         var pb2Commodity = curtains.filter(item => item.NCM_PID == oneCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == "PB2");
         if (pb2Commodity.length) {
           pb2Commodity = pb2Commodity[0];
-          if (pb2Commodity.FIX_GRADE > 1600) {
-            //2.8宽幅
-            if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.WGDZMaxZheParam;
-            else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.WDQMaxZheParam;
+          if (pb2Commodity.ITEM_NO) {
+            if (pb2Commodity.FIX_GRADE > 1600) {
+              //2.8宽幅
+              if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.WGDZMaxZheParam;
+              else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.WDQMaxZheParam;
+            } else {
+              //1.4窄幅
+              if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.GDZMaxZheParam;
+              else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.DQMaxZheParam;
+            }
+            //配布2褶数 = 配布2下单褶数 * 片数
+            pb2Zhe = pb2Commodity.WRINKLE;
+            pb2Commodity.ZE_QTY = pb2Commodity.WRINKLE * pianParam.NCP_VALUE;
+            //幅数和用量区分定宽定高
+            if (orderDetail.FIX_TYPE == "01") {
+              //定宽
+              //配布2幅数 = 配布2褶数 / 最大褶数
+              pb2Commodity.FU_QTY = this.dosageFilter(pb2Commodity.ZE_QTY / maxzheParam.NCP_VALUE);
+              //配布2用量 = （帘身高 + 高度折边用量）* 配布2幅数（进位取整）
+              pb2Commodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * Math.ceil(pb2Commodity.FU_QTY));
+            }
+            else if (orderDetail.FIX_TYPE == "02") {
+              //定高
+              //配布2用量 = 配布2褶数 * 完整褶用量 + 边用量 * 片数
+              pb2Commodity.DOSAGE = this.dosageFilter(pb2Commodity.ZE_QTY * zheParam.NCP_VALUE + bianParam.NCP_VALUE * pianParam.NCP_VALUE);
+            }
           } else {
-            //1.4窄幅
-            if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.GDZMaxZheParam;
-            else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.DQMaxZheParam;
-          }
-          //配布2褶数 = 配布2下单褶数 * 片数
-          pb2Zhe = pb2Commodity.WRINKLE;
-          pb2Commodity.ZE_QTY = pb2Commodity.WRINKLE * pianParam.NCP_VALUE;
-          //幅数和用量区分定宽定高
-          if (orderDetail.FIX_TYPE == "01") {
-            //定宽
-            //配布2幅数 = 配布2褶数 / 最大褶数
-            pb2Commodity.FU_QTY = this.dosageFilter(pb2Commodity.ZE_QTY / maxzheParam.NCP_VALUE);
-            //配布2用量 = （帘身高 + 高度折边用量）* 配布2幅数（进位取整）
-            pb2Commodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * Math.ceil(pb2Commodity.FU_QTY));
-          }
-          else if (orderDetail.FIX_TYPE == "02") {
-            //定高
-            //配布2用量 = 配布2褶数 * 完整褶用量
-            pb2Commodity.DOSAGE = this.dosageFilter(pb2Commodity.ZE_QTY * zheParam.NCP_VALUE);
+            pb2Commodity.ZE_QTY = 0;
+            pb2Commodity.FU_QTY = 0;
+            pb2Commodity.DOSAGE = 0;
           }
         }
 
@@ -1153,31 +1165,37 @@ export default {
         var zbCommodity = curtains.filter(item => item.NCM_PID == oneCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == "ZB");
         if (zbCommodity.length) {
           zbCommodity = zbCommodity[0];
-          if (zbCommodity.FIX_GRADE > 1600) {
-            //2.8宽幅
-            if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.WGDZMaxZheParam;
-            else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.WDQMaxZheParam;
+          if (zbCommodity.ITEM_NO) {
+            if (zbCommodity.FIX_GRADE > 1600) {
+              //2.8宽幅
+              if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.WGDZMaxZheParam;
+              else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.WDQMaxZheParam;
+            } else {
+              //1.4窄幅
+              if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.GDZMaxZheParam;
+              else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.DQMaxZheParam;
+            }
+            //主布褶数 = （单片褶数 - 配布1下单褶数 - 配布2下单褶数）* 片数
+            zbCommodity.ZE_QTY = (singleZhe - pb1Zhe - pb2Zhe) * pianParam.NCP_VALUE;
+            //幅数和用量区分定宽定高
+            if (orderDetail.FIX_TYPE == "01") {
+              //定宽
+              //主布幅数 = 主布褶数 / 最大褶数
+              zbCommodity.FU_QTY = this.dosageFilter(zbCommodity.ZE_QTY / maxzheParam.NCP_VALUE);
+              //主布用量 = （帘身高 + 高度折边用量）* 主布幅数（进位取整）
+              zbCommodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * Math.ceil(zbCommodity.FU_QTY));
+            }
+            else if (orderDetail.FIX_TYPE == "02") {
+              //定高
+              //主布用量 = 主布褶数 * 完整褶用量 + 边用量（有配布*1，无配布*2） * 片数
+              var pbCount = 2;
+              if (pb1Commodity.length || pb2Commodity.length) pbCount = 1;
+              zbCommodity.DOSAGE = this.dosageFilter(zbCommodity.ZE_QTY * zheParam.NCP_VALUE + bianParam.NCP_VALUE * pbCount * pianParam.NCP_VALUE);
+            }
           } else {
-            //1.4窄幅
-            if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.GDZMaxZheParam;
-            else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.DQMaxZheParam;
-          }
-          //主布褶数 = （单片褶数 - 配布1下单褶数 - 配布2下单褶数）* 片数
-          zbCommodity.ZE_QTY = (singleZhe - pb1Zhe - pb2Zhe) * pianParam.NCP_VALUE;
-          //幅数和用量区分定宽定高
-          if (orderDetail.FIX_TYPE == "01") {
-            //定宽
-            //主布幅数 = 主布褶数 / 最大褶数
-            zbCommodity.FU_QTY = this.dosageFilter(zbCommodity.ZE_QTY / maxzheParam.NCP_VALUE);
-            //主布用量 = （帘身高 + 高度折边用量）* 主布幅数（进位取整）
-            zbCommodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * Math.ceil(zbCommodity.FU_QTY));
-          }
-          else if (orderDetail.FIX_TYPE == "02") {
-            //定高
-            //主布用量 = 主布褶数 * 完整褶用量 + 边用量（有配布*1，无配布*2） * 片数
-            var pbCount = 2;
-            if (pb1Commodity.length || pb2Commodity.length) pbCount = 1;
-            zbCommodity.DOSAGE = this.dosageFilter(zbCommodity.ZE_QTY * zheParam.NCP_VALUE + bianParam.NCP_VALUE * pbCount * pianParam.NCP_VALUE);
+            zbCommodity.ZE_QTY = 0;
+            zbCommodity.FU_QTY = 0;
+            zbCommodity.DOSAGE = 0;
           }
         }
 
@@ -1185,13 +1203,19 @@ export default {
         var hbCommodity = curtains.filter(item => item.NCM_PID == oneCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == "XHB");
         if (hbCommodity.length) {
           hbCommodity = hbCommodity[0];
-          if (hbCommodity.JOINT == "SP") {
-            //竖拼花边用量 = （帘身高 + 高度折边用量）* 片数
-            hbCommodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * pianParam.NCP_VALUE);
-          }
-          else if (hbCommodity.JOINT == "HP") {
-            //横拼花边用量 = （单片褶数 * 固定褶用量 + 边用量 * 2）* 片数
-            hbCommodity.DOSAGE = this.dosageFilter((singleZhe * zheParam.NCP_VALUE + bianParam.NCP_VALUE * 2) * pianParam.NCP_VALUE);
+          if (hbCommodity.ITEM_NO) {
+            if (hbCommodity.JOINT == "SP") {
+              //竖拼花边用量 = （帘身高 + 高度折边用量）* 片数
+              hbCommodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * pianParam.NCP_VALUE);
+            }
+            else if (hbCommodity.JOINT == "HP") {
+              //横拼花边用量 = （单片褶数 * 固定褶用量 + 边用量 * 2）* 片数
+              hbCommodity.DOSAGE = this.dosageFilter((singleZhe * zheParam.NCP_VALUE + bianParam.NCP_VALUE * 2) * pianParam.NCP_VALUE);
+            }
+          } else {
+            hbCommodity.ZE_QTY = 0;
+            hbCommodity.FU_QTY = 0;
+            hbCommodity.DOSAGE = 0;
           }
         }
 
@@ -1227,29 +1251,35 @@ export default {
         var zbCommodity = curtains.filter(item => item.NCM_PID == oneCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == "ZB");
         if (zbCommodity.length) {
           zbCommodity = zbCommodity[0];
-          if (zbCommodity.FIX_GRADE > 1600) {
-            //2.8宽幅
-            if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.WGDZMaxZheParam;
-            else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.WDQMaxZheParam;
+          if (zbCommodity.ITEM_NO) {
+            if (zbCommodity.FIX_GRADE > 1600) {
+              //2.8宽幅
+              if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.WGDZMaxZheParam;
+              else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.WDQMaxZheParam;
+            } else {
+              //1.4窄幅
+              if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.GDZMaxZheParam;
+              else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.DQMaxZheParam;
+            }
+            //主布褶数 = 单片褶数 * 片数
+            zbCommodity.ZE_QTY = singleZhe * pianParam.NCP_VALUE;
+            //幅数和用量区分定宽定高
+            if (orderDetail.FIX_TYPE == "01") {
+              //定宽
+              //主布幅数 = 主布褶数 / 最大褶数
+              zbCommodity.FU_QTY = this.dosageFilter(zbCommodity.ZE_QTY / maxzheParam.NCP_VALUE);
+              //主布用量 = （窗纱高 + 高度折边用量）* 0.8 * 主布幅数（进位取整）
+              zbCommodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * 0.8 * Math.ceil(zbCommodity.FU_QTY));
+            }
+            else if (orderDetail.FIX_TYPE == "02") {
+              //定高
+              //主布用量 = 主布褶数 * 完整褶用量 + 边用量 * 2 * 片数
+              zbCommodity.DOSAGE = this.dosageFilter(zbCommodity.ZE_QTY * zheParam.NCP_VALUE + bianParam.NCP_VALUE * 2 * pianParam.NCP_VALUE);
+            }
           } else {
-            //1.4窄幅
-            if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.GDZMaxZheParam;
-            else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.DQMaxZheParam;
-          }
-          //主布褶数 = 单片褶数 * 片数
-          zbCommodity.ZE_QTY = singleZhe * pianParam.NCP_VALUE;
-          //幅数和用量区分定宽定高
-          if (orderDetail.FIX_TYPE == "01") {
-            //定宽
-            //主布幅数 = 主布褶数 / 最大褶数
-            zbCommodity.FU_QTY = this.dosageFilter(zbCommodity.ZE_QTY / maxzheParam.NCP_VALUE);
-            //主布用量 = （窗纱高 + 高度折边用量）* 0.8 * 主布幅数（进位取整）
-            zbCommodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * 0.8 * Math.ceil(zbCommodity.FU_QTY));
-          }
-          else if (orderDetail.FIX_TYPE == "02") {
-            //定高
-            //主布用量 = 主布褶数 * 完整褶用量 + 边用量 * 2 * 片数
-            zbCommodity.DOSAGE = this.dosageFilter(zbCommodity.ZE_QTY * zheParam.NCP_VALUE + bianParam.NCP_VALUE * 2 * pianParam.NCP_VALUE);
+            zbCommodity.ZE_QTY = 0;
+            zbCommodity.FU_QTY = 0;
+            zbCommodity.DOSAGE = 0;
           }
         }
 
@@ -1257,20 +1287,26 @@ export default {
         var pbCommodity = curtains.filter(item => item.NCM_PID == oneCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == "PB");
         if (pbCommodity.length) {
           pbCommodity = pbCommodity[0];
-          //配布褶数 = 主布褶数
-          pbCommodity.ZE_QTY = zbCommodity.ZE_QTY;
-          //幅数和用量区分定宽定高
-          if (orderDetail.FIX_TYPE == "01") {
-            //定宽
-            //配布幅数 = 主布幅数
-            pbCommodity.FU_QTY = zbCommodity.FU_QTY;
-            //配布用量 = 窗纱高 / 5 * 配布幅数（进位取整）
-            pbCommodity.DOSAGE = this.dosageFilter(height / 5 * Math.ceil(pbCommodity.FU_QTY));
-          }
-          else if (orderDetail.FIX_TYPE == "02") {
-            //定高
-            //配布用量 = 主布用量 / 2
-            pbCommodity.DOSAGE = this.dosageFilter(zbCommodity.DOSAGE / 2);
+          if (pbCommodity.ITEM_NO) {
+            //配布褶数 = 主布褶数
+            pbCommodity.ZE_QTY = zbCommodity.ZE_QTY;
+            //幅数和用量区分定宽定高
+            if (orderDetail.FIX_TYPE == "01") {
+              //定宽
+              //配布幅数 = 主布幅数
+              pbCommodity.FU_QTY = zbCommodity.FU_QTY;
+              //配布用量 = 窗纱高 / 5 * 配布幅数（进位取整）
+              pbCommodity.DOSAGE = this.dosageFilter(height / 5 * Math.ceil(pbCommodity.FU_QTY));
+            }
+            else if (orderDetail.FIX_TYPE == "02") {
+              //定高
+              //配布用量 = 主布用量 / 2
+              pbCommodity.DOSAGE = this.dosageFilter(zbCommodity.DOSAGE / 2);
+            }
+          } else {
+            pbCommodity.ZE_QTY = 0;
+            pbCommodity.FU_QTY = 0;
+            pbCommodity.DOSAGE = 0;
           }
         }
 
@@ -1278,13 +1314,19 @@ export default {
         var hbCommodity = curtains.filter(item => item.NCM_PID == oneCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == "XHB");
         if (hbCommodity.length) {
           hbCommodity = hbCommodity[0];
-          if (hbCommodity.JOINT == "SP") {
-            //竖拼花边用量 = （窗纱高 + 高度折边用量）* 片数
-            hbCommodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * pianParam.NCP_VALUE);
-          }
-          else if (hbCommodity.JOINT == "HP") {
-            //横拼花边用量 = （单片褶数 * 固定褶用量 + 边用量 * 2）* 片数
-            hbCommodity.DOSAGE = this.dosageFilter((singleZhe * zheParam.NCP_VALUE + bianParam.NCP_VALUE * 2) * pianParam.NCP_VALUE);
+          if (hbCommodity.ITEM_NO) {
+            if (hbCommodity.JOINT == "SP") {
+              //竖拼花边用量 = （窗纱高 + 高度折边用量）* 片数
+              hbCommodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * pianParam.NCP_VALUE);
+            }
+            else if (hbCommodity.JOINT == "HP") {
+              //横拼花边用量 = （单片褶数 * 固定褶用量 + 边用量 * 2）* 片数
+              hbCommodity.DOSAGE = this.dosageFilter((singleZhe * zheParam.NCP_VALUE + bianParam.NCP_VALUE * 2) * pianParam.NCP_VALUE);
+            }
+          } else {
+            hbCommodity.ZE_QTY = 0;
+            hbCommodity.FU_QTY = 0;
+            hbCommodity.DOSAGE = 0;
           }
         }
 
@@ -1292,29 +1334,37 @@ export default {
         var xjCommodity = curtains.filter(item => item.NCM_PID == oneCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == "XJ");
         if (xjCommodity.length) {
           xjCommodity = xjCommodity[0];
-          //下脚配布褶数 = 主布褶数
-          xjCommodity.ZE_QTY = zbCommodity.ZE_QTY;
-          //幅数和用量区分定宽定高
-          if (orderDetail.FIX_TYPE == "01") {
-            //定宽
-            //下脚配布幅数 = 主布幅数
-            xjCommodity.FU_QTY = zbCommodity.FU_QTY;
-            //下脚配布用量 = 0.23 * 下脚配布幅数（进位取整）
-            xjCommodity.DOSAGE = this.dosageFilter(0.23 * Math.ceil(xjCommodity.FU_QTY));
-            //有下脚时，主布用量 = （窗纱高 - 下脚高）* 主布幅数（进位取整）
-            zbCommodity.DOSAGE = this.dosageFilter((height - this.curtainParamsList.xiajiaoHeightParam.NCP_VALUE) * Math.ceil(zbCommodity.FU_QTY));
-          }
-          else if (orderDetail.FIX_TYPE == "02") {
-            //定高
-            //下脚配布用量 = 主布用量 / 2
-            xjCommodity.DOSAGE = this.dosageFilter(zbCommodity.DOSAGE / 2);
+          if (xjCommodity.ITEM_NO) {
+            //下脚配布褶数 = 主布褶数
+            xjCommodity.ZE_QTY = zbCommodity.ZE_QTY;
+            //幅数和用量区分定宽定高
+            if (orderDetail.FIX_TYPE == "01") {
+              //定宽
+              //下脚配布幅数 = 主布幅数
+              xjCommodity.FU_QTY = zbCommodity.FU_QTY;
+              //下脚配布用量 = 0.23 * 下脚配布幅数（进位取整）
+              xjCommodity.DOSAGE = this.dosageFilter(0.23 * Math.ceil(xjCommodity.FU_QTY));
+              //有下脚时，主布用量 = （窗纱高 - 下脚高）* 主布幅数（进位取整）
+              zbCommodity.DOSAGE = this.dosageFilter((height - this.curtainParamsList.xiajiaoHeightParam.NCP_VALUE) * Math.ceil(zbCommodity.FU_QTY));
+            }
+            else if (orderDetail.FIX_TYPE == "02") {
+              //定高
+              //下脚配布用量 = 主布用量 / 2
+              xjCommodity.DOSAGE = this.dosageFilter(zbCommodity.DOSAGE / 2);
+            }
+          } else {
+            xjCommodity.ZE_QTY = 0;
+            xjCommodity.FU_QTY = 0;
+            xjCommodity.DOSAGE = 0;
           }
         }
 
         //窗纱没有配布也没有下脚时
         if (!pbCommodity.ID && !xjCommodity.ID) {
-          //主布用量 = (窗纱高 + 高度折边用量) * 主布幅数(进位取整)
-          zbCommodity.DOSAGE = this.dosageFilter((oneCurtain.HEIGHT + HightBianParam.NCP_VALUE) * Math.ceil(zbCommodity.FU_QTY));
+          if (orderDetail.FIX_TYPE == "01" && zbCommodity.ITEM_NO) {
+            //主布用量 = (窗纱高 + 高度折边用量) * 主布幅数(进位取整)
+            zbCommodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * Math.ceil(zbCommodity.FU_QTY));
+          }
         }
       }
       //}
@@ -1546,7 +1596,7 @@ export default {
       this.exchangeModelList = [];
       GetExchangeModel({
         NC_TEMPLATE_ID: this.exchangeModelNow.NC_TEMPLATE_ID,
-        condition: this.modelCondition
+        condition: this.modelCondition.toUpperCase()
       }).then((res) => {
         if (res.data.length > 0 || (res.data.length == 1 && res.data[0].NC_MODEL_ID != this.exchangeModelNow.NC_MODEL_ID)) {
           this.exchangeModelList = res.data;
@@ -1644,6 +1694,13 @@ export default {
           this.ruleForm.ORDERBODY[this.currentIndex].curtain_change.push(...curtain_temp);
           this.drawerShow = false;
           this.getRemark();
+          //获得父节点
+          var fatherTemplateCurtain = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter(item => item.NCM_PID == 0 && item.NC_PART_TYPECODE == this.exchangeModelNow.NC_PART_TYPECODE);
+          if (fatherTemplateCurtain.length) {
+            fatherTemplateCurtain = fatherTemplateCurtain[0];
+            var index = this.ruleForm.ORDERBODY[this.currentIndex].curtains.indexOf(fatherTemplateCurtain);
+            if (index != -1) this.calculateChildrenDosage(index);
+          }
         }).catch(() => { });
       }
     },
@@ -1706,7 +1763,7 @@ export default {
       this.exchangeItemList = [];
       GetExchangeModelItem({
         NC_MODEL_ID: this.exchangeItemNow.NC_MODEL_ID,
-        condition: this.itemCondition,
+        condition: this.itemCondition.toUpperCase(),
         page: this.currentPage,
         limit: this.limit,
       }).then((res) => {
@@ -1762,6 +1819,13 @@ export default {
         this.ruleForm.ORDERBODY[this.currentIndex].curtains = this.getStoreData(this.ruleForm.ORDERBODY[this.currentIndex].curtains);
         this.drawerShow2 = false;
         this.getRemark();
+        //找到父节点
+        var fatherCurtain = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter(item => item.NC_MODEL_ID == this.exchangeItemNow.NCM_PID);
+        if (fatherCurtain.length) {
+          fatherCurtain = fatherCurtain[0];
+          var index = this.ruleForm.ORDERBODY[this.currentIndex].curtains.indexOf(fatherCurtain);
+          if (index != -1) this.calculateChildrenDosage(index);
+        }
       }).catch(() => { });
     },
     //获得需要提交的窗帘数据
@@ -2011,10 +2075,12 @@ export default {
     //获得窗帘的说明
     getRemark(index) {
       var curtains = [];
+      var orderDetail = this.ruleForm.ORDERBODY[this.currentIndex];
+      var allCurtains = orderDetail.curtains;
       if (index == undefined) {
-        curtains = this.ruleForm.ORDERBODY[this.currentIndex].curtains;
+        curtains = allCurtains;
       } else {
-        curtains.push(this.ruleForm.ORDERBODY[this.currentIndex].curtains[index]);
+        curtains.push(allCurtains[index]);
       }
       for (var i = 0; i < curtains.length; i++) {
         var oneCurtain = curtains[i];
@@ -2035,6 +2101,44 @@ export default {
             }
           } else {
             oneCurtain.ILLUSTRATE = oneCurtain.ILLUSTRATE.replace('不足4平方米。按4平方米下单量收费;', '');
+          }
+          if (orderDetail.FIX_TYPE == '02') {
+            var height = this.convertNumber(oneCurtain.HEIGHT);
+            var childrenCurtain = allCurtains.filter(item =>
+              item.NCM_PID == oneCurtain.NC_MODEL_ID
+              && ((oneCurtain.NC_PART_TYPECODE == 'LS' && (item.NC_PART_TYPECODE == 'ZB' || item.NC_PART_TYPECODE == 'PB1' || item.NC_PART_TYPECODE == 'PB2'))
+                || (oneCurtain.NC_PART_TYPECODE == 'CS' && (item.NC_PART_TYPECODE == 'ZB' || item.NC_PART_TYPECODE == 'PB')))
+            );
+            for (var j = 0; j < childrenCurtain.length; j++) {
+              var oneChildren = childrenCurtain[j];
+              if (height > 2.8) {
+                if (oneChildren.ILLUSTRATE.indexOf('超高;') == -1) {
+                  oneChildren.ILLUSTRATE += '超高;';
+                }
+              } else {
+                oneChildren.ILLUSTRATE = oneChildren.ILLUSTRATE.replace('超高;', '');
+              }
+            }
+            if (oneCurtain.NC_PART_TYPECODE == 'LS') {
+              //联动里衬
+              var lcbCurtain = allCurtains.filter(item => item.NC_PART_TYPECODE == 'LCB');
+              if (lcbCurtain.length) {
+                lcbCurtain = lcbCurtain[0];
+                var lcbChildrenCurtain = allCurtains.filter(item => item.NCM_PID == lcbCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == 'ZB');
+                if (lcbChildrenCurtain.length) {
+                  for (var j = 0; j < lcbChildrenCurtain.length; j++) {
+                    var oneChildren = lcbChildrenCurtain[j];
+                    if (height > 2.8) {
+                      if (oneChildren.ILLUSTRATE.indexOf('超高;') == -1) {
+                        oneChildren.ILLUSTRATE += '超高;';
+                      }
+                    } else {
+                      oneChildren.ILLUSTRATE = oneChildren.ILLUSTRATE.replace('超高;', '');
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }

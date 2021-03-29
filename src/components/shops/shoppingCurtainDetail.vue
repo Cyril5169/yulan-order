@@ -1379,9 +1379,11 @@ export default {
     },
     //查找库存
     getStoreData(originData) {
+      console.log(originData)
       for (var i = 0; i < originData.length; i++) {
         var oneCurtain = originData[i];
         if (!oneCurtain.itemNo) continue;
+        if (oneCurtain.productType == 'GY' || oneCurtain.productType == 'PJB') continue;
         //库存
         var postData = {
           token: "兰居尚品",

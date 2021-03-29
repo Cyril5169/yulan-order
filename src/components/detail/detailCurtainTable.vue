@@ -1571,6 +1571,7 @@ export default {
       for (var i = 0; i < originData.length; i++) {
         var oneCurtain = originData[i];
         if (!oneCurtain.item.itemNo) continue;
+        if (oneCurtain.productType == 'GY' || oneCurtain.productType == 'PJB') continue;
         //库存
         var postData = {
           token: "兰居尚品",

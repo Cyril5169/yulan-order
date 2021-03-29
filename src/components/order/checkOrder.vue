@@ -1223,7 +1223,10 @@ export default {
       };
       orderSettlement(data2).then((res) => {
         this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
-        this.$root.$emit("refreshBadgeIcon", "curtainCount");
+        if(this.newCurtainStatus == "1")
+          this.$root.$emit("refreshBadgeIcon", "newCurtainCount");
+        else
+          this.$root.$emit("refreshBadgeIcon", "curtainCount");
         if (res.msg) {
           this.$alert(res.msg, "提示", {
             confirmButtonText: "确定",

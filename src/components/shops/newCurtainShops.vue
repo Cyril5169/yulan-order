@@ -1127,10 +1127,12 @@ export default {
       if (!row.curtain_choose) return;
       if (row.curtain_level == 0) {
         //整个组件替换
+        this.modelCondition = "";
         this.exchangeModelNow = JSON.parse(JSON.stringify(row)); //当前数据
         this.getExchangeModelList();
       } else {
         //子件替换
+        this.itemCondition = "";
         this.exchangeItemNow = JSON.parse(JSON.stringify(row)); //当前数据
         this.getExangeItemList();
       }
@@ -1342,12 +1344,14 @@ export default {
         cancelButtonText: "否",
         type: "warning",
       }).then(() => {
-        //替换只是更换item，现在只需要替换字段ITEM_NO，NOTE和拉边条MATERIAL_NO
+        //替换只是更换item,先替换下面这些字段
         var originItem = this.curtainData.filter(item => item.NC_MODEL_ID == this.exchangeItemNow.NC_MODEL_ID);
         if (originItem.length) {
           originItem = originItem[0];
           originItem.ITEM_NO = item.ITEM_NO;
           originItem.NOTE = item.NOTE;
+          originItem.UNIT_NAME = item.UNIT_NAME;
+          originItem.FIX_GRADE = item.FIX_GRADE;
           originItem.MATERIAL_NO = item.MATERIAL_NO;
         }
         //替换拉边条
@@ -1819,6 +1823,9 @@ export default {
 .curtain-list .el-input__inner {
   padding: 0 5px !important;
   height: 20px !important;
+}
+.curtain-list .el-textarea__inner {
+  padding: 0 5px !important;
 }
 .curtain-list .el-table .bold-row,
 .model-exchange-inner .el-table .bold-row {

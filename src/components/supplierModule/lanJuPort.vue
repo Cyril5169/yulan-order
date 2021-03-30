@@ -2188,7 +2188,7 @@ export default {
     },
     downLoadY() {
       var PUR_NO = this.pur_headForm.PUR_NO;
-      if (this.orderNoPreFix != "X" || this.orderNoPreFix != "N") {
+      if (this.orderNoPreFix != "X" && this.orderNoPreFix != "N") {
         downLoadFile(this.Global.baseUrl + `PUR_HEAD/CreateExcelY?PUR_NO=${PUR_NO}`);
       } else if (this.orderNoPreFix == "X") {
         downLoadFile(this.Global.baseUrl + `PUR_HEAD/CreateExcel?PUR_NO=${PUR_NO}`);

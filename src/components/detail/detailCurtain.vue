@@ -88,8 +88,7 @@ export default {
             changeFlag: _dataCom.changeFlag,
             choose: true,
             suggestion: "",
-            inlineNo: _dataCom.inlineNo,
-            curtain_store: '' //库存
+            inlineNo: _dataCom.inlineNo
           };
           _arr.push(obj);
         }

@@ -1992,7 +1992,7 @@ export default {
                   }
                   var onedetail = {
                     buwei: typeCode,
-                    leibie: detail.CURTAIN_ITEM_NAME,
+                    leibie: this.transPartTypeCode(detail.NC_PART_TYPECODE),
                     code: detail.ITEM_NO,
                     danwei: detail.UNIT_NAME,
                     price: detail.PRICE_TAXIN,
@@ -2179,7 +2179,7 @@ export default {
 
       downLoadFile(
         this.Global.baseUrl +
-        `PUR_HEAD/SalExcel?current_id=${current_id}&customer=${customer}&po_type=${po_type}&check_flag=${check_flag}&beginTime=${beginTime}&finishTime=${finishTime}&purNo=${purNo}`
+        `PUR_HEAD/SalExcel?current_id=${current_id}&customer=${customer}&po_type=${po_type}&check_flag=${check_flag}&beginTime=${beginTime}&finishTime=${finishTime}&po=${purNo}`
       );
     },
     downLoadX() {
@@ -2209,7 +2209,7 @@ export default {
       var bill_type = this.bill_type;
       downLoadFile(
         this.Global.baseUrl +
-        `PUR_HEAD/HeadAndDetailExcel?cid=${cid}&purNo=${purNo}&customer=${customer}&beginTime=${beginTime}&finishTime=${finishTime}&po_type=${po_type}&bill_type=${bill_type}`
+        `PUR_HEAD/HeadAndDetailExcel?cid=${cid}&po=${purNo}&customer=${customer}&beginTime=${beginTime}&finishTime=${finishTime}&po_type=${po_type}&bill_type=${bill_type}`
       );
     },
     autoSearchDetail(row) {

@@ -1143,7 +1143,6 @@ export default {
         default:
           this.data[index].illustrate = " ";
       }
-      //return this.curtainData[index].tip;
     },
     //清空记录的行数据
     clearArr() {
@@ -1609,20 +1608,24 @@ export default {
     },
   },
   activated() {
+    for (var i = 0; i < this.curtainData.length; i++) {
+      this.$set(this.curtainData[i], "curtain_store", "");
+    }
+    console.log(this.curtainData)
     this.getActivity();
     //按规则排序
     this.curtainData.sort(function (a, b) {
       let rule = ["lt", "ls", "lspb", "sha", "pjb"];
       return rule.indexOf(a.itemType) - rule.indexOf(b.itemType);
     });
-    //获得库存
-    this.curtainData = this.getStoreData(this.curtainData);
     this.data = JSON.parse(JSON.stringify(this.curtainData));
     this.oldData = JSON.parse(JSON.stringify(this.curtainData));
     this.getOldData(this.headerData);
     this.clearArr();
     this.getSpanArr(this.data);
     if (this.suggestion) this.suggestionLJ = this.suggestion.toString();
+    //获得库存
+    this.data = this.getStoreData(this.data);
   },
 };
 </script>

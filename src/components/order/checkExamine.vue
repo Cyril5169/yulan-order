@@ -517,7 +517,7 @@ export default {
       }
       this.headerData.quantity = tab.QTY_REQUIRED;
       this.headerData.highJia = tab.CURTAIN_HEIGHT2;
-      this.headerData.productGroupType = ""; //
+      this.headerData.productGroupType = "";
       this.headerData.price = tab.all_cost;
       if (tab.CURTAIN_WBH_SIZE == -1) {
         this.headerData.outsourcingBoxExist = 0;

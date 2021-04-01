@@ -1,7 +1,7 @@
 <template>
-  <div class="curtainTable">
-    <el-card shadow="hover">
-      <div class="mb10">
+  <el-card shadow="never">
+    <div class="curtainTable">
+      <div style="margin-bottom: 10px;">
         <p class="fstrong f16">商品信息：</p>
         <span>活动：<el-select style="width:250px" v-model="message.activityId"
             :placeholder="activityOptions.length == 1? '无可选活动': '请选择活动'">
@@ -70,31 +70,26 @@
         <el-table-column label="编码" header-align="center" width="125">
           <template slot-scope="scope">
             <div>
-              <span v-if="
-                  scope.row.itemType === 'pjb' && scope.row.changeFlag === 'Y'
-                ">
+              <!-- 配件包 -->
+              <span v-if="scope.row.itemType === 'pjb' && scope.row.changeFlag === 'Y'">
                 <el-select size="mini" v-model="scope.row.itemNo" placeholder="请选择" @change="changePJBUnit(scope.$index)">
                   <el-option v-for="item in part2" :key="item.value" :label="item.label" :value="item.value">
                   </el-option>
                 </el-select>
               </span>
-              <span v-else-if="scope.row.changeFlag === 'Y'">
-                <a class="uline" @click="getNewItemNo(scope.row, scope.$index)">
-                  {{ scope.row.itemNo }}
-                </a>
-                <el-checkbox v-if="scope.row.deleteFlag === 'Y'" v-model="scope.row.choose"
-                  @change="changeLinkReverse(scope.row)">
-                </el-checkbox>
-              </span>
+              <!-- 非配件包 -->
               <span v-else>
-                {{ scope.row.itemNo }}
+                <!-- 可替换 -->
+                <a v-if="scope.row.changeFlag === 'Y'" class="uline"
+                  @click="getNewItemNo(scope.row, scope.$index)">{{ scope.row.itemNo }}</a>
+                <!-- 不可替换 -->
+                <span v-else>{{ scope.row.itemNo }}</span>
+                <!-- 是否可删 -->
                 <el-checkbox v-if="scope.row.deleteFlag === 'Y'" v-model="scope.row.choose"
                   @change="changeLinkReverse(scope.row)">
                 </el-checkbox>
               </span>
-              <span v-if="bigToSmall(scope.row) == true" style="color: red;">
-                ×
-              </span>
+              <span v-if="bigToSmall(scope.row) == true" style="color: red;">×</span>
             </div>
           </template>
         </el-table-column>
@@ -209,69 +204,54 @@
       </el-table>
       <div v-if="isManager != '0'" style="font-size:16px;margin-top:10px;">总计：<span
           style="color:red;">￥{{allTotal | dosageFilter}}</span></div>
-      <div style="text-align: center;" class="mt20">
-        <el-button type="danger" class="mr20" width="130px" @click="addCurtainToShoppingCar">
-          保存至购物车
-        </el-button>
-        <el-button type="info" class="ml20" width="130px" @click.native="
-              closeToTab({
-                oldUrl: 'shops/shoppingCurtainDetail',
-                newUrl: 'shops/curtain'
-              })
-            ">
-          返回
-        </el-button>
+      <div style="text-align: center;">
+        <el-button type="danger" width="130px" @click="addCurtainToShoppingCar">保存至购物车</el-button>
+        <el-button type="info" style="margin-left:20px;" width="130px"
+          @click.native="closeToTab({oldUrl: 'shops/shoppingCurtainDetail', newUrl: 'shops/curtain'})">返回</el-button>
       </div>
+    </div>
 
-      <!-- 替换列表 -->
-      <el-dialog width="65%" :visible.sync="dialogTableVisible" :close-on-click-modal="false" :close-on-press-escape="false"
-        :show-close="false">
-        <div slot="title">
-          <b>{{ dialogTitle }}</b>
-        </div>
-        <div v-if="items.length !== 0">
-          <el-input clearable size="small" class="ml10 mb10" v-if="curtainData[chooseIndex].productType !== 'GY'"
-            placeholder="输入商品型号查找" style="width:25%; min-width:220px;" v-model.trim="searchKey" @clear="getAllItemNoData(1)"
-            @keyup.enter.native="getSingleItemNoData(1)">
-            <div id="searchBtn" slot="append" style="cursor:pointer;" @click="getSingleItemNoData(1)">
-              搜索
-            </div>
-          </el-input>
-          <br />
-          <el-radio border size="small" class="mt10 ml10" v-for="item in items" :value="item.itemNo" :key="item.itemNo"
-            v-model="itemNo" :label="item.itemNo">
-            <span v-if="chooseType === 'LCB' || chooseType === 'GY'">
-              {{ item.itemNo + " " + item.note }}
-            </span>
-            <span v-else>{{ item.itemNo }}</span>
-          </el-radio>
-          <el-pagination v-if="curtainData[chooseIndex].productType !== 'GY'" class="tc mt10" @size-change="handleSizeChange"
-            @current-change="handleCurrentChange" :current-page.sync="currentPage" :page-size="limit"
-            layout="prev, pager, next, jumper" :total="totalNumber">
-          </el-pagination>
-        </div>
-        <div v-else style="height: 200px;">
-          暂无数据
-        </div>
-        <footer class="mt20" style="text-align: center;">
-          <el-button class="mr10" type="success" @click="chooseItemNo" plain>确定</el-button>
-          <el-button class="ml10" type="danger" @click="dialogTableVisible = false" plain>取消</el-button>
-        </footer>
-      </el-dialog>
-    </el-card>
-  </div>
+    <!-- 替换列表 -->
+    <el-dialog width="65%" :visible.sync="dialogTableVisible" :close-on-click-modal="false">
+      <div slot="title">
+        <b>{{ dialogTitle }}</b>
+      </div>
+      <div v-if="items.length !== 0">
+        <el-input clearable v-if="curtainData[chooseIndex].productType !== 'GY'" placeholder="输入商品型号查找"
+          style="width:250px;margin: 0 0 10px 10px;" v-model.trim="searchKey" @clear="initSearch"
+          @keyup.enter.native="initSearch">
+          <el-button @click="initSearch" slot="append" icon="el-icon-search">搜索</el-button>
+        </el-input>
+        <br />
+        <el-radio border size="small" class="mt10 ml10" v-for="item in items" :value="item.itemNo" :key="item.itemNo"
+          v-model="itemNo" :label="item.itemNo">
+          <span v-if="chooseType === 'LCB' || chooseType === 'GY'">
+            {{ item.itemNo + " " + item.note }}
+          </span>
+          <span v-else>{{ item.itemNo }}</span>
+        </el-radio>
+        <el-pagination v-if="curtainData[chooseIndex].productType !== 'GY'" class="tc mt10" @current-change="getAllItemNoData"
+          :current-page.sync="currentPage" :page-size="limit" layout="prev, pager, next, jumper" :total="totalNumber">
+        </el-pagination>
+      </div>
+      <div v-else style="height: 200px;">
+        暂无数据
+      </div>
+      <footer style="text-align: center;">
+        <el-button type="success" @click="chooseItemNo" plain>确定</el-button>
+        <el-button type="danger" @click="dialogTableVisible = false" plain>取消</el-button>
+      </footer>
+    </el-dialog>
+  </el-card>
 </template>
 
 <script>
 import {
   getCurtainDetailMsg,
   getGY,
-  changeDosageByNo,
   addCurtainToCar,
-  changeItem,
-  changeItemBlur,
 } from "@/api/curtain";
-import { GetDosageAll, GetDosageByNo } from "@/api/itemInfoASP";
+import { GetDosageAll, GetDosageByNo, GetChangeItemByProductType } from "@/api/itemInfoASP";
 import { getItemById, GetPromotionByItem } from "@/api/orderListASP";
 import Cookies from "js-cookie";
 import { mapMutations, mapActions } from "vuex";
@@ -520,34 +500,33 @@ export default {
     //获取窗帘配件包数据
     getPJB() {
       this.part2 = [];
-      let obj = {
+      GetChangeItemByProductType({
+        productType: "PJB",
+        condition: "",
         limit: 999,
         page: 1,
-        itemNO: "PJB",
-      };
-      changeItem(obj)
-        .then((res) => {
-          let _arr = [];
-          res.data.forEach((item) => {
-            _arr.push({
-              label: `${item.itemNo}:${item.note}`,
-              value: item.itemNo,
-              unit: item.unit === "°ü" ? "包" : item.unit,
-              note: item.note,
-              item: item,
-            });
-          });
-          _arr.sort(function (a, b) {
-            return a.value > b.value ? 1 : -1; //升序
-          });
+      }).then(res => {
+        let _arr = [];
+        res.data.forEach((item) => {
           _arr.push({
-            label: "-未选择配件包-",
-            value: null,
-            unit: "",
-            note: "",
+            label: `${item.itemNo}:${item.note}`,
+            value: item.itemNo,
+            unit: item.unit,
+            note: item.note,
+            item: item,
           });
-          this.part2 = _arr;
-        })
+        });
+        _arr.sort(function (a, b) {
+          return a.value > b.value ? 1 : -1; //升序
+        });
+        _arr.push({
+          label: "-未选择配件包-",
+          value: null,
+          unit: "",
+          note: "",
+        });
+        this.part2 = _arr;
+      })
         .catch((err) => {
           this.part2 = [];
         });
@@ -705,71 +684,31 @@ export default {
       this.searchKey = "";
       this.items = [];
       this.dialogTableVisible = true;
-      this.dialogTitle = `【${this.getProductName(
-        data.productType
-      )}】类产品列表`;
+      this.dialogTitle = `【${this.getProductName(data.productType)}】类产品列表`;
       this.chooseIndex = index;
       this.chooseType = data.productType;
       if (data.productType !== "GY") {
-        this.getAllItemNoData(1);
+        this.initSearch();
       } else {
         this.getTheGY(this.message.itemNo);
       }
     },
-    //获取每页的条数
-    handleSizeChange(val) {
-      //console.log(`每页 ${val} 条`);
-    },
-    //当前页改变时的操作
-    handleCurrentChange(val) {
-      if (this.searchKey === "") {
-        this.getAllItemNoData(0);
-      } else {
-        this.getSingleItemNoData(0);
-      }
+    initSearch() {
+      this.currentPage = 1;
+      this.getAllItemNoData();
     },
     //获取可修改的全部编码
-    getAllItemNoData(status) {
-      if (this.searchKey !== "") return;
-      //0为默认搜索，1为搜索时首页
-      if (status === 1) this.currentPage = 1;
-      let obj = {
-        itemNO: this.chooseType,
+    getAllItemNoData() {
+      this.items = [];
+      GetChangeItemByProductType({
+        productType: this.chooseType,
+        condition: this.searchKey.toUpperCase(),
         limit: this.limit,
         page: this.currentPage,
-      };
-      changeItem(obj)
-        .then((res) => {
-          this.items = res.data;
-          this.totalNumber = res.data[0].total;
-        })
-        .catch((err) => {
-          this.items = [];
-          this.currentPage = 1;
-          this.totalNumber = 0;
-        });
-    },
-    //获取模糊搜索的编码
-    getSingleItemNoData(status) {
-      //0为默认模糊搜索，1为模糊搜索时首页
-      if (this.searchKey === "") return;
-      if (status === 1) this.currentPage = 1;
-      let obj = {
-        itemType: this.chooseType,
-        itemNO: this.searchKey.toUpperCase(),
-        limit: this.limit,
-        page: this.currentPage,
-      };
-      changeItemBlur(obj)
-        .then((res) => {
-          this.items = res.data;
-          this.totalNumber = res.data[0].total;
-        })
-        .catch((err) => {
-          this.items = [];
-          this.currentPage = 1;
-          this.totalNumber = 0;
-        });
+      }).then(res => {
+        this.items = res.data;
+        this.totalNumber = res.count;
+      }).catch((err) => {});
     },
     //修改编码--影响用量
     chooseItemNo() {
@@ -823,7 +762,6 @@ export default {
           itemType: this.curtainData[this.chooseIndex].itemType,
           fixType: this.curtainData[this.chooseIndex].fixType,
         };
-        //changeDosageByNo(obj)
         GetDosageByNo(obj)
           .then((res) => {
             if (res.data.length == 0) {
@@ -894,7 +832,6 @@ export default {
         itemType: this.curtainData[index].itemType,
         fixType: this.curtainData[index].fixType,
       };
-      //changeDosageByNo(obj)
       GetDosageByNo(obj)
         .then((res) => {
           if (res.data.length == 0) {
@@ -1379,7 +1316,6 @@ export default {
     },
     //查找库存
     getStoreData(originData) {
-      console.log(originData)
       for (var i = 0; i < originData.length; i++) {
         var oneCurtain = originData[i];
         if (!oneCurtain.itemNo) continue;

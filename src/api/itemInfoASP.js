@@ -158,3 +158,11 @@ export function GetLimitPriceByProVersion(data, config = {}) {
         return Promise.reject(err);
     })
 }
+//获得旧窗帘可替换列表
+export function GetChangeItemByProductType(data, config = {}) {
+    return post('/ITEM/GetChangeItemByProductType', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}

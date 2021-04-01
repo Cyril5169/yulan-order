@@ -1,92 +1,90 @@
 <template>
-    <el-card shadow="hover">
-      <p style="color: red;margin:0;font-size:12px;">（带*号表示可选择帘头外包盒）</p>
-      <div style="margin-top:10px;">
-        <el-input clearable v-model.trim="searchKey" @clear="searchCurtain" @keyup.enter.native="searchCurtain"
-          placeholder="输入商品型号查找商品" style="width:300px;">
-          <el-button @click="searchCurtain" slot="append" icon="el-icon-search">搜索</el-button>
-        </el-input>
-      </div>
-      <el-table :data="curtainMsg" style="min-width: 750px; margin: 5px auto;">
-        <el-table-column label="型号" width="100" align="center">
-          <template slot-scope="scope">
-            <div v-if="scope.row.wbhFlag == '1'">
-              {{ scope.row.itemNo }}
-              <span style="color: red;">*</span>
-            </div>
-            <div v-else>
-              {{ scope.row.itemNo }}
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="宽度(m)" width="80" align="center">
-          <template slot-scope="scope">
-            <currency-input :customStyle="'width: 60px;'" placeholder="0.00" v-model="scope.row.width">
-            </currency-input>
-          </template>
-        </el-table-column>
-        <el-table-column label="高度(m)" width="80" align="center">
-          <template slot-scope="scope">
-            <currency-input :customStyle="'width: 60px;'" placeholder="0.00" v-model="scope.row.height">
-            </currency-input>
-          </template>
-        </el-table-column>
-        <el-table-column label="帘外包宽度(m)" prop="fixGrade" width="120" align="center">
-          <template slot-scope="scope">
-            <div v-if="scope.row.wbhFlag == '1'">
-              <el-checkbox v-model="scope.row.isWBH">
-                <currency-input :customStyle="'width: 60px;'" placeholder="0.00" v-model="scope.row.WBH">
-                </currency-input>
-              </el-checkbox>
-            </div>
-            <div v-else>
-              <el-checkbox v-model="scope.row.isWBH" disabled>
-                <el-input style="width:60px;" size="mini" placeholder="无" v-model="scope.row.WBH" disabled>
-                </el-input>
-              </el-checkbox>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="褶皱倍数" width="100" align="center">
-          <template slot-scope="scope">
-            <el-select size="mini" v-model="scope.row.multiple" style="width:70px;">
-              <el-option v-for="item in options" :key="item.value" :label="item.value" :value="item.value">
-              </el-option>
-            </el-select>
-          </template>
-        </el-table-column>
-        <el-table-column label="位置" width="140" align="center">
-          <template slot-scope="scope">
-            <el-input style="width:120px;" size="mini" ref="location" placeholder="选填(20字符内)"
-              v-model="scope.row.location" @input="oninput($event,scope.$index)">
-            </el-input>
-          </template>
-        </el-table-column>
-        <el-table-column label="活动" width="280" align="center">
-          <template slot-scope="scope">
-            <el-select style="width:250px" size="mini" :disabled="isActivity[scope.$index]"
-              v-model="scope.row.activityId" :placeholder="
+  <el-card shadow="hover">
+    <p style="color: red;margin:0;font-size:12px;">（带*号表示可选择帘头外包盒）</p>
+    <div style="margin-top:10px;">
+      <el-input clearable v-model.trim="searchKey" @clear="searchCurtain" @keyup.enter.native="searchCurtain"
+        placeholder="输入商品型号查找商品" style="width:300px;">
+        <el-button @click="searchCurtain" slot="append" icon="el-icon-search">搜索</el-button>
+      </el-input>
+    </div>
+    <el-table :data="curtainMsg" style="min-width: 750px; margin: 5px auto;">
+      <el-table-column label="型号" width="100" align="center">
+        <template slot-scope="scope">
+          <div v-if="scope.row.wbhFlag == '1'">
+            {{ scope.row.itemNo }}
+            <span style="color: red;">*</span>
+          </div>
+          <div v-else>
+            {{ scope.row.itemNo }}
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="宽度(m)" width="80" align="center">
+        <template slot-scope="scope">
+          <currency-input :customStyle="'width: 60px;'" placeholder="0.00" v-model="scope.row.width">
+          </currency-input>
+        </template>
+      </el-table-column>
+      <el-table-column label="高度(m)" width="80" align="center">
+        <template slot-scope="scope">
+          <currency-input :customStyle="'width: 60px;'" placeholder="0.00" v-model="scope.row.height">
+          </currency-input>
+        </template>
+      </el-table-column>
+      <el-table-column label="帘外包宽度(m)" prop="fixGrade" width="120" align="center">
+        <template slot-scope="scope">
+          <div v-if="scope.row.wbhFlag == '1'">
+            <el-checkbox v-model="scope.row.isWBH">
+              <currency-input :customStyle="'width: 60px;'" placeholder="0.00" v-model="scope.row.WBH">
+              </currency-input>
+            </el-checkbox>
+          </div>
+          <div v-else>
+            <el-checkbox v-model="scope.row.isWBH" disabled>
+              <el-input style="width:60px;" size="mini" placeholder="无" v-model="scope.row.WBH" disabled>
+              </el-input>
+            </el-checkbox>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="褶皱倍数" width="100" align="center">
+        <template slot-scope="scope">
+          <el-select size="mini" v-model="scope.row.multiple" style="width:70px;">
+            <el-option v-for="item in options" :key="item.value" :label="item.value" :value="item.value">
+            </el-option>
+          </el-select>
+        </template>
+      </el-table-column>
+      <el-table-column label="位置" width="140" align="center">
+        <template slot-scope="scope">
+          <el-input style="width:120px;" size="mini" ref="location" placeholder="选填(20字符内)" v-model="scope.row.location"
+            @input="oninput($event,scope.$index)">
+          </el-input>
+        </template>
+      </el-table-column>
+      <el-table-column label="活动" width="280" align="center">
+        <template slot-scope="scope">
+          <el-select style="width:250px" size="mini" :disabled="isActivity[scope.$index]" v-model="scope.row.activityId"
+            :placeholder="
                   isActivity[scope.$index] == true
                     ? '无可选活动'
                     : '请选择活动'
                 ">
-              <el-option v-for="item in activityOptions[scope.$index]" :key="item.value" :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-select>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="100" align="center">
-          <template slot-scope="scope">
-            <a @click="chooseItem(scope.row, scope.$index)" style="color:red;">选择此款</a>
-          </template>
-        </el-table-column>
-      </el-table>
-      <el-pagination style="margin:0 20%;" @size-change="handleSizeChange" @current-change="handleCurrentChange"
-        :current-page.sync="currentPage" :page-size="limit" layout="total, prev, pager, next, jumper"
-        :total="totalNumber">
-      </el-pagination>
-    </el-card>
+            <el-option v-for="item in activityOptions[scope.$index]" :key="item.value" :label="item.label" :value="item.value">
+            </el-option>
+          </el-select>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="100" align="center">
+        <template slot-scope="scope">
+          <a @click="chooseItem(scope.row, scope.$index)" style="color:red;">选择此款</a>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination style="margin:0 20%;" @current-change="searchCurtain" :current-page.sync="currentPage" :page-size="limit"
+      layout="total, prev, pager, next, jumper" :total="totalNumber">
+    </el-pagination>
+  </el-card>
 </template>
 
 <script>
@@ -223,13 +221,6 @@ export default {
         name: `shoppingCurtainDetail`,
       });
     },
-    //获取每页的条数
-    handleSizeChange(val) {},
-    //当前页改变时的操作
-    handleCurrentChange(val) {
-      this.currentPage = val;
-      this.searchCurtain();
-    },
     //获取窗帘数据
     searchCurtain(status) {
       this.curtainData = [];
@@ -243,7 +234,7 @@ export default {
           this.totalNumber = res.count;
           this.createCurtainMsg();
         })
-        .catch((err) => {});
+        .catch((err) => { });
     },
     //渲染到表格的数
     async createCurtainMsg() {

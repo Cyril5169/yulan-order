@@ -8,7 +8,7 @@
           <el-option v-for="item in productVersionData" :key="item.PRODUCTVERSION_ID" :label="item.PRODUCTVERSION_NAME"
             :value="item.PRODUCTVERSION_ID"></el-option>
         </el-select>
-        <el-button icon="el-icon-search" class="greenBtn" @click="searchShops" style="margin-left:10px;">查询</el-button>
+        <el-button icon="el-icon-search" class="greenBtn" @click="initSearch" style="margin-left:10px;">查询</el-button>
       </div>
       <hr />
       <el-table :data="shopsData">
@@ -22,7 +22,7 @@
         <el-table-column label="财务分类" prop="PROPERTY_TYPE_NAME2" width="120" align="center"></el-table-column>
         <el-table-column label="非普通出口贸易价" prop="PRICE_ADVISE_CK2" width="130" align="center"></el-table-column>
       </el-table>
-      <el-pagination style="margin:0 30%;" @current-change="handleCurrentChange" :current-page.sync="currentPage"
+      <el-pagination style="margin:0 30%;" @current-change="searchShops" :current-page.sync="currentPage"
         :page-size="limit" layout="total, prev, pager, next, jumper" :total="totalNumber">
       </el-pagination>
     </el-card>
@@ -68,9 +68,6 @@ export default {
         this.totalNumber = res.count;
         console.log(res.data);
       });
-    },
-    handleCurrentChange() {
-      this.searchShops();
     },
   },
   created() {

@@ -247,10 +247,7 @@
         </el-table-column>
         <el-table-column label="兰居意见" header-align="center" v-if="tableStatus !== 0">
           <template slot-scope="scope">
-            <el-input v-if="tableStatus === 1" type="textarea" :autosize="{ maxRows: 6 }" v-model="scope.row.suggestion"
-              clearable>
-            </el-input>
-            <el-input v-else-if="tableStatus === 2 || tableStatus === 3" size="mini" disabled type="textarea"
+            <el-input v-if="tableStatus === 2 || tableStatus === 3" size="mini" disabled type="textarea"
               :autosize="{ maxRows: 6 }" v-model="scope.row.suggestion" clearable>
             </el-input>
           </template>
@@ -268,21 +265,7 @@
           返回
         </el-button>
       </div>
-      <!-- 兰居审核 -->
-      <div v-if="tableStatus === 1" style="text-align: center;" class="mt20">
-        <el-input style="margin-bottom: 10px" resize="none" type="textarea" :rows="3" placeholder="请输入订单审核意见"
-          v-model="suggestionLJ">
-        </el-input>
-        <el-button type="success" class="mr20" width="130px" :disabled="STATUS_ID == '0'" @click.native="resolvePass">
-          确认通过
-        </el-button>
-        <el-button type="primary" class="ml20 mr20" width="130px" @click.native="resolveModify">
-          确认修改
-        </el-button>
-        <el-button type="info" class="ml20" width="130px" @click.native="rejectModify">
-          取消
-        </el-button>
-      </div>
+
       <!-- 用户根据兰居意见修改 -->
       <div v-if="tableStatus === 2" style="text-align: center;" class="mt20">
         <el-input style="margin-bottom: 10px" resize="none" type="textarea" :rows="3" disabled placeholder="请输入订单审核意见"
@@ -295,6 +278,7 @@
           取消
         </el-button>
       </div>
+
       <!-- 只可查看 -->
       <div v-if="tableStatus === 3" style="text-align: center;" class="mt20">
         <el-input style="margin-bottom: 10px" resize="none" type="textarea" :rows="3" disabled placeholder="请输入订单审核意见"
@@ -597,9 +581,14 @@ export default {
         this.headerData.activityId = this.headerData.activityName;
       }
       this.activityOptions = [];
-      if (this.customerType == "110") {
+      if (this.customerType == "110" || this.tableStatus != 0) {
         GetPromotionsById({ PID: this.headerData.activityId }).then((res) => {
           this.activityOptions = res.data;
+          this.activityOptions.push({
+            ORDER_TYPE: "",
+            ORDER_NAME: "不参与活动",
+            P_ID: null,
+          });
         });
       } else {
         getItemById(

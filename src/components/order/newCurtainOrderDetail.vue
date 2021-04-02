@@ -375,7 +375,7 @@
 <script>
 import Cookies from "js-cookie";
 import Axios from "axios";
-import { GetPromotionByItem } from "@/api/orderListASP";
+import { GetPromotionByItem, GetPromotionsById } from "@/api/orderListASP";
 import {
   GetAsyncItemData,
   GetPartTypeDataTable,
@@ -631,17 +631,19 @@ export default {
     //获得活动
     getActivity() {
       this.activityOptions = [];
-      GetPromotionByItem(
-        {
-          cid: this.cid,
-          customerType: this.customerType,
-          itemNo: this.orderDetail.ITEM_NO,
-          itemVersion: this.orderDetail.ITEM_VERSION,
-          productType: this.orderDetail.PRODUCT_TYPE,
-          productBrand: this.orderDetail.PRODUCT_BRAND,
-        },
-        { loading: false }
-      ).then((res) => {
+      // GetPromotionByItem(
+      //   {
+      //     cid: this.cid,
+      //     customerType: this.customerType,
+      //     itemNo: this.orderDetail.ITEM_NO,
+      //     itemVersion: this.orderDetail.ITEM_VERSION,
+      //     productType: this.orderDetail.PRODUCT_TYPE,
+      //     productBrand: this.orderDetail.PRODUCT_BRAND,
+      //   },
+      //   { loading: false }
+      // ).then((res) => {
+      GetPromotionsById({ PID: this.orderDetail.P_ID }).then((res) => {
+        console.log(res)
         this.activityOptions = res.data;
         this.activityOptions.push({
           ORDER_TYPE: "",
@@ -1501,7 +1503,7 @@ export default {
     //获得窗帘的说明
     getRemark(index) {
       var curtains = [];
-       var orderDetail = this.orderDetail;
+      var orderDetail = this.orderDetail;
       var allCurtains = orderDetail.curtains;
       if (index == undefined) {
         curtains = this.orderDetail.curtains;

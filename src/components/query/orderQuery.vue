@@ -513,6 +513,10 @@ export default {
       this.orderVisible = true;
     },
     async getCustomerInfo(val) {
+      var data = {
+        cid: "",
+        companyId: val.CUSTOMER_CODE
+      };
       var res = await getResideMonery({companyId: val.CUSTOMER_CODE});
       this.moneySituation = res.data;
       var url = "/order/findRebate.do";

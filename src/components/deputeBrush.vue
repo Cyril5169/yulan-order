@@ -243,9 +243,7 @@ export default {
         if (res.data[0].assignments) {
           this.assignments = res.data[0].assignments.ASSIGNMENTS;
           this.assignmentsTarget = res.data[0].assignments.ASSIGNMENTS_TARGET;
-          this.assignmentsReduce = (
-            this.assignmentsTarget - this.allSpanSum
-          ).toFixed(2);
+          this.assignmentsReduce = (this.assignmentsTarget - this.allSpanSum).toFixed(2);
           this.tHead();
         } else {
           this.tableHead1 = "所选月无任务";

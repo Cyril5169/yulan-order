@@ -4,10 +4,8 @@
       <div class="tbarStyle">
         <div>
           <span>市场</span>
-          <el-select size="small" v-model="selectAreaCode" placeholder="请选择市场" style="width:150px"
-            @change="areaCodeChange">
-            <el-option v-for="item in areaCodeList" :key="item.AREA_CODE" :label="item.AREA_NAME"
-              :value="item.AREA_CODE">
+          <el-select size="small" v-model="selectAreaCode" placeholder="请选择市场" style="width:150px" @change="areaCodeChange">
+            <el-option v-for="item in areaCodeList" :key="item.AREA_CODE" :label="item.AREA_NAME" :value="item.AREA_CODE">
             </el-option>
           </el-select>
           <span style="margin-left:5px;">片区</span>
@@ -26,16 +24,15 @@
           </el-select>
           <!-- <el-checkbox v-model="isValid" style="margin-left:10px" @change="getCustomerDataList">仅有效客户</el-checkbox> -->
           <span style="margin-left:5px;">关键字筛选</span>
-          <el-input size="small" @keyup.enter.native="getCustomerDataList()" placeholder="客户名称，客户代码" clearable
-            v-model="condition" style="width:250px;">
+          <el-input size="small" @keyup.enter.native="getCustomerDataList()" placeholder="客户名称，客户代码" clearable v-model="condition"
+            style="width:250px;">
             <el-button @click="getCustomerDataList()" slot="append" icon="el-icon-search">搜索</el-button>
           </el-input>
         </div>
         <hr />
         <div style="margin-top:10px;">
           <div style="display:inline-block;">
-            <el-transfer :titles="['可选用户', '已选用户']" class="transferP" v-model="selectCustomer" :data="customerData"
-              :props="{
+            <el-transfer :titles="['可选用户', '已选用户']" class="transferP" v-model="selectCustomer" :data="customerData" :props="{
                   key: 'CUSTOMER_CODE',
                   label: 'CUSTOMER_NAME'
                 }" @left-check-change="checkChange" @right-check-change="checkChange2">
@@ -43,20 +40,19 @@
           </div>
           <div style="display:inline-block;vertical-align:top;margin-left:20px;">
             <div>
-              <span>提交日期</span>
-              <el-date-picker format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="开始日期区间" v-model="beginTime"
-                style="width:150px"></el-date-picker>
+              <span>归属月份</span>
+              <el-date-picker value-format="yyyy-MM-dd" placeholder="开始日期区间" v-model="beginTime" style="width:150px" type="month">
+              </el-date-picker>
               &nbsp;--
-              <el-date-picker format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="结束日期区间" v-model="finishTime"
-                style="width:150px;"></el-date-picker>
+              <el-date-picker value-format="yyyy-MM-dd" placeholder="结束日期区间" v-model="finishTime" style="width:150px;" type="month"></el-date-picker>
             </div>
-            <div style="margin-top:20px;">
+            <!-- <div style="margin-top:20px;">
               <span>订单状态</span>
               <el-select v-model="selectOrderType" style="width:150px">
                 <el-option v-for="item in orderTypeData" :key="item.value" :label="item.label" :value="item.value">
                 </el-option>
               </el-select>
-            </div>
+            </div> -->
             <div style="margin-top:20px;">
               <el-button icon="el-icon-search" class="greenBtn" @click="searchData">查询</el-button>
               <el-button icon="el-icon-s-grid" class="greenBtn" @click="resetData" style="margin-left:35px;">重置
@@ -120,7 +116,7 @@
         <div style="font-size:15px;color:blue;margin:5px" v-if="getMoney > 0">
           订单金额汇总：{{ getMoney }}元
         </div>
-        <el-table :data="customerOrderData" border highlight-current-row style="width: 100%;">
+        <el-table :data="customerOrderData" border highlight-current-row show-summary :summary-method="getSummaries">
           <el-table-column type="index">
           </el-table-column>
           <el-table-column label="订单号" align="center" width="120px">
@@ -517,7 +513,7 @@ export default {
         cid: "",
         companyId: val.CUSTOMER_CODE
       };
-      var res = await getResideMonery({companyId: val.CUSTOMER_CODE});
+      var res = await getResideMonery({ companyId: val.CUSTOMER_CODE });
       this.moneySituation = res.data;
       var url = "/order/findRebate.do";
       var res2 = await manageCoupon(url, data);
@@ -528,6 +524,33 @@ export default {
       var res3 = await getCustomerInfo(data);
       this.customerInfo = res3.data;
       this.customerDetailVisible = true;
+    },
+    getSummaries(param) {
+      const { columns, data } = param;
+      const sums = [];
+      columns.forEach((column, index) => {
+        if (index === 0) {
+          sums[index] = "本页";
+          return;
+        }
+        if (index == 4) {
+          const values = data.map((item) => Number(item[column.property]));
+          if (!values.every((value) => isNaN(value))) {
+            sums[index] = values.reduce((prev, curr) => {
+              const value = Number(curr);
+              if (!isNaN(value)) {
+                return prev + curr;
+              } else {
+                return prev;
+              }
+            }, 0);
+            sums[index] = sums[index].toFixed(2);
+          }
+        } else {
+          sums[index] = "";
+        }
+      });
+      return sums;
     }
   },
   created() {

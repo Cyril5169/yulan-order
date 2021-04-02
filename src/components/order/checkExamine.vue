@@ -1,6 +1,6 @@
 <template>
-  <el-card class="centerCard">
-    <el-dialog title="窗帘详情" :visible.sync="detailVisible" width="95%" top="5vh">
+  <el-card class="centerCard" shadow="never">
+    <el-dialog title="窗帘详情" :visible.sync="detailVisible" width="95%" top="5vh" append-to-body>
       <keep-alive>
         <detailCurtainTable v-if="detailVisible" :tableStatus="check_CURTAIN_STATUS_ID != 1 ? 3 : 2" :headerData="headerData"
           :curtainData="curtainData" :suggestion="ljsuggestion" @visible="closeTheDialog" @deleteArr="getDeleteArr"
@@ -15,7 +15,7 @@
       </div>
     </el-dialog>
     <el-dialog v-if="newCurtainDetailVisible" title="窗帘详情" :visible.sync="newCurtainDetailVisible" width="1200px" top="5vh"
-      :close-on-click-modal="false">
+      :close-on-click-modal="false" append-to-body>
       <newCurtainOrderDetail :ORDERBODY="selectOrderDetail" :ruleForm="ruleForm" :originDelete="originDelete"
         @resolveModify="resolveModify" />
     </el-dialog>
@@ -28,7 +28,7 @@
       <el-button @click="backTowhere()" style="float:right;" size="small" type="success" plain v-if="button_1">返回
       </el-button>
     </div>
-    <el-card class="tableCard" shadow="hover" body-style="padding:1px">
+    <el-card class="tableCard" shadow="never" body-style="padding:1px">
       <div slot="header">
         <span class="zoomLeft">
           订单号：

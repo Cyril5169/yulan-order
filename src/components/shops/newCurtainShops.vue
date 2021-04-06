@@ -71,7 +71,7 @@
                 <span>{{transPartTypeCode(scope.row.NC_PART_TYPECODE)}}</span>
               </template>
             </el-table-column>
-            <el-table-column label="编码" width="140" header-align="center" prop="ITEM_NO">
+            <el-table-column label="编码" width="140" header-align="center" prop="ITEM_NO" :show-overflow-tooltip="false">
               <template slot-scope="scope">
                 <!-- 标定 -->
                 <template v-if="scope.row.ITEM_NO">
@@ -1819,6 +1819,8 @@ export default {
 }
 .curtain-list .el-table .cell {
   padding: 0 2px !important;
+  /* 火狐下出现省略号 */
+  overflow: inherit !important;
 }
 .curtain-list .el-input__inner {
   padding: 0 5px !important;

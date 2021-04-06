@@ -41,10 +41,10 @@
           <div style="display:inline-block;vertical-align:top;margin-left:20px;">
             <div>
               <span>归属月份</span>
-              <el-date-picker value-format="yyyy-MM-dd" placeholder="开始日期区间" v-model="beginTime" style="width:150px" type="month">
+              <el-date-picker value-format="yyyy-MM-dd" placeholder="开始日期区间" :picker-options="pickerOptions1" v-model="beginTime" style="width:150px" type="month">
               </el-date-picker>
               &nbsp;--
-              <el-date-picker value-format="yyyy-MM-dd" placeholder="结束日期区间" v-model="finishTime" style="width:150px;" type="month"></el-date-picker>
+              <el-date-picker value-format="yyyy-MM-dd" placeholder="结束日期区间" :picker-options="pickerOptions2" v-model="finishTime" style="width:150px;" type="month"></el-date-picker>
             </div>
             <!-- <div style="margin-top:20px;">
               <span>订单状态</span>
@@ -292,7 +292,25 @@ export default {
       customerDetailVisible: false,
       customerInfo: {},
       couponData: [],
-      moneySituation: ""
+      moneySituation: "",
+      pickerOptions1: {
+        disabledDate: (beginTime) => {
+          if (this.finishTime) {
+            return (
+              beginTime.getTime() >= new Date(this.finishTime).getTime()
+            );
+          }
+        },
+      },
+      pickerOptions2: {
+        disabledDate: (finishTime) => {
+          if (this.beginTime) {
+            return (
+              finishTime.getTime() <= new Date(this.beginTime).getTime()
+            );
+          }
+        },
+      },
     };
   },
   components: {

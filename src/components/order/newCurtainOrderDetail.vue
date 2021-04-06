@@ -1713,6 +1713,7 @@ export default {
 }
 .curtain-list .el-table .cell {
   padding: 0 2px !important;
+  overflow: inherit !important;
 }
 .curtain-list .el-input__inner {
   padding: 0 5px !important;

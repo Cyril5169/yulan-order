@@ -2666,6 +2666,7 @@ td {
 }
 .curtain-list .el-table .cell {
   padding: 0 2px !important;
+  overflow: inherit !important;
 }
 .curtain-list .el-table .bold-row {
   font-weight: bold;

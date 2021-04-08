@@ -142,6 +142,14 @@ export function GetItemStock(data, config = {}) {
         return Promise.reject(err);
     })
 }
+//获得墙纸库存判断
+export function GetItemStoreCheckData(data, config = {}) {
+    return post('/ITEM/GetItemStoreCheckData', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
 //获得生产状态
 export function GetProductStatus(data, config = {}) {
     return post('/ITEM/GetProductStatus', data, config).then((res) => {

@@ -1931,6 +1931,8 @@ export default {
                   onlineDanhao: oneplace[0].ORDER_NO,
                   data: JSON.stringify(detailData)
                 };
+                console.log(1)
+                console.log(postdata)
                 Axios.defaults.withCredentials = false;
                 try {
                   var resB = await Axios.post(
@@ -1940,6 +1942,7 @@ export default {
                     postdata,
                     { params: postdata, loading: false }
                   );
+                  console.log(resB)
                   if (resB.data.state == "ok") {
                   } else {
                     var msg = pruData[i].PUR_NO + "位置:" + oneplace[0].CL_PLACE + "同步失败;";
@@ -2111,6 +2114,7 @@ export default {
               { PUR_NO: pruData[i].PUR_NO },
               { loading: false }
             );
+            console.log(resC)
           }
         }
         loading.close();

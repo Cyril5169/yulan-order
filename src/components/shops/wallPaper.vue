@@ -106,7 +106,6 @@
 
 <script>
 import { getShopsWallPaperMsg } from "@/api/shopSearch";
-import { getWallPaperStore, checkStore } from "@/api/searchStore";
 import { findItemActivity } from "@/api/findActivity";
 import { addShoppingCar } from "@/api/shop";
 import { getItemById, GetPromotionByItem } from "@/api/orderListASP";
@@ -118,6 +117,7 @@ import {
   GetSalPutonRecord,
   GetItemStock,
   GetFixPriceShopsByItemNo,
+  GetItemStoreCheckData
 } from "@/api/itemInfoASP";
 
 export default {
@@ -188,108 +188,102 @@ export default {
         LOGINNAME: this.cid,
         type: "",
       };
-      //getShopsWallPaperMsg(data)
-      GetWallpaperInfo(data)
-        .then((res) => {
-          //getItemById({ itemNo: res.data.itemNo }).then(res2 => {
-          GetSalPutonRecord({ itemNo: res.data[0].ITEM_NO }).then((res2) => {
-            this.baobei = res2.count > 0 ? true : false;
-            res.data[0].DECIMAL_PLACES == "1"
-              ? (this.decimalNum = 1)
-              : (this.decimalNum = 2);
-            res.data[0].MINIMUM_PURCHASE == 0
-              ? (this.minimumPurchaseShow = false)
-              : (this.minimumPurchaseShow = true);
-            this.tableData.push({
-              type: res.data[0].ITEM_NO, //型号
-              sample: res.data[0].OLD_ITEM_NO, //样本型号
-              versionNumber: res.data[0].PRODUCTVERSION_NAME, //版本
-              version: res.data[0].NOTE, //名称
-              brand: res.data[0].BRAND_NAME, //品牌
-              productType: res.data[0].PRODUCT_TYPE, //类型
-              unit: res.data[0].UNIT, //单位
-              noteType: res.data[0].NOTE_TYPE,
-              noteTypeName: res.data[0].NOTE_TYPE_NAME,
-              number: "", //数量
-              anotherNumber: "", //辅助数量
-              minimumPurchase: res.data[0].MINIMUM_PURCHASE, // 起购数量
-            });
-            this.expands.push(res.data[0].ITEM_NO);
-            if (res.data[0].UNIT == "平方米") this.numWidth = 220;
-            else this.numWidth = 100;
-            let storage = window.localStorage;
-            let arr = [];
-            if (storage.history !== undefined && storage.history !== null) {
-              arr = storage.history.toLocaleString().split(",");
-            }
-            //记录去重
-            arr.push(this.searchKey.toUpperCase());
-            arr = [...new Set(arr)];
-            //只保留最新的8条记录
-            if (arr.length > 8) {
-              arr = arr.splice(arr.length - 8);
-            }
-            storage.history = arr;
-            this.history = arr.reverse();
-            storage.history.toLocaleString();
-            this.clearMsg();
-            //findItemActivity({
-            GetPromotionByItem({
-              cid: this.cid,
-              customerType: this.customerType,
-              itemNo: res.data[0].ITEM_NO,
-              itemVersion: res.data[0].ITEM_VERSION,
-              productType: res.data[0].PRODUCT_TYPE,
-              productBrand: res.data[0].PRODUCT_BRAND,
-            })
-              .then((res2) => {
-                if (res2.data.length === 0) {
-                  this.disableFlag = true;
-                } else {
-                  this.disableFlag = false;
-                }
-                var defaultSel = {
-                  pri: 0,
-                  id: 0,
-                };
-                for (var i = 0; i < res2.data.length; i++) {
-                  var obj = {
-                    label:
-                      res2.data[i].ORDER_TYPE +
-                      " -- " +
-                      res2.data[i].ORDER_NAME,
-                    value: res2.data[i].P_ID,
-                  };
-                  if (res2.data[i].PRIORITY != 0 && defaultSel.pri == 0) {
-                    defaultSel.pri = res2.data[i].PRIORITY;
-                    defaultSel.id = res2.data[i].P_ID;
-                  } else if (
-                    res2.data[i].PRIORITY != 0 &&
-                    defaultSel.pri > res2.data[i].PRIORITY
-                  ) {
-                    defaultSel.pri = res2.data[i].PRIORITY;
-                    defaultSel.id = res2.data[i].P_ID;
-                  }
-                  this.activity.push(obj);
-                }
-                if (defaultSel.pri != 0) {
-                  this.seletedActivity = defaultSel.id;
-                }
-                this.activity.push({
-                  label: "不参与活动",
-                  value: null,
-                });
-              })
-              .catch((err) => {
-                console.log(err);
-              });
+      GetWallpaperInfo(data).then((res) => {
+        GetSalPutonRecord({ itemNo: res.data[0].ITEM_NO }).then((res2) => {
+          this.baobei = res2.count > 0 ? true : false;
+          res.data[0].DECIMAL_PLACES == "1"
+            ? (this.decimalNum = 1)
+            : (this.decimalNum = 2);
+          res.data[0].MINIMUM_PURCHASE == 0
+            ? (this.minimumPurchaseShow = false)
+            : (this.minimumPurchaseShow = true);
+          this.tableData.push({
+            type: res.data[0].ITEM_NO, //型号
+            sample: res.data[0].OLD_ITEM_NO, //样本型号
+            versionNumber: res.data[0].PRODUCTVERSION_NAME, //版本
+            version: res.data[0].NOTE, //名称
+            brand: res.data[0].BRAND_NAME, //品牌
+            productType: res.data[0].PRODUCT_TYPE, //类型
+            unit: res.data[0].UNIT, //单位
+            noteType: res.data[0].NOTE_TYPE,
+            noteTypeName: res.data[0].NOTE_TYPE_NAME,
+            number: "", //数量
+            anotherNumber: "", //辅助数量
+            minimumPurchase: res.data[0].MINIMUM_PURCHASE, // 起购数量
           });
-        })
-        .catch((err) => {
-          this.tableData = [];
-          this.expands = [];
+          this.expands.push(res.data[0].ITEM_NO);
+          if (res.data[0].UNIT == "平方米") this.numWidth = 220;
+          else this.numWidth = 100;
+          let storage = window.localStorage;
+          let arr = [];
+          if (storage.history !== undefined && storage.history !== null) {
+            arr = storage.history.toLocaleString().split(",");
+          }
+          //记录去重
+          arr.push(this.searchKey.toUpperCase());
+          arr = [...new Set(arr)];
+          //只保留最新的8条记录
+          if (arr.length > 8) {
+            arr = arr.splice(arr.length - 8);
+          }
+          storage.history = arr;
+          this.history = arr.reverse();
+          storage.history.toLocaleString();
           this.clearMsg();
+          //findItemActivity({
+          GetPromotionByItem({
+            cid: this.cid,
+            customerType: this.customerType,
+            itemNo: res.data[0].ITEM_NO,
+            itemVersion: res.data[0].ITEM_VERSION,
+            productType: res.data[0].PRODUCT_TYPE,
+            productBrand: res.data[0].PRODUCT_BRAND,
+          }).then((res2) => {
+            if (res2.data.length === 0) {
+              this.disableFlag = true;
+            } else {
+              this.disableFlag = false;
+            }
+            var defaultSel = {
+              pri: 0,
+              id: 0,
+            };
+            for (var i = 0; i < res2.data.length; i++) {
+              var obj = {
+                label:
+                  res2.data[i].ORDER_TYPE +
+                  " -- " +
+                  res2.data[i].ORDER_NAME,
+                value: res2.data[i].P_ID,
+              };
+              if (res2.data[i].PRIORITY != 0 && defaultSel.pri == 0) {
+                defaultSel.pri = res2.data[i].PRIORITY;
+                defaultSel.id = res2.data[i].P_ID;
+              } else if (
+                res2.data[i].PRIORITY != 0 &&
+                defaultSel.pri > res2.data[i].PRIORITY
+              ) {
+                defaultSel.pri = res2.data[i].PRIORITY;
+                defaultSel.id = res2.data[i].P_ID;
+              }
+              this.activity.push(obj);
+            }
+            if (defaultSel.pri != 0) {
+              this.seletedActivity = defaultSel.id;
+            }
+            this.activity.push({
+              label: "不参与活动",
+              value: null,
+            });
+          }).catch((err) => {
+            console.log(err);
+          });
         });
+      }).catch((err) => {
+        this.tableData = [];
+        this.expands = [];
+        this.clearMsg();
+      });
     },
     getPriceTip() {
       switch (this.customerType) {
@@ -404,21 +398,32 @@ export default {
         });
         return;
       }
-      checkStore({
-        itemNo: row.type,
-        stockShowNum: val,
-      })
-        .then((res) => {
-          this.getStore(row, res);
-          return;
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }, //获取库存信息
-    getStore(row, res) {
+      //库存判断
+      GetItemStoreCheckData({ itemNo: row.type }).then((res) => {
+        var msg = "null";
+        if (res.data.maxStock && res.data.maxStock.length) {
+          var sumStock = res.data.sumStock[0].SUM_QTY;
+          var maxStock = res.data.maxStock[0].QTY;
+          if (val <= maxStock) {
+            msg = "SUCCESS";
+          } else if (maxStock < val && val <= sumStock) {
+            //允许分批出货
+            msg = "splitShipment";
+          } else if (val > sumStock) {
+            //等待制作
+            msg = "waitForProduction";
+          }
+        }
+        this.getStore(row, msg);
+        return;
+      }).catch((err) => {
+        console.log(err);
+      });
+    },
+    //获取库存信息
+    getStore(row, msg) {
       let storeMessage;
-      switch (res.msg) {
+      switch (msg) {
         case "SUCCESS":
           storeMessage = "-1";
           break;
@@ -575,17 +580,12 @@ export default {
     //查看该商品的库存
     seeStore(scope) {
       this.produceStore = [];
-      //getWallPaperStore({
-      GetItemStock({
-        itemNo: scope.row.type,
-      })
-        .then((res) => {
-          this.produceStore = res.data;
-          this.dialogTableVisible = true;
-        })
-        .catch((err) => {
-          console.log(err.data);
-        });
+      GetItemStock({ itemNo: scope.row.type }).then((res) => {
+        this.produceStore = res.data;
+        this.dialogTableVisible = true;
+      }).catch((err) => {
+        console.log(err.data);
+      });
     },
     //点击取消收起
     closeExpand() {
@@ -614,7 +614,7 @@ export default {
           storage.removeItem("history");
           this.history = this.localHistory();
         })
-        .catch(() => {});
+        .catch(() => { });
     },
   },
   created() {

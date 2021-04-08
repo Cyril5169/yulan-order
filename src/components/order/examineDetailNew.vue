@@ -1209,11 +1209,8 @@ export default {
     //获取备注文字
     getRemark(data, rowIndex) {
       if (data.certainHeightWidth === 0) {
-        if (
-          data.specification <
-          this.ruleForm.ORDERBODY[rowIndex].CURTAIN_HEIGHT &&
-          data.specification > 0
-        ) {
+        if (data.specification < this.ruleForm.ORDERBODY[rowIndex].CURTAIN_HEIGHT && data.specification > 0) {
+          console.log(data.specification, this.ruleForm.ORDERBODY[rowIndex].CURTAIN_HEIGHT)
           return "超高帘，用量待审核!!";
         }
       }

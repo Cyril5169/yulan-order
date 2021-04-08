@@ -117,8 +117,8 @@ import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
 import { findItemActivity } from "@/api/findActivity";
 import { updateShoppingCar, updateShopPrice } from "@/api/shop";
-import { checkStore } from "@/api/searchStore";
 import { getItemById, GetPromotionByItem } from "@/api/orderListASP";
+import { GetItemStoreCheckData } from "@/api/itemInfoASP";
 
 export default {
   name: "DetailWallPaper",
@@ -191,9 +191,9 @@ export default {
         });
     },
     //获取库存信息
-    getStore(row, res) {
+    getStore(row, msg) {
       let storeMessage;
-      switch (res.msg) {
+      switch (msg) {
         case "SUCCESS":
           storeMessage = null;
           this.addToCar(row, storeMessage);
@@ -380,7 +380,7 @@ export default {
         );
         return;
       }
-      newNum = newNum.toString();
+      //newNum = newNum.toString();
       let actRe = this.activity.some(item => {
         if (item.value === this.data.activityId) {
           return true;
@@ -402,17 +402,27 @@ export default {
           return;
         }
       }
-      checkStore({
-        itemNo: this.data.item.itemNo,
-        stockShowNum: newNum
-      })
-        .then(res => {
-          this.getStore(this.data, res);
-          return;
-        })
-        .catch(err => {
-          console.log(err);
-        });
+      //库存判断
+      GetItemStoreCheckData({ itemNo: this.data.item.itemNo }).then((res) => {
+        var msg = "null";
+        if (res.data.maxStock && res.data.maxStock.length) {
+          var sumStock = res.data.sumStock[0].SUM_QTY;
+          var maxStock = res.data.maxStock[0].QTY;
+          if (newNum <= maxStock) {
+            msg = "SUCCESS";
+          } else if (maxStock < newNum && newNum <= sumStock) {
+            //允许分批出货
+            msg = "splitShipment";
+          } else if (newNum > sumStock) {
+            //等待制作
+            msg = "waitForProduction";
+          }
+        }
+        this.getStore(this.data, msg);
+        return;
+      }).catch((err) => {
+        console.log(err);
+      });
     }
   }
 };

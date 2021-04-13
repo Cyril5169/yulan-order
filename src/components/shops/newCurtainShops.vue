@@ -1295,10 +1295,10 @@ export default {
             LCBITEM[j].DOSAGE = dosage;
           }
         }
-        if(oneCurtain.NC_PART_TYPECODE == "LCB") {
+        if (oneCurtain.NC_PART_TYPECODE == "LCB") {
           //如果后添加里衬布，导致里衬布没有用量
           var LSITEM = this.curtainData.filter(item => item.NC_PART_TYPECODE == "LS");
-          if(LSITEM.length && LSITEM[0].DOSAGE != undefined){
+          if (LSITEM.length && LSITEM[0].DOSAGE != undefined) {
             oneCurtain.DOSAGE = LSITEM[0].DOSAGE;
           }
         }
@@ -1544,17 +1544,17 @@ export default {
         salPromotion: this.salPromotion
       }).then(res => {
         this.$confirm("成功加入购物车！如需继续下单请修改相关信息后再次添加！", "提示", {
-          confirmButtonText: "继续下单",
-          cancelButtonText: "前往购物车",
+          confirmButtonText: "前往购物车",
+          cancelButtonText: "继续下单",
           type: "warning",
-        }).then(() => { })
-          .catch(() => {
-            this.closeToTab({
-              oldUrl: "shops/newCurtainShops",
-              newUrl: "shoppingCar/shopping?newCurtain",
-            });
+        }).then(() => {
+          this.closeToTab({
+            oldUrl: "shops/newCurtainShops",
+            newUrl: "shoppingCar/shopping?newCurtain",
           });
-        this.$root.$emit("refreshBadgeIcon", "newCurtainCount");
+        }).catch(() => {
+          this.$root.$emit("refreshBadgeIcon", "newCurtainCount");
+        });
       }).catch(res => {
         console.log(res);
         this.$alert("加入购物车失败，请联系管理员！", "提示", {

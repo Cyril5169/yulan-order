@@ -319,14 +319,12 @@ export default {
     //获取角标待确认对账单
     async getStatementIcon() {
       if (this.isContainAttr("statement")) {
-        let url = "/customerBalance/getCustomerBalanceInfo.do";
         let data = {
           cid: Cookies.get("cid"),
           limit: 9999,
           page: 1,
           status: "待确认",
         };
-        //let statement = await checkBill(url, data, { loading: false });
         let statement = await GetBalancePeriod(data, { loading: false });
         this.changeBadge({
           name: "statement",

@@ -204,7 +204,7 @@ export default {
       });
     },
     //删除单件商品
-    deleteSingle(item) {
+    deleteSingle(row) {
       this.$confirm("是否删除选中的商品？删除后将不可恢复！", "提示", {
         confirmButtonText: "确定删除",
         cancelButtonText: "我再想想",
@@ -212,7 +212,7 @@ export default {
       })
         .then(() => {
           let data = [];
-          data.push(item.cartItemId);
+          data.push(row.cartItemId);
           DeleteCartItems({ cartItemIds: data }).then((res) => {
             this.$alert("删除成功", "提示", {
               confirmButtonText: "确定",
@@ -296,7 +296,7 @@ export default {
       for (var i = 0; i < this.multipleSelection.length; i++) {
         if (this.multipleSelection[i].activityEffective === false) {
           this.$alert(
-            `产品中的${this.multipleSelection[i].item.itemNo}对应的活动已经过期，无法提交，请更换活动`,
+            `产品中的${this.multipleSelection[i].modelNumber}对应的活动已经过期，无法提交，请更换活动`,
             "提示",
             {
               type: "warning",

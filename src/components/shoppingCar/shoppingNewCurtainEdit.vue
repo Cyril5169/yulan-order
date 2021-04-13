@@ -67,26 +67,24 @@
           </el-table-column>
           <el-table-column label="编码" width="140" header-align="center" prop="ITEM_NO">
             <template slot-scope="scope">
-              <!-- 标定 -->
-              <template v-if="scope.row.ITEM_NO">
-                <!-- 是否可替换 -->
-                <a v-if="itemCanChange(scope.row)" class="a-link" :class="{'delete-cls': !scope.row.curtain_choose}"
-                  @click="exchangeModelOrItem(scope.row)">{{scope.row.ITEM_NO}}</a>
-                <span v-else :class="{'delete-cls': !scope.row.curtain_choose}">{{scope.row.ITEM_NO}}</span>
-                <!-- 是否可删/是否默认勾选 -->
-                <el-checkbox v-if="itemCanDelete(scope.row)" v-model="scope.row.curtain_choose"
-                  @change="onCheckChange($event, scope.row)"></el-checkbox>
-              </template>
-              <template v-else-if="scope.row.NC_PART_TYPECODE == 'LBT'">
-                <span style="color:red;">未维护数据!</span>
-              </template>
-              <!-- 没有模板，非标定 -->
-              <template v-else>
-                <a class="a-link" :class="{'delete-cls': !scope.row.curtain_choose}"
-                  @click="exchangeModelOrItem(scope.row)">请选择</a>
-                <el-checkbox v-model="scope.row.curtain_choose" @change="onCheckChange($event, scope.row)">
-                </el-checkbox>
-              </template>
+              <!-- 是否可替换 -->
+              <span :class="{ 'a-link': itemCanChange(scope.row), 'delete-cls': !scope.row.curtain_choose }"
+                @click="itemCanChange(scope.row) && exchangeModelOrItem(scope.row)">
+                <!-- 标定 -->
+                <template v-if="scope.row.ITEM_NO">
+                  {{scope.row.ITEM_NO}}
+                </template>
+                <template v-else-if="scope.row.NC_PART_TYPECODE == 'LBT'">
+                  <span style="color:red;">未维护数据!</span>
+                </template>
+                <!-- 没有模板，非标定 -->
+                <template v-else>
+                  请选择
+                </template>
+              </span>
+              <!-- 是否可删/是否默认勾选 -->
+              <el-checkbox v-if="itemCanDelete(scope.row)" v-model="scope.row.curtain_choose"
+                @change="onCheckChange($event, scope.row)"></el-checkbox>
             </template>
           </el-table-column>
           <el-table-column label="名称" width="80" header-align="center" prop="CURTAIN_ITEM_NAME">
@@ -352,9 +350,9 @@
     <el-drawer :title='"【" + exchangeItemNow.ITEM_NO + " " + exchangeItemNow.NOTE + "】" +  "可替换列表"' :visible.sync="drawerShow2"
       :with-header="false" size="530px">
       <div style="padding:0 10px;margin-bottom:10px;">
-        <el-input clearable v-model.trim="itemCondition" @clear="getExangeItemList" size="small"
-          @keyup.enter.native="getExangeItemList" placeholder="请输入物料号" style="width:300px;">
-          <el-button @click="getExangeItemList" slot="append" icon="el-icon-search">搜索</el-button>
+        <el-input clearable v-model.trim="itemCondition" @clear="getExchangeItemList" size="small"
+          @keyup.enter.native="getExchangeItemList" placeholder="请输入物料号" style="width:300px;">
+          <el-button @click="getExchangeItemList" slot="append" icon="el-icon-search">搜索</el-button>
         </el-input>
         <span style="color:grey;margin-left:10px;">*单击选择</span>
       </div>
@@ -367,7 +365,7 @@
           </div>
         </div>
       </div>
-      <el-pagination class="tc mt10" @current-change="getExangeItemList" :current-page.sync="currentPage" :page-size="limit"
+      <el-pagination class="tc mt10" @current-change="getExchangeItemList" :current-page.sync="currentPage" :page-size="limit"
         layout="total, prev, pager, next, jumper" :total="totalNumber">
       </el-pagination>
     </el-drawer>
@@ -415,7 +413,6 @@ export default {
       limit: 50,
       totalNumber: 0,
       oldCurtainData: [],
-      newCurtainData: [],
       isStandard: true
     }
   },
@@ -656,6 +653,7 @@ export default {
           show: true
         })
         this.dealCurtainData();
+        this.getActivity();
       })
     },
     //处理窗帘数据
@@ -954,18 +952,15 @@ export default {
     },
     //一个子件的总价
     oneTotal(row, calculatePromotion = true) {
-      var price = 0;
-      if (row.DOSAGE) {
-        price = calculatePromotion ? this.calculatePromotionPrice(row) : row.PRICE;
-        //最小下单量 帘头1.帘身里衬，窗纱4
-        var DOSAGE = this.convertNumber(row.DOSAGE);
-        if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < 1) {
-          DOSAGE = 1;
-        } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'LCB' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4) {
-          DOSAGE = 4;
-        }
-        price = price.mul(DOSAGE)
+      var price = calculatePromotion ? this.calculatePromotionPrice(row) : row.PRICE;
+      //最小下单量 帘头1.帘身里衬，窗纱4
+      var DOSAGE = row.DOSAGE ? this.convertNumber(row.DOSAGE) : 0;
+      if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < 1) {
+        DOSAGE = 1;
+      } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'LCB' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4) {
+        DOSAGE = 4;
       }
+      price = price.mul(DOSAGE)
       return price;
     },
     //改变么术贴
@@ -1148,7 +1143,7 @@ export default {
         //子件替换
         this.itemCondition = "";
         this.exchangeItemNow = JSON.parse(JSON.stringify(row)); //当前数据
-        this.getExangeItemList();
+        this.getExchangeItemList();
       }
     },
     //获得可替换组件列表
@@ -1185,6 +1180,8 @@ export default {
               //单价
               var price = this.getPrice(this.customerType, oneCurtain);
               this.$set(oneCurtain, "PRICE", price);
+              //库存
+              this.$set(oneCurtain, "curtain_store", "");
             }
             //库存
             curtain_list = this.getStoreData(curtain_list);
@@ -1308,10 +1305,17 @@ export default {
         this.$set(oneCurtain, "DOSAGE", dosage);
         if (oneCurtain.NC_PART_TYPECODE == "LS") {
           //改变里衬布的
-          var LCBITEM = originData.filter(item => item.NC_PART_TYPECODE == "LCB");
+          var LCBITEM = this.curtainHeadData.curtains.filter(item => item.NC_PART_TYPECODE == "LCB");
           for (var j = 0; j < LCBITEM.length; j++) {
             //假设有多个里衬布的情况
             LCBITEM[j].DOSAGE = dosage;
+          }
+        }
+        if (oneCurtain.NC_PART_TYPECODE == "LCB") {
+          //如果后添加里衬布，导致里衬布没有用量
+          var LSITEM = this.curtainHeadData.curtains.filter(item => item.NC_PART_TYPECODE == "LS");
+          if (LSITEM.length && LSITEM[0].DOSAGE != undefined) {
+            oneCurtain.DOSAGE = LSITEM[0].DOSAGE;
           }
         }
         //左转角
@@ -1326,7 +1330,7 @@ export default {
       return originData;
     },
     //获得可替换子件列表
-    getExangeItemList() {
+    getExchangeItemList() {
       this.exchangeItemList = [];
       GetExchangeModelItem({
         NC_MODEL_ID: this.exchangeItemNow.NC_MODEL_ID,
@@ -1651,7 +1655,6 @@ export default {
       return;
     }
     this.getPartTypeData();
-    this.getActivity();
     this.getDetail();
   }
 }
@@ -1682,6 +1685,8 @@ export default {
   max-height: 100%;
 }
 .a-link {
+  color: #409eff;
+  cursor: pointer;
   text-decoration: underline;
 }
 .a-userset {

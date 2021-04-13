@@ -42,8 +42,8 @@
             content="作废订单" placement="top">
             <i style="float:right;cursor: pointer;" class="el-icon-delete" @click="deleteOrder(item.ORDER_NO)"></i>
           </el-tooltip>
-          <el-tooltip v-if="item.ORDER_NO.slice(0, 1) == 'X' || item.ORDER_NO.slice(0, 1) == 'N'"
-            class="item" effect="dark" content="复制数据到购物车" placement="top">
+          <el-tooltip v-if="item.ORDER_NO.slice(0, 1) == 'X' || item.ORDER_NO.slice(0, 1) == 'N'" class="item" effect="dark"
+            content="复制数据到购物车" placement="top">
             <i style="float:right;cursor: pointer;" class="el-icon-sell" @click="copyCart(item.ORDER_NO)"></i>
           </el-tooltip>
           <a v-if="
@@ -439,7 +439,7 @@ export default {
       Cookies.set("new_cur_status", 0);
       this.addTab("order/checkOrder");
     },
-    summitNewCurtain(item){
+    summitNewCurtain(item) {
       let orderBody = item.ORDERBODY;
       let transCookies = [];
       for (let i = 0; i < orderBody.length; i++) {
@@ -468,18 +468,15 @@ export default {
     },
     //一个子件的总价
     oneTotal(row) {
-      var price = 0;
-      if (row.DOSAGE) {
-        price = row.PRICE;
-        //最小下单量 帘头1.帘身里衬，窗纱4
-        var DOSAGE = row.DOSAGE;
-        if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < 1) {
-          DOSAGE = 1;
-        } else if ((row.NC_PART_TYPECODE == 'LS'|| row.NC_PART_TYPECODE == 'LCB' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4) {
-          DOSAGE = 4;
-        }
-        price = price.mul(DOSAGE)
+      var price = row.PRICE;
+      //最小下单量 帘头1.帘身里衬，窗纱4
+      var DOSAGE = row.DOSAGE;
+      if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < 1) {
+        DOSAGE = 1;
+      } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'LCB' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4) {
+        DOSAGE = 4;
       }
+      price = price.mul(DOSAGE)
       return price;
     },
     //查看审核

@@ -375,12 +375,9 @@ import Cookies from "js-cookie";
 import Axios from "axios";
 import { GetPromotionByItem, GetPromotionsById } from "@/api/orderListASP";
 import {
-  GetAsyncItemData,
   GetPartTypeDataTable,
-  GetCurtainTemplateAndModel,
   GetExchangeModel,
   GetExchangeModelItem,
-  AddNewCurtainToCart
 } from "@/api/newCurtainASP";
 
 export default {
@@ -409,7 +406,6 @@ export default {
       limit: 50,
       totalNumber: 0,
       oldCurtainData: [],
-      newCurtainData: [],
       isStandard: false
     }
   },
@@ -641,7 +637,6 @@ export default {
       //   { loading: false }
       // ).then((res) => {
       GetPromotionsById({ PID: this.orderDetail.P_ID }).then((res) => {
-        console.log(res)
         this.activityOptions = res.data;
         this.activityOptions.push({
           ORDER_TYPE: "",
@@ -1300,10 +1295,10 @@ export default {
             LCBITEM[j].DOSAGE = dosage;
           }
         }
-        if(oneCurtain.NC_PART_TYPECODE == "LCB") {
+        if (oneCurtain.NC_PART_TYPECODE == "LCB") {
           //如果后添加里衬布，导致里衬布没有用量
           var LSITEM = this.orderDetail.curtains.filter(item => item.NC_PART_TYPECODE == "LS");
-          if(LSITEM.length && LSITEM[0].DOSAGE != undefined){
+          if (LSITEM.length && LSITEM[0].DOSAGE != undefined) {
             oneCurtain.DOSAGE = LSITEM[0].DOSAGE;
           }
         }

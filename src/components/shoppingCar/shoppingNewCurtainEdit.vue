@@ -378,12 +378,9 @@ import Axios from "axios";
 import { mapActions } from "vuex";
 import { GetPromotionByItem } from "@/api/orderListASP";
 import {
-  GetAsyncItemData,
   GetPartTypeDataTable,
-  GetCurtainTemplateAndModel,
   GetExchangeModel,
   GetExchangeModelItem,
-  AddNewCurtainToCart,
   GetNewCurtainDetail,
   UpdateNewCurtainCart
 } from "@/api/newCurtainASP";

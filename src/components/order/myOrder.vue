@@ -204,6 +204,10 @@ export default {
           label: "软装",
           value: "Y",
         },
+        {
+          label: "新窗帘",
+          value: "N",
+        },
       ],
       options: [
         {
@@ -577,69 +581,70 @@ export default {
         confirmButtonText: "是",
         cancelButtonText: "否",
         type: "warning",
-      })
-        .then(() => {
-          cancelOrderNew({
-            cid: Cookies.get("cid"),
-            orderNo: pushOrderNum,
-          }).then((res) => {
-            if (pushOrderNum.slice(0, 1) == "X" || pushOrderNum.slice(0, 1) == "N") {
-              this.$confirm("作废成功，是否复制数据到购物车？", "提示", {
-                confirmButtonText: "是",
-                cancelButtonText: "否",
-                type: "warning",
-              })
-                .then(() => {
-                  var data3 = {
-                    orderNo: pushOrderNum,
-                  };
-                  copyCartItem(data3).then((res) => {
-                    this.$alert("复制成功，请到购物车中查看", "提示", {
-                      confirmButtonText: "确定",
-                      type: "success",
-                    });
-                    this.$root.$emit("refreshBadgeIcon", "curtainCount");
-                  });
-                })
-                .catch(() => { });
-            } else {
-              this.$alert("作废成功", "提示", {
-                confirmButtonText: "确定",
-                type: "success",
+      }).then(() => {
+        cancelOrderNew({
+          cid: Cookies.get("cid"),
+          orderNo: pushOrderNum,
+        }).then((res) => {
+          if (pushOrderNum.slice(0, 1) == "X" || pushOrderNum.slice(0, 1) == "N") {
+            this.$confirm("作废成功，是否复制数据到购物车？", "提示", {
+              confirmButtonText: "是",
+              cancelButtonText: "否",
+              type: "warning",
+            }).then(() => {
+              var data3 = {
+                orderNo: pushOrderNum,
+              };
+              copyCartItem(data3).then((res) => {
+                this.$alert("复制成功，请到购物车中查看", "提示", {
+                  confirmButtonText: "确定",
+                  type: "success",
+                });
+                if (pushOrderNum.slice(0, 1) == "X")
+                  this.$root.$emit("refreshBadgeIcon", "curtainCount");
+                else if (pushOrderNum.slice(0, 1) == "N") {
+                  this.$root.$emit("refreshBadgeIcon", "newCurtainCount");
+                }
               });
-            }
-            this.refresh();
-            this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
-          })
-            .catch((res) => {
-              this.$alert("删除失败,请刷新订单", "提示", {
-                confirmButtonText: "确定",
-                type: "success",
-              });
+            }).catch(() => { });
+          } else {
+            this.$alert("作废成功", "提示", {
+              confirmButtonText: "确定",
+              type: "success",
             });
-          //预留接口-删除订单
-        })
-        .catch((err) => { });
+          }
+          this.refresh();
+          this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
+        }).catch((res) => {
+          this.$alert("删除失败,请刷新订单", "提示", {
+            confirmButtonText: "确定",
+            type: "success",
+          });
+        });
+        //预留接口-删除订单
+      }).catch((err) => { });
     },
     copyCart(orderNo) {
       this.$confirm("是否复制数据到购物车？", "提示", {
         confirmButtonText: "是",
         cancelButtonText: "否",
         type: "warning",
-      })
-        .then(() => {
-          var data = {
-            orderNo: orderNo,
-          };
-          copyCartItem(data).then((res) => {
-            this.$alert("复制成功，请到购物车中查看", "提示", {
-              confirmButtonText: "确定",
-              type: "success",
-            });
-            this.$root.$emit("refreshBadgeIcon", "curtainCount");
+      }).then(() => {
+        var data = {
+          orderNo: orderNo,
+        };
+        copyCartItem(data).then((res) => {
+          this.$alert("复制成功，请到购物车中查看", "提示", {
+            confirmButtonText: "确定",
+            type: "success",
           });
-        })
-        .catch(() => { });
+          if (orderNo.slice(0, 1) == "X")
+            this.$root.$emit("refreshBadgeIcon", "curtainCount");
+          else if (orderNo.slice(0, 1) == "N") {
+            this.$root.$emit("refreshBadgeIcon", "newCurtainCount");
+          }
+        });
+      }).catch(() => { });
     },
     refreshPay(item) {
       settlementAgain({

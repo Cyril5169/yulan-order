@@ -464,6 +464,7 @@ import {
   getOrderDetails,
   getOperationRecord,
   getCustomerInfo,
+  GetUnImportOrder
 } from "@/api/orderListASP";
 import {
   GetPartTypeDataTable,
@@ -495,6 +496,7 @@ export default {
       isFixed2: !window.localStorage.getItem("curtainFixed") ||
         window.localStorage.getItem("curtainFixed") == "true",
       curtainPartTypeData: [],
+      unImportOrderData: [], //在途
       curtainParamsData: [],
       curtainParamsList: {},
       drawerShow: false,
@@ -657,6 +659,12 @@ export default {
   },
   methods: {
     ...mapActions("navTabs", ["closeToTab"]),
+    //在途
+    getOnwayOrderData() {
+      GetUnImportOrder().then(res => {
+        this.unImportOrderData = res.data;
+      })
+    },
     //PartType字典
     getPartTypeData() {
       GetPartTypeDataTable().then((res) => {
@@ -969,11 +977,13 @@ export default {
         }).then((res) => {
           if (res.data && res.data.data) {
             var store_charge = "";
-            var ddz = 0;
             var kucun = res.data.data.kucun ? res.data.data.kucun : 0;
             var dinghuoshu = res.data.data.dinghuoshu ? res.data.data.dinghuoshu : 0;
             var xiaxian = res.data.data.xiaxian ? res.data.data.xiaxian : 0;
-            var store_num = kucun - dinghuoshu;
+            var ddz = 0;
+            var itemOnway = this.unImportOrderData.filter(item => item.ITEM_NO == res.data.data.code);
+            if (itemOnway.length) ddz = itemOnway[0].DOSAGE;
+            var store_num = kucun - dinghuoshu - ddz;
             if (store_num >= xiaxian) {
               store_charge = "充足";
             } else if (store_num > 0 && store_num < xiaxian) {
@@ -1386,9 +1396,9 @@ export default {
       var price = row.PRICE;
       //最小下单量 帘头1.帘身里衬，窗纱4
       var DOSAGE = row.DOSAGE ? this.convertNumber(row.DOSAGE) : 0;
-      if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < 1) {
+      if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < 1 && DOSAGE > 0) {
         DOSAGE = 1;
-      } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'LCB' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4) {
+      } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'LCB' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4 && DOSAGE > 0) {
         DOSAGE = 4;
       }
       price = price.mul(DOSAGE)
@@ -2094,7 +2104,7 @@ export default {
         if (!oneCurtain.ITEM_NO) continue;
         //最小下单量。帘头1.帘身里衬，窗纱4
         if (oneCurtain.NC_PART_TYPECODE == 'LT') {
-          if (oneCurtain.DOSAGE < 1) {
+          if (oneCurtain.DOSAGE < 1 && oneCurtain.DOSAGE > 0) {
             if (oneCurtain.ILLUSTRATE.indexOf('不足1平方米。按1平方米下单量收费;') == -1) {
               oneCurtain.ILLUSTRATE += '不足1平方米。按1平方米下单量收费;';
             }
@@ -2102,7 +2112,7 @@ export default {
             oneCurtain.ILLUSTRATE = oneCurtain.ILLUSTRATE.replace('不足1平方米。按1平方米下单量收费;', '');
           }
         } else if (oneCurtain.NC_PART_TYPECODE == 'LS' || oneCurtain.NC_PART_TYPECODE == 'LCB' || oneCurtain.NC_PART_TYPECODE == 'CS') {
-          if (oneCurtain.DOSAGE < 4) {
+          if (oneCurtain.DOSAGE < 4 && oneCurtain.DOSAGE > 0) {
             if (oneCurtain.ILLUSTRATE.indexOf('不足4平方米。按4平方米下单量收费;') == -1) {
               oneCurtain.ILLUSTRATE += '不足4平方米。按4平方米下单量收费;';
             }
@@ -2151,7 +2161,7 @@ export default {
       }
     },
     headTableRowClassName({ row, rowIndex }) {
-      return "success-row";
+      return "green-row";
     },
     tableRowClassName({ row, rowIndex }) {
       if (row.curtain_level == 0) {
@@ -2181,6 +2191,7 @@ export default {
   },
   mounted() {
     this.orderNumber = Cookies.get("NEW_ORDER_NO");
+    this.getOnwayOrderData();
     this.getPartTypeData();
     this.getCurtainParams();
     this.getDetail();
@@ -2349,6 +2360,9 @@ export default {
 </style>
 
 <style>
+.el-table .green-row {
+  background: #8bc34a;
+}
 .centerCard .el-icon-arrow-right:before {
   content: "";
 }

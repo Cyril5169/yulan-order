@@ -474,6 +474,7 @@ export default {
       isFixed: false,
       isFixed2: !window.localStorage.getItem("curtainFixed") ||
         window.localStorage.getItem("curtainFixed") == "true",
+      unImportOrderData: [], //在途  
     };
   },
   filters: {
@@ -518,6 +519,12 @@ export default {
   },
   methods: {
     ...mapActions("navTabs", ["closeToTab"]),
+    //在途
+    getOnwayOrderData() {
+      GetUnImportOrder().then(res => {
+        this.unImportOrderData = res.data;
+      })
+    },
     allTotal(index) {
       let totalMoney = 0;
       var _data = JSON.parse(JSON.stringify(this.allCurtaindata));
@@ -1596,11 +1603,13 @@ export default {
         }).then((res) => {
           if (res.data && res.data.data) {
             var store_charge = "";
-            var ddz = 0;
             var kucun = res.data.data.kucun ? res.data.data.kucun : 0;
             var dinghuoshu = res.data.data.dinghuoshu ? res.data.data.dinghuoshu : 0;
             var xiaxian = res.data.data.xiaxian ? res.data.data.xiaxian : 0;
-            var store_num = kucun - dinghuoshu;
+            var ddz = 0;
+            var itemOnway = this.unImportOrderData.filter(item => item.ITEM_NO == res.data.data.code);
+            if (itemOnway.length) ddz = itemOnway[0].DOSAGE;
+            var store_num = kucun - dinghuoshu - ddz;
             if (store_num >= xiaxian) {
               store_charge = "充足";
             } else if (store_num > 0 && store_num < xiaxian) {
@@ -1622,6 +1631,7 @@ export default {
   },
   created() {
     this.orderNumber = Cookies.get("ORDER_NO");
+    this.getOnwayOrderData();
     this.getDetail();
   },
   mounted() {

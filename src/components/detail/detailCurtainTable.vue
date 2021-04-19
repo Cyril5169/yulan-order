@@ -17,6 +17,12 @@
       <el-table style="width:100%;" border :data="data" :span-method="cellMerge">
         <el-table-column width="170" header-align="center" label="商品信息">
           <template>
+            <!-- 显示图片预览 -->
+            <div v-for="(item,index) in previewUrlList" :key="index" v-if="tableStatus == 0">
+              <!-- <img v-if="item.show" class="curtain-preview" :src="item.src" @error="showDefaultImg(index)" /> -->
+              <el-image v-if="item.show" class="curtain-preview" :src="item.src" fit="fill" @error="showDefaultImg(index)"
+                :preview-src-list="showPreviewUrlList"></el-image>
+            </div>
             <div class="messageBox">
               <div>
                 <label>款号:</label>
@@ -336,6 +342,7 @@ import {
   getItemById,
   GetPromotionByItem,
   GetPromotionsById,
+  GetUnImportOrder,
 } from "@/api/orderListASP";
 import { UpdateCartItem } from "@/api/shopASP";
 import Cookies from "js-cookie";
@@ -360,6 +367,7 @@ export default {
         groupType: "", //活动组
       },
       activityOptions: [],
+      unImportOrderData: [], //在途
       chooseBig: [true, true, true, true, true], //是否选择了大类
       spanArr0: [], //商品信息跨行的数据
       spanArr1: [], //名称跨行的数据
@@ -422,6 +430,7 @@ export default {
       part2: [],
       suggestionLJ: "", //兰居人员总体审核意见
       check_CURTAIN_STATUS_ID: Cookies.get("CURTAIN_STATUS_ID"),
+      previewUrlList: [],
     };
   },
   props: [
@@ -476,8 +485,21 @@ export default {
       }
       return totalMoney;
     },
+    showPreviewUrlList() {
+      var urlList = [];
+      for (var i = 0; i < this.previewUrlList.length; i++) {
+        if (this.previewUrlList[i].show) urlList.push(this.previewUrlList[i].src)
+      }
+      return urlList;
+    }
   },
   methods: {
+    //在途
+    getOnwayOrderData() {
+      GetUnImportOrder().then(res => {
+        this.unImportOrderData = res.data;
+      })
+    },
     //修改配件包时，对应修改单位以及名称说明
     changePJBUnit(index) {
       let _data = this.data[index].item.itemNo;
@@ -1417,6 +1439,12 @@ export default {
         .catch((err) => {
           this.part2 = [];
         });
+      //预览图片
+      this.previewUrlList.push({
+        type: 'LK',
+        src: `http://www.luxlano.com/ddkc/ckfinder/userfiles/images/pimg/${this.headerData.modelNumber}.jpg`,
+        show: true
+      })
       let obj = {
         itemNO: data.modelNumber.toString(),
         width: data.width.toString(),
@@ -1528,11 +1556,13 @@ export default {
         }).then((res) => {
           if (res.data && res.data.data) {
             var store_charge = "";
-            var ddz = 0;
             var kucun = res.data.data.kucun ? res.data.data.kucun : 0;
             var dinghuoshu = res.data.data.dinghuoshu ? res.data.data.dinghuoshu : 0;
             var xiaxian = res.data.data.xiaxian ? res.data.data.xiaxian : 0;
-            var store_num = kucun - dinghuoshu;
+            var ddz = 0;
+            var itemOnway = this.unImportOrderData.filter(item => item.ITEM_NO == res.data.data.code);
+            if (itemOnway.length) ddz = itemOnway[0].DOSAGE;
+            var store_num = kucun - dinghuoshu - ddz;
             if (store_num >= xiaxian) {
               store_charge = "充足";
             } else if (store_num > 0 && store_num < xiaxian) {
@@ -1551,11 +1581,16 @@ export default {
       }
       return originData;
     },
+    //找不到图片时
+    showDefaultImg(index) {
+      this.previewUrlList[index].show = false;
+    },
   },
   activated() {
     for (var i = 0; i < this.curtainData.length; i++) {
       this.$set(this.curtainData[i], "curtain_store", "");
     }
+    this.getOnwayOrderData();
     this.getActivity();
     //按规则排序
     this.curtainData.sort(function (a, b) {
@@ -1607,6 +1642,12 @@ export default {
   border-radius: 4px;
   color: gray;
   display: inline-block;
+}
+.curtain-preview {
+  width: 80px;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
 }
 </style>
 

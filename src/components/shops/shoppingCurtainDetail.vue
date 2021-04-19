@@ -13,6 +13,12 @@
       <el-table style="width:100%;font-size:14px;" border :data="curtainData" :span-method="cellMerge">
         <el-table-column width="140" header-align="center" label="商品信息">
           <template>
+            <!-- 显示图片预览 -->
+            <div v-for="(item,index) in previewUrlList" :key="index">
+              <!-- <img v-if="item.show" class="curtain-preview" :src="item.src" @error="showDefaultImg(index)" /> -->
+              <el-image v-if="item.show" class="curtain-preview" :src="item.src" fit="fill" @error="showDefaultImg(index)"
+                    :preview-src-list="showPreviewUrlList"></el-image>
+            </div>
             <div class="messageBox">
               <div>
                 <label>款号:</label>
@@ -252,7 +258,7 @@ import {
   addCurtainToCar,
 } from "@/api/curtain";
 import { GetDosageAll, GetDosageByNo, GetChangeItemByProductType } from "@/api/itemInfoASP";
-import { getItemById, GetPromotionByItem } from "@/api/orderListASP";
+import { getItemById, GetPromotionByItem, GetUnImportOrder } from "@/api/orderListASP";
 import Cookies from "js-cookie";
 import { mapMutations, mapActions } from "vuex";
 import Axios from "axios";
@@ -326,6 +332,8 @@ export default {
       ],
       //配件编码
       part2: [],
+      unImportOrderData: [], //在途
+      previewUrlList: [],
     };
   },
   computed: {
@@ -372,9 +380,22 @@ export default {
       }
       return totalMoney;
     },
+    showPreviewUrlList() {
+      var urlList = [];
+      for (var i = 0; i < this.previewUrlList.length; i++) {
+        if (this.previewUrlList[i].show) urlList.push(this.previewUrlList[i].src)
+      }
+      return urlList;
+    }
   },
   methods: {
     ...mapActions("navTabs", ["closeToTab"]),
+    //在途
+    getOnwayOrderData() {
+      GetUnImportOrder().then(res => {
+        this.unImportOrderData = res.data;
+      })
+    },
     //修改配件包时，对应修改单位
     changePJBUnit(index) {
       let _data = this.curtainData[index].itemNo;
@@ -544,18 +565,22 @@ export default {
         multiple: this.message.multiple, //褶皱倍数
         location: this.message.location,
       };
-      getCurtainDetailMsg(data)
-        .then((res) => {
-          GetDosageAll(data).then((res2) => {
-            this.allData = res;
-            this.replaceDosage(res2.data);
-            this.getCurtainMsg(res);
-            this.getSpanArr(res);
-          });
-        })
-        .catch((err) => {
-          console.log(err);
+      getCurtainDetailMsg(data).then(res => {
+        GetDosageAll(data).then((res2) => {
+          this.allData = res;
+          this.replaceDosage(res2.data);
+          this.getCurtainMsg(res);
+          this.getSpanArr(res);
+          //预览图片
+          this.previewUrlList.push({
+            type: 'LK',
+            src: `http://www.luxlano.com/ddkc/ckfinder/userfiles/images/pimg/${this.message.itemNo}.jpg`,
+            show: true
+          })
         });
+      }).catch((err) => {
+        console.log(err);
+      });
     },
     replaceDosage(dosageFilter) {
       var gy003 = dosageFilter.filter((item) => item.ITEM_NO == "GY-003");
@@ -708,7 +733,7 @@ export default {
       }).then(res => {
         this.items = res.data;
         this.totalNumber = res.count;
-      }).catch((err) => {});
+      }).catch((err) => { });
     },
     //修改编码--影响用量
     chooseItemNo() {
@@ -1332,11 +1357,13 @@ export default {
         }).then((res) => {
           if (res.data && res.data.data) {
             var store_charge = "";
-            var ddz = 0;
             var kucun = res.data.data.kucun ? res.data.data.kucun : 0;
             var dinghuoshu = res.data.data.dinghuoshu ? res.data.data.dinghuoshu : 0;
             var xiaxian = res.data.data.xiaxian ? res.data.data.xiaxian : 0;
-            var store_num = kucun - dinghuoshu;
+            var ddz = 0;
+            var itemOnway = this.unImportOrderData.filter(item => item.ITEM_NO == res.data.data.code);
+            if (itemOnway.length) ddz = itemOnway[0].DOSAGE;
+            var store_num = kucun - dinghuoshu - ddz;
             if (store_num >= xiaxian) {
               store_charge = "充足";
             } else if (store_num > 0 && store_num < xiaxian) {
@@ -1355,6 +1382,10 @@ export default {
       }
       return originData;
     },
+    //找不到图片时
+    showDefaultImg(index) {
+      this.previewUrlList[index].show = false;
+    },
   },
   created() {
     if (
@@ -1362,6 +1393,7 @@ export default {
       Cookies.get("curtainMsg") !== null
     ) {
       this.message = JSON.parse(Cookies.get("curtainMsg"));
+      this.getOnwayOrderData();
       this.getActivity();
       this.getPJB();
       this.getDetail();
@@ -1403,6 +1435,12 @@ export default {
   color: gray;
   display: inline-block;
   line-height: 20px;
+}
+.curtain-preview {
+  width: 80px;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
 }
 </style>
 <style>

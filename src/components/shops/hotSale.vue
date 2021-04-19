@@ -1,98 +1,24 @@
 <template>
   <el-card>
-    <div v-if="hotSaleVersion.length > 0" style="margin-bottom:20px;">
-      <h2 style="text-align:center;margin:0 0 10px 0;">
-        版本热销榜
-      </h2>
-      <div>
-        <table style="margin:0 auto;">
-          <tr v-for="(item, index) in hotSaleVersion" :key="index">
-            <td style="height:30px;min-width:160px;" v-for="(n, indexx) in 5" :key="indexx">
-              <span v-if="item[indexx].ITEM_NO != ''" class="numIndex hot-index-normal" :class="{
-                              'hot-index1': index == 0 && indexx == 0,
-                              'hot-index2':
-                                index == 0 && (indexx == 1 || indexx == 2),
-                              'hot-index3':
-                                index == 0 && (indexx == 3 || indexx == 4)
-                            }">{{ index * 5 + indexx + 1 }}</span>
-              <a style="cursor:default;">{{ item[indexx].ITEM_NO }}</a>
-              <img src="../../assets/img/img/search-hot.gif" v-if="index == 0 && item[indexx].ITEM_NO != ''" />
-            </td>
-          </tr>
-        </table>
+    <template v-for="typeData in hotSaleTypeData">
+      <div class="hot-sale-panel" v-if="typeData.data.length" :key="typeData.type">
+        <h2 class="panel-title">{{typeData.text}}</h2>
+        <div>
+          <table class="panel-table">
+            <tr v-for="(item, index) in typeData.data" :key="index">
+              <td v-for="(n, indexx) in 5" :key="indexx">
+                <span v-if="item[indexx].ITEM_NO != ''" class="numIndex hot-index-normal"
+                  :class="{'hot-index1': index == 0,'hot-index2': index == 1,'hot-index3': index == 2}">{{ index * 5 + indexx + 1 }}</span>
+                <a v-if="typeData.canClick" class="hover-link" title="点击前往下单"
+                  @click="selectHot(item[indexx].ITEM_NO)">{{ item[indexx].ITEM_NO }}</a>
+                <a v-else style="cursor:default;">{{ item[indexx].ITEM_NO }}</a>
+                <img src="../../assets/img/img/search-hot.gif" v-if="(index == 0 || index == 1) && item[indexx].ITEM_NO != ''" />
+              </td>
+            </tr>
+          </table>
+        </div>
       </div>
-    </div>
-    <div v-if="hotSaleItem.length > 0" style="margin-bottom:20px;">
-      <h2 style="text-align:center;margin:0 0 10px 0;">
-        型号热销榜
-      </h2>
-      <div>
-        <table style="margin:0 auto;">
-          <tr v-for="(item, index) in hotSaleItem" :key="index">
-            <td style="height:30px;min-width:160px;" v-for="(n, indexx) in 5" :key="indexx">
-              <span v-if="item[indexx].ITEM_NO != ''" class="numIndex hot-index-normal" :class="{
-                              'hot-index1': index == 0,
-                              'hot-index2': index == 1,
-                              'hot-index3': index == 2
-                            }">{{ index * 5 + indexx + 1 }}</span>
-              <a class="hover-link" title="点击前往下单"
-                @click="selectHot(item[indexx].ITEM_NO)">{{ item[indexx].ITEM_NO }}</a>
-              <img src="../../assets/img/img/search-hot.gif" v-if="
-                              (index == 0 || index == 1) &&
-                                item[indexx].ITEM_NO != ''
-                            " />
-            </td>
-          </tr>
-        </table>
-      </div>
-    </div>
-    <div v-if="hotSaleCurtain.length > 0" style="margin-bottom:20px;">
-      <h2 style="text-align:center;margin:0 0 10px 0;">
-        窗帘版本推荐
-      </h2>
-      <div>
-        <table style="margin:0 auto;">
-          <tr v-for="(item, index) in hotSaleCurtain" :key="index">
-            <td style="height:30px;min-width:160px;" v-for="(n, indexx) in 5" :key="indexx">
-              <span v-if="item[indexx].ITEM_NO != ''" class="numIndex hot-index-normal" :class="{
-                              'hot-index1': index == 0,
-                              'hot-index2': index == 1,
-                              'hot-index3': index == 2
-                            }">{{ index * 5 + indexx + 1 }}</span>
-              <a style="cursor:default;">{{ item[indexx].ITEM_NO }}</a>
-              <img src="../../assets/img/img/search-hot.gif" v-if="
-                              (index == 0 || index == 1) &&
-                                item[indexx].ITEM_NO != ''
-                            " />
-            </td>
-          </tr>
-        </table>
-      </div>
-    </div>
-    <div v-if="hotSaleSoft.length > 0" style="margin-bottom:20px;">
-      <h2 style="text-align:center;margin:0 0 10px 0;">
-        面料热销榜
-      </h2>
-      <div>
-        <table style="margin:0 auto;">
-          <tr v-for="(item, index) in hotSaleSoft" :key="index">
-            <td style="height:30px;min-width:160px;" v-for="(n, indexx) in 5" :key="indexx">
-              <span v-if="item[indexx].ITEM_NO != ''" class="numIndex hot-index-normal" :class="{
-                              'hot-index1': index == 0,
-                              'hot-index2': index == 1,
-                              'hot-index3': index == 2
-                            }">{{ index * 5 + indexx + 1 }}</span>
-              <a class="hover-link" title="点击前往下单"
-                @click="selectHot(item[indexx].ITEM_NO)">{{ item[indexx].ITEM_NO }}</a>
-              <img src="../../assets/img/img/search-hot.gif" v-if="
-                              (index == 0 || index == 1) &&
-                                item[indexx].ITEM_NO != ''
-                            " />
-            </td>
-          </tr>
-        </table>
-      </div>
-    </div>
+    </template>
   </el-card>
 </template>
 
@@ -104,128 +30,75 @@ import { GetHotSales, GetItemDetailById } from "@/api/itemInfoASP";
 export default {
   data() {
     return {
-      hotSaleVersion: [],
-      hotSaleItem: [],
-      hotSaleCurtain: [],
-      hotSaleSoft: [],
+      hotSaleTypeData: [
+        {
+          type: 'B',
+          text: '版本热销榜',
+          canClick: false,
+          data: []
+        },
+        {
+          type: 'A',
+          text: '型号热销榜',
+          canClick: true,
+          data: []
+        },
+        {
+          type: 'C',
+          text: '窗帘版本推荐',
+          canClick: false,
+          data: []
+        },
+        {
+          type: 'D',
+          text: '面料热销榜',
+          canClick: true,
+          data: []
+        },
+      ],
     };
   },
-  computed:{
+  computed: {
     ...mapState("navTabs", ["menuTreeListFlatten"]),
   },
   methods: {
     ...mapMutations("navTabs", ["addTab"]),
     isContainAttr(attr) {
       //是否包含权限
-      return (
-        this.menuTreeListFlatten.filter((item) => item.MENU_LINK == attr)
-          .length > 0
-      );
+      return this.menuTreeListFlatten.filter(item => item.MENU_LINK == attr).length > 0;
     },
     getHotSale() {
       GetHotSales().then((res) => {
         if (res.data.length > 0) {
-          var itemData = res.data.filter((item) => item.TYPE == "A"); //型号热销
-          var versionData = res.data.filter((item) => item.TYPE == "B"); //版本热销
-          var curtainData = res.data.filter((item) => item.TYPE == "C"); //窗帘版本推荐
-          var softData = res.data.filter((item) => item.TYPE == "D"); //面料热销
-          var data = [];
-          var data2 = [];
-          var data3 = [];
-          var data4 = [];
-          var index = 0;
-          var indexx = 0;
-          //分成每行5个的数据
-          //版本
-          for (var i = 0; i < versionData.length; i++) {
-            if (i >= 5 * (index + 1)) {
-              index++;
-              indexx = 0;
-            }
-            if (i == 5 * index) {
-              data[index] = new Array();
-            }
-            data[index][indexx] = versionData[i];
-            indexx++;
-          }
-          if (data[index].length < 5) {
-            var len = 5 - data[index].length;
-            for (var i = 0; i < len; i++) {
-              data[index].push({
-                ITEM_NO: "",
-              });
+          var hotSaleData = res.data;
+          for (var t = 0; t < this.hotSaleTypeData.length; t++) {
+            var tempData = hotSaleData.filter(item => item.TYPE == this.hotSaleTypeData[t].type);
+            if (tempData.length) {
+              var data = [];
+              var index = 0;
+              var indexx = 0;
+              for (var i = 0; i < tempData.length; i++) {
+                if (i >= 5 * (index + 1)) {
+                  index++;
+                  indexx = 0;
+                }
+                if (i == 5 * index) {
+                  data[index] = new Array();
+                }
+                data[index][indexx] = tempData[i];
+                indexx++;
+              }
+              if (data[index].length < 5) {
+                var len = 5 - data[index].length;
+                for (var i = 0; i < len; i++) {
+                  data[index].push({
+                    ITEM_NO: "",
+                  });
+                }
+              }
+              this.hotSaleTypeData[t].data = data;
             }
           }
-          this.hotSaleVersion = data;
-          //型号
-          index = 0;
-          indexx = 0;
-          for (var i = 0; i < itemData.length; i++) {
-            if (i >= 5 * (index + 1)) {
-              index++;
-              indexx = 0;
-            }
-            if (i == 5 * index) {
-              data2[index] = new Array();
-            }
-            data2[index][indexx] = itemData[i];
-            indexx++;
-          }
-          if (data2[index].length < 5) {
-            var len = 5 - data2[index].length;
-            for (var i = 0; i < len; i++) {
-              data2[index].push({
-                ITEM_NO: "",
-              });
-            }
-          }
-          this.hotSaleItem = data2;
-          //窗帘
-          index = 0;
-          indexx = 0;
-          for (var i = 0; i < curtainData.length; i++) {
-            if (i >= 5 * (index + 1)) {
-              index++;
-              indexx = 0;
-            }
-            if (i == 5 * index) {
-              data3[index] = new Array();
-            }
-            data3[index][indexx] = curtainData[i];
-            indexx++;
-          }
-          if (data3[index].length < 5) {
-            var len = 5 - data3[index].length;
-            for (var i = 0; i < len; i++) {
-              data3[index].push({
-                ITEM_NO: "",
-              });
-            }
-          }
-          this.hotSaleCurtain = data3;
-          //面料
-          index = 0;
-          indexx = 0;
-          for (var i = 0; i < softData.length; i++) {
-            if (i >= 5 * (index + 1)) {
-              index++;
-              indexx = 0;
-            }
-            if (i == 5 * index) {
-              data4[index] = new Array();
-            }
-            data4[index][indexx] = softData[i];
-            indexx++;
-          }
-          if (data4[index].length < 5) {
-            var len = 5 - data4[index].length;
-            for (var i = 0; i < len; i++) {
-              data4[index].push({
-                ITEM_NO: "",
-              });
-            }
-          }
-          this.hotSaleSoft = data4;
         }
       });
     },
@@ -291,13 +164,27 @@ export default {
       });
     },
   },
-  mounted(){
+  mounted() {
     this.getHotSale(); //获得热销榜
   }
 };
 </script>
 
 <style scoped>
+.hot-sale-panel {
+  margin-bottom: 20px;
+}
+.panel-title {
+  text-align: center;
+  margin: 0 0 10px 0;
+}
+.panel-table {
+  margin: 0 auto;
+}
+.panel-table td {
+  height: 30px;
+  min-width: 160px;
+}
 .numIndex {
   display: inline-block;
   padding: 1px 0;

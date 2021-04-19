@@ -37,6 +37,8 @@
           <span class="zoomLeft">状态：</span>
           <span style="color:#8BC34A;font-weight:bold;" class="zoomRight">{{ item.STATUS_ID | transStatus
             }}{{ item.CURTAIN_STATUS_ID | curtainStatus }}</span>
+          <countdown style="color:red;" v-if="item.STATUS_ID != 3 && (item.CURTAIN_STATUS_ID == 1 || item.CURTAIN_STATUS_ID == 2)"
+            :time="new Date(item.DATE_UPDATE).getTime() - nowDate" format="DD 天 HH 时 mm 分 ss 秒后自动作废" />
           <el-tooltip v-if="item.STATUS_ID == 5 || item.STATUS_ID == 6 || item.STATUS_ID == 0 
             || (item.STATUS_ID == 1 && item.CURTAIN_STATUS_ID !== '' && item.CURTAIN_STATUS_ID == 0)" class="item" effect="dark"
             content="作废订单" placement="top">
@@ -165,6 +167,7 @@ import {
 import { mapMutations, mapActions } from "vuex";
 import Cookies from "js-cookie";
 import shipment from "./shipment";
+import countdown from "./count-down";
 
 export default {
   name: "MyOrder",
@@ -345,9 +348,13 @@ export default {
           value: "3",
         },
       ],
+      nowDate: 0
     };
   },
-  components: { shipment },
+  components: {
+    shipment,
+    countdown
+  },
   filters: {
     transStatus(value) {
       switch (value) {
@@ -475,9 +482,9 @@ export default {
       var price = row.PRICE;
       //最小下单量 帘头1.帘身里衬，窗纱4
       var DOSAGE = row.DOSAGE;
-      if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < 1) {
+      if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < 1 && DOSAGE > 0) {
         DOSAGE = 1;
-      } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'LCB' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4) {
+      } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'LCB' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4 && DOSAGE > 0) {
         DOSAGE = 4;
       }
       price = price.mul(DOSAGE)
@@ -518,6 +525,7 @@ export default {
         this.count = res.count;
         this.data = res.data;
         this.$root.$emit("refreshBadgeIcon", "orderDeal");
+        this.nowDate = new Date(new Date().setDate(new Date().getDate() - 2)).getTime();
       });
     },
     //出货详情

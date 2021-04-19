@@ -25,6 +25,8 @@
       <el-button @click="exportProductExcel" v-if="check_CURTAIN_STATUS_ID == -1 && showExportProduct" size="mini" plain>
         导出生产模板
       </el-button>
+      <countdown style="color:red;" v-if="check_STATUS_ID != 3 && (check_CURTAIN_STATUS_ID == 1 || check_CURTAIN_STATUS_ID == 2)"
+        :time="new Date(ruleForm.DATE_UPDATE).getTime() - nowDate" format="DD 天 HH 时 mm 分 ss 秒后自动作废" @finish="backTowhere" />
       <el-button @click="backTowhere()" style="float:right;" size="small" type="success" plain v-if="button_1">返回
       </el-button>
     </div>
@@ -219,6 +221,7 @@ import { mapMutations, mapActions } from "vuex";
 import Cookies from "js-cookie";
 import DetailCurtainTable from "../detail/detailCurtainTable";
 import NewCurtainOrderDetail from "./newCurtainOrderDetail";
+import countdown from "./count-down";
 
 export default {
   name: "examineDatail",
@@ -261,12 +264,14 @@ export default {
       selectOrderDetail: {},
       newCurtainData: [],
       deleteCurtainData: [],
-      originDelete: []
+      originDelete: [],
+      nowDate: 0
     };
   },
   components: {
     DetailCurtainTable,
-    NewCurtainOrderDetail
+    NewCurtainOrderDetail,
+    countdown
   },
   filters: {
     priceFilter(value) {
@@ -407,9 +412,9 @@ export default {
       var price = row.PRICE;
       //最小下单量 帘头1.帘身里衬，窗纱4
       var DOSAGE = row.DOSAGE;
-      if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < 1) {
+      if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < 1 && DOSAGE > 0) {
         DOSAGE = 1;
-      } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'LCB' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4) {
+      } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'LCB' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4 && DOSAGE > 0) {
         DOSAGE = 4;
       }
       price = price.mul(DOSAGE)
@@ -558,6 +563,7 @@ export default {
         if (this.ruleForm.CUSTOMER_CODE == "C01613" || this.ruleForm.CUSTOMER_CODE == "C01613A") {
           this.showExportProduct = true;
         }
+        this.nowDate = new Date(new Date().setDate(new Date().getDate() - 2)).getTime();
         if (this.ruleForm.BUYUSER_PICTURE) {
           var list = this.ruleForm.BUYUSER_PICTURE.split(";");
           for (var i = 0; i < list.length - 1; i++) {
@@ -583,8 +589,10 @@ export default {
       let customerType = Cookies.get("customerType");
       if (customerType == 110) {
         this.addTab("order/examine");
+        this.closeTab("order/checkExamine");
       } else {
         this.addTab("order/myOrder");
+        this.closeTab("order/checkExamine");
       }
     },
     refreshPay() {

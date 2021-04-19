@@ -69,7 +69,7 @@
           <div class="notice">
             <i class="el-icon-bell ml10 mr10 f16" style="line-height:30px;color:gold;font-weight:bold;"></i>
             <span style="color:red;margin-right:5px;margin-top:5px;">最新公告：</span>
-            <span v-if="newsTextArr.length == 0">{{ adminText }}</span>
+            <span v-if="newsTextArr.length == 0">无新公告发布!</span>
             <span v-else style="line-height:30px;">
               <transition name="slide">
                 <a style="text-decoration:underline" :key="newsTextArr[newsIndex].ID"
@@ -197,7 +197,6 @@ export default {
         window.localStorage.getItem("asideStatus") &&
         window.localStorage.getItem("asideStatus") == "true", //false:菜单栏处于展开状态； true：菜单栏处于收起状态
       isFullscreen: false,
-      adminText: "无新公告发布!",
       moneySituation: "",
       Initial_balance: 0,
       getTheTab: "",

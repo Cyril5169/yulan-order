@@ -5,9 +5,16 @@
         @select="searchCurtain" @clear="searchCurtain" placeholder="请输入帘款查找窗帘" style="width:300px;">
         <el-button @click="searchCurtain" slot="append" icon="el-icon-search">搜索</el-button>
       </el-autocomplete>
+      <a v-if="!showHotSale && hotSaleData.data.length" style="font-size: 12px;" @click="showHotSale = true">查看热销榜</a>
+      <!-- 停产新闻 -->
+      <span v-if="newsData.length" style="line-height:30px;">
+        <transition name="slide">
+          <a :key="newsData[newsIndex].ID" @click="showNotification(newsData[newsIndex])">{{ newsData[newsIndex].TITLE }}</a>
+        </transition>
+      </span>
     </div>
     <div style="min-height:500px;">
-      <div class="curtain-contain" v-if="!noData && curtainHeadData && curtainHeadData.ITEM_NO">
+      <div class="curtain-contain" v-if="!noData && !showHotSale && curtainHeadData && curtainHeadData.ITEM_NO">
         <!-- 帘款 -->
         <div class="curtain-parent-item">
           <span>帘款：{{curtainHeadData.ITEM_NO}}</span>
@@ -58,7 +65,9 @@
               <template slot-scope="scope">
                 <!-- 显示图片预览 -->
                 <div v-for="(item,index) in previewUrlList" :key="index">
-                  <img v-if="item.show" class="curtain-preview" :src="item.src" @error="showDefaultImg(index)" />
+                  <!-- <img v-if="item.show" class="curtain-preview" :src="item.src" @error="showDefaultImg(index)" /> -->
+                  <el-image v-if="item.show" class="curtain-preview" :src="item.src" fit="fill" @error="showDefaultImg(index)"
+                    :preview-src-list="showPreviewUrlList"></el-image>
                 </div>
               </template>
             </el-table-column>
@@ -291,8 +300,25 @@
           </div>
         </div>
       </div>
-      <div class="no-data" v-if="noData">
+      <div class="no-data" v-if="noData && !showHotSale">
         未查询到相关数据！
+      </div>
+      <div v-if="showHotSale && hotSaleData.data.length">
+        <h2 class="panel-title">{{hotSaleData.text}}</h2>
+        <div>
+          <table class="panel-table">
+            <tr v-for="(item, index) in hotSaleData.data" :key="index">
+              <td v-for="(n, indexx) in 5" :key="indexx">
+                <span v-if="item[indexx].ITEM_NO != ''" class="numIndex hot-index-normal"
+                  :class="{'hot-index1': index == 0,'hot-index2': index == 1,'hot-index3': index == 2}">{{ index * 5 + indexx + 1 }}</span>
+                <a v-if="hotSaleData.canClick" class="hover-link" title="点击前往下单"
+                  @click="selectHot(item[indexx].ITEM_NO)">{{ item[indexx].ITEM_NO }}</a>
+                <a v-else style="cursor:default;">{{ item[indexx].ITEM_NO }}</a>
+                <img src="../../assets/img/img/search-hot.gif" v-if="(index == 0 || index == 1) && item[indexx].ITEM_NO != ''" />
+              </td>
+            </tr>
+          </table>
+        </div>
       </div>
     </div>
     <!-- 替换组件 -->
@@ -388,7 +414,8 @@ import {
   GetExchangeModelItem,
   AddNewCurtainToCart
 } from "@/api/newCurtainASP";
-import { GetPromotionByItem } from "@/api/orderListASP";
+import { GetPromotionByItem, GetUnImportOrder } from "@/api/orderListASP";
+import { GetHotSales, GetItemDetailById } from "@/api/itemInfoASP";
 import Cookies from "js-cookie";
 import Axios from "axios";
 import { mapActions } from "vuex";
@@ -406,6 +433,7 @@ export default {
       curtainDataChange: [], //替换后的原始数据
       curtainData: [], //显示的窗帘数据
       curtainPartTypeData: [], //类型字典
+      unImportOrderData: [], //在途
       previewUrlList: [],
       activityOptions: [], //活动集合
       noData: false,
@@ -422,7 +450,17 @@ export default {
       currentPage: 0,
       limit: 50,
       totalNumber: 0,
-      isStandard: true
+      isStandard: true,
+      showHotSale: true,
+      hotSaleData: {
+        type: 'E',
+        text: '新窗帘型号推荐',
+        canClick: true,
+        data: []
+      },
+      newsData: [],
+      newsIndex: 0, //当前滚动的公告
+      newsTimer: null
     };
   },
   computed: {
@@ -450,6 +488,13 @@ export default {
     chooseCurtainData() {
       return this.curtainData.filter(item => item.curtain_choose);
     },
+    showPreviewUrlList() {
+      var urlList = [];
+      for (var i = 0; i < this.previewUrlList.length; i++) {
+        if (this.previewUrlList[i].show) urlList.push(this.previewUrlList[i].src)
+      }
+      return urlList;
+    }
   },
   filters: {
     meshutie_filter(value) {
@@ -530,6 +575,12 @@ export default {
   },
   methods: {
     ...mapActions("navTabs", ["closeToTab"]),
+    //在途
+    getOnwayOrderData() {
+      GetUnImportOrder().then(res => {
+        this.unImportOrderData = res.data;
+      })
+    },
     //PartType字典
     getPartTypeData() {
       GetPartTypeDataTable().then((res) => {
@@ -561,6 +612,7 @@ export default {
     //搜索窗帘
     searchCurtain() {
       if (!this.searchKey) return;
+      this.showHotSale = false;
       this.templateData = [];
       this.curtainHeadData = {};
       this.curtainData = [];
@@ -788,11 +840,13 @@ export default {
         }).then((res) => {
           if (res.data && res.data.data) {
             var store_charge = "";
-            var ddz = 0;
             var kucun = res.data.data.kucun ? res.data.data.kucun : 0;
             var dinghuoshu = res.data.data.dinghuoshu ? res.data.data.dinghuoshu : 0;
             var xiaxian = res.data.data.xiaxian ? res.data.data.xiaxian : 0;
-            var store_num = kucun - dinghuoshu;
+            var ddz = 0;
+            var itemOnway = this.unImportOrderData.filter(item => item.ITEM_NO == res.data.data.code);
+            if (itemOnway.length) ddz = itemOnway[0].DOSAGE;
+            var store_num = kucun - dinghuoshu - ddz;
             if (store_num >= xiaxian) {
               store_charge = "充足";
             } else if (store_num > 0 && store_num < xiaxian) {
@@ -943,9 +997,9 @@ export default {
       var price = this.calculatePromotionPrice(row);
       //最小下单量 帘头1.帘身里衬，窗纱4
       var DOSAGE = row.DOSAGE ? this.convertNumber(row.DOSAGE) : 0;
-      if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < 1) {
+      if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < 1 && DOSAGE > 0) {
         DOSAGE = 1;
-      } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'LCB' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4) {
+      } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'LCB' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4 && DOSAGE > 0) {
         DOSAGE = 4;
       }
       price = price.mul(DOSAGE)
@@ -1576,7 +1630,7 @@ export default {
         if (!oneCurtain.ITEM_NO) continue;
         //最小下单量。帘头1.帘身里衬，窗纱4
         if (oneCurtain.NC_PART_TYPECODE == 'LT') {
-          if (oneCurtain.DOSAGE < 1) {
+          if (oneCurtain.DOSAGE < 1 && oneCurtain.DOSAGE > 0) {
             if (oneCurtain.ILLUSTRATE.indexOf('不足1平方米。按1平方米下单量收费;') == -1) {
               oneCurtain.ILLUSTRATE += '不足1平方米。按1平方米下单量收费;';
             }
@@ -1584,7 +1638,7 @@ export default {
             oneCurtain.ILLUSTRATE = oneCurtain.ILLUSTRATE.replace('不足1平方米。按1平方米下单量收费;', '');
           }
         } else if (oneCurtain.NC_PART_TYPECODE == 'LS' || oneCurtain.NC_PART_TYPECODE == 'LCB' || oneCurtain.NC_PART_TYPECODE == 'CS') {
-          if (oneCurtain.DOSAGE < 4) {
+          if (oneCurtain.DOSAGE < 4 && oneCurtain.DOSAGE > 0) {
             if (oneCurtain.ILLUSTRATE.indexOf('不足4平方米。按4平方米下单量收费;') == -1) {
               oneCurtain.ILLUSTRATE += '不足4平方米。按4平方米下单量收费;';
             }
@@ -1680,11 +1734,63 @@ export default {
         else return 'fade-row';
       }
       return '';
-    }
+    },
+    getHotSale() {
+      GetHotSales().then((res) => {
+        if (res.data.length > 0) {
+          var tempData = res.data.filter(item => item.TYPE == this.hotSaleData.type);
+          if (tempData.length) {
+            var data = [];
+            var index = 0;
+            var indexx = 0;
+            for (var i = 0; i < tempData.length; i++) {
+              if (i >= 5 * (index + 1)) {
+                index++;
+                indexx = 0;
+              }
+              if (i == 5 * index) {
+                data[index] = new Array();
+              }
+              data[index][indexx] = tempData[i];
+              indexx++;
+            }
+            if (data[index].length < 5) {
+              var len = 5 - data[index].length;
+              for (var i = 0; i < len; i++) {
+                data[index].push({
+                  ITEM_NO: "",
+                });
+              }
+            }
+            this.hotSaleData.data = data;
+            console.log(this.hotSaleData)
+          }
+        }
+      });
+    },
+    selectHot(itemNo) {
+      this.searchKey = itemNo;
+      this.searchCurtain();
+    },
+    startMove() {
+      //设置定时器滚动公告
+      this.newsTimer = setInterval(() => {
+        if (this.newsIndex === this.newsData.length - 1) {
+          this.newsIndex = 0;
+        } else {
+          this.newsIndex += 1;
+        }
+      }, 3000);
+    },
   },
   mounted() {
+    this.getOnwayOrderData();
     this.getPartTypeData();
+    this.getHotSale();
   },
+  beforeDestroy() {
+    clearInterval(this.newsTimer);
+  }
 };
 </script>
 
@@ -1816,6 +1922,43 @@ export default {
   color: white;
   font-size: 12px;
   text-align: center;
+}
+
+.panel-title {
+  text-align: center;
+  margin: 0 0 10px 0;
+}
+.panel-table {
+  margin: 0 auto;
+}
+.panel-table td {
+  height: 30px;
+  min-width: 160px;
+}
+.numIndex {
+  display: inline-block;
+  padding: 1px 0;
+  color: #fff;
+  min-width: 15px;
+  line-height: 100%;
+  font-size: 12px;
+  text-align: center;
+  margin-right: 5px;
+}
+.hot-index1 {
+  background-color: #f54545 !important;
+}
+.hot-index2 {
+  background-color: #ff8547 !important;
+}
+.hot-index3 {
+  background-color: #ffac38 !important;
+}
+.hot-index-normal {
+  background-color: #8eb9f5;
+}
+.hover-link:hover {
+  text-decoration: underline !important;
 }
 </style>
 <style>

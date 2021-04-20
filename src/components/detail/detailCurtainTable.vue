@@ -494,12 +494,6 @@ export default {
     }
   },
   methods: {
-    //在途
-    getOnwayOrderData() {
-      GetUnImportOrder().then(res => {
-        this.unImportOrderData = res.data;
-      })
-    },
     //修改配件包时，对应修改单位以及名称说明
     changePJBUnit(index) {
       let _data = this.data[index].item.itemNo;
@@ -609,7 +603,7 @@ export default {
           this.activityOptions.push({
             ORDER_TYPE: "",
             ORDER_NAME: "不参与活动",
-            P_ID: null,
+            P_ID: "",
           });
         });
       } else {
@@ -632,7 +626,7 @@ export default {
             this.activityOptions.push({
               ORDER_TYPE: "",
               ORDER_NAME: "不参与活动",
-              P_ID: null,
+              P_ID: "",
             });
           });
         });
@@ -1590,7 +1584,6 @@ export default {
     for (var i = 0; i < this.curtainData.length; i++) {
       this.$set(this.curtainData[i], "curtain_store", "");
     }
-    this.getOnwayOrderData();
     this.getActivity();
     //按规则排序
     this.curtainData.sort(function (a, b) {
@@ -1603,8 +1596,13 @@ export default {
     this.clearArr();
     this.getSpanArr(this.data);
     if (this.suggestion) this.suggestionLJ = this.suggestion.toString();
-    //获得库存
-    this.data = this.getStoreData(this.data);
+    //先获得在途
+    GetUnImportOrder().then(res => {
+      this.unImportOrderData = res.data;
+      console.log(this.unImportOrderData)
+      //再获得库存
+      this.data = this.getStoreData(this.data);
+    })
   },
 };
 </script>

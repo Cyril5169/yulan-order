@@ -577,12 +577,6 @@ export default {
     },
   },
   methods: {
-    //在途
-    getOnwayOrderData() {
-      GetUnImportOrder().then(res => {
-        this.unImportOrderData = res.data;
-      })
-    },
     //PartType字典
     getPartTypeData() {
       GetPartTypeDataTable().then((res) => {
@@ -1593,10 +1587,12 @@ export default {
   created() {
     this.isCheck = this.ruleForm.CURTAIN_STATUS_ID != "1";//只有兰居退回的可以修改
     this.orderDetail = JSON.parse(JSON.stringify(this.ORDERBODY));
-    this.getOnwayOrderData();
     this.getPartTypeData();
     this.getActivity();
-    this.dealCurtainData();
+    GetUnImportOrder().then(res => {
+      this.unImportOrderData = res.data;
+      this.dealCurtainData();
+    })
   },
 }
 </script>

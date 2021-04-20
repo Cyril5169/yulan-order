@@ -582,12 +582,6 @@ export default {
   },
   methods: {
     ...mapActions("navTabs", ["closeToTab"]),
-    //在途
-    getOnwayOrderData() {
-      GetUnImportOrder().then(res => {
-        this.unImportOrderData = res.data;
-      })
-    },
     //PartType字典
     getPartTypeData() {
       GetPartTypeDataTable().then((res) => {
@@ -665,7 +659,11 @@ export default {
           src: `http://www.luxlano.com/ddkc/ckfinder/userfiles/images/pimg/${this.curtainHeadData.MODEL_NUMBER}.jpg`,
           show: true
         })
-        this.dealCurtainData();
+        //先获得在途
+        GetUnImportOrder().then(res => {
+          this.unImportOrderData = res.data;
+          this.dealCurtainData();
+        })
         this.getActivity();
       })
     },
@@ -1669,7 +1667,6 @@ export default {
     if (!this.curtainMsg || (this.curtainMsg && !this.curtainMsg.cartItemId)) {
       return;
     }
-    this.getOnwayOrderData();
     this.getPartTypeData();
     this.getDetail();
   }

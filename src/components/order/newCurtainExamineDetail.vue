@@ -659,12 +659,6 @@ export default {
   },
   methods: {
     ...mapActions("navTabs", ["closeToTab"]),
-    //在途
-    getOnwayOrderData() {
-      GetUnImportOrder().then(res => {
-        this.unImportOrderData = res.data;
-      })
-    },
     //PartType字典
     getPartTypeData() {
       GetPartTypeDataTable().then((res) => {
@@ -823,10 +817,10 @@ export default {
         this.ruleForm = res.data[0];
         if (this.ruleForm.JIAOHUO_DATE == '9999/12/31 00:00:00') this.ruleForm.JIAOHUO_DATE = "";
         this.getCustomer();
-        for (let i = 0; i < this.ruleForm.ORDERBODY.length; i++) {
-          this.expands.push(this.ruleForm.ORDERBODY[i].LINE_NO);
-        }
-        this.dealCurtainData();
+        GetUnImportOrder().then(res => {
+          this.unImportOrderData = res.data;
+          this.dealCurtainData();
+        })
         getOperationRecord({ orderNo: this.orderNumber }, { loading: false }).then((res) => {
           this.operationRecords = res.data;
         });
@@ -927,6 +921,9 @@ export default {
           this.$set(oneCurtain, "ILLUSTRATE", "");
         }
         detail.curtain_change = this.getStoreData(detail.curtain_change);
+      }
+      for (var i = 0; i < this.ruleForm.ORDERBODY.length; i++) {
+        this.expands.push(this.ruleForm.ORDERBODY[i].LINE_NO);
       }
     },
     //把model数据转换为comodity数据

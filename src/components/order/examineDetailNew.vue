@@ -391,6 +391,7 @@ import {
   updateCurtainOrder,
   getOperationRecord,
   getCustomerInfo,
+  GetUnImportOrder,
 } from "@/api/orderListASP";
 import { mapActions } from "vuex";
 import Cookies from "js-cookie";
@@ -519,12 +520,6 @@ export default {
   },
   methods: {
     ...mapActions("navTabs", ["closeToTab"]),
-    //在途
-    getOnwayOrderData() {
-      GetUnImportOrder().then(res => {
-        this.unImportOrderData = res.data;
-      })
-    },
     allTotal(index) {
       let totalMoney = 0;
       var _data = JSON.parse(JSON.stringify(this.allCurtaindata));
@@ -538,8 +533,10 @@ export default {
           }
         }
       }
-      for (var i = 0; i < _data[index].length; i++) {
-        totalMoney += _data[index][i].price.mul(_data[index][i].dosage);
+      if (_data.length > 0) {
+        for (var i = 0; i < _data[index].length; i++) {
+          totalMoney += _data[index][i].price.mul(_data[index][i].dosage);
+        }
       }
       return totalMoney;
     },
@@ -560,14 +557,11 @@ export default {
       getOrderDetails({ orderNo: Cookies.get("ORDER_NO") }).then((res) => {
         this.ruleForm = res.data[0];
         this.getCustomer();
-        for (let i = 0; i < this.ruleForm.ORDERBODY.length; i++) {
-          this.expands.push(this.ruleForm.ORDERBODY[i].LINE_NO);
-        }
-        this.dealCurtainData();
-        var recordData = {
-          orderNo: this.orderNumber,
-        };
-        getOperationRecord(recordData, { loading: false }).then((res) => {
+        GetUnImportOrder().then(res => {
+          this.unImportOrderData = res.data;
+          this.dealCurtainData();
+        })
+        getOperationRecord({ orderNo: this.orderNumber }, { loading: false }).then((res) => {
           this.operationRecords = res.data;
         });
       });
@@ -724,6 +718,9 @@ export default {
             }
           }
         });
+      }
+      for (var i = 0; i < this.ruleForm.ORDERBODY.length; i++) {
+        this.expands.push(this.ruleForm.ORDERBODY[i].LINE_NO);
       }
     },
     getSpanArr(msg) {
@@ -1631,7 +1628,6 @@ export default {
   },
   created() {
     this.orderNumber = Cookies.get("ORDER_NO");
-    this.getOnwayOrderData();
     this.getDetail();
   },
   mounted() {

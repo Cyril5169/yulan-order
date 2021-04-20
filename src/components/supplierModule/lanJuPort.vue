@@ -58,7 +58,7 @@
             <el-input @keyup.enter.native="SelectByCustomer()" placeholder=" 客户(输入后回车)" v-model="customer" style="width:160px;"
               clearable>
             </el-input>
-            <el-input @keyup.enter.native="SelectByPo()" placeholder=" 采购单号:（模糊）" v-model="purNo" style="width:160px;" clearable>
+            <el-input @keyup.enter.native="SelectByPo()" placeholder=" 采购单号/订单号" v-model="purNo" style="width:160px;" clearable>
             </el-input>
             <el-date-picker v-model="date1" placeholder="开始时间" align="right" type="date" format="yyyy-MM-dd"
               value-format="yyyy-MM-dd" style="width:140px;">
@@ -2137,8 +2137,7 @@ export default {
         limit: this.limit,
         page: this.currentPage,
         current_id: Cookies.get("cid"),
-        customer:
-          this.customer == null || this.customer == "" ? "all" : this.customer,
+        customer: this.customer == null || this.customer == "" ? "all" : this.customer,
         po_type: this.po_type, //  status状态   cancel    efficient 生效（新采购单）   enforce 已执行（已确认）   fulfill 已完成
         check_flag: this.check_flag,
         beginTime: this.getBegintime(this.date1),
@@ -2146,8 +2145,7 @@ export default {
         po: this.purNo,
         bill_type: this.bill_type,
       };
-      GetRelativePo(data).then(
-        (res) => {
+      GetRelativePo(data).then(res => {
           this.count = res.count;
           this.pur_headData = res.data;
           this.pur_headData.forEach((item) => {

@@ -17,7 +17,7 @@
             <div v-for="(item,index) in previewUrlList" :key="index">
               <!-- <img v-if="item.show" class="curtain-preview" :src="item.src" @error="showDefaultImg(index)" /> -->
               <el-image v-if="item.show" class="curtain-preview" :src="item.src" fit="fill" @error="showDefaultImg(index)"
-                    :preview-src-list="showPreviewUrlList"></el-image>
+                :preview-src-list="showPreviewUrlList"></el-image>
             </div>
             <div class="messageBox">
               <div>
@@ -390,12 +390,6 @@ export default {
   },
   methods: {
     ...mapActions("navTabs", ["closeToTab"]),
-    //在途
-    getOnwayOrderData() {
-      GetUnImportOrder().then(res => {
-        this.unImportOrderData = res.data;
-      })
-    },
     //修改配件包时，对应修改单位
     changePJBUnit(index) {
       let _data = this.curtainData[index].itemNo;
@@ -512,7 +506,7 @@ export default {
             this.activityOptions.push({
               ORDER_TYPE: "",
               ORDER_NAME: "不参与活动",
-              P_ID: null,
+              P_ID: "",
             });
           });
         }
@@ -646,8 +640,12 @@ export default {
         this.curtainData.push(obj);
         this.getDosage(obj, i);
       }
-      //获得库存
-      this.curtainData = this.getStoreData(this.curtainData);
+      //先获得在途
+      GetUnImportOrder().then(res => {
+        this.unImportOrderData = res.data;
+        //再获得库存
+        this.curtainData = this.getStoreData(this.curtainData);
+      })
     },
     //获取窗帘大类用量
     getDosage(data, index) {
@@ -1393,7 +1391,6 @@ export default {
       Cookies.get("curtainMsg") !== null
     ) {
       this.message = JSON.parse(Cookies.get("curtainMsg"));
-      this.getOnwayOrderData();
       this.getActivity();
       this.getPJB();
       this.getDetail();

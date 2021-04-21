@@ -703,6 +703,22 @@ export default {
         var TBBianParam = this.curtainParamsData.filter(item => item.NCP_TYPE == 'BIANUSE' && item.NCP_CODE == '3B');
         if (TBBianParam.length) TBBianParam = TBBianParam[0];
         else console.log('没有边用量-3S');
+        //边用量 固定褶 4S
+        var GDZFSBianParam = this.curtainParamsData.filter(item => item.NCP_TYPE == 'BIANUSE' && item.NCP_CODE == 'GDZ4B');
+        if (GDZFSBianParam.length) GDZFSBianParam = GDZFSBianParam[0];
+        else console.log('没有边用量-GDZ4S');
+        //边用量 固定褶 3.0
+        var GDZTBBianParam = this.curtainParamsData.filter(item => item.NCP_TYPE == 'BIANUSE' && item.NCP_CODE == 'GDZ3B');
+        if (GDZTBBianParam.length) GDZTBBianParam = GDZTBBianParam[0];
+        else console.log('没有边用量-GDZ3S');
+        //边用量 打圈 4S
+        var DQFSBianParam = this.curtainParamsData.filter(item => item.NCP_TYPE == 'BIANUSE' && item.NCP_CODE == 'DQ4B');
+        if (DQFSBianParam.length) DQFSBianParam = DQFSBianParam[0];
+        else console.log('没有边用量-GDZ4S');
+        //边用量 打圈 3.0
+        var DQTBBianParam = this.curtainParamsData.filter(item => item.NCP_TYPE == 'BIANUSE' && item.NCP_CODE == 'DQ3B');
+        if (DQTBBianParam.length) DQTBBianParam = DQTBBianParam[0];
+        else console.log('没有边用量-GDZ3S');
         //高度折边用量 4S
         var HFSBianParam = this.curtainParamsData.filter(item => item.NCP_TYPE == 'HEIGHTBIANUSE' && item.NCP_CODE == '4B');
         if (HFSBianParam.length) HFSBianParam = HFSBianParam[0];
@@ -747,6 +763,10 @@ export default {
           SKPianParam: SKPianParam,
           FSBianParam: FSBianParam,
           TBBianParam: TBBianParam,
+          GDZFSBianParam: GDZFSBianParam,
+          GDZTBBianParam: GDZTBBianParam,
+          DQFSBianParam: DQFSBianParam,
+          DQTBBianParam: DQTBBianParam,
           HFSBianParam: HFSBianParam,
           HTBBianParam: HTBBianParam,
           GDZZheParam: GDZZheParam,
@@ -1068,8 +1088,13 @@ export default {
       else if (oneCurtain.KAIKOU == 'SK') pianParam = this.curtainParamsList.SKPianParam;
       //边用量
       var bianParam = null;
-      if (oneCurtain.BIAN == '4B') bianParam = this.curtainParamsList.FSBianParam;
-      else if (oneCurtain.BIAN == '3B') bianParam = this.curtainParamsList.TBBianParam;
+      if (oneCurtain.OPERATION == 'GDZ') {
+        if (oneCurtain.BIAN == '4B') bianParam = this.curtainParamsList.GDZFSBianParam;
+        else if (oneCurtain.BIAN == '3B') bianParam = this.curtainParamsList.GDZTBBianParam;
+      } else if (oneCurtain.OPERATION == "DQ") {
+        if (oneCurtain.BIAN == '4B') bianParam = this.curtainParamsList.DQFSBianParam;
+        else if (oneCurtain.BIAN == '3B') bianParam = this.curtainParamsList.DQTBBianParam;
+      }
       //高度折边用量
       var HightBianParam = null;
       if (oneCurtain.BIAN == '4B') HightBianParam = this.curtainParamsList.HFSBianParam;
@@ -1085,8 +1110,15 @@ export default {
       var height = this.convertNumber(oneCurtain.HEIGHT);
       //帘身明细计算
       if (oneCurtain.NC_PART_TYPECODE == 'LS') {
-        //单片褶数 = 四舍五入(帘身宽 * 倍数 / 片数 / 完整褶用量, 0)
-        var singleZhe = Math.round(width * this.curtainParamsList.multipleParam.NCP_VALUE / pianParam.NCP_VALUE / zheParam.NCP_VALUE);
+        var singleZhe = 0;
+        if (oneCurtain.OPERATION == "GDZ") {
+          //固定褶 单片褶数 = 四舍五入(帘身宽 * 7 / 片数, 0) * 片数
+          singleZhe = Math.round(width * 7 / pianParam.NCP_VALUE) * pianParam.NCP_VALUE;
+        }
+        else if (oneCurtain.OPERATION == "DQ") {
+          //打圈 单片褶数 = 进位取整(帘身宽 * 1.13 / 0.15 / 片数) * 片数 + 片数
+          singleZhe = Math.ceil(width * 1.13 / 0.15 / pianParam.NCP_VALUE) * pianParam.NCP_VALUE + pianParam.NCP_VALUE;
+        }
         oneCurtain.ZE_QTY = singleZhe;
         var pb1Zhe = 0;
         var pb2Zhe = 0;
@@ -1353,8 +1385,8 @@ export default {
             }
             else if (orderDetail.FIX_TYPE == "02") {
               //定高
-              //下脚配布用量 = 主布用量 / 2
-              xjCommodity.DOSAGE = this.dosageFilter(zbCommodity.DOSAGE / 2);
+              //下脚配布用量 = 主布用量 / 片数
+              xjCommodity.DOSAGE = this.dosageFilter(zbCommodity.DOSAGE / pianParam.NCP_VALUE);
             }
           } else {
             xjCommodity.ZE_QTY = 0;
@@ -2188,7 +2220,6 @@ export default {
   },
   mounted() {
     this.orderNumber = Cookies.get("NEW_ORDER_NO");
-    this.getOnwayOrderData();
     this.getPartTypeData();
     this.getCurtainParams();
     this.getDetail();

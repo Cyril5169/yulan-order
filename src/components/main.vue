@@ -1396,6 +1396,10 @@ export default {
 .el-dialog__header {
   padding: 10px !important;
 }
+.el-dialog__headerbtn {
+  top: 15px !important;
+  right: 15px !important;
+}
 .el-table td,
 .el-table th {
   padding: 4px 0 !important;

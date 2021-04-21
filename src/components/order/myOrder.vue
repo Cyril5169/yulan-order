@@ -143,10 +143,9 @@
         </el-pagination>
       </div>
     </div>
-    <el-dialog :show-close="true" :visible.sync="shipmentVisible" width="1100px" title="出货详情">
+    <el-dialog :show-close="true" :visible.sync="shipmentVisible" width="1200px" title="出货详情">
       <keep-alive>
-        <shipment v-if="shipmentVisible" :orderNo="shipmentOrderNo" :itemNo="shipmentItemNo" :lineNo="shipmentLineNo"
-          :PRODUCT="shipmentNote" :UNIT="shipmentUnit"></shipment>
+        <shipment v-if="shipmentVisible" :orderDetail="selectOrderDetail"></shipment>
       </keep-alive>
     </el-dialog>
   </el-card>
@@ -187,11 +186,7 @@ export default {
       Initial_balance: 0,
       buttonShow: true,
       shipmentVisible: false,
-      shipmentOrderNo: "",
-      shipmentItemNo: "",
-      shipmentLineNo: "",
-      shipmentNote: "",
-      shipmentUnit: "",
+      selectOrderDetail: {},
       statusIdOptionValue1: ["0", "5", "6", "21", "22"],
       commodityTypeOptions: [
         {
@@ -529,11 +524,7 @@ export default {
     },
     //出货详情
     shipmentDetail(tab) {
-      this.shipmentOrderNo = tab.ORDER_NO;
-      this.shipmentLineNo = tab.LINE_NO;
-      this.shipmentItemNo = tab.ITEM_NO;
-      this.shipmentNote = tab.TYEPE_NAME;
-      this.shipmentUnit = tab.UNIT;
+      this.selectOrderDetail = tab;
       this.shipmentVisible = true;
     },
     //标签页切换

@@ -664,6 +664,7 @@ export default {
             startDate: "0001/1/1",
             endDate: "9999/12/31",
             state: "NEEDPROCESSING",
+            type: 'yulan'
           },
           { loading: false }
         );
@@ -683,6 +684,7 @@ export default {
             startDate: "0001/1/1",
             endDate: "9999/12/31",
             state: "NEEDPROCESSING",
+            type: 'yulan'
           },
           { loading: false }
         );

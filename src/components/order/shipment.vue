@@ -145,15 +145,15 @@
             <td class="grayTD">客户代码</td>
             <td>{{this.companyId}}</td>
             <td class="grayTD">客户名称</td>
-            <td colspan="3">{{this.companyName}}</td>
+            <td colspan="3">{{this.CNAME}}</td>
           </tr>
           <tr>
             <td class="grayTD" style="width:14%;">提货单号</td>
             <td style="width:15%;">{{ submit.SALE_NO }}</td>
             <td class="grayTD" style="width:15%;">B2B订单号</td>
-            <td style="width:20%;">{{ submit.orderNo }}</td>
+            <td style="width:20%;">{{ submit.ORDER_NO }}</td>
             <td class="grayTD" style="width:14%;">ERP订单号</td>
-            <td style="width:22%;height:19px">{{ this.CONTRACT_NO }}</td>
+            <td style="width:22%;">{{ this.CONTRACT_NO }}</td>
           </tr>
           <tr>
             <td class="grayTD">联系人<span style="color:red;">*</span></td>
@@ -173,7 +173,7 @@
           <tr>
             <td class="grayTD">问题描述<span style="color:red;">*</span></td>
             <td colspan="5">
-              <el-input v-model="submit.NOTES" placeholder="" clearable class="inputStyle" placeholder="请填写">
+              <el-input v-model="submit.NOTES" type="textarea" autosize clearable class="inputStyle" placeholder="请填写">
               </el-input>
             </td>
           </tr>
@@ -248,6 +248,111 @@
 
     <!-- 兰居售后 -->
     <el-dialog :visible.sync="ljAfterSaleVisiable" :close-on-click-modal="false" width="800px" append-to-body>
+      <div style="margin-bottom:5px;">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td style="font-size:20px;height:30px;text-align:center;" colspan="6">退货/赔偿电子申请书【新增】</td>
+          </tr>
+        </table>
+      </div>
+      <div class="table-c">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td class="grayTD">客户代码</td>
+            <td>{{this.companyId}}</td>
+            <td class="grayTD">客户名称</td>
+            <td colspan="3">{{this.CNAME}}</td>
+          </tr>
+          <tr>
+            <td class="grayTD" style="width:15%;">B2B订单号</td>
+            <td style="width:15%;">{{ submit.ORDER_NO }}</td>
+            <td class="grayTD" style="width:15%;">po订单号</td>
+            <td style="width:20%;">{{ this.PUR_NO }}</td>
+            <td class="grayTD" style="width:15%;">ERP订单号</td>
+            <td style="width:20%;">{{ this.CONTRACT_NO }}</td>
+          </tr>
+          <tr>
+            <td class="grayTD">联系人<span style="color:red;">*</span></td>
+            <td>
+              <el-input v-model="submit.CONTACT_MAN" placeholder="请填写" clearable class="inputStyle">
+              </el-input>
+            </td>
+            <td class="grayTD">联系电话<span style="color:red;">*</span></td>
+            <td>
+              <el-input v-model="submit.CONTACT_PHONE" placeholder="请填写" clearable oninput="value=value.replace(/[^\d]/g,'')"
+                class="inputStyle">
+              </el-input>
+            </td>
+            <td class="grayTD">返厂物流单号</td>
+            <td>{{ submit.C_TRANSBILL  }}</td>
+          </tr>
+          <tr>
+            <td class="grayTD">问题描述<span style="color:red;">*</span></td>
+            <td colspan="5">
+              <el-input v-model="submit.NOTES" type="textarea" autosize clearable class="inputStyle" placeholder="请填写">
+              </el-input>
+            </td>
+          </tr>
+          <tr>
+            <td class="grayTD">产品/项目</td>
+            <td class="grayTD">型号</td>
+            <td class="grayTD" colspan="2">描述</td>
+            <td class="grayTD" colspan="2">上传相关信息<span style="color:red;">*</span></td>
+          </tr>
+          <tr>
+            <td>{{submit.PRODUCTION_VERSION}}</td>
+            <td>{{submit.ITEM_NO}}</td>
+            <td colspan="2">
+              <el-input v-model="submit.QTY" placeholder="请填写" clearable class="inputStyle"></el-input>
+            </td> <!-- 要小于发货数量 -->
+            <td colspan="2">
+              <div>
+                <el-upload class="upload-de" action="#" drag multiple :on-change="handleChange" :on-remove="handleRemove"
+                  ref="upload" :http-request="uploadFiles" :auto-upload="false" :file-list="submit.fileList">
+                  <i class="el-icon-upload2" style="margin-top:5px;">
+                    <span style="font-size:15px;">上传附件</span>
+                  </i>
+                </el-upload>
+              </div>
+            </td><!-- 附件 -->
+          </tr>
+
+          <tr style="height:90px">
+            <td colspan="6" border="0px" style="font-size:13px;color:gray;text-align:left;">
+              <div style="margin:0 5px;">
+                注意：1.若您未在我公司对您的《退货/赔偿电子申请书》提交处理意见之日起15日内确认、提出异议的，则视为放弃赔偿权利；<br />
+                2.玉兰公司支付的退货金额，仅限于本《退货/赔偿电子申请书》的金额，不承担其他费用；<br />
+                3.请您仔细阅读本《退货/赔偿电子申请书》相关信息，一旦确认，视为同意我公司的处理方案。<br />
+                公司名称：广东玉兰集团股份有限公司&emsp; &emsp;&emsp;&emsp;地址：东莞市莞城莞龙路段狮龙路莞城科技园内<br />
+                电话:0769-23321708&emsp;&emsp;邮政编码:523119&emsp;&emsp;邮箱：yulan315@yulangroup.cn<br />
+              </div>
+            </td>
+          </tr>
+          <tr style="height:40px">
+            <td colspan="3" border="0px" style="font-size:13px;color:gray;text-align:center;">
+              <div>
+                广东玉兰集团股份有限公司<br />
+                市场部<br />
+                {{ new Date().getFullYear() }}年
+                {{ new Date().getMonth() + 1}}月
+                {{ new Date().getDate() }}日
+              </div>
+            </td>
+            <td colspan="3" border="0px" style="font-size:13px;color:gray;text-align:center;">
+              <div>
+                经销商
+                <span>:{{ submit.CNAME }}</span>
+                <br />
+                <span> 年 月 日</span>
+              </div>
+            </td>
+          </tr>
+        </table>
+        <div style="text-align:center;margin:10px">
+          <el-button type="success" @click="_addRefundSubmit()">提交</el-button>
+          <el-button type="info" @click="ljAfterSaleVisiable=false">返回</el-button>
+        </div>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -261,6 +366,7 @@ import {
   getPackDetailInfo,
   getReturnInfo,
   getCompanyInfo,
+  GetPurByOrderNo
 } from "@/api/orderListASP";
 import {
   InsertCompensation,
@@ -270,6 +376,8 @@ import {
 } from "@/api/paymentASP";
 import { mapMutations, mapActions } from "vuex";
 import { mapState } from "vuex";
+
+
 export default {
   data() {
     return {
@@ -288,8 +396,8 @@ export default {
       FormRight: true,
       RefundDetail: false,
       companyId: Cookies.get("customerMainId"), //公司Id
-      companyName: "", //公司名称
       CONTRACT_NO: "", //ERP订单号
+      PUR_NO: "", //po单号
       CID: Cookies.get("cid"), //用户id
       CNAME: Cookies.get("realName"), //用户名称
       AlreadyRefund: false, //是否已经进行过退货赔偿
@@ -490,67 +598,65 @@ export default {
     },
     //初始化新增记录的信息
     addRefund(data) {
-      console.log(this.orderDetail)
-      console.log(data)
+      var auditType = "";
       if (this.orderDetail.PRODUCT_BRAND == "14") {
         //兰居
-
+        auditType = "lanju";
       } else {
-        this.dateStamp = new Date().getTime();
-        this.FormRight = true;
-        this.uploadSuccessNum = 0;
-        this.fileList = [];
-        this.fileNumber = 0;
-        this.fileNameList = [];
-        this.submitHead = {
-          ID: "",
-          ERP_CREATOR: "", //创建人编号
-          ERP_CREATORNAME: "", //创建人姓名
-          CID: "", //客户编号
-          CNAME: "", //客户姓名
-          SENDBACK_REASON: "", //退回理由
-          ITEM_COUNT: "", //总货品数量
-          ITEM_MAX_INDEX: "", //最大索引
-          STATE: "", //状态
-          PRINTED: "", //打印方式
-          FIRST_AUDITION: "", //初审意见
-          RETURN_TYPE: "", //退货类型
-          RETURN_ADDRESS: "", //退货地址
-          REASSURE_TS: "", //签订日期
-          DEALMAN_CODE: "",
-          DEAL_TS: "",
-          DEALMAN_NAME: "",
-        };
-        this.submit = {
-          RTCB_ID: "", //退货单ID
-          ITEM_NO: "", //产品型号
-          PRODUCTION_VERSION: this.orderDetail.PRODUCTVERSION_NAME, //版本（项目、产品）
-          UNIT: this.orderDetail.UNIT, //单位
-          QTY: "", //数量
-          NOTES: "", //问题描述
-          CONTACT_MAN: "", //联系人
-          CONTACT_PHONE: "", //联系方式
-          SALE_NO: data.SALE_NO, //提货单号
-          orderNo: this.orderDetail.ORDER_NO, //B2B订单号
-          ITEM_NO: this.orderDetail.ITEM_NO, //产品型号
-          C_TRANSBILL: data.TRANS_ID, //物流单号
-          NOTE: "", //类型
-          fileList: [], //附件列表
-          ATTACHMENT_FILE: "", //附件
-          ATTACHMENT_FILE_FOLDER: "", //附件文件夹
-        };
-        getReturnInfo({
-          companyId: this.companyId,
-          SALE_NO: this.submit.SALE_NO,
-          ITEM_NO: this.submit.ITEM_NO,
-        }).then((res) => {
-          if (res.code == 0) {
-            this.companyName = res.data[0].CUSTOMER_NAME;
-            this.CONTRACT_NO = res.data[0].CONTRACT_NO;
-            this.RefundDetail = true;
-          }
-        });
+        auditType = "yulan";
       }
+      this.dateStamp = new Date().getTime();
+      this.FormRight = true;
+      this.uploadSuccessNum = 0;
+      this.fileList = [];
+      this.fileNumber = 0;
+      this.fileNameList = [];
+      this.submitHead = {
+        ID: "",
+        ERP_CREATOR: "", //创建人编号
+        ERP_CREATORNAME: "", //创建人姓名
+        CID: "", //客户编号
+        CNAME: "", //客户姓名
+        SENDBACK_REASON: "", //退回理由
+        ITEM_COUNT: "", //总货品数量
+        ITEM_MAX_INDEX: "", //最大索引
+        STATE: "", //状态
+        PRINTED: "", //打印方式
+        FIRST_AUDITION: "", //初审意见
+        RETURN_TYPE: "", //退货类型
+        RETURN_ADDRESS: "", //退货地址
+        REASSURE_TS: "", //签订日期
+        DEALMAN_CODE: "",
+        DEAL_TS: "",
+        DEALMAN_NAME: "",
+        AUDIT_TYPE: auditType
+      };
+      this.submit = {
+        RTCB_ID: "", //退货单ID
+        ITEM_NO: "", //产品型号
+        PRODUCTION_VERSION: this.orderDetail.PRODUCTVERSION_NAME, //版本（项目、产品）
+        UNIT: this.orderDetail.UNIT, //单位
+        QTY: "", //数量
+        NOTES: "", //问题描述
+        CONTACT_MAN: "", //联系人
+        CONTACT_PHONE: "", //联系方式
+        SALE_NO: data.SALE_NO, //提货单号
+        ORDER_NO: this.orderDetail.ORDER_NO, //B2B订单号
+        ITEM_NO: this.orderDetail.ITEM_NO, //产品型号
+        C_TRANSBILL: data.TRANS_ID, //物流单号
+        NOTE: "", //类型
+        fileList: [], //附件列表
+        ATTACHMENT_FILE: "", //附件
+        ATTACHMENT_FILE_FOLDER: "", //附件文件夹
+      };
+      GetPurByOrderNo({ orderNo: this.orderDetail.ORDER_NO }).then((res) => {
+        if (res.data) {
+          this.CONTRACT_NO = res.data.CONTRACT_NO;
+          this.PUR_NO = res.data.PUR_NO
+        }
+        if (auditType == "yulan") this.RefundDetail = true;
+        else this.ljAfterSaleVisiable = true;
+      });
     },
     //新建一条售后记录
     addRefundRecord(data) {
@@ -719,7 +825,7 @@ export default {
       this.submitHead.ERP_CREATOR = this.CID;
       this.submitHead.ERP_CREATORNAME = this.CNAME;
       this.submitHead.CID = this.companyId;
-      this.submitHead.CNAME = this.companyName;
+      this.submitHead.CNAME = this.CNAME;
       this.submitHead.SENDBACK_REASON = null;
       this.submitHead.ITEM_COUNT = 1;
       this.submitHead.ITEM_MAX_INDEX = 1;

@@ -1196,6 +1196,7 @@ export default {
         DEALMAN_NAME: this.selectDealor, //创建者名称
         cName: this.selectCNAME, //客户名称
         itemNo: this.selectItemNo, //产品号S
+        type: 'yulan'
       };
       if (!obj.startDate) {
         obj.startDate = "0001/1/1 00:00:00";
@@ -1206,18 +1207,16 @@ export default {
         obj.endDate = obj.endDate + " 23:59:59";
       }
       let filter = this.$options.filters["propertyFilter"];
-      GetUserCompensation(filter(obj))
-        .then((res) => {
-          this.tableData = res.data;
-          this.tableData.forEach((item) => {
-            item.PRINTED = item.PRINTED === "0" ? true : false;
-          });
-          this.allNum = res.count;
-        })
-        .catch((err) => {
-          this.tableData = [];
-          this.allNum = 0;
+      GetUserCompensation(filter(obj)).then((res) => {
+        this.tableData = res.data;
+        this.tableData.forEach((item) => {
+          item.PRINTED = item.PRINTED === "0" ? true : false;
         });
+        this.allNum = res.count;
+      }).catch((err) => {
+        this.tableData = [];
+        this.allNum = 0;
+      });
     },
     //查看详情
     _CheckDetail(val, type) {

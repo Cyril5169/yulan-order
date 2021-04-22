@@ -431,7 +431,6 @@ Router.prototype.push = function push(location) {
 import Cookies from 'js-cookie'
 //路由守卫
 router.beforeEach((to, from, next) => {
-  //console.log(to.meta.keepAlive ? true : false);
   if (!Cookies.get('cid') && !Cookies.get('customerType') && to.name != 'login') {//判断用户信息，不合法返回登陆界面
     next('/login')
   } else {

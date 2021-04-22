@@ -184,7 +184,7 @@ export default {
       this.expands = [];
       this.baobei = false;
       var data = {
-        ITEM_NO: this.searchKey.toUpperCase(),
+        ITEM_NO: this.searchKey,
         LOGINNAME: this.cid,
         type: "",
       };

@@ -9,7 +9,7 @@
         </section>
         <h3 class="mt10 tc rel" style="margin:5px 0 0 0;">
           客户确认书【{{ getNameByState(baseData.STATE) }}】
-          <i class="icon-print el-icon-printer cpoi" style="margin-right:20px;" @click="printRefund"></i>
+          <i class="icon-print el-icon-printer" style="margin-right:20px;" @click="printRefund"></i>
         </h3>
         <br />
         <section class="mt10">
@@ -31,7 +31,7 @@
           <el-table-column prop="PROCESS" align="center" label="处理意见"> </el-table-column>
           <el-table-column label="操作" v-if="baseData.method !== 'see' && baseData.ERP_CREATOR === cid">
             <template slot-scope="scope">
-              <i class="el-icon-close cpoi" @click="deleteItem(scope.$index)"></i>
+              <i class="el-icon-close" style="cursor:pointer;" @click="deleteItem(scope.$index)"></i>
             </template>
           </el-table-column>
         </el-table>
@@ -48,7 +48,7 @@
         </table>
 
         <section class="f14">
-          <p @click="addItem" class="tc f16 p20 cpoi border-b p-click" v-if="baseData.method !== 'see'">
+          <p @click="addItem" class="tc f16 p20 border-b p-click" v-if="baseData.method !== 'see'">
             添加退换货品
             <i class="el-icon-circle-plus success-icon f24 r"></i>
           </p>
@@ -599,6 +599,7 @@ p {
 .p-click {
   position: relative;
   bottom: 3px;
+  cursor: pointer;
 }
 .icon-print {
   position: absolute;
@@ -606,6 +607,7 @@ p {
   top: 0px;
   font-size: 25px;
   color: gray;
+  cursor: pointer;
 }
 .t-dec {
   padding: 5px;

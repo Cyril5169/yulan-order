@@ -61,29 +61,22 @@
           <!-- 未做 -->
           <el-table-column width="150" label="操作" align="center">
             <template slot-scope="scope">
-              <el-tooltip content="查看" placement="top">
-                <el-button circle style="padding: 7px;" type="warning" icon="el-icon-search" size="mini"
-                  @click="_CheckDetail(scope.row, 1)">
-                </el-button>
-              </el-tooltip>
-              <el-tooltip v-if="
+              <el-button circle style="padding: 7px;" type="warning" icon="el-icon-search" size="mini"
+                @click="_CheckDetail(scope.row, 1)">
+              </el-button>
+              <el-button v-if="
                   scope.row.STATE == 'SUBMITTED' ||
                     scope.row.STATE == 'SENDBACK'
-                " content="删除" placement="top">
-                <el-button circle style="padding: 7px;" @click="_Delete(scope.row.ID)" type="danger" icon="el-icon-close"
-                  size="mini">
-                </el-button>
-              </el-tooltip>
-              <el-tooltip v-if="
+                " circle style="padding: 7px;" @click="_Delete(scope.row.ID)" type="danger" icon="el-icon-close" size="mini">
+              </el-button>
+              <el-button v-if="
                   scope.row.STATE == 'CUSTOMERAFFIRM' ||
                     scope.row.STATE == 'SENDBACK' ||
                     (scope.row.STATE == 'RECEIVE' &&
                       scope.row.RETURN_TYPE == '客户邮寄')
-                " content="编辑" placement="top">
-                <el-button circle style="padding: 7px;" @click="_CheckDetail(scope.row, 2)" type="primary" icon="el-icon-edit"
-                  size="mini">
-                </el-button>
-              </el-tooltip>
+                " circle style="padding: 7px;" @click="_CheckDetail(scope.row, 2)" type="primary" icon="el-icon-edit"
+                size="mini">
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -93,7 +86,7 @@
       </div>
     </el-card>
 
-    <el-dialog :visible.sync="RefundDetail" :close-on-click-modal="false" width="55%" append-to-body>
+    <el-dialog :visible.sync="RefundDetail" :close-on-click-modal="false" width="1000px" append-to-body>
       <!-- 查看区 -->
       <div v-show="isCheck" id="printTable">
         <div style="margin-bottom:5px;">
@@ -101,99 +94,72 @@
             <tr>
               <td style="font-size:20px;height:30px;text-align:center;" colspan="7">
                 退货/赔偿电子申请书【{{ submit.STATE | transStatus }}】
-                <i class="icon-print el-icon-printer cpoi" style="float:right" @click="printRefund"></i>
+                <i class="icon-print el-icon-printer" @click="printRefund"></i>
               </td>
             </tr>
           </table>
         </div>
-        <div>
+        <div class="second-head-table" style="margin-bottom:5px;">
           <table width="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
-              <td style="font-size:10px;height:15px;width:6%;" colspan="1">
-                编号：
-              </td>
-              <td style="font-size:10px;height:15px;text-align:left;width:15%;" colspan="1">
-                {{ submit.ID }}
-              </td>
-              <td style="font-size:10px;height:15px;width:9%;" colspan="1">
-                创建时间：
-              </td>
-              <td style="font-size:10px;height:15px;text-align:left;width:17%;" colspan="3">
-                {{ submit.CREATE_TS | datatrans }}
-              </td>
-              <td style="font-size:10px;height:15px;width:8%;" colspan="1" v-if="submit.STATE !='SUBMITTED'">
-                处理人：
-              </td>
-              <td style="font-size:10px;height:15px;width:8%;" colspan="1" v-else></td>
-              <td style="font-size:10px;height:15px;text-align:left;width:19%;" colspan="1" v-if="submit.STATE !='SUBMITTED'">
-                {{ submit.DEALMAN_NAME }}
-              </td>
-              <td style="font-size:10px;height:15px;width:19%;" colspan="1" v-else></td>
-              <td style="font-size:10px;height:15px;width:9%;" colspan="1" v-if="submit.STATE !='SUBMITTED'">
-                处理时间：
-              </td>
-              <td style="font-size:10px;height:15px;width:9%;" colspan="1" v-else></td>
-              <td style="font-size:10px;height:15px;text-align:left;width:17%;" colspan="3" v-if="submit.STATE !='SUBMITTED'">
+              <td style="width:6%;">编号：</td>
+              <td style="text-align:left;width:15%;">{{ submit.ID }}</td>
+              <td style="width:9%;">创建时间：</td>
+              <td style="text-align:left;width:17%;" colspan="3">{{ submit.CREATE_TS | datatrans }}</td>
+              <td style="width:8%;" v-if="submit.STATE !='SUBMITTED'">处理人：</td>
+              <td style="width:8%;" v-else></td>
+              <td style="text-align:left;width:19%;" v-if="submit.STATE !='SUBMITTED'">{{ submit.DEALMAN_NAME }}</td>
+              <td style="width:19%;" v-else></td>
+              <td style="width:9%;" v-if="submit.STATE !='SUBMITTED'">处理时间：</td>
+              <td style="width:9%;" v-else></td>
+              <td style="text-align:left;width:17%;" colspan="3" v-if="submit.STATE !='SUBMITTED'">
                 {{ submit.DEAL_TS | datatrans }}
               </td>
-              <td style="font-size:10px;height:15px;width:17%;" colspan="1" v-else></td>
+              <td style="width:17%;" v-else></td>
             </tr>
           </table>
         </div>
-        <div class="table-c" style="margin-top:5px;">
+        <div class="table-c">
           <table width="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
-              <td class="grayTD" style="height:15px" colspan="1">客户代码</td>
-              <td style="height:15px" colspan="1">
-                {{ submit.CID }}
-              </td>
-              <td class="grayTD" style="height:15px" colspan="1">客户名称</td>
-              <td style="height:15px" colspan="5">
-                {{ submit.CNAME }}
-              </td>
+              <td class="grayTD">客户代码</td>
+              <td>{{ submit.CID }}</td>
+              <td class="grayTD">客户名称</td>
+              <td colspan="5">{{ submit.CNAME }}</td>
             </tr>
             <tr>
-              <td class="grayTD" style="height:15px" width="12%">提货单号</td>
-              <td style="height:15px" width="14%">{{ submit.SALE_NO }}</td>
-              <td class="grayTD" style="height:15px" width="10%">B2B订单号</td>
-              <td style="height:15px" colspan="2" width="16%">{{ submit.ORDER_NO }}</td>
-              <!-- 连表查询 -->
-              <td class="grayTD" style="height:15px" width="13%">ERP订单号</td>
-              <td style="height:15px" colspan="2">{{ submit.CONTRACT_NO }}</td>
-              <!-- 连表查询 -->
+              <td class="grayTD" width="12%">提货单号</td>
+              <td width="14%">{{ submit.SALE_NO }}</td>
+              <td class="grayTD" width="10%">B2B订单号</td>
+              <td colspan="2" width="16%">{{ submit.ORDER_NO }}</td>
+              <td class="grayTD" width="13%">ERP订单号</td>
+              <td colspan="2">{{ submit.CONTRACT_NO }}</td>
             </tr>
             <tr>
-              <td class="grayTD" style="height:15px">联系人</td>
-              <td style="height:15px">{{ submit.CONTACT_MAN }}</td>
-              <td class="grayTD" style="height:15px">联系电话</td>
-              <td style="height:15px" colspan="2">
-                {{ submit.CONTACT_PHONE }}
-              </td>
-              <td class="grayTD" style="height:15px">物流单号</td>
-              <td style="height:15px" colspan="2">{{ submit.TRANS_ID }}</td>
-              <!-- 连表查询 -->
+              <td class="grayTD">联系人</td>
+              <td>{{ submit.CONTACT_MAN }}</td>
+              <td class="grayTD">联系电话</td>
+              <td colspan="2">{{ submit.CONTACT_PHONE }}</td>
+              <td class="grayTD">物流单号</td>
+              <td colspan="2">{{ submit.TRANS_ID }}</td>
             </tr>
             <tr>
-              <td class="grayTD" style="height:15px">问题描述</td>
-              <td style="height:15px" colspan="7">{{ submit.NOTES }}</td>
+              <td class="grayTD">问题描述</td>
+              <td colspan="7">{{ submit.NOTES }}</td>
             </tr>
             <tr>
-              <td class="grayTD" colspan="1" style="height:15px">产品/项目</td>
-              <td class="grayTD" colspan="2" style="height:15px">型号</td>
-              <td class="grayTD" colspan="1" style="height:15px">单位</td>
-              <td class="grayTD" colspan="1" style="height:15px">数量</td>
-              <td class="grayTD" colspan="3" style="height:15px">
-                上传相关信息
-              </td>
+              <td class="grayTD">产品/项目</td>
+              <td class="grayTD" colspan="2">型号</td>
+              <td class="grayTD">单位</td>
+              <td class="grayTD">数量</td>
+              <td class="grayTD" colspan="3">上传相关信息</td>
             </tr>
             <tr>
-              <td colspan="1" style="height:21px">
-                {{ submit.PRODUCTION_VERSION }}
-              </td>
-              <td colspan="2" style="height:21px">{{ submit.ITEM_NO }}</td>
-              <td colspan="1" style="height:21px">{{ submit.UNIT }}</td>
-              <td colspan="1" style="height:21px">{{ submit.QTY }}</td>
-              <td colspan="3" style="height:21px">
+              <td>{{ submit.PRODUCTION_VERSION }}</td>
+              <td colspan="2">{{ submit.ITEM_NO }}</td>
+              <td>{{ submit.UNIT }}</td>
+              <td>{{ submit.QTY }}</td>
+              <td colspan="3">
                 <ul class="el-upload-list el-upload-list--text">
                   <li v-for="(file, index) in files" :key="index" class="el-upload-list__item is-success" tabindex="0">
                     <a class="el-upload-list__item-name">
@@ -215,17 +181,17 @@
               </td>
             </tr>
             <tr v-if="submit.STATE != 'SUBMITTED' && submit.STATE != 'SENDBACK'">
-              <td class="grayTD" style="height:15px" colspan="1">初审意见</td>
-              <td style="height:15px" colspan="2">{{ submit.RETURN_TYPE }}</td>
-              <td style="height:15px" colspan="5">
+              <td class="grayTD">初审意见</td>
+              <td colspan="2">{{ submit.RETURN_TYPE }}</td>
+              <td colspan="5">
                 {{ submit.FIRST_AUDITION }}
               </td>
             </tr>
             <tr v-if="submit.STATE == 'SENDBACK'">
-              <td class="grayTD" style="height:15px" colspan="1">
+              <td class="grayTD">
                 初审意见及退回原因
               </td>
-              <td style="height:15px" colspan="7">
+              <td colspan="7">
                 {{ submit.FIRST_AUDITION }}
               </td>
             </tr>
@@ -234,22 +200,22 @@
                   submit.STATE != 'SENDBACK' &&
                   submit.RETURN_TYPE != '无需退货'
               ">
-              <td class="grayTD" style="height:15px">备注信息</td>
-              <td style="height:15px" colspan="7" v-if="submit.RETURN_TYPE == '玉兰取货'">
+              <td class="grayTD">备注信息</td>
+              <td colspan="7" v-if="submit.RETURN_TYPE == '玉兰取货'">
                 我公司已安排物流公司上门取货，请保持电话畅通
               </td>
-              <td style="height:15px" colspan="7" v-if="submit.RETURN_TYPE == '客户邮寄'">
+              <td colspan="7" v-if="submit.RETURN_TYPE == '客户邮寄'">
                 请您在快递单上备注提货单号
               </td>
-              <td style="height:15px" colspan="7" v-else></td>
+              <td colspan="7" v-else></td>
             </tr>
             <tr v-if="
                 submit.STATE != 'SUBMITTED' &&
                   submit.STATE != 'SENDBACK' &&
                   submit.RETURN_TYPE == '客户邮寄'
               ">
-              <td class="grayTD" style="height:15px">退货或寄样信息</td>
-              <td style="height:15px" colspan="7">
+              <td class="grayTD">退货或寄样信息</td>
+              <td colspan="7">
                 {{ submit.RETURN_ADDRESS }}
               </td>
             </tr>
@@ -258,8 +224,8 @@
                   submit.STATE != 'SENDBACK' &&
                   submit.RETURN_TYPE == '客户邮寄'
               ">
-              <td class="grayTD" style="height:15px">邮寄备注信息</td>
-              <td style="height:15px" colspan="7">
+              <td class="grayTD">邮寄备注信息</td>
+              <td colspan="7">
                 您的提货单号为{{ submit.SALE_NO }}
               </td>
             </tr>
@@ -269,21 +235,21 @@
                   submit.STATE == 'RECEIVE') &&
                   submit.RETURN_TYPE == '客户邮寄'
               ">
-              <td class="grayTD" style="height:15px">物流备注信息</td>
-              <td style="height:15px;color:red;" colspan="7" v-if="!submit.RETURN_TRANSINFO && submit.STATE == 'RECEIVE'">
+              <td class="grayTD">物流备注信息</td>
+              <td style=";color:red;" colspan="7" v-if="!submit.RETURN_TRANSINFO && submit.STATE == 'RECEIVE'">
                 {{ submit.RETURN_TRANSINFO | transInfoTip }}
               </td>
-              <td style="height:15px;" colspan="7" v-if="!submit.RETURN_TRANSINFO && submit.STATE != 'RECEIVE'">
+              <td colspan="7" v-if="!submit.RETURN_TRANSINFO && submit.STATE != 'RECEIVE'">
                 {{ submit.RETURN_TRANSINFO | transInfoTip }}
               </td>
-              <td style="height:15px;" colspan="7" v-if="submit.RETURN_TRANSINFO !== ''">
+              <td colspan="7" v-if="submit.RETURN_TRANSINFO !== ''">
                 {{ submit.RETURN_TRANSINFO }}
               </td>
             </tr>
             <!-- 初审意见附件下载 -->
             <tr v-if="submit.STATE != 'SUBMITTED'&&submit.STATE != 'SENDBACK'">
-              <td class="grayTD" style="height:15px" colspan="1">附件</td>
-              <td style="height:15px" colspan="7">
+              <td class="grayTD">附件</td>
+              <td colspan="7">
                 <ul class="el-upload-list el-upload-list--text">
                   <li v-for="(file, index) in fileListForAudition" :key="index" class="el-upload-list__item is-success"
                     tabindex="0">
@@ -310,40 +276,40 @@
             <tr v-if="
                 submit.STATE == 'CUSTOMERAFFIRM' || submit.STATE == 'APPROVED'
               ">
-              <td class="grayTD" style="width:12%;height:15px">产品/项目</td>
-              <td class="grayTD" style="width:14%;height:15px">型号</td>
-              <td class="grayTD" style="width:10%;height:15px">单位</td>
-              <td class="grayTD" style="width:8%;height:15px">数量</td>
-              <td class="grayTD" style="width:8%;height:15px">金额</td>
-              <td class="grayTD" style="width:13%;height:15px">质量问题</td>
-              <td class="grayTD" style="width:15%;height:15px">处理意见</td>
-              <td class="grayTD" style="width:20%;height:15px">附件</td>
+              <td class="grayTD" style="width:12%;">产品/项目</td>
+              <td class="grayTD" style="width:14%;">型号</td>
+              <td class="grayTD" style="width:10%;">单位</td>
+              <td class="grayTD" style="width:8%;">数量</td>
+              <td class="grayTD" style="width:8%;">金额</td>
+              <td class="grayTD" style="width:13%;">质量问题</td>
+              <td class="grayTD" style="width:15%;">处理意见</td>
+              <td class="grayTD" style="width:20%;">附件</td>
             </tr>
             <tr v-if="
                 submit.STATE == 'CUSTOMERAFFIRM' || submit.STATE == 'APPROVED'
               " v-for="(item, index) of processDetail" :key="index">
-              <td colspan="1" rowspan="1" style="height:15px">
+              <td>
                 {{ submit.PRODUCTION_VERSION }}
               </td>
-              <td colspan="1" rowspan="1" style="height:15px">
+              <td>
                 {{ submit.ITEM_NO }}
               </td>
-              <td colspan="1" rowspan="1" style="height:15px">
+              <td>
                 {{ submit.UNIT }}
               </td>
-              <td colspan="1" rowspan="1" style="height:15px">
+              <td>
                 {{ processDetail[index].P_QTY }}
               </td>
-              <td colspan="1" rowspan="1" style="height:15px">
+              <td>
                 {{ processDetail[index].P_MONEY }}
               </td>
-              <td colspan="1" rowspan="1" style="height:15px">
+              <td>
                 {{ processDetail[index].P_NOTES }}
               </td>
-              <td colspan="1" rowspan="1" style="height:15px">
+              <td>
                 {{ processDetail[index].P_RESULT }}
               </td>
-              <td colspan="1" rowspan="1" style="height:15px">
+              <td>
                 <ul class="el-upload-list el-upload-list--text" v-if="processDetail[index].fileListForProcess.length">
                   <li v-for="(file, index) in processDetail[index]
                       .fileListForProcess" :key="index" class="el-upload-list__item is-success" tabindex="0">
@@ -364,10 +330,10 @@
             <tr v-if="
                 submit.STATE == 'CUSTOMERAFFIRM' || submit.STATE == 'APPROVED'
               ">
-              <td class="grayTD" style="height:15px">金额小写</td>
-              <td style="height:15px" colspan="3">{{ submit.TOTALMONEY }}</td>
-              <td class="grayTD" style="height:15px">金额大写</td>
-              <td style="height:15px" colspan="3">{{ totalMoneyUpper }}</td>
+              <td class="grayTD">金额小写</td>
+              <td colspan="3">{{ submit.TOTALMONEY }}</td>
+              <td class="grayTD">金额大写</td>
+              <td colspan="3">{{ totalMoneyUpper }}</td>
             </tr>
 
             <tr style="height:90px">
@@ -408,7 +374,7 @@
                   <span> 年 月 日</span>
                 </div>
               </td>
-              <td colspan="4" border="0px" style="font-size:13px;color:gray;text-align:center;">
+              <td colspan="4" style="font-size:13px;color:gray;text-align:center;">
                 <div>
                   经销商
                   <span v-if="submit.STATE == 'APPROVED'">:{{ submit.CNAME }}</span><br />
@@ -433,7 +399,7 @@
 
       <!-- 编辑区 -->
       <div v-show="isEdit">
-        <div>
+        <div style="margin-bottom:5px;">
           <table width="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
               <td style="font-size:20px;height:30px;text-align:center;" colspan="8">
@@ -442,104 +408,103 @@
             </tr>
           </table>
         </div>
-        <div class="table-c" style="margin-top:5px;">
+        <div class="table-c">
           <table width="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
-              <td class="grayTD" style="height:15px" colspan="1">客户代码</td>
-              <td style="height:15px" colspan="1">
+              <td class="grayTD">客户代码</td>
+              <td>
                 {{ submit.CID }}
               </td>
-              <td class="grayTD" style="height:15px" colspan="1">客户名称</td>
-              <td style="height:15px" colspan="5">
+              <td class="grayTD">客户名称</td>
+              <td colspan="5">
                 {{ submit.CNAME }}
               </td>
             </tr>
             <tr>
-              <td class="grayTD" style="height:15px;">提货单号</td>
-              <td style="height:15px;">{{ submit.SALE_NO }}</td>
-              <td class="grayTD" style="height:15px;">B2B订单号</td>
-              <td style="height:15px;" colspan="2" v-if="submit.STATE != 'SENDBACK'">
+              <td class="grayTD">提货单号</td>
+              <td>{{ submit.SALE_NO }}</td>
+              <td class="grayTD">B2B订单号</td>
+              <td colspan="2" v-if="submit.STATE != 'SENDBACK'">
                 {{ submit.ORDER_NO }}
               </td>
-              <td style="height:15px;" colspan="2" v-else>
+              <td colspan="2" v-else>
                 <el-input v-model="submit.ORDER_NO" placeholder="请填写" clearable class="inputStyle">
                 </el-input>
               </td>
-              <td class="grayTD" style="height:15px;">ERP订单号</td>
-              <td style="height:15px;" colspan="2">{{ submit.CONTRACT_NO }}</td>
+              <td class="grayTD">ERP订单号</td>
+              <td colspan="2">{{ submit.CONTRACT_NO }}</td>
             </tr>
             <tr>
-              <td class="grayTD" style="height:15px">
+              <td class="grayTD">
                 联系人<span style="color:red;">*</span>
               </td>
-              <td style="height:15px" v-if="submit.STATE != 'SENDBACK'">
+              <td v-if="submit.STATE != 'SENDBACK'">
                 {{ submit.CONTACT_MAN }}
               </td>
-              <td style="height:15px" v-else>
+              <td v-else>
                 <el-input v-model="submit.CONTACT_MAN" placeholder="请填写" clearable class="inputStyle">
                 </el-input>
               </td>
-              <td class="grayTD" style="height:15px">
+              <td class="grayTD">
                 联系电话<span style="color:red;">*</span>
               </td>
-              <td style="height:15px" colspan="2" v-if="submit.STATE != 'SENDBACK'">
+              <td colspan="2" v-if="submit.STATE != 'SENDBACK'">
                 {{ submit.CONTACT_PHONE }}
               </td>
-              <td style="height:15px" colspan="2" v-else>
+              <td colspan="2" v-else>
                 <el-input v-model="submit.CONTACT_PHONE" placeholder="请填写联系电话" clearable class="inputStyle"
                   oninput="value=value.replace(/[^\d]/g,'')">
                 </el-input>
               </td>
-              <td class="grayTD" style="height:15px">物流单号</td>
-              <td style="height:15px" colspan="2" v-if="submit.STATE != 'SENDBACK'">
+              <td class="grayTD">物流单号</td>
+              <td colspan="2" v-if="submit.STATE != 'SENDBACK'">
                 {{ submit.TRANS_ID }}
               </td>
-              <td style="height:15px" colspan="2" v-else>
+              <td colspan="2" v-else>
                 <el-input v-model="submit.TRANS_ID" placeholder="请填写" clearable class="inputStyle">
                 </el-input>
               </td>
-              <td style="height:15px"></td>
             </tr>
             <tr>
-              <td class="grayTD" style="height:15px">
+              <td class="grayTD">
                 问题描述<span style="color:red;">*</span>
               </td>
-              <td style="height:15px" colspan="7" v-if="submit.STATE != 'SENDBACK'">
+              <td colspan="7" v-if="submit.STATE != 'SENDBACK'">
                 {{ submit.NOTES }}
               </td>
-              <td style="height:15px" colspan="7" v-else>
+              <td colspan="7" v-else>
                 <el-input v-model="submit.NOTES" placeholder="请填写问题描述" clearable class="inputStyle">
                 </el-input>
               </td>
             </tr>
             <tr>
-              <td class="grayTD" colspan="1" style="height:15px;">产品/项目</td>
-              <td class="grayTD" colspan="2" style="height:15px;">型号</td>
-              <td class="grayTD" colspan="1" style="height:15px;">单位</td>
-              <td class="grayTD" colspan="1" style="height:15px;">
+              <td class="grayTD">产品/项目</td>
+              <td class="grayTD" colspan="2">型号</td>
+              <td class="grayTD">单位</td>
+              <td class="grayTD">
                 数量<span style="color:red;">*</span>
               </td>
-              <td class="grayTD" colspan="3" style="height:15px;">
+              <td class="grayTD" colspan="3">
                 上传相关信息<span style="color:red;">*</span>
               </td>
             </tr>
             <tr>
-              <td colspan="1" style="height:21px">
+              <td>
                 {{ submit.PRODUCTION_VERSION }}
               </td>
-              <td colspan="2" style="height:21px">{{ submit.ITEM_NO }}</td>
-              <td colspan="1" style="height:21px">{{ submit.UNIT }}</td>
-              <td colspan="1" style="height:21px" v-if="submit.STATE != 'SENDBACK'">
+              <td colspan="2">{{ submit.ITEM_NO }}</td>
+              <td>{{ submit.UNIT }}</td>
+              <td v-if="submit.STATE != 'SENDBACK'">
                 {{ submit.QTY }}
               </td>
-              <td colspan="1" style="height:21px" v-else>
+              <td v-else>
                 <input v-model="submit.QTY" placeholder="必填" clearable class="inputStyle" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
                            .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)" />
               </td>
-              <td colspan="3" style="height:21px" v-if="submit.STATE != 'SENDBACK'">
+              <td colspan="3" v-if="submit.STATE != 'SENDBACK'">
                 <ul class="el-upload-list el-upload-list--text">
                   <li v-for="(file, index) in files" :key="index" class="el-upload-list__item is-success" tabindex="0">
                     <a class="el-upload-list__item-name">
@@ -554,7 +519,7 @@
                   </li>
                 </ul>
               </td>
-              <td colspan="3" style="height:21px" v-else>
+              <td colspan="3" v-else>
                 <div>
                   <el-upload class="upload-de" action="#" drag multiple :on-change="function(file, fileList) {
                         return handleChange(file, fileList);
@@ -576,10 +541,10 @@
               </td>
             </tr>
             <tr v-if="submit.STATE == 'SENDBACK'">
-              <td class="grayTD" style="height:15px" colspan="1">
+              <td class="grayTD">
                 初审意见或退回原因
               </td>
-              <td style="height:15px" colspan="7">
+              <td colspan="7">
                 {{ submit.FIRST_AUDITION }}
               </td>
             </tr>
@@ -589,47 +554,47 @@
               </td>
             </tr>
             <tr v-if="submit.STATE != 'SENDBACK'">
-              <td class="grayTD" style="height:15px" colspan="1">初审意见</td>
-              <td style="height:15px" colspan="2">{{ submit.RETURN_TYPE }}</td>
-              <td style="height:15px" colspan="5">
+              <td class="grayTD">初审意见</td>
+              <td colspan="2">{{ submit.RETURN_TYPE }}</td>
+              <td colspan="5">
                 {{ submit.FIRST_AUDITION }}
               </td>
             </tr>
             <tr v-if="
                 submit.STATE != 'SENDBACK' && submit.RETURN_TYPE != '无需退货'
               ">
-              <td class="grayTD" style="height:15px">备注信息</td>
-              <td style="height:15px" colspan="7" v-if="submit.RETURN_TYPE == '玉兰取货'">
+              <td class="grayTD">备注信息</td>
+              <td colspan="7" v-if="submit.RETURN_TYPE == '玉兰取货'">
                 我公司已安排物流公司上门取货，请保持电话畅通
               </td>
-              <td style="height:15px" colspan="7" v-if="submit.RETURN_TYPE == '客户邮寄'">
+              <td colspan="7" v-if="submit.RETURN_TYPE == '客户邮寄'">
                 请您在快递单上备注提货单号
               </td>
-              <td style="height:15px" colspan="7" v-else></td>
+              <td colspan="7" v-else></td>
             </tr>
             <tr v-if="
                 submit.STATE != 'SENDBACK' && submit.RETURN_TYPE == '客户邮寄'
               ">
-              <td class="grayTD" style="height:15px">退货或寄样信息</td>
-              <td style="height:15px" colspan="7">
+              <td class="grayTD">退货或寄样信息</td>
+              <td colspan="7">
                 {{ submit.RETURN_ADDRESS }}
               </td>
             </tr>
             <tr v-if="
                 submit.STATE != 'SENDBACK' && submit.RETURN_TYPE == '客户邮寄'
               ">
-              <td class="grayTD" style="height:15px">邮寄备注信息</td>
-              <td style="height:15px" colspan="7">
+              <td class="grayTD">邮寄备注信息</td>
+              <td colspan="7">
                 您的提货单号： {{ submit.SALE_NO }}
               </td>
             </tr>
             <tr v-if="
                 submit.STATE == 'RECEIVE' && submit.RETURN_TYPE == '客户邮寄'
               ">
-              <td class="grayTD" style="height:15px">
+              <td class="grayTD">
                 物流备注信息<span style="color:red;">*</span>
               </td>
-              <td style="height:15px" colspan="7">
+              <td colspan="7">
                 <el-input v-model="submit.RETURN_TRANSINFO" placeholder="请填写邮寄的物流公司和物流单号" clearable class="inputStyle">
                 </el-input>
               </td>
@@ -639,23 +604,23 @@
                   submit.STATE == 'APPROVED') &&
                   submit.RETURN_TYPE == '客户邮寄'
               ">
-              <td class="grayTD" style="height:15px">
+              <td class="grayTD">
                 物流备注信息<span style="color:red;">*</span>
               </td>
-              <td style="height:15px;color:red;" colspan="7" v-if="!submit.RETURN_TRANSINFO && submit.STATE == 'RECEIVE'">
+              <td style=";color:red;" colspan="7" v-if="!submit.RETURN_TRANSINFO && submit.STATE == 'RECEIVE'">
                 {{ submit.RETURN_TRANSINFO | transInfoTip }}
               </td>
-              <td style="height:15px;" colspan="7" v-if="!submit.RETURN_TRANSINFO && submit.STATE != 'RECEIVE'">
+              <td colspan="7" v-if="!submit.RETURN_TRANSINFO && submit.STATE != 'RECEIVE'">
                 {{ submit.RETURN_TRANSINFO | transInfoTip }}
               </td>
-              <td style="height:15px;" colspan="7" v-if="submit.RETURN_TRANSINFO !== ''">
+              <td colspan="7" v-if="submit.RETURN_TRANSINFO !== ''">
                 {{ submit.RETURN_TRANSINFO }}
               </td>
             </tr>
             <!-- 初审意见附件下载 -->
             <tr v-if="submit.STATE != 'SUBMITTED'&&submit.STATE != 'SENDBACK'">
-              <td class="grayTD" style="height:15px" colspan="1">附件</td>
-              <td style="height:15px" colspan="7">
+              <td class="grayTD">附件</td>
+              <td colspan="7">
                 <ul class="el-upload-list el-upload-list--text">
                   <li v-for="(file, index) in fileListForAudition" :key="index" class="el-upload-list__item is-success"
                     tabindex="0">
@@ -678,38 +643,24 @@
               </td>
             </tr>
             <tr v-if="submit.STATE == 'CUSTOMERAFFIRM'">
-              <td class="grayTD" style="width:12%;height:15px">产品/项目</td>
-              <td class="grayTD" style="width:14%;height:15px">型号</td>
-              <td class="grayTD" style="width:10%;height:15px">单位</td>
-              <td class="grayTD" style="width:8%;height:15px">数量</td>
-              <td class="grayTD" style="width:8%;height:15px">金额</td>
-              <td class="grayTD" style="width:13%;height:15px">质量问题</td>
-              <td class="grayTD" style="width:15%;height:15px">处理意见</td>
-              <td class="grayTD" style="width:20%;height:15px">附件</td>
+              <td class="grayTD" style="width:12%;">产品/项目</td>
+              <td class="grayTD" style="width:14%;">型号</td>
+              <td class="grayTD" style="width:10%;">单位</td>
+              <td class="grayTD" style="width:8%;">数量</td>
+              <td class="grayTD" style="width:8%;">金额</td>
+              <td class="grayTD" style="width:13%;">质量问题</td>
+              <td class="grayTD" style="width:15%;">处理意见</td>
+              <td class="grayTD" style="width:20%;">附件</td>
             </tr>
             <tr v-if="submit.STATE == 'CUSTOMERAFFIRM'" v-for="(item, index) of processDetail" :key="index">
-              <td colspan="1" rowspan="1" style="height:15px">
-                {{ submit.PRODUCTION_VERSION }}
-              </td>
-              <td colspan="1" rowspan="1" style="height:15px">
-                {{ submit.ITEM_NO }}
-              </td>
-              <td colspan="1" rowspan="1" style="height:15px">
-                {{ submit.UNIT }}
-              </td>
-              <td colspan="1" rowspan="1" style="height:15px">
-                {{ processDetail[index].P_QTY }}
-              </td>
-              <td colspan="1" rowspan="1" style="height:15px">
-                {{ processDetail[index].P_MONEY }}
-              </td>
-              <td colspan="1" rowspan="1" style="height:15px">
-                {{ processDetail[index].P_NOTES }}
-              </td>
-              <td colspan="1" rowspan="1" style="height:15px">
-                {{ processDetail[index].P_RESULT }}
-              </td>
-              <td colspan="1" rowspan="1" style="height:15px">
+              <td>{{ submit.PRODUCTION_VERSION }}</td>
+              <td>{{ submit.ITEM_NO }}</td>
+              <td>{{ submit.UNIT }}</td>
+              <td>{{ processDetail[index].P_QTY }}</td>
+              <td>{{ processDetail[index].P_MONEY }}</td>
+              <td>{{ processDetail[index].P_NOTES }}</td>
+              <td>{{ processDetail[index].P_RESULT }}</td>
+              <td>
                 <ul class="el-upload-list el-upload-list--text" v-if="processDetail[index].fileListForProcess.length">
                   <li v-for="(file, index) in processDetail[index]
                       .fileListForProcess" :key="index" class="el-upload-list__item is-success" tabindex="0">
@@ -746,18 +697,14 @@
                   广东玉兰集团股份有限公司<br />
                   市场部<br />
                   {{ new Date(submit.DEAL_TS).getFullYear() }}年
-                  {{
-                      addZeroIfNeed(new Date(submit.DEAL_TS).getMonth() + 1)
-                    }}月
+                  {{ addZeroIfNeed(new Date(submit.DEAL_TS).getMonth() + 1) }}月
                   {{ addZeroIfNeed(new Date(submit.DEAL_TS).getDate()) }}日
                 </div>
                 <div style="margin:4px 0px 4px 4px" v-else>
                   广东玉兰集团股份有限公司<br />
                   市场部<br />
                   {{ new Date().getFullYear() }}年
-                  {{
-                      addZeroIfNeed(new Date().getMonth() + 1)
-                    }}月
+                  {{ addZeroIfNeed(new Date().getMonth() + 1) }}月
                   {{ addZeroIfNeed(new Date().getDate()) }}日
                 </div>
               </td>
@@ -768,14 +715,8 @@
                   <span v-if="submit.STATE != 'APPROVED'"> 年 月 日</span>
                   <span v-else>
                     {{ new Date(submit.REASSURE_TS).getFullYear() }}年
-                    {{
-                      addZeroIfNeed(
-                        new Date(submit.REASSURE_TS).getMonth() + 1
-                      )
-                    }}月
-                    {{
-                      addZeroIfNeed(new Date(submit.REASSURE_TS).getDate())
-                    }}日
+                    {{ addZeroIfNeed(new Date(submit.REASSURE_TS).getMonth() + 1) }}月
+                    {{ addZeroIfNeed(new Date(submit.REASSURE_TS).getDate()) }}日
                   </span>
                 </div>
               </td>
@@ -811,91 +752,91 @@
         <div class="table-c" style="margin-top:5px;">
           <table width="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
-              <td class="grayTD" style="height:15px" colspan="1">客户代码</td>
-              <td style="height:15px" colspan="1">
+              <td class="grayTD">客户代码</td>
+              <td>
                 {{ this.companyId }}
               </td>
-              <td class="grayTD" style="height:15px" colspan="1">客户名称</td>
-              <td style="height:15px" colspan="4">
+              <td class="grayTD">客户名称</td>
+              <td colspan="4">
                 {{ this.companyName }}
               </td>
             </tr>
             <tr>
-              <td class="grayTD" style="height:15px;width:12%;">提货单号</td>
-              <td style="height:15px;width:20%;">{{ submit.SALE_NO }}</td>
-              <td class="grayTD" style="height:15px;width:14%;">B2B订单号</td>
-              <td style="height:15px;width:24%;" colspan="2">
+              <td class="grayTD" style=";width:12%;">提货单号</td>
+              <td style=";width:20%;">{{ submit.SALE_NO }}</td>
+              <td class="grayTD" style=";width:14%;">B2B订单号</td>
+              <td style=";width:24%;" colspan="2">
                 <el-input v-model="submit.ORDER_NO" placeholder="选填" clearable class="inputStyle">
                 </el-input>
               </td>
-              <td class="grayTD" style="height:15px;width:12%;">ERP订单号</td>
-              <td style="height:15px;width:18%;" colspan="2">
+              <td class="grayTD" style=";width:12%;">ERP订单号</td>
+              <td style=";width:18%;" colspan="2">
                 {{ this.CONTRACT_NO }}
               </td>
             </tr>
             <tr>
-              <td class="grayTD" style="height:15px">
+              <td class="grayTD">
                 联系人<span style="color:red;">*</span>
               </td>
-              <td style="height:15px">
+              <td>
                 <el-input v-model="submit.CONTACT_MAN" placeholder="请填写" clearable class="inputStyle">
                 </el-input>
               </td>
-              <td class="grayTD" style="height:15px">
+              <td class="grayTD">
                 联系电话<span style="color:red;">*</span>
               </td>
-              <td style="height:15px" colspan="2">
+              <td colspan="2">
                 <el-input v-model="submit.CONTACT_PHONE" placeholder="请填写联系电话" clearable class="inputStyle"
                   oninput="value=value.replace(/[^\d]/g,'')">
                 </el-input>
               </td>
-              <td class="grayTD" style="height:15px">物流单号</td>
-              <td style="height:15px">
+              <td class="grayTD">物流单号</td>
+              <td>
                 <el-input v-model="submit.TRANS_ID" placeholder="选填" clearable class="inputStyle"
                   oninput="value=value.replace(/[^\d]/g,'')">
                 </el-input>
               </td>
             </tr>
             <tr>
-              <td class="grayTD" style="height:15px">
+              <td class="grayTD">
                 问题描述<span style="color:red;">*</span>
               </td>
-              <td style="height:15px" colspan="6">
+              <td colspan="6">
                 <el-input v-model="submit.NOTES" placeholder="请填写问题描述" clearable class="inputStyle">
                 </el-input>
               </td>
             </tr>
             <tr>
-              <td class="grayTD" colspan="1" style="height:15px;width:12%;">
+              <td class="grayTD" style=";width:12%;">
                 产品/项目
               </td>
-              <td class="grayTD" colspan="2" style="height:15px;width:34%;">
+              <td class="grayTD" colspan="2" style=";width:34%;">
                 型号
               </td>
-              <td class="grayTD" colspan="1" style="height:15px;width:10%;">
+              <td class="grayTD" style=";width:10%;">
                 单位
               </td>
-              <td class="grayTD" colspan="1" style="height:15px;width:14%;">
+              <td class="grayTD" style=";width:14%;">
                 数量<span style="color:red;">*</span>
               </td>
-              <td class="grayTD" colspan="2" style="height:15px;width:30%;">
+              <td class="grayTD" colspan="2" style=";width:30%;">
                 上传相关信息<span style="color:red;">*</span>
               </td>
             </tr>
             <tr>
-              <td colspan="1" style="height:21px">
+              <td>
                 {{ submit.PRODUCTION_VERSION }}
               </td>
-              <td colspan="2" style="height:21px">{{ submit.ITEM_NO }}</td>
-              <td colspan="1" style="height:21px">{{ submit.UNIT }}</td>
-              <td colspan="1" style="height:21px">
+              <td colspan="2">{{ submit.ITEM_NO }}</td>
+              <td>{{ submit.UNIT }}</td>
+              <td>
                 <input v-model="submit.QTY" placeholder="请填写" clearable class="inputStyle" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
                            .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)" />
               </td>
-              <td colspan="2" style="height:21px">
+              <td colspan="2">
                 <div>
                   <el-upload class="upload-de" action="#" drag multiple :on-change="function(file, fileList) {
                         return handleChange(file, fileList);
@@ -960,7 +901,7 @@
         <div>
           <table width="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
-              <td style="font-size:15px;height:16px;text-align:left;" colspan="1">
+              <td style="font-size:15px;height:16px;text-align:left;">
                 请选择产品型号
               </td>
             </tr>
@@ -969,7 +910,7 @@
         <div class="table-c">
           <table width="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
-              <td colspan="1" rowspan="1" style="height:15px">
+              <td>
                 <el-select style="width:99%;" v-model="ITEM_NO" filterable placeholder="">
                   <el-option v-for="item in ItemNoArray" :key="item.value" :label="item.label" :value="item.value">
                   </el-option>
@@ -993,7 +934,7 @@
         <div>
           <table width="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
-              <td style="font-size:15px;height:16px;text-align:left;" colspan="1">
+              <td style="font-size:15px;height:16px;text-align:left;">
                 请输入提货单号（注意空格）
               </td>
             </tr>
@@ -1002,7 +943,7 @@
         <div class="table-c">
           <table width="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
-              <td colspan="1" rowspan="1" style="height:15px">
+              <td>
                 <el-input v-model="SALE_NO" placeholder="" clearable class="inputStyle">
                 </el-input>
               </td>
@@ -1319,56 +1260,56 @@ export default {
               }
             });
           }
-        }
-        //查询时，将对应客户意见的附件的字段拆解开来，并作为对象传入文件集合中
-        var list = this.submit.ATTACHMENT_FILE.split(";");
-        for (var i = 0; i < list.length - 1; i++) {
-          var index = list[i].lastIndexOf("/");
-          var fileName = list[i].substr(index + 1);
-          this.files.push({
-            name: fileName,
-            url: list[i],
-          });
-        }
-        this.initialFileNum = this.files.length;
-        //查询时，将对应初审意见的附件的字段拆解开来，并作为对象传入文件集合中
-        var list2 = this.submit.FIRST_AUDITION_FILE.split(";");
-        for (var i = 0; i < list2.length - 1; i++) {
-          var index = list2[i].lastIndexOf("/");
-          var fileName = list2[i].substr(index + 1);
-          this.fileListForAudition.push({
-            name: fileName,
-            url: list2[i],
-          });
-        }
-        //查询时，将对应处理结果的附件的字段拆解开来，并作为对象传入文件集合中
-        for (let j = 0; j < this.processDetail.length; j++) {
-          //初始化
-          this.processDetail[j].fileListForProcess = [];
-          var list3 = this.processDetail[j].PROCESS_FILE.split(";");
-          for (var i = 0; i < list3.length - 1; i++) {
-            var index = list3[i].lastIndexOf("/");
-            var fileName = list3[i].substr(index + 1);
-            this.processDetail[j].fileListForProcess.push({
+          //查询时，将对应客户意见的附件的字段拆解开来，并作为对象传入文件集合中
+          var list = this.submit.ATTACHMENT_FILE.split(";");
+          for (var i = 0; i < list.length - 1; i++) {
+            var index = list[i].lastIndexOf("/");
+            var fileName = list[i].substr(index + 1);
+            this.files.push({
               name: fileName,
-              url: list3[i],
+              url: list[i],
             });
           }
-        }
-        this.dateStamp = new Date().getTime();
-        if (type == 1) {
-          this.isEdit = false;
-          this.isCheck = true;
-          this.isRefundAdd = false;
-        } else {
-          if (this.submit.STATE == "SENDBACK") {
-            this.FormRight = true;
+          this.initialFileNum = this.files.length;
+          //查询时，将对应初审意见的附件的字段拆解开来，并作为对象传入文件集合中
+          var list2 = this.submit.FIRST_AUDITION_FILE.split(";");
+          for (var i = 0; i < list2.length - 1; i++) {
+            var index = list2[i].lastIndexOf("/");
+            var fileName = list2[i].substr(index + 1);
+            this.fileListForAudition.push({
+              name: fileName,
+              url: list2[i],
+            });
           }
-          this.isEdit = true;
-          this.isCheck = false;
-          this.isRefundAdd = false;
+          //查询时，将对应处理结果的附件的字段拆解开来，并作为对象传入文件集合中
+          for (let j = 0; j < this.processDetail.length; j++) {
+            //初始化
+            this.processDetail[j].fileListForProcess = [];
+            var list3 = this.processDetail[j].PROCESS_FILE.split(";");
+            for (var i = 0; i < list3.length - 1; i++) {
+              var index = list3[i].lastIndexOf("/");
+              var fileName = list3[i].substr(index + 1);
+              this.processDetail[j].fileListForProcess.push({
+                name: fileName,
+                url: list3[i],
+              });
+            }
+          }
+          this.dateStamp = new Date().getTime();
+          if (type == 1) {
+            this.isEdit = false;
+            this.isCheck = true;
+            this.isRefundAdd = false;
+          } else {
+            if (this.submit.STATE == "SENDBACK") {
+              this.FormRight = true;
+            }
+            this.isEdit = true;
+            this.isCheck = false;
+            this.isRefundAdd = false;
+          }
+          this.RefundDetail = true;
         }
-        this.RefundDetail = true;
       });
     },
     //保存修改
@@ -2083,6 +2024,7 @@ export default {
   height: 22px;
   text-align: center;
   font-size: 16px;
+  padding: 1px;
 }
 .tableCol {
   background: #f0f9eb;
@@ -2124,13 +2066,16 @@ export default {
 }
 
 .table-c .el-input__inner {
-  height: 20px;
+  height: 100%;
   width: 100%;
   font-size: 16px;
   box-shadow: none;
   text-align: center;
 }
-
+.second-head-table table td {
+  height: 15px;
+  font-size: 10px;
+}
 .table-c .el-input__inner:hover {
   border-color: #e9e9e9;
 }
@@ -2193,6 +2138,7 @@ export default {
 .icon-print {
   font-size: 25px;
   color: gray;
+  cursor: pointer;
 }
 .noprint {
   display: none;

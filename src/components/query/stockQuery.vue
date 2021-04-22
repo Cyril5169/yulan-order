@@ -17,8 +17,7 @@
       <!--  遍历表格 -->
       <div class="allDataDiv">
         <div class="leftCt">
-          <el-table ref="dormitoryTable" :data="itemData" stripe height="500" style="width:100%" @row-click="KC_CP_SC"
-            border>
+          <el-table ref="dormitoryTable" :data="itemData" stripe height="500" style="width:100%" @row-click="KC_CP_SC" border>
             <el-table-column prop="ITEM_NO" label="型号" width="150" align="center"></el-table-column>
             <el-table-column prop="OLD_ITEM_NO" label="版样型号" align="center"></el-table-column>
           </el-table>
@@ -29,7 +28,7 @@
               <span>库存信息：</span>
             </div>
             <div>
-              <el-table style="width:100%;" :data="stockData" height="180px" >
+              <el-table style="width:100%;" :data="stockData" height="180px">
                 <el-table-column prop="NOTE" label="仓库名称" align="center" width="180">
                 </el-table-column>
                 <el-table-column prop="ITEM_NO" label="型号" align="center" width="100">
@@ -558,23 +557,20 @@ export default {
       this.stockInfo = false; //库存信息显示
       var data = {
         productType: this.productType, //产品类型
-        //itemNo:this.search.toUpperCase(),//产品型号
         limit: this.limit, //限制数
         page: this.currentPage, //页数
         stockIds: this.stockIds, //仓库号
         find: this.search,
       };
-      GetItemByProductType(data)
-        .then((res) => {
-          this.count = res.count;
-          if (this.count == 1) {
-            this.KC_CP_SC(res.data[0]);
-          }
-          this.itemData = res.data;
-        })
-        .catch((res) => {
-          console.log(res);
-        });
+      GetItemByProductType(data).then((res) => {
+        this.count = res.count;
+        if (this.count == 1) {
+          this.KC_CP_SC(res.data[0]);
+        }
+        this.itemData = res.data;
+      }).catch((res) => {
+        console.log(res);
+      });
     },
     //清空
     clear() {

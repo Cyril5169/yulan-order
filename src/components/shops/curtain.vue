@@ -225,16 +225,14 @@ export default {
     searchCurtain(status) {
       this.curtainData = [];
       GetCurtainByCondition({
-        keywords: this.searchKey.toUpperCase(),
+        keywords: this.searchKey,
         limit: this.limit,
         page: this.currentPage,
-      })
-        .then((res) => {
-          this.curtainData = res.data;
-          this.totalNumber = res.count;
-          this.createCurtainMsg();
-        })
-        .catch((err) => { });
+      }).then((res) => {
+        this.curtainData = res.data;
+        this.totalNumber = res.count;
+        this.createCurtainMsg();
+      }).catch((err) => { });
     },
     //渲染到表格的数
     async createCurtainMsg() {

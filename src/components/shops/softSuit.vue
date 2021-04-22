@@ -2,8 +2,8 @@
   <el-card shadow="hover">
     <el-tabs v-model="activeName" @tab-click="handleClick">
       <div class="mt10">
-        <el-input clearable v-model.trim="searchKey" @clear="init" @keyup.enter.native="searchSoftSuit"
-          placeholder="输入商品型号查找商品" style="width:25%; min-width:280px;">
+        <el-input clearable v-model.trim="searchKey" @clear="init" @keyup.enter.native="searchSoftSuit" placeholder="输入商品型号查找商品"
+          style="width:25%; min-width:280px;">
           <el-button @click="searchSoftSuit" slot="append" icon="el-icon-search">搜索</el-button>
         </el-input>
       </div>
@@ -11,8 +11,7 @@
       </el-tab-pane>
       <shopTab :tableData="tableData" :numberList="numberList"></shopTab>
       <el-pagination style="margin:0 10%;" @size-change="handleSizeChange" @current-change="handleCurrentChange"
-        :current-page.sync="currentPage" :page-size="limit" layout="total, prev, pager, next, jumper"
-        :total="totalNumber">
+        :current-page.sync="currentPage" :page-size="limit" layout="total, prev, pager, next, jumper" :total="totalNumber">
       </el-pagination>
     </el-tabs>
   </el-card>
@@ -78,7 +77,7 @@ export default {
   },
   methods: {
     //获取每页的条数
-    handleSizeChange(val) {},
+    handleSizeChange(val) { },
     //获取当前页
     handleCurrentChange(val) {
       this.currentPage = val;
@@ -123,17 +122,15 @@ export default {
       this.tableData = [];
       GetSoftByProductType({
         productType: this.chooseTab,
-        keywords: this.searchKey.toUpperCase(),
+        keywords: this.searchKey,
         cid: this.cid,
         page: this.currentPage,
         limit: this.limit,
-      })
-        .then((res) => {
-          this.tableData = this.unique(res.data);
-          this.totalNumber = res.count;
-          this.createNumberList();
-        })
-        .catch((err) => {});
+      }).then((res) => {
+        this.tableData = this.unique(res.data);
+        this.totalNumber = res.count;
+        this.createNumberList();
+      }).catch((err) => { });
     },
     //切换标签页时的触发事件
     handleClick(tab, event) {

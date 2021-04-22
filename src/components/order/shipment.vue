@@ -129,6 +129,7 @@
       </div>
     </el-dialog>
 
+    <!-- 退货赔偿 -->
     <el-dialog :visible.sync="RefundDetail" :close-on-click-modal="false" width="800px" append-to-body>
       <!-- 编辑区 -->
       <div style="margin-bottom:5px;">
@@ -172,7 +173,7 @@
           <tr>
             <td class="grayTD">问题描述<span style="color:red;">*</span></td>
             <td colspan="5">
-              <el-input v-model="submit.NOTES" placeholder="" clearable class="inputStyle">
+              <el-input v-model="submit.NOTES" placeholder="" clearable class="inputStyle" placeholder="请填写">
               </el-input>
             </td>
           </tr>
@@ -197,10 +198,8 @@
             </td> <!-- 要小于发货数量 -->
             <td colspan="2">
               <div>
-                <el-upload class="upload-de" action="#" drag multiple
-                  :on-change="function(file,fileList){return  handleChange(file,fileList)}"
-                  :on-remove="function(file,fileList){return  handleRemove(file,fileList)}" ref="upload"
-                  :http-request="uploadFiles" :auto-upload="false" :file-list="submit.fileList">
+                <el-upload class="upload-de" action="#" drag multiple :on-change="handleChange" :on-remove="handleRemove"
+                  ref="upload" :http-request="uploadFiles" :auto-upload="false" :file-list="submit.fileList">
                   <i class="el-icon-upload2" style="margin-top:5px;">
                     <span style="font-size:15px;">上传附件</span>
                   </i>
@@ -247,6 +246,9 @@
       </div>
     </el-dialog>
 
+    <!-- 兰居售后 -->
+    <el-dialog :visible.sync="ljAfterSaleVisiable" :close-on-click-modal="false" width="800px" append-to-body>
+    </el-dialog>
   </div>
 </template>
 
@@ -350,6 +352,7 @@ export default {
           value: "无质量问题",
         },
       ],
+      ljAfterSaleVisiable: false
     };
   },
   props: ["orderDetail"],
@@ -487,87 +490,90 @@ export default {
     },
     //初始化新增记录的信息
     addRefund(data) {
-      this.dateStamp = new Date().getTime();
-      this.FormRight = true;
-      this.uploadSuccessNum = 0;
-      this.fileList = [];
-      this.fileNumber = 0;
-      this.fileNameList = [];
-      this.submitHead = {
-        ID: "",
-        ERP_CREATOR: "", //创建人编号
-        ERP_CREATORNAME: "", //创建人姓名
-        CID: "", //客户编号
-        CNAME: "", //客户姓名
-        SENDBACK_REASON: "", //退回理由
-        ITEM_COUNT: "", //总货品数量
-        ITEM_MAX_INDEX: "", //最大索引
-        STATE: "", //状态
-        PRINTED: "", //打印方式
-        FIRST_AUDITION: "", //初审意见
-        RETURN_TYPE: "", //退货类型
-        RETURN_ADDRESS: "", //退货地址
-        REASSURE_TS: "", //签订日期
-        DEALMAN_CODE: "",
-        DEAL_TS: "",
-        DEALMAN_NAME: "",
-      };
-      this.submit = {
-        RTCB_ID: "", //退货单ID
-        ITEM_NO: "", //产品型号
-        PRODUCTION_VERSION: "", //版本（项目、产品）
-        UNIT: "", //单位
-        QTY: "", //数量
-        NOTES: "", //问题描述
-        CONTACT_MAN: "", //联系人
-        CONTACT_PHONE: "", //联系方式
-        SALE_NO: "", //提货单号
-        orderNo: "", //B2B订单号
-        ITEM_NO: "", //产品型号
-        C_TRANSBILL: "", //物流单号
-        NOTE: "", //类型
-        fileList: [], //附件列表
-        ATTACHMENT_FILE: "", //附件
-        ATTACHMENT_FILE_FOLDER: "", //附件文件夹
-      };
-      this.submit.orderNo = this.orderDetail.ORDER_NO;
-      this.submit.ITEM_NO = this.orderDetail.ITEM_NO;
-      this.submit.UNIT = this.orderDetail.UNIT;
-      this.submit.SALE_NO = data.SALE_NO;
-      this.submit.C_TRANSBILL = data.TRANS_ID;
-      getReturnInfo({
-        companyId: this.companyId,
-        SALE_NO: this.submit.SALE_NO,
-        ITEM_NO: this.submit.ITEM_NO,
-      }).then((res) => {
-        if (res.code == 0) {
-          this.companyName = res.data[0].CUSTOMER_NAME;
-          this.CONTRACT_NO = res.data[0].CONTRACT_NO;
-          this.submit.PRODUCTION_VERSION = res.data[0].PRODUCTVERSION_NAME;
-          this.RefundDetail = true;
-        }
-      });
+      console.log(this.orderDetail)
+      console.log(data)
+      if (this.orderDetail.PRODUCT_BRAND == "14") {
+        //兰居
+
+      } else {
+        this.dateStamp = new Date().getTime();
+        this.FormRight = true;
+        this.uploadSuccessNum = 0;
+        this.fileList = [];
+        this.fileNumber = 0;
+        this.fileNameList = [];
+        this.submitHead = {
+          ID: "",
+          ERP_CREATOR: "", //创建人编号
+          ERP_CREATORNAME: "", //创建人姓名
+          CID: "", //客户编号
+          CNAME: "", //客户姓名
+          SENDBACK_REASON: "", //退回理由
+          ITEM_COUNT: "", //总货品数量
+          ITEM_MAX_INDEX: "", //最大索引
+          STATE: "", //状态
+          PRINTED: "", //打印方式
+          FIRST_AUDITION: "", //初审意见
+          RETURN_TYPE: "", //退货类型
+          RETURN_ADDRESS: "", //退货地址
+          REASSURE_TS: "", //签订日期
+          DEALMAN_CODE: "",
+          DEAL_TS: "",
+          DEALMAN_NAME: "",
+        };
+        this.submit = {
+          RTCB_ID: "", //退货单ID
+          ITEM_NO: "", //产品型号
+          PRODUCTION_VERSION: this.orderDetail.PRODUCTVERSION_NAME, //版本（项目、产品）
+          UNIT: this.orderDetail.UNIT, //单位
+          QTY: "", //数量
+          NOTES: "", //问题描述
+          CONTACT_MAN: "", //联系人
+          CONTACT_PHONE: "", //联系方式
+          SALE_NO: data.SALE_NO, //提货单号
+          orderNo: this.orderDetail.ORDER_NO, //B2B订单号
+          ITEM_NO: this.orderDetail.ITEM_NO, //产品型号
+          C_TRANSBILL: data.TRANS_ID, //物流单号
+          NOTE: "", //类型
+          fileList: [], //附件列表
+          ATTACHMENT_FILE: "", //附件
+          ATTACHMENT_FILE_FOLDER: "", //附件文件夹
+        };
+        getReturnInfo({
+          companyId: this.companyId,
+          SALE_NO: this.submit.SALE_NO,
+          ITEM_NO: this.submit.ITEM_NO,
+        }).then((res) => {
+          if (res.code == 0) {
+            this.companyName = res.data[0].CUSTOMER_NAME;
+            this.CONTRACT_NO = res.data[0].CONTRACT_NO;
+            this.RefundDetail = true;
+          }
+        });
+      }
     },
     //新建一条售后记录
     addRefundRecord(data) {
-      CheckOrderAndItemNo({ SALE_NO: data.SALE_NO, ITEM_NO: this.orderDetail.ITEM_NO }).then(
-        (res) => {
-          if (res.data.length != 0) {
-            this.$confirm(
-              "此前已对该订单该型号发起退货赔偿申请，是否要再次申请",
-              "提示",
-              {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
-                type: "warning",
-              }
-            ).then(() => {
-              this.addRefund(data);
-            });
-          } else {
+      CheckOrderAndItemNo({
+        SALE_NO: data.SALE_NO,
+        ITEM_NO: this.orderDetail.ITEM_NO
+      }).then(res => {
+        if (res.data.length != 0) {
+          this.$confirm(
+            "此前已对该订单该型号发起退货赔偿申请，是否要再次申请",
+            "提示",
+            {
+              confirmButtonText: "确定",
+              cancelButtonText: "取消",
+              type: "warning",
+            }
+          ).then(() => {
             this.addRefund(data);
-          }
+          });
+        } else {
+          this.addRefund(data);
         }
+      }
       );
     },
     //新增售后记录提交
@@ -719,30 +725,27 @@ export default {
       this.submitHead.ITEM_MAX_INDEX = 1;
       this.submitHead.SALE_NO = this.submit.SALE_NO;
       this.submitHead.ORDER_NO = this.orderDetail.ORDER_NO;
-      InsertCompensation({ head: this.submitHead, details: this.submit })
-        .then((res) => {
-          UpdateState({
-            id: res.data.ID,
-            state: "SUBMITTED",
-          })
-            .then((res) => {
-              this.$alert("提交成功", "提示", {
-                type: "success",
-                confirmButtonText: "好的",
-              });
-            })
-            .catch(() => {
-              throw "提交失败";
-            });
-          this.init_shipment();
-          this.RefundDetail = false;
-        })
-        .catch((err) => {
-          this.$alert("添加失败", "提示", {
-            type: "warning",
+      InsertCompensation({ head: this.submitHead, details: this.submit }).then((res) => {
+        UpdateState({
+          id: res.data.ID,
+          state: "SUBMITTED",
+        }).then((res) => {
+          this.$alert("提交成功", "提示", {
+            type: "success",
             confirmButtonText: "好的",
-          }).catch(() => { });
-        });
+          });
+        })
+          .catch(() => {
+            throw "提交失败";
+          });
+        this.init_shipment();
+        this.RefundDetail = false;
+      }).catch((err) => {
+        this.$alert("添加失败", "提示", {
+          type: "warning",
+          confirmButtonText: "好的",
+        }).catch(() => { });
+      });
     },
     GetNowDate() {
       var date = new Date();
@@ -769,17 +772,15 @@ export default {
           dateString: this.dateString,
           type: "customer",
         },
-      })
-        .then((res) => {
-          if (res.code == 0) {
-            this.fileList.push(res.data);
-            this.uploadSuccessNum += 1;
-            if (this.uploadSuccessNum == this.submit.fileList.length) {
-              this.sumbitNEWANSYC();
-            }
+      }).then((res) => {
+        if (res.code == 0) {
+          this.fileList.push(res.data);
+          this.uploadSuccessNum += 1;
+          if (this.uploadSuccessNum == this.submit.fileList.length) {
+            this.sumbitNEWANSYC();
           }
-        })
-        .catch(() => { });
+        }
+      }).catch(() => { });
     },
     ...mapMutations("navTabs", ["addTab"]),
     ...mapActions("navTabs", ["closeTab", "closeToTab"]),

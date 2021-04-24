@@ -190,3 +190,31 @@ export function GetAllAfterSale(data, config = {}) {
         return Promise.reject(err);
     })
 }
+export function GetAfterSaleDetailById(data, config = {}) {
+    return post('/RETURNCOMPENSATIONBILL/GetAfterSaleDetailById', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+export function LJUpdateProcess(data, config = {}) {
+    return post('/RETURNCOMPENSATIONBILL/LJUpdateProcess', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+export function NewUploadFilesForProcess(data, config = {}) {
+    return post('/RETURNCOMPENSATIONBILL/NewUploadFilesForProcess', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+export function UpdateProcessByCustomer(data, config = {}) {
+    return post('/RETURNCOMPENSATIONBILL/UpdateProcessByCustomer', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}

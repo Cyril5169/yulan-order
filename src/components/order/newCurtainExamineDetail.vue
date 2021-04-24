@@ -1112,12 +1112,12 @@ export default {
       if (oneCurtain.NC_PART_TYPECODE == 'LS') {
         var singleZhe = 0;
         if (oneCurtain.OPERATION == "GDZ") {
-          //固定褶 单片褶数 = 进位取整(帘身宽 * 1.13 / 0.15 / 片数) * 片数 + 片数
-          singleZhe = Math.ceil(width * 1.13 / 0.15 / pianParam.NCP_VALUE) * pianParam.NCP_VALUE + pianParam.NCP_VALUE;
+          //固定褶 单片褶数 = 进位取整(帘身宽 * 1.13 / 0.15 / 片数) + 1
+          singleZhe = Math.ceil(width * 1.13 / 0.15 / pianParam.NCP_VALUE) + 1;
         }
         else if (oneCurtain.OPERATION == "DQ") {
-          //打圈 单片褶数 = 四舍五入(帘身宽 * 7 / 片数, 0) * 片数
-          singleZhe = Math.round(width * 7 / pianParam.NCP_VALUE) * pianParam.NCP_VALUE;
+          //打圈 单片褶数 = 四舍五入(帘身宽 * 7 / 片数, 0)
+          singleZhe = Math.round(width * 7 / pianParam.NCP_VALUE);
         }
         oneCurtain.ZE_QTY = singleZhe;
         var pb1Zhe = 0;
@@ -1290,12 +1290,12 @@ export default {
       else if (oneCurtain.NC_PART_TYPECODE == 'CS') {
         var singleZhe = 0;
         if (oneCurtain.OPERATION == "GDZ") {
-          //固定褶 单片褶数 = 进位取整(帘身宽 * 1.13 / 0.15 / 片数) * 片数 + 片数
-          singleZhe = Math.ceil(width * 1.13 / 0.15 / pianParam.NCP_VALUE) * pianParam.NCP_VALUE + pianParam.NCP_VALUE;
+          //固定褶 单片褶数 = 进位取整(帘身宽 * 1.13 / 0.15 / 片数) + 1
+          singleZhe = Math.ceil(width * 1.13 / 0.15 / pianParam.NCP_VALUE) + 1;
         }
         else if (oneCurtain.OPERATION == "DQ") {
-          //打圈 单片褶数 = 四舍五入(帘身宽 * 7 / 片数, 0) * 片数
-          singleZhe = Math.round(width * 7 / pianParam.NCP_VALUE) * pianParam.NCP_VALUE;
+          //打圈 单片褶数 = 四舍五入(帘身宽 * 7 / 片数, 0)
+          singleZhe = Math.round(width * 7 / pianParam.NCP_VALUE);
         }
         oneCurtain.ZE_QTY = singleZhe;
 

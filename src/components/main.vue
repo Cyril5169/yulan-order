@@ -168,7 +168,7 @@ import {
   GetImageCustomer,
   GetAllData as GetImageAll,
 } from "@/api/imageStoreASP";
-import { GetAllCompensation, GetUserCompensation } from "@/api/paymentASP";
+import { GetAllCompensation, GetUserCompensation, GetUserAfterSale } from "@/api/paymentASP";
 
 export default {
   name: "Main",
@@ -694,6 +694,27 @@ export default {
         });
       }
     },
+    //兰居售后
+    async afterSaleUserIcon() {
+      if (this.isContainAttr("aftersale/ljAfterSale")) {
+        let newRefund = await GetUserAfterSale(
+          {
+            companyId: Cookies.get("companyId"),
+            page: 1, //第几页
+            limit: 99999, //一页有多少数据
+            beginTime: "0001/1/1", //开始日期
+            finishTime: "9999/12/31", //结束日期
+            state: "NEEDPROCESSING", //状态
+            type: 'lanju'
+          },
+          { loading: false }
+        );
+        this.changeBadge({
+          name: "ljaftersale",
+          index: newRefund.count,
+        });
+      }
+    },
     //网签系统
     async getWangQianIcon() {
       var allCount = 0;
@@ -1094,6 +1115,7 @@ export default {
       this.softCountIcon();
       this.newRefundUserIcon();
       this.newRefundExamineIcon();
+      this.afterSaleUserIcon();
       this.getWangQianIcon();
     },
     //根据名称判断刷新哪个角标
@@ -1161,6 +1183,9 @@ export default {
           break;
         case "newRefund2":
           this.newRefundExamineIcon();
+          break;
+        case "ljaftersale":
+          this.afterSaleUserIcon();
           break;
       }
     },

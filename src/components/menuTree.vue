@@ -33,8 +33,8 @@
             menuTreeItem.ICON_CLASS.indexOf('&') == -1
         " :class="menuTreeItem.ICON_CLASS"></i>
       <span slot="title">{{ menuTreeItem.MENU_NAME }}</span>
-      <el-badge v-if="getAllBadge(menuTreeItem.MENU_LINK) > 0" class="iconBadge"
-        :value="getAllBadge(menuTreeItem.MENU_LINK)"></el-badge>
+      <el-badge v-if="getAllBadge(menuTreeItem.MENU_LINK) > 0" class="iconBadge" :value="getAllBadge(menuTreeItem.MENU_LINK)">
+      </el-badge>
     </el-menu-item>
   </router-link>
 </template>
@@ -105,6 +105,10 @@ export default {
           return this.$store.state.badge.newRefund1; //新退货赔偿（用户）
         case "newRefundExamine":
           return this.$store.state.badge.newRefund2; //新退货赔偿（审核）
+        case "aftersale/ljAfterSale":
+          return this.$store.state.badge.ljaftersale; //兰居售后  
+        case "aftersale/ljAfterSaleExamine":
+          return this.$store.state.badge.ljaftersaleexamine; //兰居售后审核
         default:
           return 0;
       }

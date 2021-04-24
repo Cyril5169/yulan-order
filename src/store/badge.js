@@ -21,6 +21,8 @@ const state = {
     newRefund1: 0,//新退款投诉中用户可确认的单据
     newRefund2: 0,//新退款投诉中兰居可审核编辑的单据
     wangqian: 0,//网签系统待处理数量
+    ljaftersale: 0,
+    ljaftersaleexamine: 0,
 }
 
 const mutations = {

@@ -1856,10 +1856,6 @@ export default {
 }
 </style>
 <style>
-.el-table .success-row {
-  background: #f0f9eb;
-}
-
 .table-refundexamine .el-input__inner {
   height: 100%;
   width: 100%;

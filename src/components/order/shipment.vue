@@ -131,11 +131,10 @@
 
     <!-- 退货赔偿 -->
     <el-dialog :visible.sync="RefundDetail" :close-on-click-modal="false" width="800px" append-to-body>
-      <!-- 编辑区 -->
       <div style="margin-bottom:5px;">
         <table width="100%" border="0" cellspacing="0" cellpadding="0">
           <tr>
-            <td style="font-size:20px;height:30px;text-align:center;" colspan="6">退货/赔偿电子申请书【新增】</td>
+            <td style="font-size:20px;height:30px;text-align:center;" colspan="6">售后申请表（新增）</td>
           </tr>
         </table>
       </div>
@@ -308,7 +307,7 @@
             <td>{{submit.ITEM_NO}}</td>
             <td colspan="2">
               <el-input v-model="submit.NOTES" placeholder="请填写" clearable class="inputStyle"></el-input>
-            </td> <!-- 要小于发货数量 -->
+            </td>
             <td colspan="2">
               <div>
                 <el-upload class="upload-de" action="#" drag multiple :on-change="handleChange" :on-remove="handleRemove"
@@ -897,10 +896,6 @@ export default {
 }
 </style>
 <style>
-.el-table .success-row {
-  background: #f0f9eb;
-}
-
 .table-c .el-input__inner {
   height: 100%;
   width: 100%;

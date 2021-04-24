@@ -259,13 +259,13 @@
         <table width="100%" border="0" cellspacing="0" cellpadding="0">
           <tr>
             <td class="grayTD">客户代码</td>
-            <td>{{this.companyId}}</td>
+            <td>{{submitHead.CID}}</td>
             <td class="grayTD">客户名称</td>
-            <td colspan="3">{{this.CNAME}}</td>
+            <td colspan="3">{{submitHead.CNAME}}</td>
           </tr>
           <tr>
             <td class="grayTD" style="width:15%;">B2B订单号</td>
-            <td style="width:15%;">{{ submit.ORDER_NO }}</td>
+            <td style="width:15%;">{{ submitHead.ORDER_NO }}</td>
             <td class="grayTD" style="width:15%;">po订单号</td>
             <td style="width:20%;">{{ this.PUR_NO }}</td>
             <td class="grayTD" style="width:15%;">ERP订单号</td>
@@ -274,22 +274,26 @@
           <tr>
             <td class="grayTD">联系人<span style="color:red;">*</span></td>
             <td>
-              <el-input v-model="submit.CONTACT_MAN" placeholder="请填写" clearable class="inputStyle">
+              <el-input v-model="submitHead.CONTACT_PERSON" placeholder="请填写" clearable class="inputStyle">
               </el-input>
             </td>
             <td class="grayTD">联系电话<span style="color:red;">*</span></td>
             <td>
-              <el-input v-model="submit.CONTACT_PHONE" placeholder="请填写" clearable oninput="value=value.replace(/[^\d]/g,'')"
+              <el-input v-model="submitHead.CONTACT_TEL" placeholder="请填写" clearable oninput="value=value.replace(/[^\d]/g,'')"
                 class="inputStyle">
               </el-input>
             </td>
             <td class="grayTD">返厂物流单号</td>
-            <td>{{ submit.C_TRANSBILL  }}</td>
+            <td>
+              <el-input v-model="submitHead.RETURN_TRANS_ID" placeholder="请填写" clearable class="inputStyle">
+              </el-input>
+            </td>
           </tr>
           <tr>
             <td class="grayTD">问题描述<span style="color:red;">*</span></td>
             <td colspan="5">
-              <el-input v-model="submit.NOTES" type="textarea" autosize clearable class="inputStyle" placeholder="请填写">
+              <el-input v-model="submitHead.PROBLEM_DESCRIP" type="textarea" autosize clearable class="inputStyle"
+                placeholder="请填写">
               </el-input>
             </td>
           </tr>
@@ -303,7 +307,7 @@
             <td>{{submit.PRODUCTION_VERSION}}</td>
             <td>{{submit.ITEM_NO}}</td>
             <td colspan="2">
-              <el-input v-model="submit.QTY" placeholder="请填写" clearable class="inputStyle"></el-input>
+              <el-input v-model="submit.NOTES" placeholder="请填写" clearable class="inputStyle"></el-input>
             </td> <!-- 要小于发货数量 -->
             <td colspan="2">
               <div>
@@ -316,34 +320,13 @@
               </div>
             </td><!-- 附件 -->
           </tr>
-
-          <tr style="height:90px">
-            <td colspan="6" border="0px" style="font-size:13px;color:gray;text-align:left;">
+          <tr>
+            <td colspan="6" border="0px" style="font-size:14px;text-align:left;">
               <div style="margin:0 5px;">
-                注意：1.若您未在我公司对您的《退货/赔偿电子申请书》提交处理意见之日起15日内确认、提出异议的，则视为放弃赔偿权利；<br />
-                2.玉兰公司支付的退货金额，仅限于本《退货/赔偿电子申请书》的金额，不承担其他费用；<br />
-                3.请您仔细阅读本《退货/赔偿电子申请书》相关信息，一旦确认，视为同意我公司的处理方案。<br />
-                公司名称：广东玉兰集团股份有限公司&emsp; &emsp;&emsp;&emsp;地址：东莞市莞城莞龙路段狮龙路莞城科技园内<br />
-                电话:0769-23321708&emsp;&emsp;邮政编码:523119&emsp;&emsp;邮箱：yulan315@yulangroup.cn<br />
-              </div>
-            </td>
-          </tr>
-          <tr style="height:40px">
-            <td colspan="3" border="0px" style="font-size:13px;color:gray;text-align:center;">
-              <div>
-                广东玉兰集团股份有限公司<br />
-                市场部<br />
-                {{ new Date().getFullYear() }}年
-                {{ new Date().getMonth() + 1}}月
-                {{ new Date().getDate() }}日
-              </div>
-            </td>
-            <td colspan="3" border="0px" style="font-size:13px;color:gray;text-align:center;">
-              <div>
-                经销商
-                <span>:{{ submit.CNAME }}</span>
-                <br />
-                <span> 年 月 日</span>
+                注意：<br />
+                1.我们将在收到售后申请表的1个工作日内与您联系，请保持电话畅通；<br />
+                2.如果您需要联系我们，请拨打售后电话：020-89202878；<br />
+                公司名称：广东兰居尚品创意家具有限公司&emsp;&emsp;地址：广州市番禺区东环街市广路易兴工业村（方氏物业）A栋3层<br />
               </div>
             </td>
           </tr>
@@ -390,8 +373,6 @@ export default {
       processDetail: [],
       dateStamp: "",
       isX: false,
-      fileChange: false,
-      deleteFile: [],
       complaintDetail: false,
       FormRight: true,
       RefundDetail: false,
@@ -407,7 +388,6 @@ export default {
       kuaididanhao: "",
       dateString: "",
       fileNumber: 0, //存储客户上传文件数量
-      fileNameList: [], //存储用户上传附件的名称
       typeArray: [
         {
           label: "晚点",
@@ -596,68 +576,6 @@ export default {
         this.complaintDetail = false;
       });
     },
-    //初始化新增记录的信息
-    addRefund(data) {
-      var auditType = "";
-      if (this.orderDetail.PRODUCT_BRAND == "14") {
-        //兰居
-        auditType = "lanju";
-      } else {
-        auditType = "yulan";
-      }
-      this.dateStamp = new Date().getTime();
-      this.FormRight = true;
-      this.uploadSuccessNum = 0;
-      this.fileList = [];
-      this.fileNumber = 0;
-      this.fileNameList = [];
-      this.submitHead = {
-        ID: "",
-        ERP_CREATOR: "", //创建人编号
-        ERP_CREATORNAME: "", //创建人姓名
-        CID: "", //客户编号
-        CNAME: "", //客户姓名
-        SENDBACK_REASON: "", //退回理由
-        ITEM_COUNT: "", //总货品数量
-        ITEM_MAX_INDEX: "", //最大索引
-        STATE: "", //状态
-        PRINTED: "", //打印方式
-        FIRST_AUDITION: "", //初审意见
-        RETURN_TYPE: "", //退货类型
-        RETURN_ADDRESS: "", //退货地址
-        REASSURE_TS: "", //签订日期
-        DEALMAN_CODE: "",
-        DEAL_TS: "",
-        DEALMAN_NAME: "",
-        AUDIT_TYPE: auditType
-      };
-      this.submit = {
-        RTCB_ID: "", //退货单ID
-        ITEM_NO: "", //产品型号
-        PRODUCTION_VERSION: this.orderDetail.PRODUCTVERSION_NAME, //版本（项目、产品）
-        UNIT: this.orderDetail.UNIT, //单位
-        QTY: "", //数量
-        NOTES: "", //问题描述
-        CONTACT_MAN: "", //联系人
-        CONTACT_PHONE: "", //联系方式
-        SALE_NO: data.SALE_NO, //提货单号
-        ORDER_NO: this.orderDetail.ORDER_NO, //B2B订单号
-        ITEM_NO: this.orderDetail.ITEM_NO, //产品型号
-        C_TRANSBILL: data.TRANS_ID, //物流单号
-        NOTE: "", //类型
-        fileList: [], //附件列表
-        ATTACHMENT_FILE: "", //附件
-        ATTACHMENT_FILE_FOLDER: "", //附件文件夹
-      };
-      GetPurByOrderNo({ orderNo: this.orderDetail.ORDER_NO }).then((res) => {
-        if (res.data) {
-          this.CONTRACT_NO = res.data.CONTRACT_NO;
-          this.PUR_NO = res.data.PUR_NO
-        }
-        if (auditType == "yulan") this.RefundDetail = true;
-        else this.ljAfterSaleVisiable = true;
-      });
-    },
     //新建一条售后记录
     addRefundRecord(data) {
       CheckOrderAndItemNo({
@@ -682,35 +600,131 @@ export default {
       }
       );
     },
+    //初始化新增记录的信息
+    addRefund(data) {
+      this.dateStamp = new Date().getTime();
+      this.FormRight = true;
+      this.uploadSuccessNum = 0;
+      this.fileList = [];
+      this.fileNumber = 0;
+      var auditType = "";
+      if (this.orderDetail.PRODUCT_BRAND == "14") {
+        //兰居
+        auditType = "lanju";
+        this.submitHead = {
+          SALE_NO: data.SALE_NO, //提货单号
+          ORDER_NO: this.orderDetail.ORDER_NO, //B2B订单号
+          ERP_CREATOR: this.CID, //创建人编号
+          ERP_CREATORNAME: this.CNAME, //创建人姓名
+          CID: this.companyId, //客户编号
+          CNAME: this.CNAME, //客户姓名
+          AUDIT_TYPE: auditType,
+          RETURN_TRANS_ID: "",
+          PROBLEM_DESCRIP: "",
+          CONTACT_PERSON: "",
+          CONTACT_TEL: "",
+        };
+        this.submit = {
+          ITEM_NO: this.orderDetail.ITEM_NO, //产品型号
+          PRODUCTION_VERSION: this.orderDetail.PRODUCTVERSION_NAME, //版本（项目、产品）
+          UNIT: this.orderDetail.UNIT, //单位
+          NOTES: "",
+          ATTACHMENT_FILE: "", //附件
+          ATTACHMENT_FILE_FOLDER: "", //附件文件夹
+          fileList: [], //附件列表
+        };
+      } else {
+        auditType = "yulan";
+        this.submitHead = {
+          ID: "",
+          ERP_CREATOR: this.CID, //创建人编号
+          ERP_CREATORNAME: this.CNAME, //创建人姓名
+          CID: this.companyId, //客户编号
+          CNAME: this.CNAME, //客户姓名
+          SENDBACK_REASON: "", //退回理由
+          FIRST_AUDITION: "", //初审意见
+          RETURN_TYPE: "", //退货类型
+          RETURN_ADDRESS: "", //退货地址
+          REASSURE_TS: "", //签订日期
+          DEALMAN_CODE: "",
+          DEAL_TS: "",
+          DEALMAN_NAME: "",
+          AUDIT_TYPE: auditType,
+          SALE_NO: data.SALE_NO, //提货单号
+          ORDER_NO: this.orderDetail.ORDER_NO, //B2B订单号
+        };
+        this.submit = {
+          RTCB_ID: "", //退货单ID
+          ITEM_NO: "", //产品型号
+          PRODUCTION_VERSION: this.orderDetail.PRODUCTVERSION_NAME, //版本（项目、产品）
+          UNIT: this.orderDetail.UNIT, //单位
+          QTY: "", //数量
+          NOTES: "", //问题描述
+          CONTACT_MAN: "", //联系人
+          CONTACT_PHONE: "", //联系方式
+          SALE_NO: data.SALE_NO, //提货单号
+          ORDER_NO: this.orderDetail.ORDER_NO, //B2B订单号
+          ITEM_NO: this.orderDetail.ITEM_NO, //产品型号
+          C_TRANSBILL: data.TRANS_ID, //物流单号
+          NOTE: "", //类型
+          fileList: [], //附件列表
+          ATTACHMENT_FILE: "", //附件
+          ATTACHMENT_FILE_FOLDER: "", //附件文件夹
+        };
+      }
+      GetPurByOrderNo({ orderNo: this.orderDetail.ORDER_NO }).then((res) => {
+        if (res.data) {
+          this.CONTRACT_NO = res.data.CONTRACT_NO;
+          this.PUR_NO = res.data.PUR_NO
+        }
+        if (auditType == "yulan") this.RefundDetail = true;
+        else this.ljAfterSaleVisiable = true;
+      });
+    },
     //新增售后记录提交
     _addRefundSubmit() {
-      //判断是否填完所有信息
-      if (
-        !this.submit.CONTACT_MAN ||
-        !this.submit.CONTACT_PHONE ||
-        !this.submit.NOTES ||
-        !this.submit.QTY
-      ) {
-        this.$alert("请完善信息", "提示", {
-          confirmButtonText: "确定",
-          type: "warning",
-        });
-        return;
+      if (this.submitHead.AUDIT_TYPE == "yulan") {
+        //判断是否填完所有信息
+        if (
+          !this.submit.CONTACT_MAN ||
+          !this.submit.CONTACT_PHONE ||
+          !this.submit.NOTES ||
+          !this.submit.QTY
+        ) {
+          this.$alert("请完善信息", "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return;
+        }
+        //退货数量应小于下单数量
+        if (this.submit.QTY > this.zongshuliang) {
+          this.$alert("填写数量必须小于下单数量", "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return;
+        }
+        if (this.submit.QTY <= 0) {
+          this.$alert("填写数量必须为正数", "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return;
+        }
       }
-      //退货数量应小于下单数量
-      if (this.submit.QTY > this.zongshuliang) {
-        this.$alert("填写数量必须小于下单数量", "提示", {
-          confirmButtonText: "确定",
-          type: "warning",
-        });
-        return;
-      }
-      if (this.submit.QTY <= 0) {
-        this.$alert("填写数量必须为正数", "提示", {
-          confirmButtonText: "确定",
-          type: "warning",
-        });
-        return;
+      else {
+        if (
+          !this.submitHead.CONTACT_PERSON ||
+          !this.submitHead.CONTACT_TEL ||
+          !this.submitHead.PROBLEM_DESCRIP
+        ) {
+          this.$alert("请完善信息", "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return;
+        }
       }
       //判断是否上传附件
       if (this.submit.fileList.length == 0) {
@@ -720,46 +734,55 @@ export default {
         });
         return;
       }
-      //判断上传附件的形式为图片或视频
-      if (this.FormRight == false) {
-        this.$alert("提交失败，附件仅能上传图片或视频", "提示", {
-          confirmButtonText: "确定",
-          type: "warning",
-        });
-        return;
-      }
       this.$refs.upload.submit();
     },
-    //添加兰居处理结果中的明细数目
-    _rowPlus() {
-      if (this.processDetail.length >= this.submit.QTY) {
-        this.$alert("已经达到编辑项的上限", "提示", {
-          confirmButtonText: "确定",
-          type: "warning",
-        });
-        return;
-      } else {
-        this.processDetail.push({
-          RTCB_ID: "",
-          LINE_NO: "",
-          QTY: "",
-          NOTES: "",
-          PROCESS: "",
-          MONEY: "",
-        });
-      }
+    //批量且重命名上传文档
+    uploadFiles(param) {
+      const formData = new FormData();
+      formData.append("file", param.file);
+      NewUploadFiles(formData, {
+        params: {
+          CID: this.companyId,
+          dateStamp: this.dateStamp,
+          dateString: this.dateString,
+          type: "customer",
+        }
+      }).then((res) => {
+        this.fileList.push(res.data); //重命名后的集合
+        this.uploadSuccessNum += 1;
+        if (this.uploadSuccessNum == this.submit.fileList.length) {
+          this.sumbitNEWANSYC();
+        }
+      }).catch(() => { });
     },
-    //减少兰居处理结果中的明细数目
-    _rowSubtract(index) {
-      if (this.processDetail.length == 1) {
-        this.$alert("必须至少有一项该类信息", "提示", {
-          confirmButtonText: "确定",
-          type: "warning",
-        });
-        return;
-      } else {
-        this.processDetail.splice(index, 1);
+    sumbitNEWANSYC() {
+      //相当于同步，等提交成功后再执行
+      //附件拼接
+      for (let j = 0; j < this.fileList.length; j++) {
+        this.submit.ATTACHMENT_FILE +=
+          "/Files/RTCB_ITEM/" +
+          this.companyId +
+          "/" +
+          this.dateStamp +
+          "/" +
+          this.fileList[j] +
+          ";";
       }
+      this.submit.ATTACHMENT_FILE_FOLDER = "/Files/RTCB_ITEM/" + this.companyId + "/" + this.dateStamp;
+      InsertCompensation({ head: this.submitHead, details: this.submit }).then((res) => {
+        this.$alert("提交成功", "提示", {
+          type: "success",
+          confirmButtonText: "好的",
+        });
+        this.init_shipment();
+        this.RefundDetail = false;
+        this.ljAfterSaleVisiable = false;
+      }).catch((err) => {
+        this.$alert("添加失败", "提示", {
+          type: "warning",
+          confirmButtonText: "好的",
+        }).catch(() => { });
+      });
     },
     handleChange(file, fileList) {
       var point = file.name.lastIndexOf(".");
@@ -786,13 +809,10 @@ export default {
         return item == suffix.trim();
       });
       if (result) {
-        this.FormRight = true;
         this.submit.fileList = fileList;
-        this.fileChange = true;
       } else {
-        this.FormRight = false;
-        this.submit.fileList = [];
-        this.$alert("请上传图片、视频或文档，否则无法成功提交", "提示", {
+        this.submit.fileList = fileList.splice(0, fileList.length - 1);
+        this.$alert("请上传图片、视频或文档", "提示", {
           confirmButtonText: "确定",
           type: "warning",
         });
@@ -801,57 +821,6 @@ export default {
     },
     handleRemove(file, fileList) {
       this.submit.fileList = fileList;
-      if ((file.status = "success")) {
-        this.deleteFile.push(file.url);
-        this.fileNameList.splice(this.fileNameList.length - 1, 1);
-      }
-    },
-    sumbitNEWANSYC() {
-      //相当于同步，等提交成功后再执行
-      //附件拼接
-      for (let j = 0; j < this.fileList.length; j++) {
-        this.submit.ATTACHMENT_FILE +=
-          "/Files/RTCB_ITEM/" +
-          this.companyId +
-          "/" +
-          this.dateStamp +
-          "/" +
-          this.fileList[j] +
-          ";";
-      }
-      this.submit.ATTACHMENT_FILE_FOLDER =
-        "/Files/RTCB_ITEM/" + this.companyId + "/" + this.dateStamp;
-      this.submit.ITEM_INDEX = 1;
-      this.submitHead.ERP_CREATOR = this.CID;
-      this.submitHead.ERP_CREATORNAME = this.CNAME;
-      this.submitHead.CID = this.companyId;
-      this.submitHead.CNAME = this.CNAME;
-      this.submitHead.SENDBACK_REASON = null;
-      this.submitHead.ITEM_COUNT = 1;
-      this.submitHead.ITEM_MAX_INDEX = 1;
-      this.submitHead.SALE_NO = this.submit.SALE_NO;
-      this.submitHead.ORDER_NO = this.orderDetail.ORDER_NO;
-      InsertCompensation({ head: this.submitHead, details: this.submit }).then((res) => {
-        UpdateState({
-          id: res.data.ID,
-          state: "SUBMITTED",
-        }).then((res) => {
-          this.$alert("提交成功", "提示", {
-            type: "success",
-            confirmButtonText: "好的",
-          });
-        })
-          .catch(() => {
-            throw "提交失败";
-          });
-        this.init_shipment();
-        this.RefundDetail = false;
-      }).catch((err) => {
-        this.$alert("添加失败", "提示", {
-          type: "warning",
-          confirmButtonText: "好的",
-        }).catch(() => { });
-      });
     },
     GetNowDate() {
       var date = new Date();
@@ -866,27 +835,6 @@ export default {
       }
       var dateTime = year + "-" + month + "-" + day;
       this.dateString = dateTime;
-    },
-    //批量且重命名上传文档
-    uploadFiles(param) {
-      const formData = new FormData();
-      formData.append("file", param.file);
-      NewUploadFiles(formData, {
-        params: {
-          CID: this.companyId,
-          dateStamp: this.dateStamp,
-          dateString: this.dateString,
-          type: "customer",
-        },
-      }).then((res) => {
-        if (res.code == 0) {
-          this.fileList.push(res.data);
-          this.uploadSuccessNum += 1;
-          if (this.uploadSuccessNum == this.submit.fileList.length) {
-            this.sumbitNEWANSYC();
-          }
-        }
-      }).catch(() => { });
     },
     ...mapMutations("navTabs", ["addTab"]),
     ...mapActions("navTabs", ["closeTab", "closeToTab"]),

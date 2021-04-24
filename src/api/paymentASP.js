@@ -176,3 +176,17 @@ export function NewUploadFiles(data, config = {}) {
         return Promise.reject(err);
     })
 }
+export function GetUserAfterSale(data, config = {}) {
+    return post('/RETURNCOMPENSATIONBILL/GetUserAfterSale', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+export function GetAllAfterSale(data, config = {}) {
+    return post('/RETURNCOMPENSATIONBILL/GetAllAfterSale', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}

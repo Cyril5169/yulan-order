@@ -58,6 +58,8 @@ import refund from '@/components/newRefund'
 import refundExamine from '@/components/newRefundExamine'   
 import lanJuFinanceExamine from '@/components/design/lanJuFinanceExamine'
 import expressSearch from '@/components/order/expressSearch' 
+import ljAfterSale from '@/components/aftersale/ljAfterSale'
+import ljAfterSaleExamine from '@/components/aftersale/ljAfterSaleExamine'
 
 Vue.use(Router)
 
@@ -417,6 +419,16 @@ const router = new Router({
           path: '/order/expressSearch',
           name: 'expressSearch',
           component: expressSearch
+        },
+        {
+          path: '/aftersale/ljAfterSale',
+          name: 'ljAfterSale',
+          component: ljAfterSale
+        },
+        {
+          path: '/aftersale/ljAfterSaleExamine',
+          name: 'ljAfterSaleExamine',
+          component: ljAfterSaleExamine
         },
       ]
     }

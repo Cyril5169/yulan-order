@@ -245,7 +245,7 @@
               <el-table-column label="用量" width="100" header-align="center" prop="DOSAGE">
                 <template slot-scope="scope">
                   <span v-if="scope.row.NC_PART_TYPECODE != 'LBT'">
-                    <el-input v-model="scope.row.DOSAGE" style="width:40px;" size="mini"
+                    <el-input v-model="scope.row.DOSAGE" style="width:45px;" size="mini"
                       @input="changeLSArea($event, scope.$index, scopeHead.$index)" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
@@ -1267,6 +1267,15 @@ export default {
             lczbCommodity.ZE_QTY = singleZhe * pianParam.NCP_VALUE;
             //里衬用量
             if (orderDetail.CURTAIN_HEIGHT > 2.7) {
+              if (lczbCommodity.FIX_GRADE > 1600) {
+                //2.8宽幅
+                if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.WGDZMaxZheParam;
+                else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.WDQMaxZheParam;
+              } else {
+                //1.4窄幅
+                if (oneCurtain.OPERATION == "GDZ") maxzheParam = this.curtainParamsList.GDZMaxZheParam;
+                else if (oneCurtain.OPERATION == "DQ") maxzheParam = this.curtainParamsList.DQMaxZheParam;
+              }
               //帘身高>2.7定宽 = (帘身高 + 高度折边用量- 0.03) * 进位取整(里衬褶数 / 最大褶数)
               lczbCommodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE - 0.03) * Math.ceil(lczbCommodity.ZE_QTY / maxzheParam.NCP_VALUE));
             }

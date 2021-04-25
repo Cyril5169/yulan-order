@@ -266,9 +266,9 @@
             <td class="grayTD" style="width:15%;">B2B订单号</td>
             <td style="width:15%;">{{ submitHead.ORDER_NO }}</td>
             <td class="grayTD" style="width:15%;">po订单号</td>
-            <td style="width:20%;">{{ this.PUR_NO }}</td>
+            <td style="width:20%;">{{ PUR_NO }}</td>
             <td class="grayTD" style="width:15%;">ERP订单号</td>
-            <td style="width:20%;">{{ this.CONTRACT_NO }}</td>
+            <td style="width:20%;">{{ CONTRACT_NO }}</td>
           </tr>
           <tr>
             <td class="grayTD">联系人<span style="color:red;">*</span></td>
@@ -526,7 +526,6 @@ export default {
       //判断是否填完所有信息
       if (
         this.submit.SALE_NO == "" ||
-        this.submit.C_TRANSBILL == "" ||
         this.submit.TYPE == "" ||
         this.submit.MEMO == ""
       ) {
@@ -596,8 +595,7 @@ export default {
         } else {
           this.addRefund(data);
         }
-      }
-      );
+      });
     },
     //初始化新增记录的信息
     addRefund(data) {

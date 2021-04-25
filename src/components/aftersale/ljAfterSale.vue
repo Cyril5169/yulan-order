@@ -408,7 +408,7 @@ export default {
     //保存修改
     _EditDetail(val) {
       //客户上传付款凭证
-      if (this.submit.SH_MONEY != 0) {
+      if (this.processDetail.SH_MONEY != 0) {
         if (this.processDetail.fileList.length == 0) {
           this.$alert("请上传付款凭证", "提示", {
             confirmButtonText: "确定",

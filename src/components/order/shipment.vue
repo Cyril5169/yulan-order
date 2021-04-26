@@ -265,7 +265,7 @@
           <tr>
             <td class="grayTD" style="width:15%;">B2B订单号</td>
             <td style="width:15%;">{{ submitHead.ORDER_NO }}</td>
-            <td class="grayTD" style="width:15%;">po订单号</td>
+            <td class="grayTD" style="width:15%;">PO订单号</td>
             <td style="width:20%;">{{ PUR_NO }}</td>
             <td class="grayTD" style="width:15%;">ERP订单号</td>
             <td style="width:20%;">{{ CONTRACT_NO }}</td>

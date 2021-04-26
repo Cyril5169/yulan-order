@@ -99,7 +99,8 @@
           </tr>
           <tr>
             <td class="grayTD">问题描述<span style="color:red;">*</span></td>
-            <td colspan="5" style="text-align:left;padding-left:5px;"><span style="white-space:break-spaces;">{{submitHead.PROBLEM_DESCRIP}}</span></td>
+            <td colspan="5" style="text-align:left;padding-left:5px;"><span
+                style="white-space:break-spaces;">{{submitHead.PROBLEM_DESCRIP}}</span></td>
           </tr>
           <tr>
             <td class="grayTD">产品/项目</td>
@@ -197,6 +198,7 @@
                 1.兰居提交处理意见后，请您在15日内确认、提出异议，否则本《售后申请表》作废；<br />
                 2.请您仔细阅读本《售后申请表》相关信息，一旦确认，视为同意我司的处理意见；<br />
                 3.如果产生售后费用，请扫下方收款二维码进行支付，并将截图上传作为付款凭证；<br />
+                <el-image style="width: 100px;cursor:pointer;" :src="require('../../assets/img/ljshouhou.jpg')" :preview-src-list="[require('../../assets/img/ljshouhou.jpg')]"></el-image><br />
                 售后电话：020-89202878<br />
                 公司名称：广东兰居尚品创意家具有限公司&emsp;&emsp;地址：广州市番禺区东环街市广路易兴工业村（方氏物业）A栋3层<br />
               </div>

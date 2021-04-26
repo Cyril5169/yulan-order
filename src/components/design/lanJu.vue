@@ -403,7 +403,7 @@
 
     <el-dialog width="500px" :visible.sync="BigPic">
       <div>
-        <img style="width:450px;height:450px;" src="../../assets/img/payment.png" />
+        <img style="width:450px;" src="../../assets/img/payment.png" />
       </div>
     </el-dialog>
   </div>

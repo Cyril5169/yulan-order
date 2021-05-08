@@ -131,7 +131,7 @@
           </tr>
           <template v-if="submitHead.STATE != 'SUBMITTED'">
             <tr>
-              <td class="grayTD" style="font-size:20px;height:30px" colspan="8">玉兰处理意见</td>
+              <td class="grayTD" style="font-size:20px;height:30px" colspan="8">兰居处理意见</td>
             </tr>
             <tr>
               <td class="grayTD">处理意见<span style="color:red;">*</span></td>
@@ -145,7 +145,7 @@
             <tr>
               <td class="grayTD">售后订单号<span style="color:red;">*</span></td>
               <td colspan="5">
-                <span>{{processDetail.SH_ORDER_NO}}</span>
+                <a target="_blank" :href="'http://www.luxlano.com/ddkc/DD_bjl.asp?b2b=' + processDetail.SH_ORDER_NO">{{processDetail.SH_ORDER_NO}}</a>
               </td>
             </tr>
             <tr>
@@ -251,7 +251,7 @@ export default {
       currentPage: 1, //当前页数
       limit: 10, //每页最多显示数量
       submit: [],
-      processDetail: {}, //玉兰处理结果表明细
+      processDetail: {}, //兰居处理结果表明细
       submitHead: {}, //存储表头数据
       ljAfterSaleVisiable: false,
       selectStatus: "NEEDPROCESSING", //存储下拉框的值

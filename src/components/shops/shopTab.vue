@@ -382,7 +382,7 @@ export default {
           if (res.data && res.data.data) {
             var kucun = res.data.data.kucun ? res.data.data.kucun : 0;
             var dinghuoshu = res.data.data.dinghuoshu ? res.data.data.dinghuoshu : 0;
-            this.produceStore[3].body = kucun - dinghuoshu;
+            this.produceStore[3].body = this.dosageFilter(kucun - dinghuoshu);
           } else {
             this.produceStore[3].body = "暂无数据";
           }

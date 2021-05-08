@@ -1,7 +1,8 @@
 <template>
   <el-card shadow="never">
     <div class="curtainTable">
-      <div style="margin-bottom:10px;">活动：<el-select v-if="tableStatus === 0" size="small" style="width:250px"
+      <div style="margin-bottom:10px;">活动：
+      <el-select v-if="tableStatus === 0" size="small" style="width:250px"
           v-model="headerData.activityId" :placeholder="activityOptions.length == 1? '无可选活动': '请选择活动'">
           <el-option v-for="item in activityOptions" :key="item.P_ID"
             :label="item.ORDER_TYPE? item.ORDER_TYPE + ' -- ' + item.ORDER_NAME : item.ORDER_NAME" :value="item.P_ID">
@@ -1033,7 +1034,7 @@ export default {
     },
     //获取备注文字
     getRemark(data) {
-      if (data.certainHeightWidth === 0) {
+      if (data.certainHeightWidth === 0 && data.productType == 'ML') {
         if (
           data.specification < this.headerData.height &&
           data.specification > 0
@@ -1599,7 +1600,6 @@ export default {
     //先获得在途
     GetUnImportOrder().then(res => {
       this.unImportOrderData = res.data;
-      console.log(this.unImportOrderData)
       //再获得库存
       this.data = this.getStoreData(this.data);
     })

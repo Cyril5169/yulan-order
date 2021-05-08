@@ -28,7 +28,7 @@
       </el-input>
     </div>
     <div id="outDiv">
-      <el-card style="position:relative;" v-for="(item, index) of data" :key="index">
+      <el-card style="position:relative;" v-for="(item, index) of orderList" :key="index">
         <div slot="header">
           <span class="zoomLeft">时间：</span>
           <span class="zoomRight">{{ item.DATE_CRE }}</span>
@@ -65,7 +65,7 @@
         </div>
 
         <div class="outDiv" style="float:left;width:90%">
-          <el-table border :data="data[index].ORDERBODY" style="width: 100%;margin-bottom:5px;"
+          <el-table border :data="orderList[index].ORDERBODY" style="width: 100%;margin-bottom:5px;"
             :row-class-name="tableRowClassName">
             <el-table-column prop="ITEM_NO" label="型号" align="center" width="150"></el-table-column>
             <el-table-column prop="BRAND_NAME" label="品牌" align="center" width="150"></el-table-column>
@@ -172,7 +172,7 @@ export default {
   data() {
     return {
       isManager: Cookies.get("isManager"),
-      data: [],
+      orderList: [],
       date1: "",
       date2: "",
       find: "",
@@ -424,9 +424,10 @@ export default {
         transCookies[i].height = orderBody[i].CURTAIN_HEIGHT;
         transCookies[i].orderNumber = item.ORDER_NO;
         transCookies[i].lineNo = orderBody[i].LINE_NO;
-        transCookies[i].activityId = orderBody[i].curtains[0].activityId;
+        transCookies[i].activityId = orderBody[i].P_ID;
         transCookies[i].quantity = orderBody[i].QTY_REQUIRED;
         var price = 0;
+        //获取原价
         for (let j = 0; j < orderBody[i].curtains.length; j++) {
           price += orderBody[i].curtains[j].price.mul(
             orderBody[i].curtains[j].dosage
@@ -453,9 +454,10 @@ export default {
         transCookies[i].height = orderBody[i].CURTAIN_HEIGHT;
         transCookies[i].orderNumber = item.ORDER_NO;
         transCookies[i].lineNo = orderBody[i].LINE_NO;
-        transCookies[i].activityId = orderBody[i].curtains[0].activityId;
+        transCookies[i].activityId = orderBody[i].P_ID;
         transCookies[i].quantity = orderBody[i].QTY_REQUIRED;
         var price = 0;
+        //获取原价
         for (let j = 0; j < orderBody[i].curtains.length; j++) {
           price += this.oneTotal(orderBody[i].curtains[j]);
         }
@@ -495,7 +497,7 @@ export default {
     //订单获取
     refresh() {
       //新后台
-      this.data = [];
+      this.orderList = [];
       var data = {
         companyId: Cookies.get("companyId"),
         limit: this.limit,
@@ -517,8 +519,9 @@ export default {
       }
       getAllOrders(data).then((res) => {
         this.count = res.count;
-        this.data = res.data;
-        this.$root.$emit("refreshBadgeIcon", "orderDeal");
+        this.orderList = res.data;
+        if (this.activeName == "pending")
+          this.$root.$emit("refreshBadgeIcon", "orderDeal");
         this.nowDate = new Date(new Date().setDate(new Date().getDate() - 2)).getTime();
       });
     },
@@ -628,10 +631,7 @@ export default {
         cancelButtonText: "否",
         type: "warning",
       }).then(() => {
-        var data = {
-          orderNo: orderNo,
-        };
-        copyCartItem(data).then((res) => {
+        copyCartItem({ orderNo: orderNo }).then((res) => {
           this.$alert("复制成功，请到购物车中查看", "提示", {
             confirmButtonText: "确定",
             type: "success",

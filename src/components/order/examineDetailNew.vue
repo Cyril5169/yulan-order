@@ -635,7 +635,7 @@ export default {
         headerDataTemp.quantity = data.QTY_REQUIRED;
         headerDataTemp.highJia = data.CURTAIN_HEIGHT2;
         headerDataTemp.productGroupType = ""; //
-        headerDataTemp.price = data.all_cost;
+        //headerDataTemp.price = data.all_cost;
         if (data.CURTAIN_WBH_SIZE == -1) {
           headerDataTemp.outsourcingBoxExist = 0; //判断
         } else {
@@ -1212,7 +1212,7 @@ export default {
     },
     //获取备注文字
     getRemark(data, rowIndex) {
-      if (data.certainHeightWidth === 0) {
+      if (data.certainHeightWidth === 0 && data.productType == 'ML') {
         if (data.specification < this.ruleForm.ORDERBODY[rowIndex].CURTAIN_HEIGHT && data.specification > 0) {
           console.log(data.specification, this.ruleForm.ORDERBODY[rowIndex].CURTAIN_HEIGHT)
           return "超高帘，用量待审核!!";
@@ -1414,7 +1414,6 @@ export default {
           }
         }
       }
-      let url = "/order/updateCurtainOrder.do";
       let data = {
         cid: Cookies.get("cid"),
         orderNo: this.orderNumber,
@@ -1431,34 +1430,31 @@ export default {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
-      })
-        .then(() => {
-          updateCurtainOrder(data)
-            .then((res) => {
-              this.$alert("操作成功,已将该订单退回给客户进行确认", "提示", {
-                confirmButtonText: "确定",
-                type: "success",
-              });
-              this.closeToTab({
-                oldUrl: "order/examineDetailNew",
-                newUrl: "order/examine",
-              });
-            })
-            .catch((res) => {
-              this.$alert("操作失败:" + res.msg, "提示", {
-                confirmButtonText: "确定",
-                type: "warning",
-              });
-              console.log(res);
-            });
+      }).then(() => {
+        updateCurtainOrder(data).then((res) => {
+          this.$alert("操作成功,已将该订单退回给客户进行确认", "提示", {
+            confirmButtonText: "确定",
+            type: "success",
+          });
+          this.closeToTab({
+            oldUrl: "order/examineDetailNew",
+            newUrl: "order/examine",
+          });
         })
+          .catch((res) => {
+            this.$alert("操作失败:" + res.msg, "提示", {
+              confirmButtonText: "确定",
+              type: "warning",
+            });
+            console.log(res);
+          });
+      })
         .catch(() => { });
     },
     //退回客户修改
     _back() {
       this.getLJSuggest();
       this.getCurtainData();
-      let url = "/order/updateCurtainOrder.do";
       let data = {
         cid: Cookies.get("cid"),
         orderNo: this.orderNumber,
@@ -1487,17 +1483,16 @@ export default {
         type: "warning",
       })
         .then(() => {
-          updateCurtainOrder(data)
-            .then((res) => {
-              this.$alert("操作成功,已将该订单退回给客户进行修改", "提示", {
-                confirmButtonText: "确定",
-                type: "success",
-              });
-              this.closeToTab({
-                oldUrl: "order/examineDetailNew",
-                newUrl: "order/examine",
-              });
-            })
+          updateCurtainOrder(data).then((res) => {
+            this.$alert("操作成功,已将该订单退回给客户进行修改", "提示", {
+              confirmButtonText: "确定",
+              type: "success",
+            });
+            this.closeToTab({
+              oldUrl: "order/examineDetailNew",
+              newUrl: "order/examine",
+            });
+          })
             .catch((res) => {
               this.$alert("操作失败:" + res.msg, "提示", {
                 confirmButtonText: "确定",
@@ -1512,7 +1507,6 @@ export default {
     _pass() {
       this.getLJSuggest();
       this.getCurtainData();
-      var url = "/order/updateCurOrderStatus.do";
       var data = {
         cid: Cookies.get("cid"),
         orderNo: Cookies.get("ORDER_NO"),
@@ -1540,27 +1534,25 @@ export default {
       this.$confirm(msg, "提示", {
         confirmButtonText: "确定",
         type: "warning",
-      })
-        .then(() => {
-          updateCurtainOrder(data)
-            .then((res) => {
-              this.$alert("操作成功,该订单已通过审核", "提示", {
-                confirmButtonText: "确定",
-                type: "success",
-              });
-              this.closeToTab({
-                oldUrl: "order/examineDetailNew",
-                newUrl: "order/examine",
-              });
-            })
-            .catch((res) => {
-              this.$alert("操作失败:" + res.msg, "提示", {
-                confirmButtonText: "确定",
-                type: "warning",
-              });
-              console.log(res);
-            });
+      }).then(() => {
+        updateCurtainOrder(data).then((res) => {
+          this.$alert("操作成功,该订单已通过审核", "提示", {
+            confirmButtonText: "确定",
+            type: "success",
+          });
+          this.closeToTab({
+            oldUrl: "order/examineDetailNew",
+            newUrl: "order/examine",
+          });
         })
+          .catch((res) => {
+            this.$alert("操作失败:" + res.msg, "提示", {
+              confirmButtonText: "确定",
+              type: "warning",
+            });
+            console.log(res);
+          });
+      })
         .catch(() => { });
     },
     //隔行变色

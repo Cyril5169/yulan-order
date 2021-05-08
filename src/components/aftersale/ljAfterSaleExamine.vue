@@ -132,7 +132,7 @@
             </td><!-- 附件 -->
           </tr>
           <tr>
-            <td class="grayTD" style="font-size:20px;height:30px" colspan="8">玉兰处理意见</td>
+            <td class="grayTD" style="font-size:20px;height:30px" colspan="8">兰居处理意见</td>
           </tr>
           <tr>
             <td class="grayTD">处理意见<span style="color:red;">*</span></td>
@@ -152,7 +152,7 @@
               <el-input v-if="submitHead.STATE == 'SUBMITTED'" v-model="processDetail.SH_ORDER_NO" clearable class="inputStyle"
                 placeholder="请填写">
               </el-input>
-              <span v-else>{{processDetail.SH_ORDER_NO}}</span>
+              <a v-else target="_blank" :href="'http://www.luxlano.com/ddkc/DD_bjl.asp?b2b=' + processDetail.SH_ORDER_NO">{{processDetail.SH_ORDER_NO}}</a>
             </td>
           </tr>
           <tr>
@@ -261,7 +261,7 @@ export default {
       limit: 10, //每页最多显示数量
       submitHead: {},
       submit: [],
-      processDetail: {}, //玉兰处理结果表明细
+      processDetail: {}, //兰居处理结果表明细
       ljAfterSaleVisiable: false,
       selectStatus: "", //存储下拉框的值
       beginTime: "", //查询的开始时间

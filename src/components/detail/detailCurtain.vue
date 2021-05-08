@@ -95,7 +95,7 @@ export default {
       }
       this.headerData = {
         activity: _data.activity, //活动中文名称
-        activityId: _data.activityId ? _data.activityId : null,
+        activityId: _data.activityId,
         activityName: _data.activityName,
         activityGroupType: _data.activityGroupType, //活动组别
         activityEffective: _data.activityEffective,

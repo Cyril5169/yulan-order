@@ -542,6 +542,26 @@ export default {
       deleteIds: []
     }
   },
+  computed: {
+    ruleFormPost() {
+      var data = [];
+      if (this.ruleForm) {
+        data = JSON.parse(JSON.stringify(this.ruleForm));
+        //去除ORDERBODY
+        data.ORDERBODY = [];
+      }
+      return data;
+    },
+    orderDetailsPost() {
+      var data = [];
+      if (this.ruleForm.ORDERBODY) {
+        data = JSON.parse(JSON.stringify(this.ruleForm.ORDERBODY));
+        //去除curtains
+        data.curtains = [];
+      }
+      return data;
+    }
+  },
   filters: {
     datatrans(value) {
       //时间戳转化大法
@@ -2028,26 +2048,25 @@ export default {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
-      })
-        .then(() => {
-          newCurtainUpdateCurtainOrder({
-            cid: Cookies.get("cid"),
-            curtainStatusId: "2",
-            orderHead: this.ruleForm,
-            orderDetails: this.ruleForm.ORDERBODY,
-            allCurtains: this.newCurtainData,
-            deleteIds: this.deleteIds
-          }).then(res => {
-            this.$alert("操作成功,已将该订单退回给客户进行确认", "提示", {
-              confirmButtonText: "确定",
-              type: "success",
-            });
-            this.closeToTab({
-              oldUrl: "order/newCurtainExamineDetail",
-              newUrl: "order/newCurtainExamine",
-            });
-          })
+      }).then(() => {
+        newCurtainUpdateCurtainOrder({
+          cid: Cookies.get("cid"),
+          curtainStatusId: "2",
+          orderHead: this.ruleFormPost,
+          orderDetails: this.orderDetailsPost,
+          allCurtains: this.newCurtainData,
+          deleteIds: this.deleteIds
+        }).then(res => {
+          this.$alert("操作成功,已将该订单退回给客户进行确认", "提示", {
+            confirmButtonText: "确定",
+            type: "success",
+          });
+          this.closeToTab({
+            oldUrl: "order/newCurtainExamineDetail",
+            newUrl: "order/newCurtainExamine",
+          });
         })
+      })
         .catch(() => {
           this.$alert("操作失败:" + res.msg, "提示", {
             confirmButtonText: "确定",
@@ -2071,8 +2090,8 @@ export default {
           newCurtainUpdateCurtainOrder({
             cid: Cookies.get("cid"),
             curtainStatusId: "1",
-            orderHead: this.ruleForm,
-            orderDetails: this.ruleForm.ORDERBODY,
+            orderHead: this.ruleFormPost,
+            orderDetails: this.orderDetailsPost,
             allCurtains: this.newCurtainData,
             deleteIds: []
           }).then((res) => {
@@ -2110,8 +2129,8 @@ export default {
           newCurtainUpdateCurtainOrder({
             cid: Cookies.get("cid"),
             curtainStatusId: "4",
-            orderHead: this.ruleForm,
-            orderDetails: this.ruleForm.ORDERBODY,
+            orderHead: this.ruleFormPost,
+            orderDetails: this.orderDetailsPost,
             allCurtains: this.newCurtainData,
             deleteIds: []
           }).then((res) => {

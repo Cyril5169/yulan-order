@@ -311,6 +311,24 @@ export default {
         if (this.ruleForm.ORDERBODY[i].checkStatus == "未修改") visible = false;
       }
       return visible;
+    },
+    ruleFormPost() {
+      var data = [];
+      if (this.ruleForm) {
+        data = JSON.parse(JSON.stringify(this.ruleForm));
+        //去除ORDERBODY
+        data.ORDERBODY = [];
+      }
+      return data;
+    },
+    orderDetailsPost() {
+      var data = [];
+      if (this.ruleForm.ORDERBODY) {
+        data = JSON.parse(JSON.stringify(this.ruleForm.ORDERBODY));
+        //去除curtains
+        data.curtains = [];
+      }
+      return data;
     }
   },
   methods: {
@@ -520,7 +538,7 @@ export default {
       this.headerData.quantity = tab.QTY_REQUIRED;
       this.headerData.highJia = tab.CURTAIN_HEIGHT2;
       this.headerData.productGroupType = "";
-      this.headerData.price = tab.all_cost;
+      //this.headerData.price = tab.all_cost;
       if (tab.CURTAIN_WBH_SIZE == -1) {
         this.headerData.outsourcingBoxExist = 0;
       } else {
@@ -694,12 +712,11 @@ export default {
     customerChange() {
       //拼接删除的数据
       this.getCurtainData();
-      console.log(this.newCurtainData, this.deleteIds)
       newCurtainUpdateCurtainOrder({
         cid: Cookies.get("cid"),
         curtainStatusId: "0",
-        orderHead: this.ruleForm,
-        orderDetails: this.ruleForm.ORDERBODY,
+        orderHead: this.ruleFormPost,
+        orderDetails: this.orderDetailsPost,
         allCurtains: this.newCurtainData,
         deleteIds: this.deleteIds
       }).then((res) => {

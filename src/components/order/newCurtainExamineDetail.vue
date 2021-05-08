@@ -870,16 +870,7 @@ export default {
     dealCurtainData() {
       for (var i = 0; i < this.ruleForm.ORDERBODY.length; i++) {
         var detail = this.ruleForm.ORDERBODY[i];
-
-        //看是标定还是非标定
-        var isStandard = true;
-        var headData = detail.curtain_template.filter(item => item.NC_PART_TYPECODE == "LK");
-        if (headData.length) {
-          //是否标定
-          isStandard = headData[0].NCT_STANDARD != 'N';
-        }
-        this.$set(detail, "isStandard", isStandard);
-
+        
         for (var j = 0; j < detail.curtains.length; j++) {
           var oneCurtain = detail.curtains[j];
           //窗帘层级
@@ -1672,10 +1663,9 @@ export default {
         if (res.data.length > 0 || (res.data.length == 1 && res.data[0].NC_MODEL_ID != this.exchangeModelNow.NC_MODEL_ID)) {
           this.exchangeModelList = res.data;
           //默认数据
-          var defaultModel = this.ruleForm.ORDERBODY[this.currentIndex].curtain_template.filter(item =>
-            item.NC_TEMPLATE_ID == this.exchangeModelNow.NC_TEMPLATE_ID);
-          if (defaultModel.length) {
-            this.exchangeModelTemplate = defaultModel[0];
+          this.exchangeModelTemplate = {
+            NC_PART_TYPECODE: this.exchangeModelNow.NC_PART_TYPECODE,
+            NC_MODEL_ID: this.exchangeModelNow.OLD_NC_MODEL_ID
           }
           for (var i = 0; i < this.exchangeModelList.length; i++) {
             var curtain_list = this.exchangeModelList[i].curtain_model;

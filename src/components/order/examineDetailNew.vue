@@ -1214,7 +1214,6 @@ export default {
     getRemark(data, rowIndex) {
       if (data.certainHeightWidth === 0 && data.productType == 'ML') {
         if (data.specification < this.ruleForm.ORDERBODY[rowIndex].CURTAIN_HEIGHT && data.specification > 0) {
-          console.log(data.specification, this.ruleForm.ORDERBODY[rowIndex].CURTAIN_HEIGHT)
           return "超高帘，用量待审核!!";
         }
       }
@@ -1363,6 +1362,7 @@ export default {
         item.note = "";
         item.suggestion = "";
         item.productNote = "";
+        item.curtain_store = "";
       });
       var oldData_temp = [];
       _old_data.forEach((oneItem) => {
@@ -1383,6 +1383,7 @@ export default {
         item.note = "";
         item.suggestion = "";
         item.productNote = "";
+        item.curtain_store = "";
       });
       return JSON.stringify(oldData_temp) == JSON.stringify(_data_temp);
     },

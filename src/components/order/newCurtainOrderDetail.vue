@@ -406,8 +406,7 @@ export default {
       currentPage: 0,
       limit: 50,
       totalNumber: 0,
-      oldCurtainData: [],
-      isStandard: false
+      oldCurtainData: []
     }
   },
   computed: {
@@ -649,14 +648,7 @@ export default {
     //处理窗帘数据
     dealCurtainData() {
       var detail = this.orderDetail;
-
-      //看是标定还是非标定
-      var headData = detail.curtain_template.filter(item => item.NC_PART_TYPECODE == "LK");
-      if (headData.length) {
-        //是否标定
-        this.isStandard = headData[0].NCT_STANDARD != 'N';
-      }
-
+      
       for (var j = 0; j < detail.curtains.length; j++) {
         var oneCurtain = detail.curtains[j];
         //窗帘层级
@@ -1020,7 +1012,7 @@ export default {
         canChange = row.NCT_CHANGE == 1;
       } else {
         var isStandardLT = false;
-        if (!this.isStandard) {
+        if (!this.orderDetail.isStandard) {
           //非标定帘款的标定帘头的子件可修改
           var fatherCurtain = this.orderDetail.curtains.filter(item => item.NC_MODEL_ID == row.NCM_PID && item.NC_MODEL_ID != 0);
           if (fatherCurtain.length && fatherCurtain[0].NC_PART_TYPECODE == 'LT' && fatherCurtain[0].NCM_STANDARD != 'N')
@@ -1152,9 +1144,9 @@ export default {
         if (res.data.length > 0 || (res.data.length == 1 && res.data[0].NC_MODEL_ID != this.exchangeModelNow.NC_MODEL_ID)) {
           this.exchangeModelList = res.data;
           //默认数据
-          var defaultModel = this.orderDetail.curtain_template.filter(item => item.NC_TEMPLATE_ID == this.exchangeModelNow.NC_TEMPLATE_ID);
-          if (defaultModel.length) {
-            this.exchangeModelTemplate = defaultModel[0];
+          this.exchangeModelTemplate = {
+            NC_PART_TYPECODE: this.exchangeModelNow.NC_PART_TYPECODE,
+            NC_MODEL_ID: this.exchangeModelNow.OLD_NC_MODEL_ID
           }
           for (var i = 0; i < this.exchangeModelList.length; i++) {
             var curtain_list = this.exchangeModelList[i].curtain_model;

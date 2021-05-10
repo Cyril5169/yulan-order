@@ -1866,7 +1866,6 @@ export default {
                   };
                   detailData.push(onedetail);
                 }
-                console.log(oneplace)
                 //找各种款式
                 var ltlist = oneplace.filter((item) => item.CL_NAME == "lt");
                 var lslist = oneplace.filter((item) => item.CL_NAME == "ls");
@@ -1909,6 +1908,9 @@ export default {
                   tempCustmorjc: oneplace[0].LINKMAN,
                   tempPhone: oneplace[0].LINKTEL,
                   tempAddress: oneplace[0].POST_ADDRESS,
+                  tempProvince: oneplace[0].RECIVER_AREA1,
+                  tempCity: oneplace[0].RECIVER_AREA2,
+                  tempArea: oneplace[0].RECIVER_AREA3,
                   templatename: oneplace[0].CL_ITEM_NO,
                   liantou: ltlist.length > 0,
                   lianshen: lslist.length > 0,
@@ -1931,8 +1933,7 @@ export default {
                   onlineDanhao: oneplace[0].ORDER_NO,
                   data: JSON.stringify(detailData)
                 };
-                console.log(1)
-                console.log(postdata)
+                //console.log(postdata)
                 Axios.defaults.withCredentials = false;
                 try {
                   var resB = await Axios.post(
@@ -1942,7 +1943,6 @@ export default {
                     postdata,
                     { params: postdata, loading: false }
                   );
-                  console.log(resB)
                   if (resB.data.state == "ok") {
                   } else {
                     var msg = pruData[i].PUR_NO + "位置:" + oneplace[0].CL_PLACE + "同步失败;";
@@ -1961,11 +1961,12 @@ export default {
             }
             else if (orderNo.substring(0, 1) == "N") {
               //新窗帘
+              var onedata = pruData[i].data;
               var orderDetailData = pruData[i].newcurtaindata;
               //一个明细就是一个位置
               for (var j = 0; j < orderDetailData.length; j++) {
                 var oneOrderDetail = orderDetailData[j];
-                var oneplace = orderDetailData[j].curtains;
+                var oneplace = oneOrderDetail.curtains;
                 var detailData = [];
                 for (var d = 0; d < oneplace.length; d++) {
                   var detail = oneplace[d];
@@ -2052,6 +2053,9 @@ export default {
                   tempCustmorjc: oneOrderDetail.LINKPERSON,
                   tempPhone: oneOrderDetail.TELEPHONE,
                   tempAddress: oneOrderDetail.POST_ADDRESS,
+                  tempProvince: onedata[0].RECIVER_AREA1,
+                  tempCity: onedata[0].RECIVER_AREA2,
+                  tempArea: onedata[0].RECIVER_AREA3,
                   templatename: oneOrderDetail.ITEM_NO,
                   liantou: ltlist.length > 0,
                   lianshen: lslist.length > 0,
@@ -2114,7 +2118,6 @@ export default {
               { PUR_NO: pruData[i].PUR_NO },
               { loading: false }
             );
-            console.log(resC)
           }
         }
         loading.close();

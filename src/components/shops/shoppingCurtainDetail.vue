@@ -258,7 +258,7 @@ import {
   addCurtainToCar,
 } from "@/api/curtain";
 import { GetDosageAll, GetDosageByNo, GetChangeItemByProductType } from "@/api/itemInfoASP";
-import { getItemById, GetPromotionByItem, GetUnImportOrder } from "@/api/orderListASP";
+import { getItemById, GetPromotionByItem, GetUnImportOrder, GetUnImportOrderByItem } from "@/api/orderListASP";
 import Cookies from "js-cookie";
 import { mapMutations, mapActions } from "vuex";
 import Axios from "axios";
@@ -332,7 +332,6 @@ export default {
       ],
       //配件编码
       part2: [],
-      unImportOrderData: [], //在途
       previewUrlList: [],
     };
   },
@@ -640,12 +639,8 @@ export default {
         this.curtainData.push(obj);
         this.getDosage(obj, i);
       }
-      //先获得在途
-      GetUnImportOrder().then(res => {
-        this.unImportOrderData = res.data;
-        //再获得库存
-        this.curtainData = this.getStoreData(this.curtainData);
-      })
+      //库存
+      this.curtainData = this.getStoreData(this.curtainData);
     },
     //获取窗帘大类用量
     getDosage(data, index) {
@@ -1354,27 +1349,29 @@ export default {
           loading: false,
         }).then((res) => {
           if (res.data && res.data.data) {
-            var store_charge = "";
-            var kucun = res.data.data.kucun ? res.data.data.kucun : 0;
-            var dinghuoshu = res.data.data.dinghuoshu ? res.data.data.dinghuoshu : 0;
-            var xiaxian = res.data.data.xiaxian ? res.data.data.xiaxian : 0;
-            var ddz = 0;
-            var itemOnway = this.unImportOrderData.filter(item => item.ITEM_NO == res.data.data.code);
-            if (itemOnway.length) ddz = itemOnway[0].DOSAGE;
-            var store_num = kucun - dinghuoshu - ddz;
-            if (store_num >= xiaxian) {
-              store_charge = "充足";
-            } else if (store_num > 0 && store_num < xiaxian) {
-              store_charge = "量少待查";
-            } else if (store_num < 0) {
-              store_charge = "欠料待审";
-            }
-            var data = originData.filter((item) => item.itemNo == res.data.data.code);
-            if (data.length) {
-              for (var j = 0; j < data.length; j++) {
-                data[j].curtain_store = store_charge;
+            var itemNo = res.data.data.code;
+            GetUnImportOrderByItem({ itemNo: itemNo }, { loading: false }).then(res2 => {
+              var store_charge = "";
+              var kucun = res.data.data.kucun ? res.data.data.kucun : 0;
+              var dinghuoshu = res.data.data.dinghuoshu ? res.data.data.dinghuoshu : 0;
+              var xiaxian = res.data.data.xiaxian ? res.data.data.xiaxian : 0;
+              var ddz = 0;
+              if (res2.length) ddz = res2[0].DOSAGE;
+              var store_num = kucun - dinghuoshu - ddz;
+              if (store_num >= xiaxian) {
+                store_charge = "充足";
+              } else if (store_num > 0 && store_num < xiaxian) {
+                store_charge = "量少待查";
+              } else if (store_num < 0) {
+                store_charge = "欠料待审";
               }
-            }
+              var data = originData.filter((item) => item.itemNo == itemNo);
+              if (data.length) {
+                for (var j = 0; j < data.length; j++) {
+                  data[j].curtain_store = store_charge;
+                }
+              }
+            })
           }
         }).catch(res => { });
       }

@@ -104,17 +104,9 @@
             </el-table>
           </div>
           <div class="buttonDiv">
-            <p style="width:100px; font-size:18px; color:tomato; text-align:center;">
-              {{ item.status }}
-            </p>
             <p>
-              <el-button v-if=" !item.collapse &&
-                  (item.CURTAIN_STATUS_ID == '0' && item.STATUS_ID == '1') ||
-                    item.CURTAIN_STATUS_ID == '3'
-                " @click="toExamineDetail(item.ORDER_NO)" size="medium" type="success" plain>审核订单</el-button>
-            </p>
-            <p>
-              <el-button v-if="!item.collapse" @click="toCheckExamine(item.ORDER_NO)" size="medium" type="primary" plain>订单详情
+              <el-button @click="exportProductExcel(item)" v-if="!item.collapse && showExportProduct(item)" size="mini" plain>
+                导出生产模板
               </el-button>
             </p>
             <p>
@@ -124,8 +116,13 @@
                 " @click="_back(item)" size="medium" type="warning" plain>直接退回</el-button>
             </p>
             <p>
-              <el-button @click="exportProductExcel(item)" v-if="!item.collapse && showExportProduct(item)" size="mini" plain>
-                导出生产模板
+              <el-button v-if=" !item.collapse &&
+                  (item.CURTAIN_STATUS_ID == '0' && item.STATUS_ID == '1') ||
+                    item.CURTAIN_STATUS_ID == '3'
+                " @click="toExamineDetail(item.ORDER_NO)" size="medium" type="success" plain>审核订单</el-button>
+            </p>
+            <p>
+              <el-button v-if="!item.collapse" @click="toCheckExamine(item.ORDER_NO)" size="medium" type="primary" plain>订单详情
               </el-button>
             </p>
           </div>

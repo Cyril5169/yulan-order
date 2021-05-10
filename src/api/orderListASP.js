@@ -328,6 +328,13 @@ export function GetUnImportOrder(data, config = {}) {
         return Promise.reject(err);
     })
 }
+export function GetUnImportOrderByItem(data, config = {}) {
+    return post('/CTM_ORDER/GetUnImportOrderByItem', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
 export function GetPurByOrderNo(data, config = {}) {
     return post('/PUR_HEAD/GetPurByOrderNo', data, config).then((res) => {
         return Promise.resolve(res);

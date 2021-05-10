@@ -2,8 +2,8 @@
   <el-card shadow="never">
     <div class="curtainTable">
       <div style="margin-bottom:10px;">活动：
-      <el-select v-if="tableStatus === 0" size="small" style="width:250px"
-          v-model="headerData.activityId" :placeholder="activityOptions.length == 1? '无可选活动': '请选择活动'">
+        <el-select v-if="tableStatus === 0" size="small" style="width:250px" v-model="headerData.activityId"
+          :placeholder="activityOptions.length == 1? '无可选活动': '请选择活动'">
           <el-option v-for="item in activityOptions" :key="item.P_ID"
             :label="item.ORDER_TYPE? item.ORDER_TYPE + ' -- ' + item.ORDER_NAME : item.ORDER_NAME" :value="item.P_ID">
           </el-option>
@@ -344,6 +344,7 @@ import {
   GetPromotionByItem,
   GetPromotionsById,
   GetUnImportOrder,
+  GetUnImportOrderByItem
 } from "@/api/orderListASP";
 import { UpdateCartItem } from "@/api/shopASP";
 import Cookies from "js-cookie";
@@ -368,7 +369,6 @@ export default {
         groupType: "", //活动组
       },
       activityOptions: [],
-      unImportOrderData: [], //在途
       chooseBig: [true, true, true, true, true], //是否选择了大类
       spanArr0: [], //商品信息跨行的数据
       spanArr1: [], //名称跨行的数据
@@ -1550,27 +1550,29 @@ export default {
           loading: false,
         }).then((res) => {
           if (res.data && res.data.data) {
-            var store_charge = "";
-            var kucun = res.data.data.kucun ? res.data.data.kucun : 0;
-            var dinghuoshu = res.data.data.dinghuoshu ? res.data.data.dinghuoshu : 0;
-            var xiaxian = res.data.data.xiaxian ? res.data.data.xiaxian : 0;
-            var ddz = 0;
-            var itemOnway = this.unImportOrderData.filter(item => item.ITEM_NO == res.data.data.code);
-            if (itemOnway.length) ddz = itemOnway[0].DOSAGE;
-            var store_num = kucun - dinghuoshu - ddz;
-            if (store_num >= xiaxian) {
-              store_charge = "充足";
-            } else if (store_num > 0 && store_num < xiaxian) {
-              store_charge = "量少待查";
-            } else if (store_num < 0) {
-              store_charge = "欠料待审";
-            }
-            var data = originData.filter((item) => item.item.itemNo == res.data.data.code);
-            if (data.length) {
-              for (var j = 0; j < data.length; j++) {
-                data[j].curtain_store = store_charge;
+            var itemNo = res.data.data.code;
+            GetUnImportOrderByItem({ itemNo: itemNo }, { loading: false }).then(res2 => {
+              var store_charge = "";
+              var kucun = res.data.data.kucun ? res.data.data.kucun : 0;
+              var dinghuoshu = res.data.data.dinghuoshu ? res.data.data.dinghuoshu : 0;
+              var xiaxian = res.data.data.xiaxian ? res.data.data.xiaxian : 0;
+              var ddz = 0;
+              if (res2.length) ddz = res2[0].DOSAGE;
+              var store_num = kucun - dinghuoshu - ddz;
+              if (store_num >= xiaxian) {
+                store_charge = "充足";
+              } else if (store_num > 0 && store_num < xiaxian) {
+                store_charge = "量少待查";
+              } else if (store_num < 0) {
+                store_charge = "欠料待审";
               }
-            }
+              var data = originData.filter((item) => item.item.itemNo == itemNo);
+              if (data.length) {
+                for (var j = 0; j < data.length; j++) {
+                  data[j].curtain_store = store_charge;
+                }
+              }
+            })
           }
         }).catch(res => { });
       }
@@ -1597,12 +1599,8 @@ export default {
     this.clearArr();
     this.getSpanArr(this.data);
     if (this.suggestion) this.suggestionLJ = this.suggestion.toString();
-    //先获得在途
-    GetUnImportOrder().then(res => {
-      this.unImportOrderData = res.data;
-      //再获得库存
-      this.data = this.getStoreData(this.data);
-    })
+    //库存
+    this.data = this.getStoreData(this.data);
   },
 };
 </script>

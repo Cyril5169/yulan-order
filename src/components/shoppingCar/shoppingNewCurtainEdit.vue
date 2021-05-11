@@ -175,7 +175,8 @@
                     <a class="a-userset">{{ scope.row.KAIKOU? scope.row.KAIKOU : '请选择' | kaikou_filter}}</a>
                     <el-dropdown-menu slot="dropdown">
                       <el-dropdown-item command="TK">对开</el-dropdown-item>
-                      <el-dropdown-item command="DK">单开</el-dropdown-item>
+                      <el-dropdown-item command="DK">左单开</el-dropdown-item>
+                      <el-dropdown-item command="RDK">右单开</el-dropdown-item>
                       <el-dropdown-item command="SK">特殊开</el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
@@ -521,8 +522,11 @@ export default {
           return "对开";
           break;
         case "DK":
-          return "单开";
+          return "左单开";
           break;
+        case "RDK":
+          return "右单开";
+          break;  
         case "SK":
           return "特殊开";
           break;

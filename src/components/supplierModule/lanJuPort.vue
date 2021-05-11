@@ -1305,8 +1305,11 @@ export default {
           return "对开";
           break;
         case "DK":
-          return "单开";
+          return "左单开";
           break;
+        case "RDK":
+          return "右单开";
+          break;  
         case "SK":
           return "特殊开";
           break;

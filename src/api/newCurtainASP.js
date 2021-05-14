@@ -96,3 +96,11 @@ export function GetPurOrderDetails(data, config = {}) {
       return Promise.reject(err);
   })
 }
+//停产新闻
+export function GetStopProductionData(data, config = {}) {
+  return post('/STOP_PRODUCTION_ITEM/GetStopProductionData', data, config).then((res) => {
+      return Promise.resolve(res);
+  }).catch((err) => {
+      return Promise.reject(err);
+  })
+}

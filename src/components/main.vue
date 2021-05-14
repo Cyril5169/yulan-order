@@ -67,16 +67,17 @@
         </el-header>
         <el-main class="backTop" id="mainBackTop">
           <div class="notice">
-            <i class="el-icon-bell ml10 mr10 f16" style="line-height:30px;color:gold;font-weight:bold;"></i>
-            <span style="color:red;margin-right:5px;margin-top:5px;">最新公告：</span>
-            <span v-if="newsTextArr.length == 0">无新公告发布!</span>
-            <span v-else style="line-height:30px;">
-              <transition name="slide">
-                <a style="text-decoration:underline" :key="newsTextArr[newsIndex].ID"
-                  @click="showNotification(newsTextArr[newsIndex])">{{ newsTextArr[newsIndex].TITLE }}</a>
-              </transition>
+            <i class="el-icon-bell" style="line-height:30px;color:gold;margin: 0 10px;font-size:16px;"></i>
+            <span style="color:red;">最新公告：</span>
+            <span v-if="newsTextArr.length == 0" style="flex:1;">无新公告发布!</span>
+            <span v-else style="flex:1;">
+              <el-carousel height="30px" direction="vertical">
+                <el-carousel-item v-for="(item,index) in newsTextArr" :key="index">
+                  <a style="text-decoration:underline;" :key="item.ID" @click="showNotification(item)">{{ item.TITLE }}</a>
+                </el-carousel-item>
+              </el-carousel>
             </span>
-            <span v-if="identity == 'ECWEB'" class="r f14 mr10" style="line-height:30px;color:red;">
+            <span v-if="identity == 'ECWEB'" class="f14 mr10" style="color:red;">
               <strong>
                 <i>{{ moneySituation }}</i>
               </strong>
@@ -186,7 +187,6 @@ export default {
       customerType: Cookies.get("customerType"),
       realName: Cookies.get("realName"),
       identity: Cookies.get("identity"),
-      newsIndex: 0, //当前滚动的公告
       newsTextArr: [], //最新公告集合
       newsTitle: "",
       newsHtmlData: "", //所有需要显示的公告拼接
@@ -1001,45 +1001,32 @@ export default {
           .length > 0
       );
     },
-    startMove() {
-      //设置定时器滚动公告
-      this.newsTimer = setInterval(() => {
-        if (this.newsIndex === this.newsTextArr.length - 1) {
-          this.newsIndex = 0;
-        } else {
-          this.newsIndex += 1;
-        }
-      }, 3000);
-    },
     getNews() {
       //获得最新的生效公告
       GetNewNotification({ cid: this.cid }).then((res) => {
         this.newsTextArr = res.data;
-        if (this.newsTextArr.length > 0) {
-          this.startMove();
-          for (var i = 0; i < this.newsTextArr.length; i++) {
-            if (this.newsTextArr[i].showFlag == 1) {
-              this.newsTextArr[i].CONTENT = this.newsTextArr[i].CONTENT.replace(
-                /\[ReplaceMark\]/g,
-                this.Global.fileCenterUrl
-              ); //替换网址
-              //将所有需要显示的公告拼接
+        for (var i = 0; i < this.newsTextArr.length; i++) {
+          if (this.newsTextArr[i].showFlag == 1) {
+            this.newsTextArr[i].CONTENT = this.newsTextArr[i].CONTENT.replace(
+              /\[ReplaceMark\]/g,
+              this.Global.fileCenterUrl
+            ); //替换网址
+            //将所有需要显示的公告拼接
+            this.newsHtmlData +=
+              "<div style='text-align:center;'><span style='font-size:18px;color:#303133;'>" +
+              this.newsTextArr[i].TITLE +
+              "</span></div><br />";
+            this.newsHtmlData += this.newsTextArr[i].CONTENT + "<br /><br />";
+            if (i != this.newsTextArr.length - 1)
               this.newsHtmlData +=
-                "<div style='text-align:center;'><span style='font-size:18px;color:#303133;'>" +
-                this.newsTextArr[i].TITLE +
-                "</span></div><br />";
-              this.newsHtmlData += this.newsTextArr[i].CONTENT + "<br /><br />";
-              if (i != this.newsTextArr.length - 1)
-                this.newsHtmlData +=
-                  "<div style='border-bottom:0.2rem solid #ccc;'></div><br />";
-              this.notificationVisible = true;
-              if (this.newsTextArr[i].POPUPTYPE == "FIRSTOFDAY")
-                InserFlag({
-                  nid: this.newsTextArr[i].ID,
-                  cid: this.cid,
-                  accept: 1,
-                }); //标记为已显示
-            }
+                "<div style='border-bottom:0.2rem solid #ccc;'></div><br />";
+            this.notificationVisible = true;
+            if (this.newsTextArr[i].POPUPTYPE == "FIRSTOFDAY")
+              InserFlag({
+                nid: this.newsTextArr[i].ID,
+                cid: this.cid,
+                accept: 1,
+              }); //标记为已显示
           }
         }
       });
@@ -1296,7 +1283,6 @@ export default {
     }
   },
   beforeDestroy() {
-    clearInterval(this.newsTimer);
     clearInterval(this.timeOutTimer);
   },
 };
@@ -1389,10 +1375,11 @@ export default {
 .notice {
   width: 100%;
   height: 30px;
+  line-height: 30px;
   background: white;
   margin-bottom: 5px;
-  vertical-align: middle;
   font-size: 12px;
+  display: flex;
 }
 .up-class {
   height: 100%;

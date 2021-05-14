@@ -1,11 +1,19 @@
 <template>
   <el-card shadow="hover">
     <p style="color: red;margin:0;font-size:12px;">（带*号表示可选择帘头外包盒）</p>
-    <div style="margin-top:10px;">
+    <div style="margin-top:10px;display:flex;line-height:40px;">
       <el-input clearable v-model.trim="searchKey" @clear="searchCurtain" @keyup.enter.native="searchCurtain"
         placeholder="输入商品型号查找商品" style="width:300px;">
         <el-button @click="searchCurtain" slot="append" icon="el-icon-search">搜索</el-button>
       </el-input>
+      <span v-if="newsData.length" style="margin-left:10px;flex:1;">
+        <el-carousel height="40px" direction="vertical">
+          <el-carousel-item v-for="(item,index) in newsData" :key="index">
+            <a style="text-decoration:underline;font-size:13px;" :key="item.ID"
+              @click="showDetailStopData(item,index)">{{ item.TITLE }}</a>
+          </el-carousel-item>
+        </el-carousel>
+      </span>
     </div>
     <el-table :data="curtainMsg" style="min-width: 750px; margin: 5px auto;">
       <el-table-column label="型号" width="100" align="center">
@@ -84,6 +92,18 @@
     <el-pagination style="margin:0 20%;" @current-change="searchCurtain" :current-page.sync="currentPage" :page-size="limit"
       layout="total, prev, pager, next, jumper" :total="totalNumber">
     </el-pagination>
+
+    <el-dialog :visible.sync="newsDetailShow" width="350px" :title="stopDetailTitle">
+      <el-table :data="stopDetailList">
+        <el-table-column label="序号" type="index" align="center"></el-table-column>
+        <el-table-column label="型号" prop="ITEM_NO" align="center"></el-table-column>
+        <el-table-column label="更改时间" prop="STOP_DATE" align="center">
+          <template slot-scope="scope">
+            <span>{{ scope.row.STOP_DATE | dateFilter }}</span>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -92,6 +112,7 @@ import { mapMutations } from "vuex";
 import Cookies from "js-cookie";
 import { GetCurtainByCondition } from "@/api/itemInfoASP";
 import { GetPromotionByItem } from "@/api/orderListASP";
+import { GetStopProductionData } from "@/api/newCurtainASP";
 
 export default {
   name: "Curtain",
@@ -137,6 +158,10 @@ export default {
       currentPage: 1, //当前的页数
       limit: 10, //每页的个数
       totalNumber: 0, //总条数
+      newsData: [],
+      newsDetailShow: false,
+      stopDetailList: [],
+      stopDetailTitle: ''
     };
   },
   methods: {
@@ -314,9 +339,89 @@ export default {
       this.currentPage = 1;
       this.searchCurtain();
     },
+    //停产新闻
+    getStopProductionNews() {
+      GetStopProductionData({ proType: 'curtain' }).then(res => {
+        //分成两块，待淘汰和停产
+        if (res.data.length) {
+          var statusList = [
+            {
+              value: 'stay',
+              label: '待淘汰'
+            },
+            {
+              value: 'stop',
+              label: '已淘汰'
+            }
+          ]
+          for (var s = 0; s < statusList.length; s++) {
+            var status = statusList[s];
+            var filterData = res.data.filter(item => item.STOP_TYPE == status.value);
+            if (filterData.length) {
+              //按年月分组
+              var groupData = this.groupBy(filterData, "STOP_DATE", this.datatrans);
+              for (var g = 0; g < groupData.length; g++) {
+                var itemTxt = '';
+                for (var i = 0; i < groupData[g].value.length; i++) {
+                  itemTxt += groupData[g].value[i].ITEM_NO + '，';
+                  if (i >= 3) break;
+                }
+                itemTxt = status.label + '产品：' + groupData[g].group + '，型号：' + itemTxt;
+                if (groupData[g].value.length > 3) {
+                  itemTxt += '...';
+                } else {
+                  itemTxt = itemTxt.substring(0, itemTxt.length - 1)
+                }
+                //拼接
+                this.newsData.push({
+                  ID: status.value + groupData[g].group,
+                  TITLE: itemTxt,
+                  DATA: filterData
+                })
+              }
+            }
+          }
+        }
+      })
+    },
+    datatrans(value) {
+      //时间戳转化大法
+      if (value == null || value == "") {
+        return "";
+      }
+      let date = new Date(value);
+      let y = date.getFullYear();
+      let MM = date.getMonth() + 1;
+      MM = MM < 10 ? "0" + MM : MM;
+      return y + "-" + MM
+    },
+    showDetailStopData(item, index) {
+      this.stopDetailList = JSON.parse(JSON.stringify(item.DATA));
+      if (index == 0) this.stopDetailTitle = "待淘汰产品列表";
+      else this.stopDetailTitle = "已淘汰产品列表";
+      this.newsDetailShow = true;
+    },
+    //单列的groupby
+    groupBy(array, name, filterMethod = function (a) { return a }) {
+      let groups = [];
+      array.forEach((item) => {
+        let groupName = filterMethod(item[name]);
+        var hasgroup = groups.filter((item) => item.group == groupName);
+        if (hasgroup.length) {
+          hasgroup[0].value.push(item);
+        } else {
+          groups.push({
+            group: groupName,
+            value: [item],
+          });
+        }
+      });
+      return groups;
+    },
   },
   created() {
     this.init();
+    this.getStopProductionNews();
   },
   activated() {
     var selectNo = this.$route.params.selectNo;
@@ -324,6 +429,7 @@ export default {
       this.searchKey = selectNo;
       this.init();
     }
+    this.getStopProductionNews();
   },
 };
 </script>

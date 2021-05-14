@@ -1,16 +1,20 @@
 <template>
   <el-card shadow="never">
-    <div>
+    <div style="display:flex;line-height:40px">
       <el-autocomplete :trigger-on-focus="false" clearable v-model.trim="searchKey" :fetch-suggestions="querySearchAsync"
         @select="searchCurtain" @clear="searchCurtain" placeholder="请输入帘款查找窗帘" style="width:300px;">
         <el-button @click="searchCurtain" slot="append" icon="el-icon-search">搜索</el-button>
       </el-autocomplete>
-      <a v-if="!showHotSale && hotSaleData.data.length" style="font-size: 12px;" @click="showHotSale = true">查看热销榜</a>
+      <a v-if="!showHotSale && hotSaleData.data.length" style="font-size: 12px;margin-left:10px;"
+        @click="showHotSale = true">查看热销榜</a>
       <!-- 停产新闻 -->
-      <span v-if="newsData.length" style="line-height:30px;">
-        <transition name="slide">
-          <a :key="newsData[newsIndex].ID" @click="showNotification(newsData[newsIndex])">{{ newsData[newsIndex].TITLE }}</a>
-        </transition>
+      <span v-if="newsData.length" style="margin-left:10px;flex:1;">
+        <el-carousel height="40px" direction="vertical">
+          <el-carousel-item v-for="(item,index) in newsData" :key="index">
+            <a style="text-decoration:underline;font-size:13px;" :key="item.ID"
+              @click="showDetailStopData(item,index)">{{ item.TITLE }}</a>
+          </el-carousel-item>
+        </el-carousel>
       </span>
     </div>
     <div style="min-height:500px;">
@@ -403,6 +407,18 @@
         layout="total, prev, pager, next, jumper" :total="totalNumber">
       </el-pagination>
     </el-drawer>
+
+    <el-dialog :visible.sync="newsDetailShow" width="350px" :title="stopDetailTitle">
+      <el-table :data="stopDetailList">
+        <el-table-column label="序号" type="index" align="center"></el-table-column>
+        <el-table-column label="型号" prop="ITEM_NO" align="center"></el-table-column>
+        <el-table-column label="更改时间" prop="STOP_DATE" align="center">
+          <template slot-scope="scope">
+            <span>{{ scope.row.STOP_DATE | dateFilter }}</span>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -413,7 +429,8 @@ import {
   GetCurtainTemplateAndModel,
   GetExchangeModel,
   GetExchangeModelItem,
-  AddNewCurtainToCart
+  AddNewCurtainToCart,
+  GetStopProductionData
 } from "@/api/newCurtainASP";
 import {
   GetPromotionByItem,
@@ -463,8 +480,9 @@ export default {
         data: []
       },
       newsData: [],
-      newsIndex: 0, //当前滚动的公告
-      newsTimer: null
+      newsDetailShow: false,
+      stopDetailList: [],
+      stopDetailTitle: ''
     };
   },
   computed: {
@@ -524,7 +542,7 @@ export default {
           break;
         case "RDK":
           return "右单开";
-          break;  
+          break;
         case "SK":
           return "特殊开";
           break;
@@ -584,7 +602,7 @@ export default {
     ...mapActions("navTabs", ["closeToTab"]),
     //PartType字典
     getPartTypeData() {
-      GetPartTypeDataTable().then((res) => {
+      GetPartTypeDataTable().then(res => {
         this.curtainPartTypeData = res.data;
       });
     },
@@ -841,7 +859,7 @@ export default {
         }).then((res) => {
           if (res.data && res.data.data) {
             var itemNo = res.data.data.code;
-            GetUnImportOrderByItem({ itemNo: itemNo },{ loading: false }).then(res2 => {
+            GetUnImportOrderByItem({ itemNo: itemNo }, { loading: false }).then(res2 => {
               var store_charge = "";
               var kucun = res.data.data.kucun ? res.data.data.kucun : 0;
               var dinghuoshu = res.data.data.dinghuoshu ? res.data.data.dinghuoshu : 0;
@@ -1738,6 +1756,7 @@ export default {
       }
       return '';
     },
+    //热销
     getHotSale() {
       GetHotSales().then((res) => {
         if (res.data.length > 0) {
@@ -1775,20 +1794,90 @@ export default {
       this.searchKey = itemNo;
       this.searchCurtain();
     },
-    startMove() {
-      //设置定时器滚动公告
-      this.newsTimer = setInterval(() => {
-        if (this.newsIndex === this.newsData.length - 1) {
-          this.newsIndex = 0;
-        } else {
-          this.newsIndex += 1;
+    //停产新闻
+    getStopProductionNews() {
+      GetStopProductionData({ proType: 'newcurtain' }).then(res => {
+        //分成两块，待淘汰和停产
+        if (res.data.length) {
+          var statusList = [
+            {
+              value: 'stay',
+              label: '待淘汰'
+            },
+            {
+              value: 'stop',
+              label: '已淘汰'
+            }
+          ]
+          for (var s = 0; s < statusList.length; s++) {
+            var status = statusList[s];
+            var filterData = res.data.filter(item => item.STOP_TYPE == status.value);
+            if (filterData.length) {
+              //按年月分组
+              var groupData = this.groupBy(filterData, "STOP_DATE", this.datatrans);
+              for (var g = 0; g < groupData.length; g++) {
+                var itemTxt = '';
+                for (var i = 0; i < groupData[g].value.length; i++) {
+                  itemTxt += groupData[g].value[i].ITEM_NO + '，';
+                  if (i >= 3) break;
+                }
+                itemTxt = status.label + '产品：' + groupData[g].group + '，型号：' + itemTxt;
+                if (groupData[g].value.length > 3) {
+                  itemTxt += '...';
+                } else {
+                  itemTxt = itemTxt.substring(0, itemTxt.length - 1)
+                }
+                //拼接
+                this.newsData.push({
+                  ID: status.value + groupData[g].group,
+                  TITLE: itemTxt,
+                  DATA: filterData
+                })
+              }
+            }
+          }
         }
-      }, 3000);
+      })
+    },
+    datatrans(value) {
+      //时间戳转化大法
+      if (value == null || value == "") {
+        return "";
+      }
+      let date = new Date(value);
+      let y = date.getFullYear();
+      let MM = date.getMonth() + 1;
+      MM = MM < 10 ? "0" + MM : MM;
+      return y + "-" + MM
+    },
+    showDetailStopData(item, index) {
+      this.stopDetailList = JSON.parse(JSON.stringify(item.DATA));
+      if (index == 0) this.stopDetailTitle = "待淘汰产品列表";
+      else this.stopDetailTitle = "已淘汰产品列表";
+      this.newsDetailShow = true;
+    },
+    //单列的groupby
+    groupBy(array, name, filterMethod = function (a) { return a }) {
+      let groups = [];
+      array.forEach((item) => {
+        let groupName = filterMethod(item[name]);
+        var hasgroup = groups.filter((item) => item.group == groupName);
+        if (hasgroup.length) {
+          hasgroup[0].value.push(item);
+        } else {
+          groups.push({
+            group: groupName,
+            value: [item],
+          });
+        }
+      });
+      return groups;
     },
   },
   mounted() {
     this.getPartTypeData();
     this.getHotSale();
+    this.getStopProductionNews();
   },
   beforeDestroy() {
     clearInterval(this.newsTimer);

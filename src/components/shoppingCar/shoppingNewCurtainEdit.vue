@@ -526,7 +526,7 @@ export default {
           break;
         case "RDK":
           return "右单开";
-          break;  
+          break;
         case "SK":
           return "特殊开";
           break;

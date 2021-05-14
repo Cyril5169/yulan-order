@@ -624,7 +624,7 @@ export default {
           return "左单开";
           break;
         case "RDK":
-          return "右单开";  
+          return "右单开";
           break;
         case "SK":
           return "特殊开";

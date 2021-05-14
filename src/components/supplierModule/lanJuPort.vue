@@ -1309,7 +1309,7 @@ export default {
           break;
         case "RDK":
           return "右单开";
-          break;  
+          break;
         case "SK":
           return "特殊开";
           break;
@@ -1884,7 +1884,7 @@ export default {
                   lsOpen = this.$options.filters.kaikou_filter(lslist[0].PRODUCT_NOTE);
                   //工艺方式
                   var operationForLs = lslist.filter(item => item.ITEM_NO.indexOf('GY') > -1);
-                  if(operationForLs.length){
+                  if (operationForLs.length) {
                     lsOperation = operationForLs[0].MNAME;
                   }
                 }
@@ -1898,7 +1898,7 @@ export default {
                   shaOpen = this.$options.filters.kaikou_filter(shalist[0].PRODUCT_NOTE);
                   //工艺方式
                   var operationForSha = shalist.filter(item => item.ITEM_NO.indexOf('GY') > -1);
-                  if(operationForSha.length){
+                  if (operationForSha.length) {
                     shaOperation = operationForSha[0].MNAME;
                   }
                 }
@@ -2152,12 +2152,12 @@ export default {
         bill_type: this.bill_type,
       };
       GetRelativePo(data).then(res => {
-          this.count = res.count;
-          this.pur_headData = res.data;
-          this.pur_headData.forEach((item) => {
-            item.PRINTED = item.PRINTED === "1" ? true : false;
-          });
-        }
+        this.count = res.count;
+        this.pur_headData = res.data;
+        this.pur_headData.forEach((item) => {
+          item.PRINTED = item.PRINTED === "1" ? true : false;
+        });
+      }
       );
     },
     //查询未打印的单据

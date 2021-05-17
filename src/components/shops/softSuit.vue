@@ -116,6 +116,7 @@
       </div>
     </el-dialog>
 
+    <!-- 停产通知 -->
     <el-dialog :visible.sync="newsDetailShow" width="350px" :title="stopDetailTitle">
       <el-table :data="stopDetailList">
         <el-table-column label="序号" type="index" align="center"></el-table-column>

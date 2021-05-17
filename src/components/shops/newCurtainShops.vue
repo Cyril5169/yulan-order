@@ -408,6 +408,7 @@
       </el-pagination>
     </el-drawer>
 
+    <!-- 停产通知 -->
     <el-dialog :visible.sync="newsDetailShow" width="350px" :title="stopDetailTitle">
       <el-table :data="stopDetailList">
         <el-table-column label="序号" type="index" align="center"></el-table-column>
@@ -418,6 +419,12 @@
           </template>
         </el-table-column>
       </el-table>
+    </el-dialog>
+
+    <el-dialog :visible.sync="showDosageTip" width="600px" title="提示" top="5vh">
+      <span style="font-size:18px;">系统检测到帘身和窗纱的尺寸不匹配，请核对窗纱高度是否要减尺寸!</span>
+      <el-image class="tip-img" :src="require('../../assets/img/lanjutip1.jpg')" fit="fill"></el-image>
+      <el-image class="tip-img" :src="require('../../assets/img/lanjutip2.jpg')" fit="fill"></el-image>
     </el-dialog>
   </el-card>
 </template>
@@ -482,7 +489,9 @@ export default {
       newsData: [],
       newsDetailShow: false,
       stopDetailList: [],
-      stopDetailTitle: ''
+      stopDetailTitle: '',
+      shouldShowDosageTip: true, //布工艺是打圈、纱是固定褶，用量一样时的提示（只提示一次）
+      showDosageTip: false
     };
   },
   computed: {
@@ -638,6 +647,7 @@ export default {
       this.curtainDataOrigin = [];
       this.curtainDataChange = [];
       this.previewUrlList = [];
+      this.shouldShowDosageTip = true;
       GetCurtainTemplateAndModel({ item_no: this.searchKey }).then((res) => {
         this.templateData = res.data;
         if (this.templateData.length) {
@@ -977,6 +987,7 @@ export default {
         }
       }
       this.getRemark(index);
+      this.judgeDosageTip();
     },
     //直接改变帘身用量
     changeLSArea(val, index) {
@@ -1040,6 +1051,7 @@ export default {
     handleOperationCommand(common, index) {
       var oneCurtain = this.curtainData[index];
       oneCurtain.NCM_OPERATION = common;
+      this.judgeDosageTip();
     },
     //处理拉边条
     handleBianCommand(common, index) {
@@ -1873,6 +1885,25 @@ export default {
       });
       return groups;
     },
+    //布工艺是打圈、纱是固定褶，用量一样时，提示
+    judgeDosageTip() {
+      if (!this.shouldShowDosageTip) return;
+      var curtains = this.curtainData;
+      //帘身
+      var lsItem = curtains.filter(item => item.NC_PART_TYPECODE == 'LS');
+      //窗纱
+      var csItem = curtains.filter(item => item.NC_PART_TYPECODE == 'CS');
+      if (lsItem.length && csItem.length) {
+        lsItem = lsItem[0];
+        csItem = csItem[0];
+        if (lsItem.NCM_OPERATION == "DQ" && csItem.NCM_OPERATION == "GDZ"
+          && lsItem.curtain_height > 0 && csItem.curtain_height > 0
+          && lsItem.curtain_height == csItem.curtain_height) {
+          this.showDosageTip = true;
+          this.shouldShowDosageTip = false;
+        }
+      }
+    }
   },
   mounted() {
     this.getPartTypeData();
@@ -2050,6 +2081,10 @@ export default {
 }
 .hover-link:hover {
   text-decoration: underline !important;
+}
+.tip-img {
+  width: 500px;
+  margin: 5px 0;
 }
 </style>
 <style>

@@ -17,8 +17,11 @@
       <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="日期区间" v-model="date2"
         style="width:12%;"></el-date-picker>
       <el-select style="width:150px;" v-model="commodityType" placeholder="请选择商品类型">
-        <el-option v-for="item in commodityTypeOptions" :key="item.value" :label="item.label" :value="item.value">
-        </el-option>
+        <template v-for="item in commodityTypeOptions">
+          <el-option v-if="isContainAttr(item.attr)" :key="item.value" :label="getAttrMenu(item.attr).MENU_NAME"
+            :value="item.value">
+          </el-option>
+        </template>
       </el-select>
       <el-select style="width:160px;" v-model="orderStatus" placeholder="请选择审核状态">
         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
@@ -162,7 +165,7 @@ import {
   GetOrderUseRebate,
   settlementAgain
 } from "@/api/orderListASP";
-import { mapMutations, mapActions } from "vuex";
+import { mapMutations, mapActions, mapState } from "vuex";
 import Cookies from "js-cookie";
 import shipment from "./shipment";
 import countdown from "./count-down";
@@ -192,18 +195,22 @@ export default {
         {
           label: "墙纸配套类",
           value: "W",
+          attr: 'shoppingCar/shopping?wallPaper'
         },
         {
           label: "窗帘",
           value: "X",
+          attr: 'shoppingCar/shopping?curtain'
         },
         {
           label: "软装",
           value: "Y",
+          attr: 'shoppingCar/shopping?softSuit'
         },
         {
           label: "新窗帘",
           value: "N",
+          attr: 'shoppingCar/shopping?newCurtain'
         },
       ],
       options: [
@@ -411,9 +418,24 @@ export default {
       return realVal;
     },
   },
+  computed: {
+    ...mapState("navTabs", ["menuTreeListFlatten"]),
+  },
   methods: {
     ...mapMutations("navTabs", ["addTab"]),
     ...mapActions("navTabs", ["closeTab", "closeToTab"]),
+    isContainAttr(attr) {
+      //是否包含权限
+      return this.menuTreeListFlatten.filter(item => item.MENU_LINK == attr).length > 0;
+    },
+    getAttrMenu(attr) {
+      var menu = {};
+      var hasMenu = this.menuTreeListFlatten.filter(item => item.MENU_LINK == attr);
+      if (hasMenu.length) {
+        menu = hasMenu[0];
+      }
+      return menu;
+    },
     //窗帘提交订单
     summitCurtain(item) {
       let orderBody = item.ORDERBODY;

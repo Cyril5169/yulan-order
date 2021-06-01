@@ -1,16 +1,20 @@
 <template>
   <el-card shadow="hover">
     <el-tabs v-model="activeName" @tab-click="handleClick">
-      <el-tab-pane label="墙纸配套类" name="wallPaper">
+      <el-tab-pane :label="getAttrMenu('shoppingCar/shopping?wallPaper').MENU_NAME" name="wallPaper"
+        v-if="isContainAttr('shoppingCar/shopping?wallPaper')">
         <ShoppingWallPaper v-if="activeName =='wallPaper'"></ShoppingWallPaper>
       </el-tab-pane>
-      <el-tab-pane label="定制窗帘" name="curtain">
+      <el-tab-pane :label="getAttrMenu('shoppingCar/shopping?curtain').MENU_NAME" name="curtain"
+        v-if="isContainAttr('shoppingCar/shopping?curtain')">
         <ShoppingCurtain v-if="activeName =='curtain'"></ShoppingCurtain>
       </el-tab-pane>
-      <el-tab-pane label="软装" name="softSuit">
+      <el-tab-pane :label="getAttrMenu('shoppingCar/shopping?softSuit').MENU_NAME" name="softSuit"
+        v-if="isContainAttr('shoppingCar/shopping?softSuit')">
         <ShoppingSoftSuit v-if="activeName =='softSuit'"></ShoppingSoftSuit>
       </el-tab-pane>
-      <el-tab-pane label="全新定型窗帘" name="newCurtain">
+      <el-tab-pane :label="getAttrMenu('shoppingCar/shopping?newCurtain').MENU_NAME" name="newCurtain"
+        v-if="isContainAttr('shoppingCar/shopping?newCurtain')">
         <ShoppingNewCurtain v-if="activeName =='newCurtain'"></ShoppingNewCurtain>
       </el-tab-pane>
     </el-tabs>
@@ -22,7 +26,7 @@ import ShoppingWallPaper from "./shoppingWallPaper";
 import ShoppingCurtain from "./shoppingCurtain";
 import ShoppingSoftSuit from "./shoppingSoftSuit";
 import ShoppingNewCurtain from "./shoppingNewCurtain";
-import { mapMutations } from "vuex";
+import { mapMutations, mapState } from "vuex";
 
 export default {
   name: "Shopping",
@@ -36,6 +40,15 @@ export default {
     ShoppingSoftSuit,
     ShoppingNewCurtain
   },
+  computed: {
+    ...mapState("navTabs", ["menuTreeListFlatten"]),
+    activeName: {
+      get() {
+        return this.$store.state.navTabs.activeUrlName.split("?")[1];
+      },
+      set(value) { },
+    },
+  },
   methods: {
     ...mapMutations("navTabs", ["addTab"]),
     handleClick(tab, event) {
@@ -44,15 +57,19 @@ export default {
         path: "/shoppingCar/shopping" + "?" + tab.name,
       });
     },
-  },
-  computed: {
-    activeName: {
-      get() {
-        return this.$store.state.navTabs.activeUrlName.split("?")[1];
-      },
-      set(value) { },
+    isContainAttr(attr) {
+      //是否包含权限
+      return this.menuTreeListFlatten.filter(item => item.MENU_LINK == attr).length > 0;
     },
-  }
+    getAttrMenu(attr) {
+      var menu = {};
+      var hasMenu = this.menuTreeListFlatten.filter(item => item.MENU_LINK == attr);
+      if (hasMenu.length) {
+        menu = hasMenu[0];
+      }
+      return menu;
+    },
+  },
 };
 </script>
 

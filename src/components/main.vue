@@ -1232,11 +1232,11 @@ export default {
         this.isFullscreen = false;
       }
     };
-    document.onkeydown = function (event) {
+    document.onkeydown = () => {
       var key = window.event.keyCode;
       if (key == 27) {
-        if (this.fullscreen == true) {
-          this.handleFullScreen();
+        if (this.isFullscreen) {
+          this.isFullscreen = false;
         }
       }
     };

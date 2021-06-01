@@ -262,7 +262,6 @@ import {
   getPackByCustomer
 } from "@/api/areaInfoASP";
 import { getOrderByAreaCustomer } from "@/api/orderInfoASP";
-import { GetOrderAndTaskByCustomer, getCustomerInfo } from "@/api/orderListASP";
 
 export default {
   data() {

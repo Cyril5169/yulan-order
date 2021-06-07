@@ -498,9 +498,7 @@ export default {
     },
     //下载
     downLoad(path) {
-      downLoadFile(
-        this.Global.baseUrl + `DownLoadAPI/DownloadFile?path=${path}&`
-      );
+      downLoadFile(this.Global.baseUrl + `DownLoadAPI/DownloadFile?path=${path}`);
     },
     //隔行变色
     tableRowClassName({ row, rowIndex }) {

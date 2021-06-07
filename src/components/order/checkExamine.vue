@@ -374,7 +374,7 @@ export default {
         transCookies[i].height = orderBody[i].CURTAIN_HEIGHT;
         transCookies[i].orderNumber = item.ORDER_NO;
         transCookies[i].lineNo = orderBody[i].LINE_NO;
-        transCookies[i].activityId = orderBody[i].curtains[0].activityId;
+        transCookies[i].activityId = orderBody[i].P_ID;
         transCookies[i].quantity = orderBody[i].QTY_REQUIRED;
         var price = 0;
         for (let j = 0; j < orderBody[i].curtains.length; j++) {
@@ -405,7 +405,7 @@ export default {
         transCookies[i].height = orderBody[i].CURTAIN_HEIGHT;
         transCookies[i].orderNumber = item.ORDER_NO;
         transCookies[i].lineNo = orderBody[i].LINE_NO;
-        transCookies[i].activityId = orderBody[i].curtains[0].activityId;
+        transCookies[i].activityId = orderBody[i].P_ID;
         transCookies[i].quantity = orderBody[i].QTY_REQUIRED;
         //重新计算价格
         var price = 0;

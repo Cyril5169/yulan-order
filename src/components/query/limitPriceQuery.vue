@@ -3,7 +3,7 @@
     <el-card shadow="never">
       <div>
         <span>版本</span>
-        <el-select v-model="productKey" placeholder="--请选择版本--" filterable>
+        <el-select v-model="productKey" placeholder="--请选择版本--" filterable @change="initSearch">
           <el-option label="全部" value=""></el-option>
           <el-option v-for="item in productVersionData" :key="item.PRODUCTVERSION_ID" :label="item.PRODUCTVERSION_NAME"
             :value="item.PRODUCTVERSION_ID"></el-option>

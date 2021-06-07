@@ -249,16 +249,10 @@ export default {
     },
     downLoad(file) {
       if (file.FILE_TYPE == 0) {
-        downLoadFile(
-          this.Global.fileCenterUrl +
-          `FILE_CENTERAPI/DownloadFile?FILE_ID=${file.FILE_ID}`
-        );
+        downLoadFile(this.Global.fileCenterUrl + `FILE_CENTERAPI/DownloadFile?FILE_ID=${file.FILE_ID}`);
       } else if (file.FILE_TYPE == 1) {
         //如果是文件夹变成压缩包
-        downLoadFile(
-          this.Global.fileCenterUrl +
-          `FILE_CENTERAPI/DownloadFileCompress?FILE_ID=${file.FILE_ID}&`
-        );
+        downLoadFile(this.Global.fileCenterUrl + `FILE_CENTERAPI/DownloadFileCompress?FILE_ID=${file.FILE_ID}`);
       }
     },
     isImage(file) {

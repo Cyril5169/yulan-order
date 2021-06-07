@@ -1517,7 +1517,7 @@ export default {
       if (!this.beforeModify()) return;
       UpdateNewCurtainCart({
         cartItem: this.curtainHeadData,
-        commodities: this.curtainHeadData.curtains,
+        commodities: this.chooseCurtainData,
         salPromotion: this.salPromotion,
         deleteIds: this.deleteCurtainData
       }).then(res => {

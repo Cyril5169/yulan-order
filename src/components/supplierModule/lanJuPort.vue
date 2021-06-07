@@ -2004,7 +2004,7 @@ export default {
                     danwei: detail.UNIT_NAME,
                     price: detail.PRICE_TAXIN,
                     guige: detail.FIX_GRADE,
-                    shuliang: detail.DOSAGE,
+                    shuliang: detail.ACTUAL_DOSAGE ? detail.ACTUAL_DOSAGE : detail.DOSAGE,
                     shenhe2Des: detail.PRODUCT_NOTE,
                     beizhu: detail.NOTE + detail.ILLUSTRATE,
                     zheshu: detail.ZE_QTY
@@ -2189,10 +2189,6 @@ export default {
         this.Global.baseUrl +
         `PUR_HEAD/SalExcel?current_id=${current_id}&customer=${customer}&po_type=${po_type}&check_flag=${check_flag}&beginTime=${beginTime}&finishTime=${finishTime}&po=${purNo}`
       );
-    },
-    downLoadX() {
-      var PUR_NO = this.pur_headForm.PUR_NO;
-
     },
     downLoadY() {
       var PUR_NO = this.pur_headForm.PUR_NO;

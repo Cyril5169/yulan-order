@@ -60,6 +60,9 @@ import lanJuFinanceExamine from '@/components/design/lanJuFinanceExamine'
 import expressSearch from '@/components/order/expressSearch' 
 import ljAfterSale from '@/components/aftersale/ljAfterSale'
 import ljAfterSaleExamine from '@/components/aftersale/ljAfterSaleExamine'
+import safeStock from '@/components/purplan/safeStock'
+import basePlan from '@/components/purplan/basePlan'
+import purPlan from '@/components/purplan/purPlan'
 
 Vue.use(Router)
 
@@ -429,6 +432,21 @@ const router = new Router({
           path: '/aftersale/ljAfterSaleExamine',
           name: 'ljAfterSaleExamine',
           component: ljAfterSaleExamine
+        },
+        {
+          path: '/purplan/safeStock',
+          name: 'safeStock',
+          component: safeStock
+        },
+        {
+          path: '/purplan/basePlan',
+          name: 'basePlan',
+          component: basePlan
+        },
+        {
+          path: '/purplan/purPlan',
+          name: 'purPlan',
+          component: purPlan
         },
       ]
     }

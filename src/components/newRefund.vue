@@ -1519,9 +1519,7 @@ export default {
     },
     //下载
     downLoad(path) {
-      downLoadFile(
-        this.Global.baseUrl + `DownLoadAPI/DownloadFile?path=${path}&`
-      );
+      downLoadFile(this.Global.baseUrl + `DownLoadAPI/DownloadFile?path=${path}`);
     },
     //切换下一页
     handleCurrentChange(val) {

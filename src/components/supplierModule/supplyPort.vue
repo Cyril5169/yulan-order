@@ -316,7 +316,6 @@
               </tr>
               <tr>
                 <td colspan="2">
-
                   <el-table :data="gridData" class="tb_font13" cellpadding="0" style="width:100%" border>
                     <el-table-column width="38" type="index" label=" " :index="indexMethod">
                     </el-table-column>
@@ -360,7 +359,6 @@
                     <el-table-column property="MGUIGE" label="物料型号" align="center" min-width="80"></el-table-column>
                     <el-table-column property="BD_ITEM_NO" label="壁达型号" align="center" min-width="62"></el-table-column>
                     <el-table-column property="MNAME" label="名称" header-align="center" min-width="50"></el-table-column>
-                    <!--width="50" -->
                     <el-table-column property="GRADE" label="规格" header-align="center" min-width="45"></el-table-column>
                     <el-table-column property="QTY_PUR" label="数量" header-align="center" align="right" min-width="42">
                     </el-table-column>
@@ -1112,7 +1110,6 @@ export default {
           `PUR_HEAD/SalExcel_1?current_id=${current_id}&customer=${customer}&po_type=${po_type}&check_flag=${check_flag}&beginTime=${beginTime}&finishTime=${finishTime}&po=${po}`
       );
     },
-
     downLoadX() {
       var PUR_NO = this.pur_headForm.PUR_NO;
       downLoadFile(

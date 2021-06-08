@@ -1,6 +1,6 @@
 <template>
-  <div class="purPlan">
-    <el-card shadow="never">
+  <div class="safeStock">
+    <el-card shadow="never" class="flex-card">
       <div>
         <span>创建日期:</span>
         <el-date-picker style="width:130px;" v-model="beginTime" placeholder="日期区间" size="small">
@@ -24,39 +24,41 @@
         <el-button type="primary" size="small" @click="onAddClick">手工新增</el-button>
         <el-button @click="exportExcel" type="primary" size="small">导出Excel</el-button>
       </div>
-      <hr />
-      <el-table :data="planData" height="530">
-        <el-table-column type="index" width="50" align="center"></el-table-column>
-        <el-table-column label="供应商" prop="SUPPLY_CODE" width="100" align="center"></el-table-column>
-        <el-table-column label="型号" prop="ITEM_NO" width="120" align="center"></el-table-column>
-        <el-table-column label="需求计划量" prop="PLAN_QUANTITY" width="120" align="center"></el-table-column>
-        <el-table-column label="需求日期" prop="REQ_DATE" width="120" align="center">
-          <template slot-scope="scope">
-            <span>{{scope.row.REQ_DATE | dateFilter}}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="已到货数量" prop="ARRIVAL_QUANTITY" width="120" align="center"></el-table-column>
-        <el-table-column label="状态" prop="STATE_ID" width="100" align="center">
-          <template slot-scope="scope">
-            <span>{{scope.row.STATE_ID | transStatus}}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="备注" prop="NOTE" align="center"></el-table-column>
-        <el-table-column label="创建日期" prop="CRE_DATE" width="130" align="center">
-          <template slot-scope="scope">
-            <span>{{scope.row.CRE_DATE | dateFilter('yyyy-MM-dd HH:mm')}}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" align="center" width="130">
-          <template slot-scope="scope">
-            <el-button circle type="primary" icon="el-icon-edit" size="mini" @click="onEditClick(scope.row)">
-            </el-button>
-            <el-button v-if="scope.row.STATE_ID == '1'" circle type="danger" icon="el-icon-close" size="mini"
-              @click="onDeleteClick(scope.row)">
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+      <hr style="width:100%;" />
+      <div style="flex:1;position:relative;">
+        <el-table :data="planData" height="100%" style="position:absolute;">
+          <el-table-column type="index" width="50" align="center"></el-table-column>
+          <el-table-column label="供应商" prop="SUPPLY_NAME" width="200" align="center"></el-table-column>
+          <el-table-column label="型号" prop="ITEM_NO" width="120" align="center"></el-table-column>
+          <el-table-column label="需求计划量" prop="PLAN_QUANTITY" width="120" align="center"></el-table-column>
+          <el-table-column label="需求日期" prop="REQ_DATE" width="120" align="center">
+            <template slot-scope="scope">
+              <span>{{scope.row.REQ_DATE | dateFilter}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="已到货数量" prop="ARRIVAL_QUANTITY" width="120" align="center"></el-table-column>
+          <el-table-column label="状态" prop="STATE_ID" width="100" align="center">
+            <template slot-scope="scope">
+              <span>{{scope.row.STATE_ID | transStatus}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="备注" prop="NOTE" align="center"></el-table-column>
+          <el-table-column label="创建日期" prop="CRE_DATE" width="130" align="center">
+            <template slot-scope="scope">
+              <span>{{scope.row.CRE_DATE | dateFilter('yyyy-MM-dd HH:mm')}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" align="center" width="130">
+            <template slot-scope="scope">
+              <el-button circle type="primary" icon="el-icon-edit" size="mini" @click="onEditClick(scope.row)">
+              </el-button>
+              <el-button v-if="scope.row.STATE_ID == '1'" circle type="danger" icon="el-icon-close" size="mini"
+                @click="onDeleteClick(scope.row)">
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
     </el-card>
 
     <el-dialog width="350px" :title="dialogTitle" :visible.sync="dialogVisible">
@@ -344,8 +346,25 @@ export default {
 </script>
 
 <style scoped>
+.safeStock {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
 .greenBtn {
   background: #8bc34a;
   color: rgb(255, 255, 255);
+}
+.flex-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+</style>
+<style>
+.flex-card .el-card__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 </style>

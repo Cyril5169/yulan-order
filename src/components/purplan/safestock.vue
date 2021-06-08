@@ -1,31 +1,33 @@
 <template>
   <div class="safeStock">
-    <el-card shadow="never">
+    <el-card shadow="never" class="flex-card">
       <div style="margin-left:20px;">
         <span>统计范围:{{beginTime | dateFilter}} ~ {{finishTime | dateFilter}}</span>
         <el-button icon="el-icon-search" class="greenBtn" @click="initSearch" style="margin-left:10px;" size="small">查询
         </el-button>
         <el-button v-if="buttonShow" type="primary" @click="onSaveClick" size="small">保存数据</el-button>
       </div>
-      <hr />
-      <el-table :data="stockData" height="530">
-        <el-table-column label="型号" prop="ITEM_NO" width="100" align="center"></el-table-column>
-        <el-table-column label="版本名称" prop="PRODUCTVERSION_NAME" width="80" align="center"></el-table-column>
-        <el-table-column label="供货周期(天)" prop="OEM_SUPPLY_DAYS" width="100" align="center"></el-table-column>
-        <el-table-column label="上市年月" prop="DATE_UP" width="70" align="center"></el-table-column>
-        <el-table-column label="已上市月份数" prop="SSYS" width="100" align="center"></el-table-column>
-        <el-table-column label="总销售量" prop="QTY" width="80" align="center"></el-table-column>
-        <el-table-column label="总销售频次" prop="QTY_PC" width="80" align="center"></el-table-column>
-        <el-table-column label="单位" prop="UNIT" width="50" align="center"></el-table-column>
-        <el-table-column label="统计月份数" prop="YS" width="90" align="center"></el-table-column>
-        <el-table-column label="计算月份数" prop="JSYS" width="90" align="center"></el-table-column>
-        <el-table-column label="月均销售量" prop="QTY_MONTH" width="90" align="center"></el-table-column>
-        <el-table-column label="月均销售频次" prop="QTY_PC_MONTH" width="100" align="center"></el-table-column>
-        <el-table-column label="日均销售量" prop="QTY_DAY" width="90" align="center"></el-table-column>
-        <el-table-column label="预警数" prop="QTY_ARM" width="60" align="center"></el-table-column>
-        <el-table-column label="新产品标志" prop="NEW_FLAG" width="90" align="center"></el-table-column>
-        <el-table-column label="版本发放数量" prop="VERSION_NUM" width="100" align="center"></el-table-column>
-      </el-table>
+      <hr style="width:100%;" />
+      <div style="flex:1;position:relative;">
+        <el-table :data="stockData" height="100%" style="position:absolute;">
+          <el-table-column label="型号" prop="ITEM_NO" width="100" align="center"></el-table-column>
+          <el-table-column label="版本名称" prop="PRODUCTVERSION_NAME" width="80" align="center"></el-table-column>
+          <el-table-column label="供货周期(天)" prop="OEM_SUPPLY_DAYS" width="100" align="center"></el-table-column>
+          <el-table-column label="上市年月" prop="DATE_UP" width="70" align="center"></el-table-column>
+          <el-table-column label="已上市月份数" prop="SSYS" width="100" align="center"></el-table-column>
+          <el-table-column label="总销售量" prop="QTY" width="80" align="center"></el-table-column>
+          <el-table-column label="总销售频次" prop="QTY_PC" width="80" align="center"></el-table-column>
+          <el-table-column label="单位" prop="UNIT" width="50" align="center"></el-table-column>
+          <el-table-column label="统计月份数" prop="YS" width="90" align="center"></el-table-column>
+          <el-table-column label="计算月份数" prop="JSYS" width="90" align="center"></el-table-column>
+          <el-table-column label="月均销售量" prop="QTY_MONTH" width="90" align="center"></el-table-column>
+          <el-table-column label="月均销售频次" prop="QTY_PC_MONTH" width="100" align="center"></el-table-column>
+          <el-table-column label="日均销售量" prop="QTY_DAY" width="90" align="center"></el-table-column>
+          <el-table-column label="预警数" prop="QTY_ARM" width="60" align="center"></el-table-column>
+          <el-table-column label="新产品标志" prop="NEW_FLAG" width="90" align="center"></el-table-column>
+          <el-table-column label="版本发放数量" prop="VERSION_NUM" width="100" align="center"></el-table-column>
+        </el-table>
+      </div>
     </el-card>
   </div>
 </template>
@@ -59,9 +61,10 @@ export default {
             month_num_para = month_num_para[0];
             var month_num = month_num_para.VALUE;
             //结束时间为本月第一天
-            this.finishTime = new Date(new Date(new Date().getTime()).setDate(1));
+            var temp = new Date(new Date(new Date(new Date().getTime()).setDate(1)).setHours(0, 0, 0, 0));
+            this.finishTime = new Date(new Date(temp.getTime()).getTime() - 1000);
             //开始时间取得参数
-            this.beginTime = new Date(new Date(this.finishTime.getTime()).setMonth(this.finishTime.getMonth() - month_num));
+            this.beginTime = new Date(new Date(temp.getTime()).setMonth(temp.getMonth() - month_num));
           }
         }
 
@@ -121,8 +124,25 @@ export default {
 </script>
 
 <style scoped>
+.safeStock {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
 .greenBtn {
   background: #8bc34a;
   color: rgb(255, 255, 255);
+}
+.flex-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+</style>
+<style>
+.flex-card .el-card__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 </style>

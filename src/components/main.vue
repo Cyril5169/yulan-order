@@ -1394,6 +1394,8 @@ export default {
   margin: 0;
   padding: 10px;
   background: #ecf5ef;
+  display: flex;
+  flex-direction: column;
 }
 </style>
 

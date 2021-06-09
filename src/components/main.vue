@@ -65,7 +65,7 @@
             </el-tab-pane>
           </el-tabs>
         </el-header>
-        <el-main class="backTop" id="mainBackTop">
+        <el-main class="backTop" id="mainBackTop" :class="{'flex-layout': $route.meta.isFlex}">
           <div class="notice">
             <i class="el-icon-bell" style="line-height:30px;color:gold;margin: 0 10px;font-size:16px;"></i>
             <span style="color:red;">最新公告：</span>
@@ -1394,6 +1394,8 @@ export default {
   margin: 0;
   padding: 10px;
   background: #ecf5ef;
+}
+.flex-layout {
   display: flex;
   flex-direction: column;
 }

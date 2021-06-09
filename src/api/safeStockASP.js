@@ -80,3 +80,11 @@ export function DeletePurPlan(data, config = {}) {
       return Promise.reject(err);
   })
 }
+//item
+export function GetItemAndSupply(data, config = {}) {
+  return post('/ITEM/GetItemAndSupply', data, config).then((res) => {
+      return Promise.resolve(res);
+  }).catch((err) => {
+      return Promise.reject(err);
+  })
+}

@@ -54,10 +54,10 @@ import lanJuMarketExamine from '@/components/design/lanJuMarketExamine'
 import payDelegation from '@/components/supplierModule/payDelegation'
 import payDelegationExamine from '@/components/supplierModule/payDelegationExamine'
 import DeliveryList_lanju from '@/components/supplierModule/deliveryList_lanju'
-import refund from '@/components/newRefund'    
-import refundExamine from '@/components/newRefundExamine'   
+import refund from '@/components/newRefund'
+import refundExamine from '@/components/newRefundExamine'
 import lanJuFinanceExamine from '@/components/design/lanJuFinanceExamine'
-import expressSearch from '@/components/order/expressSearch' 
+import expressSearch from '@/components/order/expressSearch'
 import ljAfterSale from '@/components/aftersale/ljAfterSale'
 import ljAfterSaleExamine from '@/components/aftersale/ljAfterSaleExamine'
 import safeStock from '@/components/purplan/safeStock'
@@ -300,37 +300,31 @@ const router = new Router({
           path: '/query/stockQuery',
           name: 'stockQuery',
           component: StockQuery,
-          
         },
         {
           path: '/query/areaQuery',
           name: 'areaQuery',
           component: AreaQuery,
-          
         },
         {
           path: '/query/salesQuery',
           name: 'salesQuery',
           component: SalesQuery,
-          
         },
         {
           path: '/query/orderQuery',
           name: 'orderQuery',
           component: OrderQuery,
-          
         },
         {
           path: '/query/productQuery',
           name: 'productQuery',
           component: productQuery,
-          
         },
         {
           path: '/query/limitPriceQuery',
           name: 'limitPriceQuery',
           component: limitPriceQuery,
-          
         },
         {
           path: '/supplierModule/trans',
@@ -436,17 +430,26 @@ const router = new Router({
         {
           path: '/purplan/safeStock',
           name: 'safeStock',
-          component: safeStock
+          component: safeStock,
+          meta: {
+            isFlex: true //flex布局
+          }
         },
         {
           path: '/purplan/basePlan',
           name: 'basePlan',
-          component: basePlan
+          component: basePlan,
+          meta: {
+            isFlex: true //flex布局
+          }
         },
         {
           path: '/purplan/purPlan',
           name: 'purPlan',
-          component: purPlan
+          component: purPlan,
+          meta: {
+            isFlex: true //flex布局
+          }
         },
       ]
     }

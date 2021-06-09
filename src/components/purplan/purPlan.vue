@@ -67,8 +67,8 @@
           <el-input style="width:200px;" v-model="purPlanModel.ITEM_NO" :disabled="!addOrNot" @focus="searchItemShow">
           </el-input>
         </el-form-item>
-        <el-form-item label="供应商" prop="SUPPLY_CODE">
-          <el-input style="width:200px;" v-model="purPlanModel.SUPPLY_CODE" :disabled="true">
+        <el-form-item label="供应商" prop="SUPPLY_NAME">
+          <el-input style="width:200px;" v-model="purPlanModel.SUPPLY_NAME" :disabled="true">
           </el-input>
         </el-form-item>
         <el-form-item label="需求计划量" prop="PLAN_QUANTITY">
@@ -113,9 +113,9 @@ import {
   GetPurPlanListByCondition,
   EditPruPlan,
   InsertPurPlanByHand,
-  DeletePurPlan
+  DeletePurPlan,
+  GetItemAndSupply
 } from "@/api/safeStockASP";
-import { getItemById } from "@/api/orderListASP";
 import { downLoadFile } from "@/common/js/downLoadFile";
 
 export default {
@@ -210,6 +210,7 @@ export default {
     onAddClick() {
       this.purPlanModel = {
         SUPPLY_CODE: '',
+        SUPPLY_NAME: '',
         ITEM_NO: '',
         PLAN_QUANTITY: '',
         REQ_DATE: new Date(),
@@ -222,15 +223,14 @@ export default {
     },
     searchItemShow() {
       if (!this.addOrNot) return;
-      this.itemSearch = "";
       this.searchItemVisible = true;
       this.$nextTick(() => {
         this.$refs.itemSearchInput.focus();
       })
     },
     onSearchItemClick() {
-      getItemById({ itemNo: this.itemSearch }, { loading: false }).then(res => {
-        if (res.data == null) {
+      GetItemAndSupply({ itemNo: this.itemSearch }, { loading: false }).then(res => {
+        if (res.data.length == 0) {
           this.$message({
             message: "不存在该型号!",
             type: "warning",
@@ -238,8 +238,9 @@ export default {
           });
           return;
         }
-        this.purPlanModel.ITEM_NO = res.data.ITEM_NO;
-        this.purPlanModel.SUPPLY_CODE = res.data.OEM_SUPPLY_ID;
+        this.purPlanModel.ITEM_NO = res.data[0].ITEM_NO;
+        this.purPlanModel.SUPPLY_CODE = res.data[0].OEM_SUPPLY_ID;
+        this.purPlanModel.SUPPLY_NAME = res.data[0].SUPPLY_NAME;
         this.searchItemVisible = false;
       })
     },
@@ -252,6 +253,7 @@ export default {
     onSaveClick() {
       if (!this.purPlanModel.ITEM_NO ||
         !this.purPlanModel.SUPPLY_CODE ||
+        !this.purPlanModel.SUPPLY_NAME ||
         !this.purPlanModel.PLAN_QUANTITY ||
         !this.purPlanModel.REQ_DATE) {
         this.$alert("信息不完整", "提示", {

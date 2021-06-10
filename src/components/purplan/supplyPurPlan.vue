@@ -16,9 +16,9 @@
         <span style="margin-left:10px;">型号:</span>
         <el-input v-model="itemCondition" size="small" style="width: 150px" placeholder="输入型号搜索" @keyup.enter.native="searchData">
         </el-input>
-        <span style="margin-left:10px;">供应商:</span>
+        <!-- <span style="margin-left:10px;">供应商:</span>
         <el-input v-model="supplyCondition" size="small" style="width: 150px" placeholder="输入供应商搜索"
-          @keyup.enter.native="searchData"></el-input>
+          @keyup.enter.native="searchData"></el-input> -->
         <el-button icon="el-icon-search" class="greenBtn" @click="searchData" style="margin-left:10px;" size="small">查询
         </el-button>
         <el-button type="primary" size="small" @click="onAddClick">手工新增</el-button>
@@ -26,9 +26,9 @@
       </div>
       <hr style="width:100%;" />
       <div style="flex:1;position:relative;">
-        <el-table :data="planData" height="100%" style="position:absolute;" :row-class-name="tableRowClassName">
+        <el-table :data="planData" height="100%" style="position:absolute;">
           <el-table-column type="index" width="50" align="center"></el-table-column>
-          <el-table-column label="供应商" prop="SUPPLY_NAME" width="180" align="center"></el-table-column>
+          <!-- <el-table-column label="供应商" prop="SUPPLY_NAME" width="180" align="center"></el-table-column> -->
           <el-table-column label="型号" prop="ITEM_NO" width="100" align="center"></el-table-column>
           <el-table-column label="需求计划量" prop="PLAN_QUANTITY" width="100" align="center"></el-table-column>
           <el-table-column label="需求日期" prop="REQ_DATE" width="100" align="center">
@@ -47,7 +47,7 @@
               <span>{{scope.row.PLAN_QUANTITY - scope.row.ARRIVAL_QUANTITY}}</span>
             </template>
           </el-table-column>
-          <el-table-column label="已入库数量" prop="STOCK_QUANTITY" width="100" align="center"></el-table-column>
+          <!-- <el-table-column label="已入库数量" prop="STOCK_QUANTITY" width="100" align="center"></el-table-column> -->
           <el-table-column label="状态" prop="STATE_ID" width="80" align="center">
             <template slot-scope="scope">
               <span>{{scope.row.STATE_ID | transStatus}}</span>
@@ -59,7 +59,7 @@
               <span>{{scope.row.CRE_DATE | dateFilter('yyyy-MM-dd HH:mm')}}</span>
             </template>
           </el-table-column>
-          <el-table-column label="操作" align="center" width="100">
+          <!-- <el-table-column label="操作" align="center" width="100">
             <template slot-scope="scope">
               <el-button circle type="primary" icon="el-icon-edit" size="mini" @click="onEditClick(scope.row)">
               </el-button>
@@ -67,7 +67,7 @@
                 @click="onDeleteClick(scope.row)">
               </el-button>
             </template>
-          </el-table-column>
+          </el-table-column> -->
         </el-table>
       </div>
     </el-card>
@@ -128,6 +128,7 @@ import {
   GetItemAndSupply
 } from "@/api/safeStockASP";
 import { downLoadFile } from "@/common/js/downLoadFile";
+import Cookies from "js-cookie";
 
 export default {
   data() {
@@ -168,7 +169,7 @@ export default {
         },
       ],
       itemCondition: '',
-      supplyCondition: '',
+      supplyCondition: Cookies.get("companyId"),
       planData: [],
       addOrNot: true,
       purPlanModel: {},

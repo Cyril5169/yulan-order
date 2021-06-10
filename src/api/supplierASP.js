@@ -56,6 +56,13 @@ export function AsyncBuJingLing(data, config = {}) {
         return Promise.reject(err);
     })
 }
+export function SaveHistoryLJPostData(data, config = {}) {
+    return post('/PUR_HEAD/SaveHistoryLJPostData', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
 export function GetBJLData(data, config = {}) {
     return post('/PUR_HEAD/GetBJLData', data, config).then((res) => {
         return Promise.resolve(res);

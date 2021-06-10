@@ -1,6 +1,4 @@
 import { get, post, patch, put } from './httpASP'
-import Axios from 'axios'
-import Cookies from "js-cookie";
 
 var baseUrl = 'http://47.107.56.156:1001/';//测试
 //var baseUrl = 'http://14.29.223.114:1001/';//正式

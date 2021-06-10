@@ -1137,6 +1137,7 @@ import {
   GetNoPrinted,
   AsyncBuJingLing,
   GetBJLData,
+  SaveHistoryLJPostData,
 } from "@/api/supplierASP";
 import { GetPartTypeDataTable, GetPurOrderDetails } from "@/api/newCurtainASP";
 import { downLoadFile } from "@/common/js/downLoadFile";
@@ -1831,6 +1832,7 @@ export default {
     },
     //同步布精灵数据
     async asyncBuJingLing(pruData) {
+      var dateStamp = new Date().getTime();
       var result = "";
       if (pruData.length) {
         var loading = this.$loading({
@@ -1952,6 +1954,14 @@ export default {
                     failPur += msg;
                     oneFail += msg;
                   }
+                  //记录发出去回返回来的值
+                  await SaveHistoryLJPostData({
+                    dirName: oneplace[0].ORDER_NO + '-' + dateStamp,
+                    fileName: oneplace[0].ORDER_NO + '-' + detail.CL_PLACE_ID,
+                    content: JSON.stringify(postdata),
+                    resBLJ: JSON.stringify(resB)
+                  },
+                    { loading: false });
                 } catch (err) {
                   this.$message({
                     message: "同步失败!",
@@ -2104,6 +2114,13 @@ export default {
                     failPur += msg;
                     oneFail += msg;
                   }
+                  //记录发出去回返回来的值
+                  await SaveHistoryLJPostData({
+                    dirName: oneOrderDetail.ORDER_NO + '-' + dateStamp,
+                    fileName: oneOrderDetail.ORDER_NO + '-' + oneOrderDetail.LINE_NO,
+                    content: JSON.stringify(postdata),
+                    resBLJ: JSON.stringify(resB)
+                  }, { loading: false });
                 } catch (err) {
                   this.$message({
                     message: "同步失败!",

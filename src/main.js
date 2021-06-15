@@ -43,7 +43,7 @@ Axios.interceptors.request.use(config => {
     config.params.tForIE = new Date()
   }
   //一个取巧的方法，之后看能怎么优化
-  //在axios中传入config，配置一个参数来控制。如果loading为false，则不需要loading（见main.vue getUserMoney方法）
+  //在axios中传入config，配置一个参数来控制。如果loading为false，则不需要loading
   if (config.loading != undefined && config.loading == false)
     return config;
   if (config.url !== '/item/getGYList.do' && config.url !== '/salPromotion/selectSalPromotion.do')

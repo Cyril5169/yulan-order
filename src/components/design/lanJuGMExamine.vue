@@ -327,7 +327,7 @@ import {
   CheckDetailByID,
   addSubmit,
   editSubmit
-} from "@/api/lanju";
+} from "@/api/lanjuASP";
 import { downLoadFile } from "@/common/js/downLoadFile";
 import { mapMutations } from "vuex";
 import Cookies from "js-cookie";

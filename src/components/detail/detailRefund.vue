@@ -156,14 +156,6 @@ import "@/assets/css/base.css";
 import { digitUppercase } from "@/common/js/money.js";
 import { toLocale } from "@/common/js/date.js";
 import {
-  getProductData,
-  addRefund,
-  getRefundById,
-  deleteRefund,
-  updataRefundStatus,
-  updateRefund
-} from "@/api/refund";
-import {
   GetCompensationByIdBefore,
   InsertCompensationOld,
   UpdateCompensation,
@@ -195,7 +187,6 @@ export default {
       let method = this.baseData.method;
       if (method !== "new") {
         let obj = { id: this.baseData.ID };
-        //let _data = await getRefundById(obj);
         let _data = await GetCompensationByIdBefore(obj);
         _data = _data.data[0];
         _data.method = method;
@@ -219,7 +210,6 @@ export default {
         cancelButtonText: "取消"
       })
         .then(async ({ value }) => {
-          //getProductData({ itemNo: value })
           GetItemDetailById({ itemNo: value })
             .then(res => {
               if (res.data.length > 0) {
@@ -310,7 +300,6 @@ export default {
         let obj = {
           id: this.baseData.ID
         };
-        //deleteRefund(obj)
         DeleteCompensation(obj)
           .then(res => {
             this.$alert("删除成功", "提示", {
@@ -344,12 +333,10 @@ export default {
         //obj.rtcbItems = _rcbItems;
         //new--新建
         if (this.baseData.method === "new") {
-          //addRefund(obj)
           InsertCompensationOld({ head: obj, details: _rcbItems })
             .then(res => {
               if (status === 1) {
                 //直接提交
-                //updateRefund(obj)
                 UpdateState({
                   id: res.data.ID,
                   state: "CUSTOMERAFFIRM"
@@ -402,7 +389,6 @@ export default {
           } else {
             tipWord = "保存";
           }
-          //updateRefund(obj)
           UpdateCompensation({ head: obj, details: _rcbItems })
             .then(res => {
               this.$alert(`${tipWord}成功`, "提示", {
@@ -434,12 +420,10 @@ export default {
         id: this.baseData.ID,
         state: flag ? "APPROVED" : "CANCELED"
       };
-      //updataRefundStatus(obj)
       UpdateState(obj)
         .then(res => {
           this.$root.$emit("updateRefund");
           //成功后，调用查询接口，重新覆盖渲染
-          //getRefundById({
           GetCompensationByIdBefore({
             id: this.baseData.ID
           })

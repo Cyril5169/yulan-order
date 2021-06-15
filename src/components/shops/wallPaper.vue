@@ -105,8 +105,6 @@
 </template>
 
 <script>
-import { getShopsWallPaperMsg } from "@/api/shopSearch";
-import { findItemActivity } from "@/api/findActivity";
 import { addShoppingCar } from "@/api/shop";
 import { getItemById, GetPromotionByItem } from "@/api/orderListASP";
 import { mapMutations } from "vuex";
@@ -230,7 +228,6 @@ export default {
           this.history = arr.reverse();
           storage.history.toLocaleString();
           this.clearMsg();
-          //findItemActivity({
           GetPromotionByItem({
             cid: this.cid,
             customerType: this.customerType,

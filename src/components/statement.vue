@@ -219,7 +219,6 @@
 const BACKIT = "客户反馈";
 const OKIT = "客户确认";
 import {
-  checkBill,
   billDetail,
   userReturn,
   statementDetail,
@@ -481,14 +480,12 @@ export default {
     },
     //获取对账单
     getBill() {
-      let url = "/customerBalance/getCustomerBalanceInfo.do";
       let data = {
         cid: Cookies.get("cid"),
         limit: this.outerlimit,
         page: this.outerCurrentPage,
         status: "",
       };
-      //checkBill(url, data).then(res => {
       GetBalancePeriod(data).then((res) => {
         console.log(res);
         this.tableData = res.data.customerBalancePeriodList;

@@ -2,124 +2,61 @@
   <el-card class="centerCard">
     <div slot="header">
       <span class="headSpan">我的优惠券</span>
-      <!-- <el-button @click="addTab('order/myOrder')" style="float:right;" size="small"  type="success" plain>返回</el-button> -->
     </div>
     <div>
-      <div
-        v-for="(item, index) of couponData"
-        :key="index"
-        :class="
-          item.dateId != 1 || item.rebateMoneyOver <= 0 || item.status !=1
-            ? switchClass.cctvF
-            : switchClass.cctvT
-        "
-      >
+      <div v-for="(item, index) of couponData" :key="index" class="coupon-card"
+        :class="{ 'coupon-card-uneffect': notEffectiveCoupon(item)}">
         <div class="couponHead">
-          <div
-            :class="
-              item.dateId != 1 || item.rebateMoneyOver <= 0 || item.status !=1
-                ? switchClass.logoF
-                : switchClass.logoT
-            "
-          ></div>
+          <div class="coupon-logo" :class="{'coupon-logo-uneffect': notEffectiveCoupon(item)}">
+          </div>
           <div class="logoTxt">
-            <p
-              style="color:white; font-size:15px; padding-top:5px; font-weight:bold; letter-spacing:2px;"
-            >
-              {{ item.notes }}
-            </p>
-            <span>总返利&nbsp;{{ item.rebateMoney }}元</span>
-            <span class="rightCoupon">券号：{{ item.id }}</span>
+            <div class="head-title">
+              {{ item.NOTES }}
+            </div>
+            <span>总返利&nbsp;{{ item.REBATE_MONEY }}元</span>
+            <span class="rightCoupon">券号：{{ item.ID }}</span>
           </div>
         </div>
 
         <div class="couponBody">
-          <p
-            :class="
-              item.dateId != 1 || item.rebateMoneyOver <= 0 || item.status !=1
-                ? switchClass.transTxtF
-                : switchClass.transTxtT
-            "
-            style="text-align:center"
-          >
-            <span style="font-size:18px;">余额￥</span>
+          <div class="over-money" :class="notEffectiveCoupon(item) ? 'over-money-uneffect' : 'over-money-effect'">
+            <span style="font-size:20px;">余额￥</span>
             <span v-if="isManager === '0'">***</span>
-            <span v-else>{{ item.rebateMoneyOver }}</span>
-          </p>
-          <div style="margin:0 auto; width:245px;">
-            <div
-              :class="
-                item.dateId != 1 || item.rebateMoneyOver <= 0 || item.status !=1
-                  ? switchClass.roundedRectangleF
-                  : switchClass.roundedRectangleT
-              "
-            >
-              <p>
-                &nbsp;&nbsp;&nbsp;有效期：{{
-                  item.dateStart | datatrans
-                }}至&nbsp;&nbsp;{{ item.dateEnd | datatrans }}
-              </p>
-            </div>
+            <span v-else>{{ item.REBATE_MONEY_OVER }}</span>
           </div>
-          <br />
-          <p style="text-align:center;">适用：{{ item.application }}</p>
-          <div class="Record" style="text-align:center">
-            <span @click="RecordUse(item.id)" style="cursor: pointer;"
-              >查看使用记录>>&nbsp;&nbsp;&nbsp;</span
-            >
-            <span @click="RecordBack(item.id)" style="cursor: pointer;"
-              >查看返利记录>></span
-            >
+          <div class="valid-date" :class="{'valid-date-uneffect': notEffectiveCoupon(item)}">
+            有效期：{{ item.DATE_START | dateFilter }}&nbsp;至&nbsp;{{ item.DATE_END | dateFilter }}
+          </div>
+          <div>适用：{{ item.APPLICATION }}</div>
+          <div>
+            <span @click="getRecordUseData(item.ID)" class="record-text">查看使用记录>></span>
+            <span @click="getRecordBackData(item.ID)" class="record-text">查看返利记录>></span>
           </div>
         </div>
       </div>
     </div>
+
     <!-- 查看使用记录 -->
-    <el-dialog
-      :title="'优惠券使用记录[券号:' + useTable.couponId + ']'"
-      :visible.sync="dialogUse"
-      width="60%"
-      top="5vh"
-    >
+    <el-dialog :title="'优惠券使用记录[券号:' + couponId + ']'" :visible.sync="dialogUse" width="1000px" top="5vh">
       <keep-alive>
-        <useRecordDetail
-          v-if="dialogUse"
-          :useTable="useTable"
-        ></useRecordDetail>
+        <useRecordDetail v-if="dialogUse" :couponId="couponId"></useRecordDetail>
       </keep-alive>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogUse = false">关闭</el-button>
-      </span>
     </el-dialog>
     <!-- 查看返利记录 -->
-    <el-dialog
-      :title="'优惠券返利记录[券号:' + backTable.couponId + ']'"
-      :visible.sync="dialogBack"
-      width="60%"
-      top="5vh"
-    >
+    <el-dialog :title="'优惠券返利记录[券号:' + backTable.couponId + ']'" :visible.sync="dialogBack" width="60%" top="5vh">
       <keep-alive>
-        <couponRecordDetail
-          v-if="dialogBack"
-          :backTable="backTable"
-        ></couponRecordDetail>
+        <couponRecordDetail v-if="dialogBack" :backTable="backTable"></couponRecordDetail>
       </keep-alive>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogBack = false">关闭</el-button>
-      </span>
     </el-dialog>
   </el-card>
 </template>
 
 <script>
-import { searchTickets } from "@/api/orderList";
-import { manageCoupon } from "@/api/orderList";
-import { CouponUseRecord } from "@/api/orderList";
+import { GetAllCoupon } from "@/api/couponASP";
 import { CouponbackRecord } from "@/api/orderList";
 import Cookies from "js-cookie";
 import useRecordDetail from "./useRecordDetail";
 import couponRecordDetail from "./couponRecordDetail";
-import { getUseRecord } from "@/api/orderListASP";
 
 export default {
   name: "MyCoupon",
@@ -131,56 +68,33 @@ export default {
     return {
       isManager: Cookies.get("isManager"),
       couponData: [],
-      switchClass: {
-        cctvT: "cctvT",
-        cctvF: "cctvF",
-        logoT: "logoT",
-        logoF: "logoF",
-        transTxtT: "transTxtT",
-        transTxtF: "transTxtF",
-        roundedRectangleT: "roundedRectangleT",
-        roundedRectangleF: "roundedRectangleF"
-      },
       dialogUse: false,
       dialogBack: false,
-      useTable: [],
+      couponId: "",
       backTable: []
     };
   },
   methods: {
     allTickets() {
-      var url = "/order/findRebate.do";
-      var data = {
-        cid: Cookies.get("cid"),
-        companyId: Cookies.get("companyId")
-      };
-      manageCoupon(url, data).then(res => {
+      GetAllCoupon({ companyId: Cookies.get("companyId") }).then(res => {
         this.couponData = res.data;
       });
     },
-    RecordUse(itemID) {
-      this.useTable = [];
-      var url = "/order/findRecrods.do";
-      // var data = {
-      //   id: itemID
-      // };
-      var data = {
-        couponId: itemID,
-        keyWords: "",
-        beginTime: "0001/1/1",
-        finishTime: "9999/12/31",
-        page: 1,
-        limit: 20
-      };
-      //CouponUseRecord(url, data)
-      getUseRecord(data).then(res => {
-        this.useTable = res.data;
-        this.useTable.couponId = itemID;
-        this.useTable.count = res.count;
-        this.dialogUse = true;
-      });
+    notEffectiveCoupon(item) {
+      var unValidDate = true;
+      var nowDate = new Date(new Date().setDate(-1));
+      //判断有效日期
+      if (new Date(item.DATE_START).getTime() <= nowDate.getTime() 
+          && new Date(item.DATE_END).getTime() >= nowDate.getTime()) {
+        unValidDate = false;
+      }
+      return unValidDate || item.REBATE_MONEY_OVER <= 0 || item.STATUS != 1;
     },
-    RecordBack(itemId) {
+    getRecordUseData(itemID) {
+      this.couponId = itemID;
+      this.dialogUse = true;
+    },
+    getRecordBackData(itemId) {
       var url = "/order/getReturnRecord.do";
       var data = {
         id: itemId
@@ -192,25 +106,7 @@ export default {
       });
     }
   },
-  filters: {
-    datatrans(value) {
-      //时间戳转化大法
-      let date = new Date(value);
-      let y = date.getFullYear();
-      let MM = date.getMonth() + 1;
-      MM = MM < 10 ? "0" + MM : MM;
-      let d = date.getDate();
-      d = d < 10 ? "0" + d : d;
-      let h = date.getHours();
-      h = h < 10 ? "0" + h : h;
-      let m = date.getMinutes();
-      m = m < 10 ? "0" + m : m;
-      let s = date.getSeconds();
-      s = s < 10 ? "0" + s : s;
-      return y + "-" + MM + "-" + d + " "; /* + h + ':' + m + ':' + s; */
-    }
-  },
-  created: function() {
+  created() {
     this.allTickets();
   }
 };
@@ -222,107 +118,71 @@ export default {
   font-size: 18px;
   color: black;
 }
-.centerCard {
-  margin: 0 auto;
-  position: relative;
-}
-.centerCard p{
-  margin: 0;
-}
-.roundedRectangleF {
-  display: inline-block;
-  height: 30px;
-  line-height: 30px;
-  margin: 0 auto;
-  color: white;
-  width: 238px;
-  background: gray;
-  /* background: rgb(253, 85, 56);这个是能用的 */
-  border-width: 10px; /*边缘的宽度*/
-  border-radius: 15px; /*圆角的大小 */
-}
-.roundedRectangleT {
-  display: inline-block;
-  height: 30px;
-  line-height: 30px;
-  margin: 0 auto;
-  color: white;
-  width: 238px;
-  background: rgb(253, 85, 56);
-  border-width: 10px; /*边缘的宽度*/
-  border-radius: 15px; /*圆角的大小 */
-}
-.cctvF {
-  background: url("blackCoupon.png");
-  width: 350px;
-  height: 230px;
-  margin-right: 5%;
-  background-size: 100%;
-  background-repeat: no-repeat;
-  display: inline-block;
-  font-size: 13px;
-}
-.cctvT {
-  background: url("coupon.png");
-  width: 350px;
-  height: 230px;
-  margin-right: 5%;
-  background-size: 100%;
-  background-repeat: no-repeat;
-  display: inline-block;
-  font-size: 13px;
-}
 .couponHead {
-  height: 50px;
+  height: 58px;
 }
 .couponBody {
-  height: 170px;
-  margin-top: 15px;
+  height: 160px;
+  text-align: center;
+  box-sizing: border-box;
 }
-.logoF {
-  background: url("blackLogo.jpg");
+.coupon-card {
+  width: 369px;
+  height: 219px;
+  margin: 0 50px 20px 0;
+  background: url("../../assets/img/coupon/coupon.png") no-repeat;
+  background-size: 100% 100%;
+  display: inline-block;
+  font-size: 13px;
+}
+.coupon-card-uneffect {
+  background: url("../../assets/img/coupon/blackCoupon.png") no-repeat;
+  background-size: 100% 100%;
+}
+.coupon-logo {
   width: 40px;
   height: 40px;
-  background-size: 100%;
-  background-repeat: no-repeat;
+  background: url("../../assets/img/coupon/logopng.png") no-repeat;
+  background-size: 100% 100%;
   border-radius: 50%;
   float: left;
   margin-top: 8px;
-  margin-left: 5%;
-  margin-right: 3%;
+  margin-left: 15px;
+  margin-right: 10px;
 }
-.logoT {
-  background: url("logopng.png");
-  width: 40px;
-  height: 40px;
-  background-size: 100%;
-  background-repeat: no-repeat;
-  border-radius: 50%;
-  float: left;
-  margin-top: 8px;
-  margin-left: 5%;
-  margin-right: 3%;
+.coupon-logo-uneffect {
+  background: url("../../assets/img/coupon/blackLogo.jpg") no-repeat;
+  background-size: 100% 100%;
+}
+.head-title {
+  color: white;
+  font-size: 18px;
+  padding-top: 5px;
+  font-weight: bold;
+  letter-spacing: 2px;
 }
 .logoTxt span {
   display: inline-block;
   color: white;
   margin-top: 3px;
 }
-.transTxtF {
-  font-size: 40px;
-  font-weight: bold;
-  color: rgb(
-    180,
-    180,
-    180
-  ); /* 
-  background: -webkit-linear-gradient(left,  rgb(253,59,49) 22%, rgb(253,128,67) 50%,  rgb(253,168,77) 100% );   
-  -webkit-background-clip: text;        
-  -webkit-text-fill-color: transparent;  */
+.rightCoupon {
+  float: right;
+  margin-right: 10px;
 }
-.transTxtT {
+.over-money {
   font-size: 40px;
   font-weight: bold;
+  margin: 5px 0;
+  height: 45px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.over-money-uneffect {
+  color: rgb(180, 180, 180);
+}
+.over-money-effect {
   background: -webkit-linear-gradient(
     left,
     rgb(253, 59, 49) 22%,
@@ -333,16 +193,25 @@ export default {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-.Record span:hover {
+.valid-date {
+  display: inline-block;
+  height: 30px;
+  line-height: 30px;
+  padding: 0 20px;
+  margin: 5px 0;
+  color: white;
+  background: rgb(253, 85, 56);
+  border-width: 10px;
+  border-radius: 15px;
+}
+.valid-date-uneffect {
+  background: gray;
+}
+.record-text {
+  margin: 0 5px;
+  cursor: pointer;
+}
+.record-text:hover {
   color: orange;
-}
-.rightCoupon {
-  float: right;
-  margin-right: 10px;
-}
-</style>
-<style>
-.el-table .success-row {
-  background: #f0f9eb;
 }
 </style>

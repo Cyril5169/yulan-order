@@ -721,7 +721,6 @@ export default {
   methods: {
     //修改打印标记
     changePrinted(value, index) {
-      //updatePrinted({
       UpdatePrintedById({
         id: value.PUR_NO,
         printed: value.PRINTED,

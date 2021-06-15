@@ -727,12 +727,6 @@ import print from "print-js";
 import Axios from "axios";
 import Cookies from "js-cookie";
 import { digitUppercase } from "@/common/js/money.js";
-import {
-  getAllRefund,
-  deleteRefund,
-  updataRefundStatus,
-  updatePrinted,
-} from "@/api/refund";
 import { getReturnInfo2 } from "@/api/orderListASP";
 import {
   GetAllCompensation,
@@ -1407,7 +1401,6 @@ export default {
     },
     //修改打印标记
     changePrinted(value, index) {
-      //updatePrinted({
       UpdatePrintedById({
         id: value.ID,
         printed: value.PRINTED ? "0" : "1",

@@ -80,12 +80,12 @@ export default {
           type: "warning",
         }).then(() => {
           InsertPurPlanList(this.selectPlan).then(res => {
-            this.$alert("保存成功！", "提示", {
+            this.$alert("生成成功！", "提示", {
               confirmButtonText: "确定",
               type: "warning",
             });
           }).catch(res => {
-            this.$alert("保存失败！" + res.msg, "提示", {
+            this.$alert("生成失败！" + res.msg, "提示", {
               confirmButtonText: "确定",
               type: "warning",
             });

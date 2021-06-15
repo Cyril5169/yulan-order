@@ -416,7 +416,7 @@ import {
   addSubmit,
   editByCustomer,
   GetInitialInfo
-} from "@/api/lanju";
+} from "@/api/lanjuASP";
 import { UploadFiles } from "@/api/imageStoreASP";
 import { downLoadFile } from "@/common/js/downLoadFile";
 import { mapMutations } from "vuex";

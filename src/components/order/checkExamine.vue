@@ -210,7 +210,6 @@ import {
   GetCtmOrder,
   GetPromotionByType,
   GetPromotionByTypeAndId,
-  GetOrderUseRebate,
   ljExportProductExcel,
   updateCurtainOrderStatus,
   settlementAgain

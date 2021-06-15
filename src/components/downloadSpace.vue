@@ -61,8 +61,6 @@ export default {
   data() {
     return {
       refreshClass: "el-icon-refresh-left",
-      downLoadUrl: "http://47.107.56.156:1001/", //测试
-      //downLoadUrl: "http://14.29.223.114:1001/",//正式
       find: "",
       dirShow: false,
       picShow: false,

@@ -37,12 +37,9 @@
                   <i class="el-icon-arrow-down el-icon--right headIcon"></i>
                 </span>
                 <el-dropdown-menu slot="dropdown" style="min-width: 150px;">
-                  <el-dropdown-item v-if="identity != 'SUPLY'"><a style="color:#606266;" target="_blank" :href="
-                        'http://14.29.221.4:10250/pc/#/?cid=' +
-                          cid +
-                          '&password=' +
-                          userInfo.password
-                      ">网络协议签订</a>
+                  <el-dropdown-item v-if="identity != 'SUPLY'">
+                    <a style="color:#606266;" target="_blank" :href="
+                        'http://14.29.221.4:10250/pc/#/?cid=' + cid + '&password=' + userInfo.password">网络协议签订</a>
                     <el-badge v-if="wangqian > 0" style="margin-top:5px;" :value="wangqian"></el-badge>
                   </el-dropdown-item>
                   <el-dropdown-item @click.native="addTab('myZone/myCoupon')">我的优惠券</el-dropdown-item>
@@ -152,9 +149,7 @@ import { mapMutations, mapActions, mapState } from "vuex";
 import menuTree from "./menuTree";
 import studyContextDetail from "./studyContext/studyContextDetail";
 import hotSale from "./shops/hotSale";
-import { getAllRefund } from "@/api/refund";
 import { getIconNumber } from "@/api/painting";
-import { checkBill } from "@/api/orderList";
 import { GetNewNotification, InserFlag } from "@/api/notificationASP";
 import { GetCustomerMustWriteStudy } from "@/api/studyASP";
 import { QueryWebMenuByUserId } from "@/api/webMenuASP";
@@ -163,8 +158,8 @@ import { GetCartItemCount } from "@/api/shopASP";
 import { GetAllCompensationOld } from "@/api/paymentASP";
 import { ChangePassword } from "@/api/webUserASP";
 import { GetCurrentDelegation, GetAllDelegation } from "@/api/supplierASP";
-import { GetAllData, GetAllUserData } from "@/api/lanju";
-import { GetAllComplaint, GetAllUserComplaint } from "@/api/complaint";
+import { GetAllData, GetAllUserData } from "@/api/lanjuASP";
+import { GetAllComplaint, GetAllUserComplaint } from "@/api/complaintASP";
 import {
   GetImageCustomer,
   GetAllData as GetImageAll,
@@ -254,7 +249,6 @@ export default {
     //获取角标情况【退货】
     async addBadgeIcon() {
       if (this.isContainAttr("refundCompensation")) {
-        //let _refund = await getAllRefund({
         let _refund = await GetAllCompensationOld(
           {
             CID: this.cid,

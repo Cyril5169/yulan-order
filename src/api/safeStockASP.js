@@ -56,6 +56,14 @@ export function GetPurPlanListByCondition(data, config = {}) {
       return Promise.reject(err);
   })
 }
+//供应商需求计划
+export function GetSupplyPurPlanListByCondition(data, config = {}) {
+  return post('/PUR_PLAN/GetSupplyPurPlanListByCondition', data, config).then((res) => {
+      return Promise.resolve(res);
+  }).catch((err) => {
+      return Promise.reject(err);
+  })
+}
 //修改需求计划
 export function EditPruPlan(data, config = {}) {
   return post('/PUR_PLAN/EditPruPlan', data, config).then((res) => {
@@ -83,6 +91,14 @@ export function DeletePurPlan(data, config = {}) {
 //item
 export function GetItemAndSupply(data, config = {}) {
   return post('/ITEM/GetItemAndSupply', data, config).then((res) => {
+      return Promise.resolve(res);
+  }).catch((err) => {
+      return Promise.reject(err);
+  })
+}
+//供应商确认于取消
+export function EditSupplyStatus(data, config = {}) {
+  return post('/PUR_PLAN/EditSupplyStatus', data, config).then((res) => {
       return Promise.resolve(res);
   }).catch((err) => {
       return Promise.reject(err);

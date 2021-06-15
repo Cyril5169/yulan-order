@@ -4,12 +4,7 @@
       <div class="loginMain">
         <!-- 登录框头部--图标 -->
         <div class="mainLogoWrap">
-          <img
-            class="mainLogo"
-            width="100%"
-            src="../assets/img/loginLogo.png"
-            alt
-          />
+          <img class="mainLogo" width="100%" src="../assets/img/loginLogo.png" alt />
         </div>
         <div class="mainInfo">
           <h1>{{ Global.webTitle }}</h1>
@@ -22,56 +17,26 @@
           </div>
           <div class="info">
             <p>密&nbsp;码</p>
-            <el-input
-              type="password"
-              style="width:300px;"
-              v-model="password"
-              @keydown.native="keyLogin"
-            >
-              <img
-                slot="prefix"
-                src="../assets/img/password.png"
-                width="22"
-                alt
-              />
+            <el-input type="password" style="width:300px;" v-model="password" @keydown.native="keyLogin">
+              <img slot="prefix" src="../assets/img/password.png" width="22" alt />
             </el-input>
           </div>
           <div class="submit" @click="loginSubmit">登录</div>
           <div style="margin-top:10px;">
-            <span
-              style="position:relative;float:right;right:60px;"
-              @click="rememberPassWord = !rememberPassWord"
-            >
-              <input
-                style="width:14px;height:14px;vertical-align:middle;"
-                type="checkbox"
-                value
-                v-model="rememberPassWord"
-              /><span style="color:gray;vertical-align:middle;"
-                >自&nbsp;动&nbsp;登&nbsp;录</span
-              >
+            <span style="position:relative;float:right;right:60px;" @click="rememberPassWord = !rememberPassWord">
+              <input style="width:14px;height:14px;vertical-align:middle;" type="checkbox" value
+                v-model="rememberPassWord" /><span style="color:gray;vertical-align:middle;">自&nbsp;动&nbsp;登&nbsp;录</span>
             </span>
           </div>
         </div>
       </div>
-      <div
-        class="bottomButton"
-        v-if="Global.webTitle != Global.sysTitle.supply.webTitle"
-      >
+      <div class="bottomButton" v-if="Global.webTitle != Global.sysTitle.supply.webTitle">
         <div class="bottomBtn" @click="maskShow = true">
-          <img
-            src="../assets/img/img/Android.png"
-            style="vertical-align:middle;"
-            width="23"
-          />
+          <img src="../assets/img/img/Android.png" style="vertical-align:middle;" width="23" />
           <span style="vertical-align:middle">安卓版下载 ></span>
         </div>
         <div class="bottomBtn" @click="maskShow2 = true">
-          <img
-            src="../assets/img/img/Apple.png"
-            style="vertical-align:middle;"
-            width="23"
-          />
+          <img src="../assets/img/img/Apple.png" style="vertical-align:middle;" width="23" />
           <span style="vertical-align:middle">苹果版下载 ></span>
         </div>
       </div>
@@ -103,9 +68,7 @@
 <script>
 import Cookies from "js-cookie";
 import { userLogin } from "@/api/user";
-import { RedirectMain } from "@/api/orderListASP";
-import { mapMutations, mapActions } from "vuex";
-import { mapState } from "vuex";
+import { mapMutations } from "vuex";
 
 export default {
   name: "Login",
@@ -153,50 +116,45 @@ export default {
       };
       Cookies.remove("cid");
       Cookies.remove("customerType");
-      userLogin(obj)
-        .then(res => {
-          if (res.data.stopped == 1) {
-            this.$alert("账号被禁用，无法登录", "提示", {
-              type: "warning",
-              confirmButtonText: "好的"
-            });
-            return;
-          }
-          let companyId;
-          Cookies.set("cid", cid);
-          sessionStorage.setItem("_userId", cid);
-          if (res.pos) res.data.pos = res.pos;
-          Cookies.set("userInfo", res.data);
-          Cookies.set("isManager", res.data.isManager);
-          Cookies.set("realName", res.data.realName);
-          companyId = res.data.companyId === null ? "null" : res.data.companyId;
-          Cookies.set("companyId", companyId);
-          Cookies.set("customerMainId", res.data.customerMainId);
-          Cookies.set("identity", res.data.type);
-          if (res.customerType === "") {
-            if (res.data.type === "USER") {
-              Cookies.set("customerType", "110");
-            }
-          } else {
-            Cookies.set("customerType", res.customerType);
-          }
-          this.emptyTabList();
-          if (this.rememberPassWord) {
-            window.localStorage.setItem("username", cid);
-            window.localStorage.setItem("password", this.password);
-          } else {
-            window.localStorage.setItem("username", "");
-            window.localStorage.setItem("password", "");
-          }
-          window.localStorage.setItem(
-            "rememberPassWord",
-            this.rememberPassWord
-          );
-          this.$router.push({
-            path: "/main"
+      userLogin(obj).then(res => {
+        if (res.data.stopped == 1) {
+          this.$alert("账号被禁用，无法登录", "提示", {
+            type: "warning",
+            confirmButtonText: "好的"
           });
-          this.$router.go(0); //刷新页面
-        })
+          return;
+        }
+        Cookies.set("cid", cid);
+        sessionStorage.setItem("_userId", cid); // http里面使用
+        if (res.pos) res.data.pos = res.pos;
+        Cookies.set("userInfo", res.data);
+        Cookies.set("isManager", res.data.isManager);
+        Cookies.set("realName", res.data.realName);
+        let companyId = res.data.companyId === null ? "null" : res.data.companyId;
+        Cookies.set("companyId", companyId);
+        Cookies.set("customerMainId", res.data.customerMainId);
+        Cookies.set("identity", res.data.type);
+        if (res.customerType === "") {
+          if (res.data.type === "USER") {
+            Cookies.set("customerType", "110");
+          }
+        } else {
+          Cookies.set("customerType", res.customerType);
+        }
+        this.emptyTabList();
+        if (this.rememberPassWord) {
+          window.localStorage.setItem("username", cid);
+          window.localStorage.setItem("password", this.password);
+        } else {
+          window.localStorage.setItem("username", "");
+          window.localStorage.setItem("password", "");
+        }
+        window.localStorage.setItem("rememberPassWord", this.rememberPassWord);
+        this.$router.push({
+          path: "/main"
+        });
+        this.$router.go(0); //刷新页面
+      })
         .catch(err => {
           this.$alert(`${err.msg}`, "提示", {
             type: "warning",

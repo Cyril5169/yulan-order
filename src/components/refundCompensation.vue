@@ -236,12 +236,6 @@
 <script>
 import Cookies from "js-cookie";
 import "@/assets/css/base.css";
-import {
-  getAllRefund,
-  deleteRefund,
-  updataRefundStatus,
-  updatePrinted
-} from "@/api/refund";
 import { getCustomerInfo } from "@/api/orderListASP";
 import {
   GetAllCompensationOld,
@@ -312,19 +306,6 @@ export default {
     //初始化角标
     async initBadge() {
       this.$root.$emit('refreshBadgeIcon','refund');
-      // //let _refund = await getAllRefund({
-      // let _refund = await GetAllCompensation({
-      //   CID: this.cid,
-      //   page: 1,
-      //   number: 10000,
-      //   startDate: "0001/1/1",
-      //   endDate: "9999/12/31",
-      //   state: "CUSTOMERAFFIRM"
-      // });
-      // this.changeBadge({
-      //   name: "refund",
-      //   index: _refund.count
-      // });
     },
     //按条件搜索
     searchRefund() {
@@ -348,7 +329,6 @@ export default {
         obj.endDate = obj.endDate + " 23:59:59";
       }
       let filter = this.$options.filters["propertyFilter"];
-      //getAllRefund(filter(obj))
       GetAllCompensationOld(filter(obj))
         .then(res => {
           this.tableData = res.data;
@@ -434,7 +414,6 @@ export default {
           id: data.ID,
           state: "ONCREATE"
         };
-        //updataRefundStatus(obj)
         UpdateState(obj)
           .then(res => {
             this.$alert("撤回成功", "提示", {
@@ -453,7 +432,6 @@ export default {
             }).catch(() => {});
           });
       } else if (method === "delete") {
-        //deleteRefund({
         DeleteCompensation({
           id: data.ID
         })
@@ -495,7 +473,6 @@ export default {
     },
     //修改打印标记
     changePrinted(value, index) {
-      //updatePrinted({
       UpdatePrintedById({
         id: value.ID,
         printed: value.PRINTED ? "0" : "1"

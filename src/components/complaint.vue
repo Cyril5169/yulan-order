@@ -386,7 +386,7 @@ import {
     GetCustomerName,
     GetQtyDeliver,
     CheckOrderAndItemNo
-} from "@/api/complaint";
+} from "@/api/complaintASP";
 import { mapMutations } from "vuex";
 import Cookies from "js-cookie";
 export default {

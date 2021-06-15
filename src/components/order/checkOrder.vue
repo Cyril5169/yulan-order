@@ -56,20 +56,16 @@
         </el-dialog>
       </el-dialog>
       <!-- 查看使用记录 -->
-      <el-dialog :title="'优惠券使用记录[券号:' + useTable.couponId + ']'" :visible.sync="dialogUse" width="60%" top="5vh">
+      <el-dialog :title="'优惠券使用记录[券号:' + couponId + ']'" :visible.sync="dialogUse" width="1000px" top="5vh">
         <keep-alive>
-          <useRecordDetail v-if="dialogUse" :useTable="useTable"></useRecordDetail>
+          <useRecordDetail v-if="dialogUse" :couponId="couponId"></useRecordDetail>
         </keep-alive>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="dialogUse = false">关闭</el-button>
-        </span>
       </el-dialog>
       <!-- 查看返利记录 -->
       <el-dialog :title="'优惠券返利记录[券号:' + backTable.couponId + ']'" :visible.sync="dialogBack" width="60%" top="5vh">
-        <couponRecordDetail :backTable="backTable"></couponRecordDetail>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="dialogBack = false">关闭</el-button>
-        </span>
+        <keep-alive>
+          <couponRecordDetail v-if="dialogBack" :backTable="backTable"></couponRecordDetail>
+        </keep-alive>
       </el-dialog>
       <!-- 维护购买人 -->
       <el-dialog :visible.sync="buyUserVisible" title="管理购买用户" :close-on-click-modal="false" width="1000px">
@@ -203,15 +199,15 @@
           <br />
           <br />
           <span>选择地区：</span>
-          <el-select @change="getCity3" style="width:250px;" v-model="ctm_order.buyUserArea1" placeholder="请选择省份">
+          <el-select @change="getCity3" style="width:253px;" v-model="ctm_order.buyUserArea1" placeholder="请选择省份">
             <el-option v-for="(item, index) in provinceData" :key="index" :label="item.regionName" :value="item.regionName">
             </el-option>
           </el-select>
-          <el-select @change="getCountry3" style="width:250px;" v-model="ctm_order.buyUserArea2" placeholder="请选择城市">
+          <el-select @change="getCountry3" style="width:253px;" v-model="ctm_order.buyUserArea2" placeholder="请选择城市">
             <el-option v-for="(item, index) in cityData" :key="index" :label="item.regionName" :value="item.regionName">
             </el-option>
           </el-select>
-          <el-select style="width:250px;" v-model="ctm_order.buyUserArea3" placeholder="请选择县区">
+          <el-select style="width:254px;" v-model="ctm_order.buyUserArea3" placeholder="请选择县区">
             <el-option v-for="(item, index) in countryData" :key="index" :label="item.regionName" :value="item.regionName">
             </el-option>
           </el-select>
@@ -258,12 +254,13 @@
           <el-input style="width:400px" v-model="ctm_order.projectNo" placeholder="请输入工程报备单号"></el-input>
         </fieldset>
       </div>
+      <!-- 查看大图 -->
       <el-dialog :visible.sync="dialogImageVisible">
         <img width="100%" :src="dialogImageUrl" alt="" />
       </el-dialog>
-      <el-table :data="order_details" border style="width: 100%" :row-class-name="tableRowClassName">
+      <!-- 明细 -->
+      <el-table :data="order_details" border :row-class-name="tableRowClassName">
         <el-table-column prop="itemNo" align="center" label="型号"></el-table-column>
-        <!-- :formatter="FixIt"  -->
         <el-table-column align="center" label="数量">
           <template slot-scope="scope1">
             <span>{{ scope1.row.qtyRequired }}</span>
@@ -308,77 +305,70 @@
           </template>
         </el-table-column>
       </el-table>
-    </el-card>
-    <!-- 使用优惠券 -->
-    <el-card shadow="never">
-      <el-collapse v-model="activeNames">
-        <el-collapse-item title="使用优惠券/礼品卡" name="1">
-          <div v-for="(item, index) of couponData" :key="index"
-            :class="canUseConpon(item) ? switchClass.cctv : switchClass.cctvF">
-            <div class="couponHead">
-              <div :class="canUseConpon(item) ? switchClass.logo : switchClass.logoF"></div>
-              <div class="logoTxt">
-                <p style="color:white; font-size:15px; padding-top:5px; font-weight:bold; letter-spacing:2px;">
-                  {{ item.notes }}
-                </p>
-                <span>总返利&nbsp;{{ item.rebateMoney }}元</span>
-                <span class="rightCoupon">券号：{{ item.id }}</span>
-              </div>
-            </div>
 
-            <div class="couponBody">
-              <p style="text-align:center" :class="
-                  canUseConpon(item) ? switchClass.transTxt : switchClass.transTxtF
-                ">
-                <span style="font-size:18px;">余额￥</span>
-                <span v-if="isManager === '0'">***</span>
-                <span v-else>{{ item.rebateMoneyOver }}</span>
-              </p>
-              <div style="margin:0 auto; width:245px;">
-                <div :class="
-                    canUseConpon(item)
-                      ? switchClass.roundedRectangle
-                      : switchClass.roundedRectangleF
-                  ">
-                  <p>
-                    &nbsp;&nbsp;&nbsp;有效期：{{
-                      item.dateStart | datatrans
-                    }}至{{ item.dateEnd | datatrans }}
-                  </p>
+      <!-- 使用优惠券 -->
+      <el-collapse v-model="activeNames" v-if="couponDataGroup.length > 0">
+        <el-collapse-item title="使用优惠券" name="1">
+          <div v-if="couponDataGroup.length > 1" style="color:red;">不同分组优惠券不能同时使用!</div>
+          <div v-for="(couponList, couponIndex) in couponDataGroup" :key="couponIndex">
+            <div v-if="couponDataGroup.length > 1">分组{{couponList.group}}</div>
+            <div v-for="(item, index) in couponList.value" :key="index" class="coupon-card"
+              :class="{'coupon-card-uneffect': !canUseCoupon(item)}">
+              <div class="couponHead">
+                <div class="coupon-logo" :class="{'coupon-logo-uneffect': !canUseCoupon(item)}"></div>
+                <div class="logoTxt">
+                  <div class="head-title">
+                    {{ item.NOTES }}
+                  </div>
+                  <span>总返利&nbsp;{{ item.REBATE_MONEY }}元</span>
+                  <span class="rightCoupon">券号：{{ item.ID }}</span>
                 </div>
-                <el-checkbox :disabled="!canUseConpon(item)" v-model="couponStatus[index]" @change="
-                    changeCoupon(couponStatus[index], item.id, item.rebateType)
-                  "></el-checkbox>
               </div>
-              <p style="text-align:center;">适用：{{ item.application }}</p>
-              <div class="Record" style="text-align:center">
-                <span @click="RecordUse(item.id)" style="cursor: pointer;">查看使用记录>>&nbsp;&nbsp;&nbsp;</span>
-                <span @click="RecordBack(item.id)" style="cursor: pointer;">查看返利记录>></span>
+
+              <div class="couponBody">
+                <div class="over-money" :class="canUseCoupon(item) ? 'over-money-effect' : 'over-money-uneffect'">
+                  <span style="font-size:20px;">余额￥</span>
+                  <span v-if="isManager === '0'">***</span>
+                  <span v-else>{{ item.REBATE_MONEY_OVER }}</span>
+                </div>
+                <div>
+                  <div class="valid-date" :class="{'valid-date-uneffect': !canUseCoupon(item)}">
+                    有效期：{{item.DATE_START | dateFilter}}&nbsp;至&nbsp;{{ item.DATE_END | dateFilter }}
+                  </div>
+                  <el-checkbox :disabled="!canUseCoupon(item)" v-model="item.checked" @change="changeCoupon($event, item)">
+                  </el-checkbox>
+                </div>
+                <div>适用：{{ item.APPLICATION }}</div>
+                <div>
+                  <span @click="getRecordUseData(item.ID)" class="record-text">查看使用记录>>&nbsp;&nbsp;&nbsp;</span>
+                  <span @click="RecordBack(item.ID)" class="record-text">查看返利记录>></span>
+                </div>
               </div>
-            </div>
-            <div style="margin-left:20px;" v-if="!canUseConpon(item)">
-              由于活动："{{ canNotUseActivity(item) }}"，该优惠券无法使用
+              <div style="margin-left:20px;" v-if="!canUseCoupon(item)">
+                由于活动："{{ canNotUseActivity(item) }}"，该优惠券无法使用
+              </div>
             </div>
           </div>
         </el-collapse-item>
       </el-collapse>
+      <div v-else style="margin:5px 0 0 5px">无可用优惠券</div>
 
       <div class="rightDiv">
-        <p>
+        <div>
           折后总金额：
           <span v-if="isManager === '0'">***</span>
           <span v-else>{{ totalPrice | priceFilter }}</span>
-        </p>
-        <p>
+        </div>
+        <div>
           总返利：
           <span v-if="isManager === '0'">***</span>
           <span v-else>{{ backPrice | priceFilter }}</span>
-        </p>
-        <p>
+        </div>
+        <div>
           应付总金额：
           <span v-if="isManager === '0'">***</span>
           <span v-else>{{ allSpend | priceFilter }}</span>
-        </p>
+        </div>
         <el-button @click="backToOrder" size="medium" type="success" plain>返回订单</el-button>
         <el-button v-if="curtainStatus == '0'" @click="payIt" size="medium" type="danger" plain>立即提交</el-button>
         <el-button v-if="curtainStatus == '3'" @click="payNew" size="medium" type="danger" plain>确认提交</el-button>
@@ -391,11 +381,10 @@
 import Cookies from "js-cookie";
 import { addAddress } from "@/api/orderList";
 import { usetheCoupon } from "@/api/orderList";
-import { querycharge } from "@/api/orderList";
-import { searchTickets } from "@/api/orderList";
 import { deleteAddress } from "@/api/orderList";
 import { editAddress } from "@/api/orderList";
 import { CouponbackRecord } from "@/api/orderList";
+import { GetCanUseCoupon } from "@/api/couponASP";
 import {
   orderSettlement,
   normalOrderSettlement,
@@ -446,9 +435,8 @@ export default {
           { required: true, message: "请填写电话", trigger: "blur" },
         ],
       },
-      useTable: [],
+      couponId: "",
       backTable: [],
-      couponStatus: [false, false],
       product_group_tpye: "", //类型
       //获取地址
       transferData: [],
@@ -530,6 +518,8 @@ export default {
       array: [],
       activeNames: ["1"],
       couponData: [],
+      couponDataGroup: [],
+      selectCouponGroup: "",
       rebateY: "",
       rebateM: "",
       chargeData: {
@@ -545,16 +535,6 @@ export default {
             trigger: "blur",
           },
         ],
-      },
-      switchClass: {
-        cctv: "cctv",
-        cctvF: "cctvF",
-        logo: "logo",
-        logoF: "logoF",
-        transTxt: "transTxt",
-        transTxtF: "transTxtF",
-        roundedRectangle: "roundedRectangle",
-        roundedRectangleF: "roundedRectangleF",
       },
       dialogImageUrl: "",
       dialogImageVisible: false,
@@ -573,22 +553,6 @@ export default {
         realVal = 0.0;
       }
       return realVal;
-    },
-    datatrans(value) {
-      //时间戳转化大法
-      let date = new Date(value);
-      let y = date.getFullYear();
-      let MM = date.getMonth() + 1;
-      MM = MM < 10 ? "0" + MM : MM;
-      let d = date.getDate();
-      d = d < 10 ? "0" + d : d;
-      let h = date.getHours();
-      h = h < 10 ? "0" + h : h;
-      let m = date.getMinutes();
-      m = m < 10 ? "0" + m : m;
-      let s = date.getSeconds();
-      s = s < 10 ? "0" + s : s;
-      return y + "-" + MM + "-" + d + " "; /* + h + ':' + m + ':' + s; */
     },
     nameTrans(value) {
       if (value == "year") {
@@ -666,34 +630,98 @@ export default {
       } else return "--";
     },
     //单选框使用优惠券
-    changeCoupon(index, id, type) {
-      if (type == "year" && index == true) {
-        this.rebateY = id;
-      } else if (type == "year" && index == false) {
-        this.rebateY = "";
-      } else if (type == "month" && index == true) {
-        this.rebateM = id;
-      } else if (type == "month" && index == false) {
-        this.rebateM = "";
-      }
-      var url = "/order/showRebate.do"; //接口
-      this.ctm_order.allSpend = this.totalPrice;
-      var data = {
-        product_group_tpye: this.product_group_tpye,
-        promotion_cost: this.totalPrice,
-        rebateY: this.rebateY,
-        rebateM: this.rebateM,
-        cid: Cookies.get("cid"),
-        ctm_orders: this.order_details,
-        ctm_order: this.ctm_order,
-      };
-      usetheCoupon(url, data).then((res) => {
-        for (var i = 0; i < res.data.rebate.length; i++) {
-          this.order_details[i].nianfanli = res.data.rebate[i].rebateYear;
-          this.order_details[i].yuefanli = res.data.rebate[i].rebateMonth;
+    changeCoupon(checked, coupon) {
+      if (checked) {
+        //判断当前勾选的组
+        if (this.selectCouponGroup != coupon.GROUP_TYPE) {
+          //取消之前的勾选
+          var oneCouponGroupData = this.couponData.filter(item => item.GROUP_TYPE == this.selectCouponGroup);
+          for (var i = 0; i < oneCouponGroupData.length; i++) {
+            oneCouponGroupData[i].checked = false;
+          }
+        } else {
+          //看选择的返利券是否超过金额,不给多选
+          if (this.totalPrice == this.backPrice) {
+            var thisCoupon = this.couponData.filter(item => item.ID == coupon.ID);
+            thisCoupon[0].checked = false;
+          }
         }
-        this.backPrice = res.data.allRebateMonth + res.data.allRebateYear;
-      });
+      }
+      //根据选择的数据进行计算返利
+      this.rebateY = "";
+      var money_y = 0;
+      this.rebateM = "";
+      var money_m = 0;
+      var promotion_money = 0;
+      var selectCoupon = this.couponData.filter(item => item.checked);
+      this.selectCouponGroup = "";
+      for (var i = 0; i < selectCoupon.length; i++) {
+        if (selectCoupon[i].REBATE_TYPE == "year") {
+          this.rebateY = selectCoupon[i].ID;
+          money_y = selectCoupon[i].REBATE_MONEY_OVER;
+        } else if (selectCoupon[i].REBATE_TYPE == "month") {
+          this.rebateM = selectCoupon[i].ID;
+          money_m = selectCoupon[i].REBATE_MONEY_OVER;
+        }
+        this.selectCouponGroup = selectCoupon[i].GROUP_TYPE; //赋值分组
+      }
+      this.ctm_order.allSpend = this.totalPrice;
+      //优惠券分摊
+      for (var i = 0; i < this.order_details.length; i++) {
+        var oneDetails = this.order_details[i];
+        oneDetails.yuefanli = 0;
+        oneDetails.nianfanli = 0;
+      }
+      var allRebateMonth = 0;
+      var allRebateYear = 0;
+      //两步走，先分摊月券
+      if (money_m > 0) {
+        //先算出需要分担的金额
+        var shouldSharePrice = this.totalPrice <= money_m ? this.totalPrice : money_m;
+        for (var i = 0; i < this.order_details.length; i++) {
+          var oneDetails = this.order_details[i];
+          if (i != this.order_details.length - 1) {
+            oneDetails.yuefanli = this.getBackMoney(this.totalPrice, shouldSharePrice, oneDetails.promotionCost)
+          } else {
+            oneDetails.yuefanli = shouldSharePrice.sub(allRebateMonth);
+          }
+          allRebateMonth = allRebateMonth.add(oneDetails.yuefanli);
+        }
+      }
+      //然后分摊年券
+      if (money_y > 0 && this.totalPrice.sub(allRebateMonth) > 0) {
+        //先算出需要分担的金额
+        var shouldSharePrice = (this.totalPrice.sub(allRebateMonth)) <= money_y ? this.totalPrice.sub(allRebateMonth) : money_y;
+        for (var i = 0; i < this.order_details.length; i++) {
+          var oneDetails = this.order_details[i];
+          if (i != this.order_details.length - 1) {
+            oneDetails.nianfanli = this.getBackMoney(this.totalPrice, shouldSharePrice, oneDetails.promotionCost)
+          } else {
+            oneDetails.nianfanli = shouldSharePrice.sub(allRebateYear);
+          }
+          allRebateYear = allRebateYear.add(oneDetails.nianfanli);
+        }
+      }
+
+      this.backPrice = allRebateMonth.add(allRebateYear);
+    },
+    getBackMoney(promotion_cost, money, thisMoney) {
+      var backMoney = 0;
+      if (money != 0) {
+        backMoney = this.dosageFilter(thisMoney * money / promotion_cost);
+      }
+      return backMoney;
+    },
+    getLastBackMoney(allMoney, lastAllMoney, thisMoney) {
+      if (allMoney == 0) {
+        return allMoney;
+      }
+      if (allMoney - lastAllMoney > thisMoney) {
+        return thisMoney;
+      }
+      else {
+        return allMoney - lastAllMoney;
+      }
     },
     //获取优惠券
     _getTickets() {
@@ -703,19 +731,17 @@ export default {
         companyId: Cookies.get("companyId"),
         typeId: this.product_group_tpye,
       };
-      searchTickets(url, data).then((res) => {
+      GetCanUseCoupon({ companyId: Cookies.get("companyId") }).then((res) => {
         this.couponData = res.data;
-        for (let i = 0; i < this.couponData.length; i++) {
-          if (
-            this.couponData[i].dateId === 0 ||
-            this.couponData[i].rebateMoneyOver <= 0
-          ) {
-            this.couponData.splice(i, 1);
-          }
+        for (var i = 0; i < this.couponData.length; i++) {
+          this.$set(this.couponData[i], "checked", false);
         }
+        //按照组别进行分组
+        this.couponDataGroup = this.groupBy(this.couponData, "GROUP_TYPE");
+        console.log(this.couponDataGroup)
       });
     },
-    canUseConpon(couponData) {
+    canUseCoupon(couponData) {
       for (var i = 0; i < this.order_details.length; i++) {
         if (
           this.order_details[i].activityId &&
@@ -726,7 +752,7 @@ export default {
             return false;
           }
           if (
-            couponData.rebateType != onePro.REBATE_TYPE &&
+            couponData.REBATE_TYPE != onePro.REBATE_TYPE &&
             onePro.REBATE_TYPE != "all"
           ) {
             return false;
@@ -746,7 +772,7 @@ export default {
             return onePro.ORDER_NAME;
           }
           if (
-            couponData.rebateType != onePro.REBATE_TYPE &&
+            couponData.REBATE_TYPE != onePro.REBATE_TYPE &&
             onePro.REBATE_TYPE != "all"
           ) {
             return onePro.ORDER_NAME;
@@ -755,23 +781,26 @@ export default {
       }
       return "";
     },
-    RecordUse(itemID) {
-      this.useTable = [];
-      var url = "/order/findRecrods.do";
-      var data = {
-        couponId: itemID,
-        keyWords: "",
-        beginTime: "0001/1/1",
-        finishTime: "9999/12/31",
-        page: 1,
-        limit: 20,
-      };
-      getUseRecord(data).then((res) => {
-        this.useTable = res.data;
-        this.useTable.couponId = itemID;
-        this.useTable.count = res.count;
-        this.dialogUse = true;
+    //单列的groupby
+    groupBy(array, name, filterMethod = function (a) { return a }) {
+      let groups = [];
+      array.forEach((item) => {
+        let groupName = filterMethod(item[name]);
+        var hasgroup = groups.filter((item) => item.group == groupName);
+        if (hasgroup.length) {
+          hasgroup[0].value.push(item);
+        } else {
+          groups.push({
+            group: groupName,
+            value: [item],
+          });
+        }
       });
+      return groups;
+    },
+    getRecordUseData(itemID) {
+      this.couponId = itemID;
+      this.dialogUse = true;
     },
     RecordBack(itemId) {
       var url = "/order/getReturnRecord.do";
@@ -1223,7 +1252,7 @@ export default {
       };
       orderSettlement(data2).then((res) => {
         this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
-        if(this.newCurtainStatus == "1")
+        if (this.newCurtainStatus == "1")
           this.$root.$emit("refreshBadgeIcon", "newCurtainCount");
         else
           this.$root.$emit("refreshBadgeIcon", "curtainCount");
@@ -1355,12 +1384,10 @@ export default {
     },
     //查询经办人
     chargeQuery() {
-      var url = "/order/getlink.do";
       var data = {
         cid: Cookies.get("cid"),
         companyId: Cookies.get("companyId"),
       };
-      //querycharge(url, data).then(res => {
       getCustomerInfo(data).then((res) => {
         this.chargeData = res.data;
       });
@@ -1817,84 +1844,66 @@ export default {
   font-size: 18px;
 }
 
-.roundedRectangle {
-  display: inline-block;
-  height: 30px;
-  line-height: 30px;
-  margin: 0 auto;
-  color: white;
-  width: 225px;
-  background: rgb(253, 85, 56);
-  border-width: 10px; /*边缘的宽度*/
-  border-radius: 15px; /*圆角的大小 */
-}
-.roundedRectangleF {
-  display: inline-block;
-  height: 30px;
-  line-height: 30px;
-  margin: 0 auto;
-  color: white;
-  width: 225px;
-  background: gray;
-  border-width: 10px; /*边缘的宽度*/
-  border-radius: 15px; /*圆角的大小 */
-}
-.cctv {
-  background: url("../../assets/img/coupon/coupon.png");
-  width: 350px;
-  height: 230px;
-  margin-right: 10%;
-  background-size: 100%;
-  background-repeat: no-repeat;
-  display: inline-block;
-}
-.cctvF {
-  background: url("../../assets/img/coupon/blackCoupon.png");
-  width: 350px;
-  height: 230px;
-  margin-right: 10%;
-  background-size: 100%;
-  background-repeat: no-repeat;
-  display: inline-block;
-}
 .couponHead {
-  height: 50px;
+  height: 58px;
 }
 .couponBody {
-  height: 170px;
-  margin-top: 5px;
+  height: 160px;
+  text-align: center;
+  box-sizing: border-box;
 }
-.logo {
-  background: url("../../assets/img/coupon/logopng.png");
+.coupon-card {
+  width: 369px;
+  height: 219px;
+  margin: 0 50px 20px 0;
+  background: url("../../assets/img/coupon/coupon.png") no-repeat;
+  background-size: 100% 100%;
+  display: inline-block;
+}
+.coupon-card-uneffect {
+  background: url("../../assets/img/coupon/blackCoupon.png");
+  background-size: 100% 100%;
+}
+.coupon-logo {
   width: 40px;
   height: 40px;
-  background-size: 100%;
-  background-repeat: no-repeat;
+  background: url("../../assets/img/coupon/logopng.png") no-repeat;
+  background-size: 100% 100%;
   border-radius: 50%;
   float: left;
-  margin-top: 10px;
-  margin-left: 5%;
-  margin-right: 3%;
+  margin-top: 8px;
+  margin-left: 15px;
+  margin-right: 10px;
 }
-.logoF {
+.coupon-logo-uneffect {
   background: url("../../assets/img/coupon/blackLogo.jpg");
-  width: 40px;
-  height: 40px;
-  background-size: 100%;
-  background-repeat: no-repeat;
-  border-radius: 50%;
-  float: left;
-  margin-top: 10px;
-  margin-left: 5%;
-  margin-right: 3%;
+  background-size: 100% 100%;
+}
+.head-title {
+  color: white;
+  font-size: 18px;
+  padding-top: 5px;
+  font-weight: bold;
+  letter-spacing: 2px;
 }
 .logoTxt span {
   display: inline-block;
   color: white;
 }
-.transTxt {
+.rightCoupon {
+  float: right;
+  margin-right: 10px;
+}
+.over-money {
   font-size: 40px;
   font-weight: bold;
+  margin: 5px 0;
+  height: 45px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.over-money-effect {
   background: -webkit-linear-gradient(
     left,
     rgb(253, 59, 49) 22%,
@@ -1905,16 +1914,28 @@ export default {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-.transTxtF {
-  font-size: 40px;
-  font-weight: bold;
+.over-money-uneffect {
   color: rgb(180, 180, 180);
 }
-.rightCoupon {
-  float: right;
-  margin-right: 10px;
+.valid-date {
+  display: inline-block;
+  height: 30px;
+  line-height: 30px;
+  padding: 0 20px;
+  margin: 5px 0;
+  color: white;
+  background: rgb(253, 85, 56);
+  border-width: 10px;
+  border-radius: 15px;
 }
-.Record span:hover {
+.valid-date-uneffect {
+  background: gray;
+}
+.record-text {
+  margin: 0 5px;
+  cursor: pointer;
+}
+.record-text:hover {
   color: orange;
 }
 </style>

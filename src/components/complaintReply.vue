@@ -414,7 +414,7 @@ import {
   addSubmit,
   editSubmit,
   CheckDetailByID
-} from "@/api/complaint";
+} from "@/api/complaintASP";
 import { mapMutations } from "vuex";
 import Cookies from "js-cookie";
 export default {

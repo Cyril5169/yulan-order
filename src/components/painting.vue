@@ -209,15 +209,12 @@
 <script>
 import {
   getPaintingList,
-  getIconNumber,
   changeStatus,
   getWaterNumber,
   AddImage
 } from "@/api/painting";
 import { mapMutations, mapActions } from "vuex";
 import Cookies from "js-cookie";
-//const Quest = 'http://106.14.159.244:8080/yulan-capital';
-//const Head = 'http://106.14.159.244:8080/upload';
 //玉兰
 const Quest = "http://14.29.223.114:10250/yulan-capital";
 const Head = "http://14.29.223.114:10250/upload";
@@ -319,22 +316,6 @@ export default {
     //角标更新
     IconReflash() {
       this.$root.$emit('refreshBadgeIcon','painting');
-      // let IconNum = 0;
-      // let data = {
-      //   cid: Cookies.get("cid"),
-      //   page: 1,
-      //   limit: 999,
-      //   startDate: "",
-      //   endDate: "",
-      //   state: "CUSTOMERAFFIRM"
-      // };
-      // getIconNumber(data).then(res => {
-      //   IconNum = res.airbrushDesignerAssureList.length;
-      //   this.changeBadge({
-      //     name: "painting",
-      //     index: IconNum
-      //   });
-      // });
     },
     //同意与否
     _changeStatus(YN) {

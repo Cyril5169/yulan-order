@@ -124,8 +124,6 @@
 <script>
 import Cookies from "js-cookie";
 import { mapMutations, mapActions } from "vuex";
-import { mapState } from "vuex";
-import { findItemActivity } from "@/api/findActivity";
 import { updateShoppingCar, updateShopPrice } from "@/api/shop";
 import { getItemById, GetPromotionByItem } from "@/api/orderListASP";
 

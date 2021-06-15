@@ -41,10 +41,12 @@
           <div style="display:inline-block;vertical-align:top;margin-left:20px;">
             <div>
               <span>归属月份</span>
-              <el-date-picker value-format="yyyy-MM-dd" placeholder="开始日期区间" :picker-options="pickerOptions1" v-model="beginTime" style="width:150px" type="month">
+              <el-date-picker value-format="yyyy-MM-dd" placeholder="开始日期区间" :picker-options="pickerOptions1" v-model="beginTime"
+                style="width:150px" type="month">
               </el-date-picker>
               &nbsp;--
-              <el-date-picker value-format="yyyy-MM-dd" placeholder="结束日期区间" :picker-options="pickerOptions2" v-model="finishTime" style="width:150px;" type="month"></el-date-picker>
+              <el-date-picker value-format="yyyy-MM-dd" placeholder="结束日期区间" :picker-options="pickerOptions2" v-model="finishTime"
+                style="width:150px;" type="month"></el-date-picker>
             </div>
             <!-- <div style="margin-top:20px;">
               <span>订单状态</span>
@@ -76,7 +78,7 @@
             </el-table-column>
             <el-table-column label="客户名称" align="center" width="350px">
               <template slot-scope="scope">
-                <el-button size="mini" @click="getCustomerInfo(scope.row)" type="text">{{ scope.row.CUSTOMER_NAME }}
+                <el-button size="mini" @click="getCustomerInfoClick(scope.row)" type="text">{{ scope.row.CUSTOMER_NAME }}
                 </el-button>
               </template>
             </el-table-column>
@@ -174,9 +176,9 @@
           <tr>
             <td style="width:150px">优惠券余额：</td>
             <td v-if="couponData.length">
-              <span v-for="item of couponData" :key="item.index">
-                {{item.id}}: ￥{{item.rebateMoneyOver}}
-              </span>
+              <div v-for="item of couponData" :key="item.index">
+                {{item.ID}}: ￥{{item.REBATE_MONEY_OVER}}
+              </div>
             </td>
             <td v-else>
               <span style="color:red;">当前无生效优惠券</span>
@@ -194,8 +196,8 @@
 
 <script>
 import checkExamine from "../order/checkExamine";
+import { GetCanUseCoupon } from "@/api/couponASP";
 import Cookies from "js-cookie";
-import { manageCoupon } from "@/api/orderList";
 import {
   getAreaCode,
   getDistrictByAreaCode,
@@ -526,19 +528,15 @@ export default {
       Cookies.set("status_ID", -2);
       this.orderVisible = true;
     },
-    async getCustomerInfo(val) {
+    async getCustomerInfoClick(val) {
       var data = {
         cid: "",
         companyId: val.CUSTOMER_CODE
       };
       var res = await getResideMonery({ companyId: val.CUSTOMER_CODE });
       this.moneySituation = res.data;
-      var url = "/order/findRebate.do";
-      var res2 = await manageCoupon(url, data);
+      var res2 = await GetCanUseCoupon({ companyId: val.CUSTOMER_CODE });
       this.couponData = res2.data;
-      this.couponData = this.couponData.filter(
-        item => item.dateId == 1 && item.rebateMoneyOver > 0 && item.status == 1
-      );
       var res3 = await getCustomerInfo(data);
       this.customerInfo = res3.data;
       this.customerDetailVisible = true;

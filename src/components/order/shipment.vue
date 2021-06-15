@@ -341,9 +341,8 @@
 
 <script>
 import Axios from "axios";
-import { addSubmit } from "@/api/complaint";
+import { addSubmit } from "@/api/complaintASP";
 import Cookies from "js-cookie";
-import { getShipment } from "@/api/orderList";
 import {
   getPackDetailInfo,
   getReturnInfo,

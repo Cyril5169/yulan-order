@@ -1,16 +1,6 @@
 import { get, post, patch, put} from './http'
 import Axios from 'axios'
 
-//获取用户的购物车信息
-export function getUserMarket(data){
-    return Axios.get('/cart/getAllCartByCID.do',{
-        params: data
-    }).then(res =>{
-        return Promise.resolve(res);
-    }).catch(err =>{
-        console.log(err);
-    })
-}
 //添加入购物车
 export function addShoppingCar(data){
     return Axios.post('/cart/addCartItem.do',data).then((res) =>{

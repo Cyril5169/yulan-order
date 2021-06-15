@@ -8,11 +8,3 @@ export function userLogin(data) {
         return Promise.reject(err);
     })
 }
-//获取用户当前余额情况
-export function getUserMoney(data, config = {}) {
-    return post('/order/getResidemoney.do', data, config).then((res) => {
-        return Promise.resolve(res);
-    }).catch((err) => {
-        return Promise.reject(err);
-    })
-}

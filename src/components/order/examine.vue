@@ -138,7 +138,6 @@
 </template>
 
 <script>
-import { getOrderlist, getExamineOrder } from "@/api/orderList";
 import {
   getCurtainOrders,
   updateCurtainOrder,

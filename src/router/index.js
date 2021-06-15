@@ -63,6 +63,7 @@ import ljAfterSaleExamine from '@/components/aftersale/ljAfterSaleExamine'
 import safeStock from '@/components/purplan/safeStock'
 import basePlan from '@/components/purplan/basePlan'
 import purPlan from '@/components/purplan/purPlan'
+import supplyPurPlan from '@/components/purplan/supplyPurPlan'
 
 Vue.use(Router)
 
@@ -447,6 +448,14 @@ const router = new Router({
           path: '/purplan/purPlan',
           name: 'purPlan',
           component: purPlan,
+          meta: {
+            isFlex: true //flex布局
+          }
+        },
+        {
+          path: '/purplan/supplyPurPlan',
+          name: 'supplyPurPlan',
+          component: supplyPurPlan,
           meta: {
             isFlex: true //flex布局
           }

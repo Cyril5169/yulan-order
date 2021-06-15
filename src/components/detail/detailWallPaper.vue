@@ -114,8 +114,6 @@
 <script>
 import Cookies from "js-cookie";
 import { mapMutations, mapActions } from "vuex";
-import { mapState } from "vuex";
-import { findItemActivity } from "@/api/findActivity";
 import { updateShoppingCar, updateShopPrice } from "@/api/shop";
 import { getItemById, GetPromotionByItem } from "@/api/orderListASP";
 import { GetItemStoreCheckData } from "@/api/itemInfoASP";
@@ -158,34 +156,31 @@ export default {
       if (this.data.activityEffective === false) {
         this.data.activityId = this.data.activityName;
       }
-      //findItemActivity({
       GetPromotionByItem({
-        //CID: this.cid,
         cid: this.cid,
         customerType: this.customerType,
         itemNo: this.data.item.itemNo,
         itemVersion: this.data.item.itemVersion,
         productType: this.data.item.productType,
         productBrand: this.data.item.productBrand
+      }).then(res => {
+        if (res.data.length === 0 && this.data.activityEffective !== false) {
+          this.disableFlag = true;
+        } else {
+          this.disableFlag = false;
+        }
+        for (var i = 0; i < res.data.length; i++) {
+          var obj = {
+            label: res.data[i].ORDER_TYPE + " -- " + res.data[i].ORDER_NAME,
+            value: res.data[i].P_ID
+          };
+          this.activity.push(obj);
+        }
+        this.activity.push({
+          label: "不参与活动",
+          value: ""
+        });
       })
-        .then(res => {
-          if (res.data.length === 0 && this.data.activityEffective !== false) {
-            this.disableFlag = true;
-          } else {
-            this.disableFlag = false;
-          }
-          for (var i = 0; i < res.data.length; i++) {
-            var obj = {
-              label: res.data[i].ORDER_TYPE + " -- " + res.data[i].ORDER_NAME,
-              value: res.data[i].P_ID
-            };
-            this.activity.push(obj);
-          }
-          this.activity.push({
-            label: "不参与活动",
-            value: ""
-          });
-        })
         .catch(err => {
           console.log(err);
         });

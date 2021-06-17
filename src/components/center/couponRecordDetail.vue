@@ -1,59 +1,49 @@
 <template>
   <div>
-    <el-table
-      empty-text="暂无返利记录"
-      :data="rebateRecordData"
-      style="width: 100%"
-      :row-class-name="tableRowClassName"
-    >
+    <el-table empty-text="暂无返利记录" :data="rebateRecordData" style="width: 100%" :row-class-name="tableRowClassName">
       <el-table-column align="center" label="优惠券类型">
         <template slot-scope="scope1">
-          <span>{{scope1.row.rebateType |nameTrans}}</span>
+          <span>{{scope1.row.REBATE_TYPE |nameTrans}}</span>
         </template>
       </el-table-column>
       <el-table-column align="center" label="创建日期">
         <template slot-scope="scope1">
-          <span>{{scope1.row.dateCre |datatrans}}</span>
+          <span>{{scope1.row.DATE_CRE |dateFilter}}</span>
         </template>
       </el-table-column>
       <el-table-column align="center" label="有效期" width="200">
         <template slot-scope="scope1">
-          <span>{{scope1.row.dateStart |datatrans}}至{{scope1.row.dateEnd |datatrans}}</span>
+          <span>{{scope1.row.DATE_START |dateFilter}}至{{scope1.row.DATE_END |dateFilter}}</span>
         </template>
       </el-table-column>
       <el-table-column align="center" label="返利金额">
         <template slot-scope="scope1">
           <span v-if="isManager === '0'">***</span>
-          <span v-else>{{scope1.row.returnMoney}}</span>
+          <span v-else>{{scope1.row.RETURN_MONEY}}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="notes" align="center" label="备注说明"></el-table-column>
+      <el-table-column prop="NOTES" align="center" label="备注说明"></el-table-column>
     </el-table>
   </div>
 </template>
 
 <script>
 import Cookies from "js-cookie";
-import { CouponbackRecord } from "@/api/orderList";
+import { GetSalReturnRecord } from "@/api/couponASP";
 
 export default {
   name: "couponRecordDetail",
-  props: ["backTable"],
+  props: ["couponId"],
   data() {
     return {
       isManager: Cookies.get("isManager"),
       rebateRecordData: [],
-      couponId: '',
     };
   },
   methods: {
     getRebateRecord() {
       this.rebateRecordData = [];
-      var url = "/order/getReturnRecord.do";
-      var data = {
-        id: this.couponId
-      };
-      CouponbackRecord(url, data).then(res => {
+      GetSalReturnRecord({ couponId: this.couponId }).then(res => {
         this.rebateRecordData = res.data;
       });
     },
@@ -65,22 +55,6 @@ export default {
     }
   },
   filters: {
-    datatrans(value) {
-      //时间戳转化大法
-      let date = new Date(value);
-      let y = date.getFullYear();
-      let MM = date.getMonth() + 1;
-      MM = MM < 10 ? "0" + MM : MM;
-      let d = date.getDate();
-      d = d < 10 ? "0" + d : d;
-      let h = date.getHours();
-      h = h < 10 ? "0" + h : h;
-      let m = date.getMinutes();
-      m = m < 10 ? "0" + m : m;
-      let s = date.getSeconds();
-      s = s < 10 ? "0" + s : s;
-      return y + "-" + MM + "-" + d + " "; /* + h + ':' + m + ':' + s; */
-    },
     nameTrans(value) {
       if (value == "year") {
         return "年返券";
@@ -89,9 +63,8 @@ export default {
       } else return "其它券类";
     }
   },
-  activated(){
-    this.rebateRecordData = this.backTable;
-    this.couponId = this.backTable.couponId;
+  activated() {
+    this.getRebateRecord();
   }
 };
 </script>

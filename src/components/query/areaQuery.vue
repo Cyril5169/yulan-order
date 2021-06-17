@@ -67,7 +67,7 @@
         <hr />
         <div>
           <div style="font-size:15px;color:blue;margin:5px" v-if="sumOrderMoney > 0">
-            订单金额汇总：{{ sumOrderMoney }}元
+            任务金额汇总：{{ sumOrderMoney }}元
           </div>
           <!-- <el-table :data="customerOrderTaskData" border class="orderDataTable">
             <el-table-column type="index">
@@ -139,7 +139,7 @@
       </div>
       <div>
         <div style="font-size:15px;color:blue;margin:5px" v-if="getMoney > 0">
-          订单金额汇总：{{ getMoney }}元
+          任务金额汇总：{{ getMoney }}元
         </div>
         <el-table :summary-method="getSummaries" show-summary :data="customerOrderData" border highlight-current-row
           style="width: 100%;">

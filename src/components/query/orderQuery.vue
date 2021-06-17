@@ -65,7 +65,7 @@
         <hr />
         <div>
           <div style="font-size:15px;color:blue;margin:5px" v-if="sumOrderMoney > 0">
-            订单金额汇总：{{ sumOrderMoney }}元
+            任务金额汇总：{{ sumOrderMoney }}元
           </div>
           <el-table :data="customerOrderTaskData" border class="orderDataTable">
             <el-table-column type="index">
@@ -89,9 +89,11 @@
             </el-table-column>
             <el-table-column prop="ALL_SPEND" label="订单总额" align="center">
             </el-table-column>
+            <el-table-column prop="ALL_SPEND_CALCULATE" label="任务总额" align="center">
+            </el-table-column>
             <el-table-column label="任务差额" align="center">
               <template slot-scope="scope">
-                <span>{{scope.row.ASSIGNMENTS_TARGET.sub(scope.row.ALL_SPEND)}}</span>
+                <span>{{scope.row.ASSIGNMENTS_TARGET.sub(scope.row.ALL_SPEND_CALCULATE)}}</span>
               </template>
             </el-table-column>
             <el-table-column label="任务完成标记" prop="" align="center" :filters="[
@@ -100,7 +102,7 @@
               ]" :filter-method="filterHandler">
               <template slot-scope="scope">
                 <!-- 小于号eslint报错用&lt;代替 -->
-                <span>{{scope.row.ASSIGNMENTS_TARGET.sub(scope.row.ALL_SPEND) &lt;= 0 &&  scope.row.ASSIGNMENTS_TARGET > 0?'完成':''}}</span>
+                <span>{{scope.row.ASSIGNMENTS_TARGET.sub(scope.row.ALL_SPEND_CALCULATE) &lt;= 0 &&  scope.row.ASSIGNMENTS_TARGET > 0?'完成':''}}</span>
               </template>
             </el-table-column>
           </el-table>
@@ -108,7 +110,7 @@
       </div>
     </el-card>
     <!-- 订单汇总 -->
-    <el-dialog width="600px" :visible.sync="allOrderVisible">
+    <el-dialog width="800px" :visible.sync="allOrderVisible">
       <div style="font-size:18px">
         <div style="text-align:center;">
           客户名称：{{ selectOneCustomer.CUSTOMER_NAME }}
@@ -116,7 +118,7 @@
       </div>
       <div>
         <div style="font-size:15px;color:blue;margin:5px" v-if="getMoney > 0">
-          订单金额汇总：{{ getMoney }}元
+          任务金额汇总：{{ getMoney }}元
         </div>
         <el-table :data="customerOrderData" border highlight-current-row show-summary :summary-method="getSummaries">
           <el-table-column type="index">
@@ -132,12 +134,13 @@
               {{ scope2.row.STATUS_ID | transType }}
             </template>
           </el-table-column>
-          <el-table-column prop="DATE_CRE" label="提交时间" align="center" width="150px">
+          <el-table-column prop="DATE_CRE" label="创建时间" align="center" width="150px">
             <template slot-scope="scope4">
               {{ scope4.row.DATE_CRE | datatrans }}
             </template>
           </el-table-column>
           <el-table-column prop="ALL_SPEND" label="订单金额" align="center"></el-table-column>
+          <el-table-column prop="ALL_SPEND_CALCULATE" label="任务金额" align="center"></el-table-column>
         </el-table>
         <!-- 分页 -->
         <div style="margin:0 25%;" class="block">
@@ -384,7 +387,7 @@ export default {
     sumOrderMoney() {
       var sum = 0;
       for (var i = 0; i < this.customerOrderTaskData.length; i++) {
-        sum = sum.add(this.customerOrderTaskData[i].ALL_SPEND);
+        sum = sum.add(this.customerOrderTaskData[i].ALL_SPEND_CALCULATE);
       }
       return sum;
     }
@@ -490,15 +493,15 @@ export default {
     filterHandler(value, row, column) {
       if (value == "完成")
         return (
-          row.ASSIGNMENTS_TARGET - row.ALL_SPEND <= 0 &&
+          row.ASSIGNMENTS_TARGET - row.ALL_SPEND_CALCULATE <= 0 &&
           row.ASSIGNMENTS_TARGET > 0
         );
-      else return row.ASSIGNMENTS_TARGET - row.ALL_SPEND > 0;
+      else return row.ASSIGNMENTS_TARGET - row.ALL_SPEND_CALCULATE > 0;
     },
     getCustomerAllOrder(row) {
       this.currentPage = 1;
       this.selectOneCustomer = row;
-      this.getMoney = row.ALL_SPEND;
+      this.getMoney = row.ALL_SPEND_CALCULATE;
       this.getOrderAll();
     },
     getOrderAll() {
@@ -549,7 +552,7 @@ export default {
           sums[index] = "本页";
           return;
         }
-        if (index == 4) {
+        if (index == 4 || index == 5) {
           const values = data.map((item) => Number(item[column.property]));
           if (!values.every((value) => isNaN(value))) {
             sums[index] = values.reduce((prev, curr) => {

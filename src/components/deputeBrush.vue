@@ -18,20 +18,20 @@
               <span class="year-task-item">{{selectYear}}年协议年任务:{{yearData.ASSIGNMENTS?yearData.ASSIGNMENTS:'无'}}</span>
             </td>
             <td width="22%">
-              <span class="year-task-item">{{selectYear}}年实付总额:{{yearData.ALL_SPEND}}</span>
+              <span class="year-task-item">{{selectYear}}年任务总额:{{yearData.ALL_SPEND_CALCULATE}}</span>
             </td>
             <td width="22%">
               <span
-                class="year-task-item">{{selectYear}}年年任务完成差额:{{(yearData.ASSIGNMENTS - yearData.ALL_SPEND) | dosageFilter}}</span>
+                class="year-task-item">{{selectYear}}年年任务完成差额:{{(yearData.ASSIGNMENTS - yearData.ALL_SPEND_CALCULATE) | dosageFilter}}</span>
             </td>
             <td>
-              <span class="year-task-item" v-if="(yearData.ASSIGNMENTS - yearData.ALL_SPEND) > 0">未完成</span>
+              <span class="year-task-item" v-if="(yearData.ASSIGNMENTS - yearData.ALL_SPEND_CALCULATE) > 0">未完成</span>
               <span class="year-task-item" style="color: green;" v-else>已完成</span>
             </td>
           </tr>
         </table>
       </div>
-      <div>
+      <div style="margin-bottom: 10px;">
         <span class="fstrong f16" style="margin-right:20px;">订单信息汇总表:</span>
         <span>选择月份：</span>
         <el-date-picker size="mini" style="width:120px;" :picker-options="pickerOptions1" v-model="date1" type="month"
@@ -40,10 +40,10 @@
           placeholder="请选择月份" value-format="yyyy-MM-dd"></el-date-picker>
         <el-button @click="searchByMonth()" slot="append" size="mini" type="success" icon="el-icon-search">搜索
         </el-button>
-
       </div>
+
       <el-table :data="tableData" border :summary-method="getSummaries" :row-class-name="tableRowClassName" show-summary
-        style="width: 100%; margin-top:10px">
+        ref="taskTable">
         <el-table-column>
           <el-table-column prop="WEB_TJ_TIME" width="160" label="提交时间" align="center"></el-table-column>
         </el-table-column>
@@ -60,19 +60,14 @@
             </template>
           </el-table-column>
         </el-table-column>
-        <el-table-column>
-          <template slot="header">
-            <span style="color:red;">{{ tableHead2 }}</span>
-          </template>
+        <el-table-column :render-header="renderSecondHead">
           <el-table-column prop="sumMoney" label="订单金额" align="center"></el-table-column>
           <el-table-column prop="ALLBACK_Y" label="年返利使用金额" align="center"></el-table-column>
         </el-table-column>
-        <el-table-column>
-          <template slot="header">
-            <span style="color:red;">{{ tableHead3 }}</span>
-          </template>
+        <el-table-column :render-header="renderThirdHead">
           <el-table-column prop="ALLBACK_M" label="月返利使用金额" align="center"></el-table-column>
           <el-table-column prop="ALL_SPEND" label="实付金额" align="center"></el-table-column>
+          <el-table-column prop="ALL_SPEND_CALCULATE" label="任务金额" align="center"></el-table-column>
         </el-table-column>
         <el-table-column>
           <template slot="header">
@@ -233,10 +228,8 @@ export default {
         let zoom = res.data[0].orders;
         this.allSpanSum = 0;
         for (let i = 0; i < zoom.length; i++) {
-          zoom[i].sumMoney = zoom[i].ALL_SPEND.add(zoom[i].ALLBACK_Y).add(
-            zoom[i].ALLBACK_M
-          );
-          this.allSpanSum = this.allSpanSum.add(zoom[i].ALL_SPEND);
+          zoom[i].sumMoney = zoom[i].ALL_SPEND.add(zoom[i].ALLBACK_Y).add(zoom[i].ALLBACK_M);
+          this.allSpanSum = this.allSpanSum.add(zoom[i].ALL_SPEND_CALCULATE);
         }
         this.tableData = zoom;
         if (res.data[0].assignments) {
@@ -246,6 +239,8 @@ export default {
           this.tHead();
         } else {
           this.tableHead1 = "所选月无任务";
+          this.tableHead2 = "";
+          this.tableHead3 = "";
         }
       });
     },
@@ -290,11 +285,17 @@ export default {
         ? this.date1.slice(5, 7) + "月"
         : this.date1.slice(5, 7) + "-" + this.date2.slice(5, 7) + "月总";
       this.tableHead1 = `${selectMonth}促销目标任务：${this.assignmentsTarget}`;
-      this.tableHead2 = `${selectMonth}实付总额：${this.allSpanSum}`;
+      this.tableHead2 = `${selectMonth}任务总额：${this.allSpanSum}`;
       this.tableHead3 = `任务完成差额：${this.assignmentsReduce}`;
     },
     renderFirstHead(h) {
       return h("span", { attrs: { style: "color:red" } }, this.tableHead1);
+    },
+    renderSecondHead(h) {
+      return h("span", { attrs: { style: "color:red" } }, this.tableHead2);
+    },
+    renderThirdHead(h) {
+      return h("span", { attrs: { style: "color:red" } }, this.tableHead3);
     },
   },
   filters: {

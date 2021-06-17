@@ -1523,8 +1523,10 @@ export default {
     },
     //获取产品类型
     getProductType(value) {
-      if (value.substring(0, 1) == "X" || value.substring(0, 1) == "N") {
+      if (value.substring(0, 1) == "X") {
         return "窗帘";
+      }else if (value.substring(0, 1) == "N") {
+        return "新窗帘";
       } else if (value.substring(0, 1) == "Y") {
         return "软装";
       } else if (value.substring(0, 1) == "W") {
@@ -1988,6 +1990,10 @@ export default {
                   var lslist = oneplace.filter((item) => item.NC_PART_TYPECODE == "LS");
                   var shalist = oneplace.filter((item) => item.NC_PART_TYPECODE == "CS");
                   var typeCode = detail.NC_PART_TYPECODE;
+                  var dosage = detail.DOSAGE;
+                  if(detail.NCM_PID == 0) {
+                    dosage = detail.ACTUAL_DOSAGE ? detail.ACTUAL_DOSAGE : detail.DOSAGE
+                  }
                   if (detail.NCM_PID != 0) {
                     //找父节点
                     var fatherCurtain = oneplace.filter(item => item.NC_MODEL_ID == detail.NCM_PID);
@@ -2014,7 +2020,7 @@ export default {
                     danwei: detail.UNIT_NAME,
                     price: detail.PRICE_TAXIN,
                     guige: detail.FIX_GRADE,
-                    shuliang: detail.ACTUAL_DOSAGE ? detail.ACTUAL_DOSAGE : detail.DOSAGE,
+                    shuliang: dosage,
                     shenhe2Des: detail.PRODUCT_NOTE,
                     beizhu: detail.NOTE + detail.ILLUSTRATE,
                     zheshu: detail.ZE_QTY
@@ -2092,13 +2098,14 @@ export default {
                   data: JSON.stringify(detailData),
                   //新窗帘新增
                   orderVolume: oneOrderDetail.QTY_REQUIRED,
-                  beizhu: oneOrderDetail.NOTES + oneOrderDetail.YULAN_NOTES,
-                  jiaofuriqi: oneOrderDetail.JIAOHUO_DATE,
+                  beizhu: oneOrderDetail.NOTES + oneOrderDetail.LANJU_NOTE,
+                  jiaofuriqi: this.dateFilter(oneOrderDetail.JIAOHUO_DATE),
                   lianshenZhewei: lsZe,
                   chuangshaZhewei: shaZe,
                   goodSize: "W" + oneOrderDetail.CURTAIN_WIDTH.toString() + "_H" + oneOrderDetail.CURTAIN_HEIGHT.toString() + "_AC" + oneOrderDetail.ANCAO_HEIGHT.toString()
                 };
                 //console.log(postdata)
+                //return
                 Axios.defaults.withCredentials = false;
                 try {
                   var resB = await Axios.post(

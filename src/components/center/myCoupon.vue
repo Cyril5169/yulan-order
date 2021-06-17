@@ -43,9 +43,9 @@
       </keep-alive>
     </el-dialog>
     <!-- 查看返利记录 -->
-    <el-dialog :title="'优惠券返利记录[券号:' + backTable.couponId + ']'" :visible.sync="dialogBack" width="60%" top="5vh">
+    <el-dialog :title="'优惠券返利记录[券号:' + couponId + ']'" :visible.sync="dialogBack" width="60%" top="5vh">
       <keep-alive>
-        <couponRecordDetail v-if="dialogBack" :backTable="backTable"></couponRecordDetail>
+        <couponRecordDetail v-if="dialogBack" :couponId="couponId"></couponRecordDetail>
       </keep-alive>
     </el-dialog>
   </el-card>
@@ -53,7 +53,6 @@
 
 <script>
 import { GetAllCoupon } from "@/api/couponASP";
-import { CouponbackRecord } from "@/api/orderList";
 import Cookies from "js-cookie";
 import useRecordDetail from "./useRecordDetail";
 import couponRecordDetail from "./couponRecordDetail";
@@ -71,43 +70,35 @@ export default {
       dialogUse: false,
       dialogBack: false,
       couponId: "",
-      backTable: []
     };
   },
   methods: {
-    allTickets() {
+    getAllCouponData() {
       GetAllCoupon({ companyId: Cookies.get("companyId") }).then(res => {
         this.couponData = res.data;
       });
     },
     notEffectiveCoupon(item) {
       var unValidDate = true;
-      var nowDate = new Date(new Date().setDate(-1));
+      var nowDate = new Date(new Date().setDate(new Date().getDate() - 1));
       //判断有效日期
-      if (new Date(item.DATE_START).getTime() <= nowDate.getTime() 
-          && new Date(item.DATE_END).getTime() >= nowDate.getTime()) {
+      if (new Date(item.DATE_START).getTime() <= nowDate.getTime()
+        && new Date(item.DATE_END).getTime() >= nowDate.getTime()) {
         unValidDate = false;
       }
-      return unValidDate || item.REBATE_MONEY_OVER <= 0 || item.STATUS != 1;
+      return unValidDate || item.REBATE_MONEY_OVER <= 0 || item.STATUS != '1';
     },
     getRecordUseData(itemID) {
       this.couponId = itemID;
       this.dialogUse = true;
     },
     getRecordBackData(itemId) {
-      var url = "/order/getReturnRecord.do";
-      var data = {
-        id: itemId
-      };
-      CouponbackRecord(url, data).then(res => {
-        this.backTable = res.data;
-        this.backTable.couponId = itemId;
-        this.dialogBack = true;
-      });
+      this.couponId = itemId;
+      this.dialogBack = true;
     }
   },
   created() {
-    this.allTickets();
+    this.getAllCouponData();
   }
 };
 </script>

@@ -62,9 +62,9 @@
         </keep-alive>
       </el-dialog>
       <!-- 查看返利记录 -->
-      <el-dialog :title="'优惠券返利记录[券号:' + backTable.couponId + ']'" :visible.sync="dialogBack" width="60%" top="5vh">
+      <el-dialog :title="'优惠券返利记录[券号:' + couponId + ']'" :visible.sync="dialogBack" width="60%" top="5vh">
         <keep-alive>
-          <couponRecordDetail v-if="dialogBack" :backTable="backTable"></couponRecordDetail>
+          <couponRecordDetail v-if="dialogBack" :couponId="couponId"></couponRecordDetail>
         </keep-alive>
       </el-dialog>
       <!-- 维护购买人 -->
@@ -380,15 +380,12 @@
 <script>
 import Cookies from "js-cookie";
 import { addAddress } from "@/api/orderList";
-import { usetheCoupon } from "@/api/orderList";
 import { deleteAddress } from "@/api/orderList";
 import { editAddress } from "@/api/orderList";
-import { CouponbackRecord } from "@/api/orderList";
 import { GetCanUseCoupon } from "@/api/couponASP";
 import {
   orderSettlement,
   normalOrderSettlement,
-  getUseRecord,
   getCustomerInfo,
   GetPromotionsById,
   GetBuyUserInfo,
@@ -621,13 +618,104 @@ export default {
       this.transferData.unshift(morendizhi);
     },
     //表格过滤  --是否允许分批
-    formatRole: function (row, column) {
-      //return row.PART_SEND_ID ===0? "是":"否";  //预留
+    formatRole(row, column) {
       if (row.partSendId == 0) {
         return "等生产";
       } else if (row.partSendId == 1) {
         return "分批发货";
       } else return "--";
+    },
+    getBackMoney(promotion_cost, money, thisMoney) {
+      var backMoney = 0;
+      if (money != 0) {
+        backMoney = this.dosageFilter(thisMoney * money / promotion_cost);
+      }
+      return backMoney;
+    },
+    getLastBackMoney(allMoney, lastAllMoney, thisMoney) {
+      if (allMoney == 0) {
+        return allMoney;
+      }
+      if (allMoney - lastAllMoney > thisMoney) {
+        return thisMoney;
+      }
+      else {
+        return allMoney - lastAllMoney;
+      }
+    },
+    //获取优惠券
+    _getTickets() {
+      var url = "/order/getRebate.do";
+      var data = {
+        cid: Cookies.get("cid"),
+        companyId: Cookies.get("companyId"),
+        typeId: this.product_group_tpye,
+      };
+      GetCanUseCoupon({ companyId: Cookies.get("companyId") }).then((res) => {
+        this.couponData = res.data;
+        for (var i = 0; i < this.couponData.length; i++) {
+          this.$set(this.couponData[i], "checked", false);
+        }
+        //按照组别进行分组
+        this.couponDataGroup = this.groupBy(this.couponData, "GROUP_TYPE");
+      });
+    },
+    //单列的groupby
+    groupBy(array, name, filterMethod = function (a) { return a }) {
+      let groups = [];
+      array.forEach((item) => {
+        let groupName = filterMethod(item[name]);
+        var hasgroup = groups.filter((item) => item.group == groupName);
+        if (hasgroup.length) {
+          hasgroup[0].value.push(item);
+        } else {
+          groups.push({
+            group: groupName,
+            value: [item],
+          });
+        }
+      });
+      return groups;
+    },
+    canUseCoupon(couponData) {
+      for (var i = 0; i < this.order_details.length; i++) {
+        if (
+          this.order_details[i].activityId &&
+          this.order_details[i].salPromotion
+        ) {
+          var onePro = this.order_details[i].salPromotion;
+          if (onePro.REBATE_FLAG == "N") {
+            return false;
+          }
+          if (
+            couponData.REBATE_TYPE != onePro.REBATE_TYPE &&
+            onePro.REBATE_TYPE != "all"
+          ) {
+            return false;
+          }
+        }
+      }
+      return true;
+    },
+    canNotUseActivity(couponData) {
+      for (var i = 0; i < this.order_details.length; i++) {
+        if (
+          this.order_details[i].activityId &&
+          this.order_details[i].salPromotion
+        ) {
+          var onePro = this.order_details[i].salPromotion;
+          if (onePro.REBATE_FLAG == "N") {
+            return onePro.ORDER_NAME;
+          }
+          if (
+            couponData.REBATE_TYPE != onePro.REBATE_TYPE &&
+            onePro.REBATE_TYPE != "all"
+          ) {
+            return onePro.ORDER_NAME;
+          }
+        }
+      }
+      return "";
     },
     //单选框使用优惠券
     changeCoupon(checked, coupon) {
@@ -705,113 +793,13 @@ export default {
 
       this.backPrice = allRebateMonth.add(allRebateYear);
     },
-    getBackMoney(promotion_cost, money, thisMoney) {
-      var backMoney = 0;
-      if (money != 0) {
-        backMoney = this.dosageFilter(thisMoney * money / promotion_cost);
-      }
-      return backMoney;
-    },
-    getLastBackMoney(allMoney, lastAllMoney, thisMoney) {
-      if (allMoney == 0) {
-        return allMoney;
-      }
-      if (allMoney - lastAllMoney > thisMoney) {
-        return thisMoney;
-      }
-      else {
-        return allMoney - lastAllMoney;
-      }
-    },
-    //获取优惠券
-    _getTickets() {
-      var url = "/order/getRebate.do";
-      var data = {
-        cid: Cookies.get("cid"),
-        companyId: Cookies.get("companyId"),
-        typeId: this.product_group_tpye,
-      };
-      GetCanUseCoupon({ companyId: Cookies.get("companyId") }).then((res) => {
-        this.couponData = res.data;
-        for (var i = 0; i < this.couponData.length; i++) {
-          this.$set(this.couponData[i], "checked", false);
-        }
-        //按照组别进行分组
-        this.couponDataGroup = this.groupBy(this.couponData, "GROUP_TYPE");
-        console.log(this.couponDataGroup)
-      });
-    },
-    canUseCoupon(couponData) {
-      for (var i = 0; i < this.order_details.length; i++) {
-        if (
-          this.order_details[i].activityId &&
-          this.order_details[i].salPromotion
-        ) {
-          var onePro = this.order_details[i].salPromotion;
-          if (onePro.REBATE_FLAG == "N") {
-            return false;
-          }
-          if (
-            couponData.REBATE_TYPE != onePro.REBATE_TYPE &&
-            onePro.REBATE_TYPE != "all"
-          ) {
-            return false;
-          }
-        }
-      }
-      return true;
-    },
-    canNotUseActivity(couponData) {
-      for (var i = 0; i < this.order_details.length; i++) {
-        if (
-          this.order_details[i].activityId &&
-          this.order_details[i].salPromotion
-        ) {
-          var onePro = this.order_details[i].salPromotion;
-          if (onePro.REBATE_FLAG == "N") {
-            return onePro.ORDER_NAME;
-          }
-          if (
-            couponData.REBATE_TYPE != onePro.REBATE_TYPE &&
-            onePro.REBATE_TYPE != "all"
-          ) {
-            return onePro.ORDER_NAME;
-          }
-        }
-      }
-      return "";
-    },
-    //单列的groupby
-    groupBy(array, name, filterMethod = function (a) { return a }) {
-      let groups = [];
-      array.forEach((item) => {
-        let groupName = filterMethod(item[name]);
-        var hasgroup = groups.filter((item) => item.group == groupName);
-        if (hasgroup.length) {
-          hasgroup[0].value.push(item);
-        } else {
-          groups.push({
-            group: groupName,
-            value: [item],
-          });
-        }
-      });
-      return groups;
-    },
     getRecordUseData(itemID) {
       this.couponId = itemID;
       this.dialogUse = true;
     },
     RecordBack(itemId) {
-      var url = "/order/getReturnRecord.do";
-      var data = {
-        id: itemId,
-      };
-      CouponbackRecord(url, data).then((res) => {
-        this.backTable = res.data;
-        this.backTable.couponId = itemId;
-        this.dialogBack = true;
-      });
+      this.couponId = itemId;
+      this.dialogBack = true;
     },
     //确定修改地址
     changeAddress(formName) {

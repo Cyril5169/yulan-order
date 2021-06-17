@@ -36,7 +36,7 @@
 
 <script>
 import Cookies from "js-cookie";
-import { getUseRecord, getTotalRecordSum } from "@/api/orderListASP";
+import { getUseRecord, getTotalRecordSum } from "@/api/couponASP";
 
 export default {
   name: "useRecordDetail",
@@ -45,7 +45,6 @@ export default {
     return {
       isManager: Cookies.get("isManager"),
       useRecordData: [],
-      useTable: [],
       date1: "",
       date2: "",
       find: "",
@@ -134,11 +133,6 @@ export default {
     }
   },
   activated() {
-    // this.find = "";
-    // this.date1 = "";
-    // this.date2 = "";
-    // this.currentPage = 1;
-    // this.limit = 20;
     this.getRecordUse();
   }
 };

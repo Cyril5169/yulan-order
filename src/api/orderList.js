@@ -27,23 +27,6 @@ export function deleteAddress(url, data) {
     })
 }
 
-//使用优惠券
-export function usetheCoupon(url, data) {
-    return post(url, data).then((res) => {
-        return Promise.resolve(res);
-    }).catch((err) => {
-        return Promise.reject(err);
-    })
-}
-
-//查看返利记录
-export function CouponbackRecord(url, data) {
-    return post(url, data).then((res) => {
-        return Promise.resolve(res);
-    }).catch((err) => {
-        return Promise.reject(err);
-    })
-}
 
 //订单详情新接口
 export function orderDetail(url, data) {

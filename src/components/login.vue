@@ -11,7 +11,7 @@
           <div class="loginBar"></div>
           <div class="info">
             <p>账&nbsp;号</p>
-            <el-input style="width:300px;" v-model="cid">
+            <el-input style="width:300px;" v-model.trim="cid">
               <img slot="prefix" src="../assets/img/cid.png" width="22" alt />
             </el-input>
           </div>

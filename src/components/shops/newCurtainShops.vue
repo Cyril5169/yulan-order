@@ -1620,7 +1620,8 @@ export default {
           NC_MODEL_ID: oneCurtain.NC_MODEL_ID,
           NC_TEMPLATE_ID: oneCurtain.NC_TEMPLATE_ID,
           NC_PART_TYPECODE: oneCurtain.NC_PART_TYPECODE,
-          NCM_NOTE: oneCurtain.NCM_NOTE
+          NCM_NOTE: oneCurtain.NCM_NOTE,
+          CERTAIN_HEIGHT_WIDTH: oneCurtain.FIX_TYPE == '01' ? 1 : 0
         }
         details.push(oneDetail);
       }
@@ -1643,7 +1644,6 @@ export default {
           this.$root.$emit("refreshBadgeIcon", "newCurtainCount");
         });
       }).catch(res => {
-        console.log(res);
         this.$alert("加入购物车失败，请联系管理员！", "提示", {
           confirmButtonText: "确定",
           type: "warning",
@@ -1797,7 +1797,6 @@ export default {
               }
             }
             this.hotSaleData.data = data;
-            console.log(this.hotSaleData)
           }
         }
       });
@@ -1864,7 +1863,7 @@ export default {
     },
     showDetailStopData(item, index) {
       this.stopDetailList = JSON.parse(JSON.stringify(item.DATA));
-      if (index == 0) this.stopDetailTitle = "待淘汰产品列表";
+      if (item.TITLE.indexOf('待淘汰') > -1) this.stopDetailTitle = "待淘汰产品列表";
       else this.stopDetailTitle = "已淘汰产品列表";
       this.newsDetailShow = true;
     },

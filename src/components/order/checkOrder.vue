@@ -1448,9 +1448,8 @@ export default {
       for (var i = 0; i < getPush.length; i++) {
         var onedetail = {};
         //窗帘特有
-        onedetail.ancaoHeight = getPush[i].ancaoHeight
-          ? getPush[i].ancaoHeight
-          : 0;
+        onedetail.ancaoHeight = getPush[i].ancaoHeight ? getPush[i].ancaoHeight : 0;
+        onedetail.curtainFixType = getPush[i].curtainFixType;
         onedetail.curtainWidth = getPush[i].width;
         onedetail.curtainHeight = getPush[i].height;
         onedetail.curtainHeight2 = getPush[i].falseShadeHigh

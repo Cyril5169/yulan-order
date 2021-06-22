@@ -333,7 +333,7 @@ export default {
     },
     showDetailStopData(item, index) {
       this.stopDetailList = JSON.parse(JSON.stringify(item.DATA));
-      if (index == 0) this.stopDetailTitle = "待淘汰产品列表";
+      if (item.TITLE.indexOf('待淘汰') > -1) this.stopDetailTitle = "待淘汰产品列表";
       else this.stopDetailTitle = "已淘汰产品列表";
       this.newsDetailShow = true;
     },

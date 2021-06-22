@@ -108,8 +108,7 @@
             </el-table-column>
             <el-table-column width="100" label="同步标记" prop="IMPORT_FLAG" align="center">
               <template slot-scope="scope">
-                <span v-if="scope.row.ORDER_NO.substring(0, 1) != 'X' && scope.row.ORDER_NO.substring(0, 1) != 'N'"></span>
-                <span v-else-if="scope.row.IMPORT_FLAG == 'Y'">已同步</span>
+                <span v-if="scope.row.IMPORT_FLAG == 'Y'">已同步</span>
                 <button v-else class="btn-style" @click="onClickAsync(scope.row)">同步订单</button>
               </template>
             </el-table-column>
@@ -1423,16 +1422,15 @@ export default {
           arr_pur: this.multipleSelection,
           batchdate_deliver: this.batchdate_deliver,
         };
-        UpdateCheckFlagBatch(data)
-          .then(async (res) => {
-            this.$alert("批量确认成功", "提示", {
-              confirmButtonText: "确定",
-              type: "success",
-            });
-            //同步到布精灵
-            await this.asyncBuJingLing(res.data);
-            this.autoSearch();
-          })
+        UpdateCheckFlagBatch(data).then(async (res) => {
+          this.$alert("批量确认成功", "提示", {
+            confirmButtonText: "确定",
+            type: "success",
+          });
+          //同步到布精灵
+          await this.asyncBuJingLing(res.data);
+          this.autoSearch();
+        })
           .catch((res) => {
             this.$alert("批量确认失败，请稍后重试", "提示", {
               confirmButtonText: "确定",
@@ -1525,12 +1523,10 @@ export default {
     getProductType(value) {
       if (value.substring(0, 1) == "X") {
         return "窗帘";
-      }else if (value.substring(0, 1) == "N") {
+      } else if (value.substring(0, 1) == "N") {
         return "新窗帘";
       } else if (value.substring(0, 1) == "Y") {
         return "软装";
-      } else if (value.substring(0, 1) == "W") {
-        return "墙纸配套类";
       } else return "手工单";
     },
     getBegintime(value) {
@@ -1742,25 +1738,24 @@ export default {
           });
           return;
         }
-        SubmitX(data, { loading: false })
-          .then(async (res) => {
-            this.checkVisible = false;
-            //同步布精灵数据
-            if (res.data.length) {
-              await this.asyncBuJingLing([
-                { PUR_NO: res.data[0].PUR_NO, data: res.data, newcurtaindata: this.gridData },
-              ]);
-            }
-            this.checkedVisible = true;
-            this.autoSearch();
-          })
+        SubmitX(data, { loading: false }).then(async res => {
+          this.checkVisible = false;
+          //同步布精灵数据
+          if (res.data.length) {
+            await this.asyncBuJingLing([
+              { PUR_NO: res.data[0].PUR_NO, data: res.data, newcurtaindata: this.gridData },
+            ]);
+          }
+          this.checkedVisible = true;
+          this.autoSearch();
+        })
           .catch((res) => {
             this.$alert("确认失败，请稍后重试", "提示", {
               confirmButtonText: "确定",
               type: "warning",
             });
           });
-      } else {
+      } else if (this.orderNoPreFix == "Y") {
         for (let i = 0; i < this.gridData.length; i++) {
           if (
             this.gridData[i].DATE_DELIVER == "9999/12/31 00:00:00" ||
@@ -1777,18 +1772,22 @@ export default {
           pur_headForm: this.pur_headForm,
           gridData: this.gridData,
         };
-        Submit(data, { loading: false })
-          .then((res) => {
-            this.checkVisible = false;
-            this.checkedVisible = true;
-            this.autoSearch();
-          })
-          .catch((res) => {
-            this.$alert("确认失败，请稍后重试", "提示", {
-              confirmButtonText: "确定",
-              type: "warning",
-            });
+        Submit(data, { loading: false }).then(async res => {
+          this.checkVisible = false;
+          //同步布精灵数据
+          if (res.data.length) {
+            await this.asyncBuJingLing([
+              { PUR_NO: res.data[0].PUR_NO, data: res.data },
+            ]);
+          }
+          this.checkedVisible = true;
+          this.autoSearch();
+        }).catch((res) => {
+          this.$alert("确认失败，请稍后重试", "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
           });
+        });
       }
     },
     //单列的groupby
@@ -1991,7 +1990,7 @@ export default {
                   var shalist = oneplace.filter((item) => item.NC_PART_TYPECODE == "CS");
                   var typeCode = detail.NC_PART_TYPECODE;
                   var dosage = detail.DOSAGE;
-                  if(detail.NCM_PID == 0) {
+                  if (detail.NCM_PID == 0) {
                     dosage = detail.ACTUAL_DOSAGE ? detail.ACTUAL_DOSAGE : detail.DOSAGE
                   }
                   if (detail.NCM_PID != 0) {
@@ -2138,6 +2137,93 @@ export default {
                 }
               }
             }
+            else if (orderNo.substring(0, 1) == "Y") {
+              //软装
+              for (var d = 0; d < onedata.length; d++) {
+                var detail = onedata[d];
+
+                var detailData = [];
+                var onedetail = {
+                  buwei: "ls",
+                  leibie: detail.MNAME,
+                  code: detail.ITEM_NO,
+                  danwei: detail.UNIT_NAME,
+                  price: detail.PRICE_TAXIN,
+                  guige: detail.FIX_GRADE,
+                  shuliang: detail.QTY_PUR,
+                  shenhe2Des: "",
+                  beizhu: detail.NOTES,
+                };
+                detailData.push(onedetail);
+
+                var postdata = {
+                  token: "ljsp-bjl",
+                  cpPlaceId: detail.LINE_NO,
+                  custmorname: detail.CUSTOMER_NAME,
+                  sortname: detail.CUSTOMER_CODE,
+                  tempCustmorjc: detail.LINKMAN,
+                  tempPhone: detail.LINKTEL,
+                  tempAddress: detail.POST_ADDRESS,
+                  tempProvince: detail.RECIVER_AREA1,
+                  tempCity: detail.RECIVER_AREA2,
+                  tempArea: detail.RECIVER_AREA3,
+                  templatename: detail.CL_ITEM_NO,
+                  liantou: false,
+                  lianshen: true,
+                  chuangsha: false,
+                  liantouHeight: null,
+                  liantouWidth: null,
+                  liantouLeft: null,
+                  liantouRight: null,
+                  liantouMoshutie: null,
+                  lianshenHeight: null,
+                  lianshenWidth: detail.QTY_PUR,
+                  lianshenOpen: null,
+                  lianshenType: null,
+                  chuangshaHeight: null,
+                  chuangshaWidth: null,
+                  chuangshaOpen: null,
+                  chuangshaType: null,
+                  subcustmorname: detail.PUR_NO,
+                  zswz: detail.CL_PLACE,
+                  onlineDanhao: detail.ORDER_NO,
+                  data: JSON.stringify(detailData)
+                };
+                //console.log(postdata)
+                //return
+                Axios.defaults.withCredentials = false;
+                try {
+                  var resB = await Axios.post(
+                    "http://ljsp.ubxiu.com:8098/syn/add",
+                    //"http://buyisoft.utools.club/syn/add",
+                    //"http://buyisoft.cn.utools.club/syn/add",
+                    postdata,
+                    { params: postdata, loading: false }
+                  );
+                  if (resB.data.state == "ok") {
+                  } else {
+                    var msg = pruData[i].PUR_NO + "位置:" + oneplace[0].CL_PLACE + "同步失败;";
+                    failPur += msg;
+                    oneFail += msg;
+                  }
+                  //记录发出去回返回来的值
+                  await SaveHistoryLJPostData({
+                    dirName: onedata[0].ORDER_NO + '-' + dateStamp,
+                    fileName: onedata[0].ORDER_NO + '-' + detail.CL_PLACE_ID,
+                    content: JSON.stringify(postdata),
+                    resBLJ: JSON.stringify(resB)
+                  },
+                    { loading: false });
+                } catch (err) {
+                  this.$message({
+                    message: "同步失败!",
+                    type: "error",
+                    duration: 1000,
+                  });
+                  return;
+                }
+              }
+            }
           }
           if (!oneFail) {
             //一个单同步成功的修改同步状态
@@ -2216,7 +2302,7 @@ export default {
     },
     downLoadY() {
       var PUR_NO = this.pur_headForm.PUR_NO;
-      if (this.orderNoPreFix != "X" && this.orderNoPreFix != "N") {
+      if (this.orderNoPreFix == "Y") {
         downLoadFile(this.Global.baseUrl + `PUR_HEAD/CreateExcelY?PUR_NO=${PUR_NO}`);
       } else if (this.orderNoPreFix == "X") {
         downLoadFile(this.Global.baseUrl + `PUR_HEAD/CreateExcel?PUR_NO=${PUR_NO}`);
@@ -2419,7 +2505,7 @@ export default {
               this.checkedVisible = true;
             }
           })
-        } else {
+        } else if (this.orderNoPreFix == "Y") {
           this.gridData = res.data;
 
           if (row.SUPPLY_CHECK_FLAG === "0") {

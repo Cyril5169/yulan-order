@@ -124,9 +124,7 @@
         </el-table-column>
         <el-table-column label="名称" header-align="center" width="110">
           <template slot-scope="scope">
-            <div v-if="scope.row.curtainItemName !== null && scope.row.curtainItemName !== ''">
-              {{ scope.row.curtainItemName }}
-            </div>
+            <div v-if="scope.row.curtainItemName">{{ scope.row.curtainItemName }}</div>
             <div v-else>{{ getTypeName(scope.row.itemType) }}</div>
           </template>
         </el-table-column>
@@ -157,10 +155,7 @@
         </el-table-column>
         <el-table-column label="面料属性" width="100" header-align="center" align="center">
           <template slot-scope="scope">
-            <div v-if="
-                scope.row.certainHeightWidth !== null &&
-                  scope.row.productType === 'ML'
-              ">
+            <div v-if="scope.row.productType === 'ML' && scope.row.itemType != 'lspb'">
               <el-select :disabled="tableStatus === 3" size="mini" v-model="scope.row.certainHeightWidth" placeholder="请选择"
                 @change="changeDosageByFixtype(scope.$index)">
                 <el-option v-for="item in fixType" :key="item.value" :label="item.label" :value="item.value">
@@ -184,7 +179,7 @@
                                 .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"
                 v-model="scope.row.dosage">
               </el-input>
-              {{ scope.row.dosage === "" ? "" : scope.row.unit }}
+              {{ scope.row.unit }}
             </span>
             <span v-else-if="scope.row.itemType === 'lspb'">--</span>
             <span v-else-if="scope.row.modifyFlag === 'Y'">
@@ -195,7 +190,7 @@
                                 .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 2)"
                 v-model="scope.row.dosage">
               </el-input>
-              {{ scope.row.dosage === "" ? "" : scope.row.unit }}
+              {{ scope.row.unit }}
             </span>
             <span v-else>
               {{ scope.row.dosage | dosageFilter }}
@@ -338,7 +333,7 @@ import {
   updateCurtain,
   deleteTheGroup,
 } from "@/api/curtain";
-import { GetDosageByNo, GetChangeItemByProductType } from "@/api/itemInfoASP";
+import { GetDosageByNo, GetChangeItemByProductType, GetMLTipByList } from "@/api/itemInfoASP";
 import {
   getItemById,
   GetPromotionByItem,
@@ -774,7 +769,6 @@ export default {
     },
     //获取可修改的全部编码
     getAllItemNoData() {
-      this.items = [];
       GetChangeItemByProductType({
         productType: this.chooseType,
         condition: this.searchKey.toUpperCase(),
@@ -826,6 +820,7 @@ export default {
       this.data[this.chooseIndex].curtainItemName = data.note;
       this.data[this.chooseIndex].specification = data.fixGrade / 1000;
       this.data[this.chooseIndex].price = price;
+      this.data[this.chooseIndex].note = "";
       let theFixType;
       if (this.data[this.chooseIndex].itemType === "lspb") {
         this.data[this.chooseIndex].certainHeightWidth = null;
@@ -833,6 +828,8 @@ export default {
         this.judgeTip(this.data[this.chooseIndex], this.chooseIndex);
         //库存
         this.data = this.getStoreData(this.data);
+        //面料提示
+        this.getMLTip();
         return;
       }
       if (data.fixType === "01") {
@@ -892,6 +889,8 @@ export default {
             this.judgeTip(this.data[this.chooseIndex], this.chooseIndex);
             //库存
             this.data = this.getStoreData(this.data);
+            //面料提示
+            this.getMLTip();
           })
           .catch((err) => {
             console.log(err);
@@ -901,10 +900,10 @@ export default {
         this.judgeTip(this.data[this.chooseIndex], this.chooseIndex);
         //库存
         this.data = this.getStoreData(this.data);
+        //面料提示
+        this.getMLTip();
         if (this.data[this.chooseIndex].item.itemNo === "GY-003") {
-          this.data[this.chooseIndex].dosage = this.curtainData[
-            this.chooseIndex
-          ].dosage;
+          this.data[this.chooseIndex].dosage = this.curtainData[this.chooseIndex].dosage;
         } else {
           for (let i = 0; i < this.data.length; i++) {
             if (
@@ -1582,6 +1581,47 @@ export default {
     showDefaultImg(index) {
       this.previewUrlList[index].show = false;
     },
+    //获取面料的提示
+    getMLTip() {
+      //根据curtainData的数据，获取所有提示，统一提示
+      var itemNoList = [];
+      for (var i = 0; i < this.data.length; i++) {
+        var oneCurtain = this.data[i];
+        //if(oneCurtain.itemType == 'ls')
+        var remark = oneCurtain.note;
+        var remainRemark = remark.match(/提示:(\S*).;/);
+        if (remainRemark == null)
+          itemNoList.push(oneCurtain.item.itemNo);
+      }
+      if (itemNoList.length) {
+        GetMLTipByList({ itemNoList: itemNoList }).then(res => {
+          if (res.data.length) {
+            var msgTip = "";
+            for (var i = 0; i < res.data.length; i++) {
+              if (res.data[i].NOTE) {
+                msgTip += res.data[i].ITEM_NO + ":" + res.data[i].NOTE + ";";
+                var data = this.data.filter((item) => item.item.itemNo == res.data[i].ITEM_NO);
+                if (data.length) {
+                  for (var j = 0; j < data.length; j++) {
+                    var remark = data[j].note;
+                    var remainRemark = remark.match(/提示:(\S*)./);
+                    if (remainRemark && remainRemark.length) remainRemark = remainRemark[1];
+                    data[j].note = data[j].note.replace('提示:' + remainRemark + '.', "");
+                    data[j].note += '提示:' + res.data[i].NOTE + '.';
+                  }
+                }
+              }
+            }
+            if (msgTip) {
+              this.$alert(msgTip, "提示", {
+                confirmButtonText: "确定",
+                type: "warning",
+              });
+            }
+          }
+        })
+      }
+    },
   },
   activated() {
     for (var i = 0; i < this.curtainData.length; i++) {
@@ -1601,6 +1641,8 @@ export default {
     if (this.suggestion) this.suggestionLJ = this.suggestion.toString();
     //库存
     this.data = this.getStoreData(this.data);
+    //面料提示
+    this.getMLTip();
   },
 };
 </script>

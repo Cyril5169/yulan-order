@@ -182,7 +182,7 @@
               </el-table-column>
               <el-table-column label="面料属性" width="80" header-align="center" align="center">
                 <template slot-scope="scope1">
-                  <div v-if="scope1.row.certainHeightWidth !== null && scope1.row.productType === 'ML'">
+                  <div v-if="scope1.row.productType === 'ML' && scope1.row.itemType != 'lspb'">
                     <el-select size="mini" v-model="scope1.row.certainHeightWidth" placeholder="请选择"
                       @change="changeDosageByFixtype(scope1.$index, scope.$index)">
                       <el-option v-for="item in fixType" :key="item.value" :label="item.label" :value="item.value">
@@ -202,7 +202,7 @@
                                 .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"
                       v-model="scope1.row.dosage">
                     </el-input>
-                    {{ scope1.row.dosage === "" ? "" : scope1.row.unit }}
+                    {{ scope1.row.unit }}
                   </span>
                 </template>
               </el-table-column>
@@ -911,7 +911,6 @@ export default {
     },
     //获取可修改的全部编码
     getAllItemNoData() {
-      this.items = [];
       GetChangeItemByProductType({
         productType: this.chooseType,
         condition: this.searchKey.toUpperCase(),
@@ -1397,14 +1396,21 @@ export default {
           return;
         } else {
           for (let j = 0; j < this.allCurtains[i].length; j++) {
-            let item = this.allCurtains[i][j];
+            let oneCurtain = this.allCurtains[i][j];
             if (
-              (item.manufacturingInstructions === "特殊见备注" ||
-                item.manufacturingInstructions === "特殊开备注") &&
-              (!item.note || item.note === "")
+              (oneCurtain.manufacturingInstructions === "特殊见备注" ||
+                oneCurtain.manufacturingInstructions === "特殊开备注") &&
+              (!oneCurtain.note || oneCurtain.note === "")
             ) {
               this.$alert(`请填写特殊开的备注`, "提示", {
                 confirmButtonText: "确定",
+                type: "warning",
+              });
+              return;
+            }
+            if (oneCurtain.dosage === "") {
+              this.$alert(`${this.getTypeName(oneCurtain.itemType)}用量不能为空`, "提示", {
+                confirmButtonText: "好的",
                 type: "warning",
               });
               return;

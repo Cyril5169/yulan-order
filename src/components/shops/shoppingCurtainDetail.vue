@@ -130,11 +130,7 @@
         </el-table-column>
         <el-table-column label="面料属性" width="80" header-align="center" align="center">
           <template slot-scope="scope">
-            <div v-if="
-                scope.row.fixType !== '' &&
-                  scope.row.fixType !== null &&
-                  scope.row.productType === 'ML'
-              ">
+            <div v-if="scope.row.productType === 'ML'&& scope.row.itemType != 'lspb'">
               <el-select size="mini" v-model="scope.row.fixType" placeholder="请选择" @change="changeDosageByFixtype(scope.$index)">
                 <el-option v-for="item in fixType" :key="item.value" :label="item.label" :value="item.value">
                 </el-option>
@@ -154,7 +150,7 @@
                                 .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)"
                 v-model="scope.row.dosage">
               </el-input>
-              {{ scope.row.dosage === "" ? "" : scope.row.unit }}
+              {{ scope.row.unit }}
             </span>
             <span v-else>
               {{ scope.row.dosage | dosageFilter }}
@@ -257,7 +253,12 @@ import {
   getGY,
   addCurtainToCar,
 } from "@/api/curtain";
-import { GetDosageAll, GetDosageByNo, GetChangeItemByProductType } from "@/api/itemInfoASP";
+import {
+  GetDosageAll,
+  GetDosageByNo,
+  GetChangeItemByProductType,
+  GetMLTipByList
+} from "@/api/itemInfoASP";
 import { getItemById, GetPromotionByItem, GetUnImportOrder, GetUnImportOrderByItem } from "@/api/orderListASP";
 import Cookies from "js-cookie";
 import { mapMutations, mapActions } from "vuex";
@@ -641,6 +642,49 @@ export default {
       }
       //库存
       this.curtainData = this.getStoreData(this.curtainData);
+      //面料提示
+      this.getMLTip();
+    },
+    //获取面料的提示
+    getMLTip() {
+      //根据curtainData的数据，获取所有提示，统一提示
+      var itemNoList = [];
+      for (var i = 0; i < this.curtainData.length; i++) {
+        var oneCurtain = this.curtainData[i];
+        //if(oneCurtain.itemType == 'ls')
+        var remark = oneCurtain.remark;
+        var remainRemark = remark.match(/提示:(\S*).;/);
+        if (remainRemark == null)
+          itemNoList.push(oneCurtain.itemNo);
+      }
+      if (itemNoList.length) {
+        GetMLTipByList({ itemNoList: itemNoList }).then(res => {
+          if (res.data.length) {
+            var msgTip = "";
+            for (var i = 0; i < res.data.length; i++) {
+              if (res.data[i].NOTE) {
+                msgTip += res.data[i].ITEM_NO + ":" + res.data[i].NOTE + ";";
+                var data = this.curtainData.filter((item) => item.itemNo == res.data[i].ITEM_NO);
+                if (data.length) {
+                  for (var j = 0; j < data.length; j++) {
+                    var remark = data[j].remark;
+                    var remainRemark = remark.match(/提示:(\S*)./);
+                    if (remainRemark && remainRemark.length) remainRemark = remainRemark[1];
+                    data[j].remark = data[j].remark.replace('提示:' + remainRemark + '.', "");
+                    data[j].remark += '提示:' + res.data[i].NOTE + '.';
+                  }
+                }
+              }
+            }
+            if (msgTip) {
+              this.$alert(msgTip, "提示", {
+                confirmButtonText: "确定",
+                type: "warning",
+              });
+            }
+          }
+        })
+      }
     },
     //获取窗帘大类用量
     getDosage(data, index) {
@@ -717,7 +761,6 @@ export default {
     },
     //获取可修改的全部编码
     getAllItemNoData() {
-      this.items = [];
       GetChangeItemByProductType({
         productType: this.chooseType,
         condition: this.searchKey.toUpperCase(),
@@ -757,9 +800,8 @@ export default {
       this.curtainData[this.chooseIndex].fixGrade = data.fixGrade;
       this.curtainData[this.chooseIndex].fixType = status2 ? "" : data.fixType;
       this.curtainData[this.chooseIndex].price = price;
-      this.allData.itemList[this.chooseIndex].fixType = status2
-        ? ""
-        : data.fixType;
+      this.curtainData[this.chooseIndex].remark = "";
+      this.allData.itemList[this.chooseIndex].fixType = status2 ? "" : data.fixType;
       //非工艺修改用量
       if (!status1) {
         if (this.curtainData[this.chooseIndex].itemType === "lspb") {
@@ -767,6 +809,8 @@ export default {
           this.judgeTip(this.curtainData[this.chooseIndex], this.chooseIndex);
           //库存
           this.curtainData = this.getStoreData(this.curtainData);
+          //面料提示
+          this.getMLTip();
           return;
         }
         //修改用量
@@ -807,6 +851,8 @@ export default {
             this.judgeTip(_data, this.chooseIndex);
             //库存
             this.curtainData = this.getStoreData(this.curtainData);
+            //面料提示
+            this.getMLTip();
           })
           .catch((err) => {
             console.log(err);
@@ -818,6 +864,8 @@ export default {
         this.judgeTip(this.curtainData[this.chooseIndex], this.chooseIndex);
         //库存
         this.curtainData = this.getStoreData(this.curtainData);
+        //面料提示
+        this.getMLTip();
         if (this.curtainData[this.chooseIndex].itemNo === "GY-003") {
           this.curtainData[this.chooseIndex].dosage = this.allData.GY;
         } else {

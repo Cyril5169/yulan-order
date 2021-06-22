@@ -174,3 +174,11 @@ export function GetChangeItemByProductType(data, config = {}) {
         return Promise.reject(err);
     })
 }
+//面料提示
+export function GetMLTipByList(data, config = {}) {
+    return post('/ITEM_NOTE/GetMLTipByList', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}

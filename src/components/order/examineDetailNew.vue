@@ -206,7 +206,7 @@
                   </span>
                 </template>
               </el-table-column>
-              <el-table-column label="库存" width="60" align="center" prop="curtain_store"></el-table-column>
+              <el-table-column label="库存" width="70" align="center" prop="curtain_store"></el-table-column>
               <el-table-column label="制造说明" width="100" header-align="center" align="center">
                 <template slot-scope="scope1">
                   <div v-if="scope1.row.productType === 'XHB'"></div>

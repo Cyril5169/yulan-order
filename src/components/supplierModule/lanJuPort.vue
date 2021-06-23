@@ -108,7 +108,8 @@
             </el-table-column>
             <el-table-column width="100" label="同步标记" prop="IMPORT_FLAG" align="center">
               <template slot-scope="scope">
-                <span v-if="scope.row.IMPORT_FLAG == 'Y'">已同步</span>
+                <span v-if="scope.row.ORDER_NO.substring(0, 1) != 'X' && scope.row.ORDER_NO.substring(0, 1) != 'N' && scope.row.ORDER_NO.substring(0, 1) != 'Y'"></span>
+                <span v-else-if="scope.row.IMPORT_FLAG == 'Y'">已同步</span>
                 <button v-else class="btn-style" @click="onClickAsync(scope.row)">同步订单</button>
               </template>
             </el-table-column>
@@ -255,7 +256,7 @@
           <el-table-column prop="MGUIGE" label="物料型号" align="center" width="120"></el-table-column>
           <el-table-column prop="MNAME" label="名称" header-align="center" width="80"></el-table-column>
           <el-table-column prop="GRADE" label="规格" header-align="center" width="70"></el-table-column>
-          <el-table-column prop="QTY_PUR" label="数量" header-align="center" align="right" width="60">
+          <el-table-column prop="QTY_PUR" label="数量" header-align="center" align="right" width="70">
           </el-table-column>
           <el-table-column label="含税单价" header-align="center" align="right" width="80">
             <template slot-scope="scope">
@@ -803,7 +804,7 @@
             <el-table-column prop="MGUIGE" label="物料型号" align="center" width="120"></el-table-column>
             <el-table-column prop="MNAME" label="名称" header-align="center" width="80"></el-table-column>
             <el-table-column prop="GRADE" label="规格" header-align="center" width="80"></el-table-column>
-            <el-table-column prop="QTY_PUR" label="数量" header-align="center" align="right" width="60">
+            <el-table-column prop="QTY_PUR" label="数量" header-align="center" align="right" width="70">
             </el-table-column>
             <el-table-column label="含税单价" header-align="center" align="right" width="80">
               <template slot-scope="scope">
@@ -1422,13 +1423,14 @@ export default {
           arr_pur: this.multipleSelection,
           batchdate_deliver: this.batchdate_deliver,
         };
-        UpdateCheckFlagBatch(data).then(async (res) => {
-          this.$alert("批量确认成功", "提示", {
-            confirmButtonText: "确定",
-            type: "success",
-          });
+        UpdateCheckFlagBatch(data).then(async res => {
           //同步到布精灵
           await this.asyncBuJingLing(res.data);
+          this.$message({
+            message: "批量确认成功!",
+            type: "success",
+            duration: 1000
+          });
           this.autoSearch();
         })
           .catch((res) => {
@@ -1438,30 +1440,6 @@ export default {
             });
           });
       }
-    },
-    BatchSure() {
-      let arr_pur = [];
-      for (let i = 0; i < this.multipleSelection.length; i++) {
-        arr_pur.push(this.multipleSelection[i].PUR_NO);
-      }
-      var data = {
-        arr_pur: arr_pur,
-        batchdate_deliver: this.batchdate_deliver,
-      };
-      UpdateCheckFlagBatch(data)
-        .then((res) => {
-          this.$alert("批量确认成功", "提示", {
-            confirmButtonText: "确定",
-            type: "success",
-          });
-          this.autoSearch();
-        })
-        .catch((res) => {
-          this.$alert("批量确认失败，请稍后重试", "提示", {
-            confirmButtonText: "确定",
-            type: "warning",
-          });
-        });
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
@@ -2302,12 +2280,12 @@ export default {
     },
     downLoadY() {
       var PUR_NO = this.pur_headForm.PUR_NO;
-      if (this.orderNoPreFix == "Y") {
-        downLoadFile(this.Global.baseUrl + `PUR_HEAD/CreateExcelY?PUR_NO=${PUR_NO}`);
-      } else if (this.orderNoPreFix == "X") {
+      if (this.orderNoPreFix == "X") {
         downLoadFile(this.Global.baseUrl + `PUR_HEAD/CreateExcel?PUR_NO=${PUR_NO}`);
       } else if (this.orderNoPreFix == "N") {
         downLoadFile(this.Global.baseUrl + `PUR_HEAD/CreateExcelN?PUR_NO=${PUR_NO}`);
+      }else {
+        downLoadFile(this.Global.baseUrl + `PUR_HEAD/CreateExcelY?PUR_NO=${PUR_NO}`);
       }
     },
     downLoadAll() {
@@ -2366,7 +2344,7 @@ export default {
 
         this.supply_check_notes = this.pur_headForm.SUPPLY_CHECK_NOTES;
         this.date_deliver = "";
-
+        console.log(this.orderNoPreFix)
         if (this.orderNoPreFix == "X") {
           this.gridData = res.data;
           let loc = [];
@@ -2505,7 +2483,8 @@ export default {
               this.checkedVisible = true;
             }
           })
-        } else if (this.orderNoPreFix == "Y") {
+        } else {
+          //软装和手工单
           this.gridData = res.data;
 
           if (row.SUPPLY_CHECK_FLAG === "0") {

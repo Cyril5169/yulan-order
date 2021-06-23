@@ -213,7 +213,7 @@ export default {
             confirmButtonText: "好的",
           });
           return;
-        } else data.activityId = null;
+        }
       }
       if (data.wbhFlag == "1" && data.isWBH == false && data.WBH !== "") {
         this.$alert("在填写了帘外包宽度的情况下，请勾选前面的按钮!!", "提示", {

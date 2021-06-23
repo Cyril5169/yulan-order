@@ -49,6 +49,14 @@
       <el-table-column width="1" type="expand">
         <!-- 窗帘详情 -->
         <template slot-scope="scopeHead">
+          <div style="margin:0 0 10px 10px;">
+            <span style="color:#8bc34a">制作方向:</span>
+            <el-select size="mini" style="width:100px;" v-model="scopeHead.row.CURTAIN_FIX_TYPE"
+              @change="changeFixType($event, scopeHead.$index)">
+              <el-option v-for="item in fixTypeOptions" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
+          </div>
           <div class="curtain-list">
             <el-table :data="scopeHead.row.curtains" ref="curtainTable" class="curtain-table" border
               :row-class-name="tableRowClassName">
@@ -257,7 +265,7 @@
                   <span v-else>-</span>
                 </template>
               </el-table-column>
-              <el-table-column label="库存" width="60" align="center" prop="curtain_store"></el-table-column>
+              <el-table-column label="库存" width="70" align="center" prop="curtain_store"></el-table-column>
               <el-table-column label="单价" width="60" align="center" prop="PRICE">
                 <template slot-scope="scope">
                   <!-- 只有部件算钱 -->
@@ -403,7 +411,7 @@
                 </el-table-column>
                 <el-table-column label="名称" width="80" header-align="center" prop="NOTE">
                 </el-table-column>
-                <el-table-column label="库存" width="60" align="center" prop="curtain_store"></el-table-column>
+                <el-table-column label="库存" width="70" align="center" prop="curtain_store"></el-table-column>
                 <el-table-column label="单价" width="60" align="center" prop="PRICE">
                   <template slot-scope="scope">
                     <!-- 只有部件算钱 -->
@@ -540,7 +548,17 @@ export default {
       },
       oldCurtainData: [],
       newCurtainData: [],
-      deleteIds: []
+      deleteIds: [],
+      fixTypeOptions: [
+        {
+          value: "01",
+          label: "定宽",
+        },
+        {
+          value: "02",
+          label: "定高",
+        },
+      ],
     }
   },
   computed: {
@@ -1051,6 +1069,14 @@ export default {
       }
       return price;
     },
+    changeFixType(value, index) {
+      this.currentIndex = index
+      var curtains = this.ruleForm.ORDERBODY[this.currentIndex].curtains;
+      for (var i = 0; i < curtains.length; i++) {
+        //计算明细用量
+        this.calculateChildrenDosage(i);
+      }
+    },
     //转换数字
     convertNumber(val) {
       if (typeof val === 'number' && !isNaN(val)) return val;
@@ -1155,14 +1181,14 @@ export default {
             pb1Zhe = pb1Commodity.WRINKLE;
             pb1Commodity.ZE_QTY = pb1Commodity.WRINKLE * pianParam.NCP_VALUE;
             //幅数和用量区分定宽定高
-            if (orderDetail.FIX_TYPE == "01") {
+            if (orderDetail.CURTAIN_FIX_TYPE == "01") {
               //定宽
               //配布1幅数 = 配布1褶数 / 最大褶数
               pb1Commodity.FU_QTY = this.dosageFilter(pb1Commodity.ZE_QTY / maxzheParam.NCP_VALUE);
               //配布1用量 = （帘身高 + 高度折边用量）* 配布1幅数（进位取整）
               pb1Commodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * Math.ceil(pb1Commodity.FU_QTY));
             }
-            else if (orderDetail.FIX_TYPE == "02") {
+            else if (orderDetail.CURTAIN_FIX_TYPE == "02") {
               //定高
               //配布1用量 = 配布1褶数 * 完整褶用量
               pb1Commodity.DOSAGE = this.dosageFilter(pb1Commodity.ZE_QTY * zheParam.NCP_VALUE);
@@ -1192,14 +1218,14 @@ export default {
             pb2Zhe = pb2Commodity.WRINKLE;
             pb2Commodity.ZE_QTY = pb2Commodity.WRINKLE * pianParam.NCP_VALUE;
             //幅数和用量区分定宽定高
-            if (orderDetail.FIX_TYPE == "01") {
+            if (orderDetail.CURTAIN_FIX_TYPE == "01") {
               //定宽
               //配布2幅数 = 配布2褶数 / 最大褶数
               pb2Commodity.FU_QTY = this.dosageFilter(pb2Commodity.ZE_QTY / maxzheParam.NCP_VALUE);
               //配布2用量 = （帘身高 + 高度折边用量）* 配布2幅数（进位取整）
               pb2Commodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * Math.ceil(pb2Commodity.FU_QTY));
             }
-            else if (orderDetail.FIX_TYPE == "02") {
+            else if (orderDetail.CURTAIN_FIX_TYPE == "02") {
               //定高
               //配布2用量 = 配布2褶数 * 完整褶用量 + 边用量 * 片数
               pb2Commodity.DOSAGE = this.dosageFilter(pb2Commodity.ZE_QTY * zheParam.NCP_VALUE + bianParam.NCP_VALUE * pianParam.NCP_VALUE);
@@ -1228,14 +1254,14 @@ export default {
             //主布褶数 = （单片褶数 - 配布1下单褶数 - 配布2下单褶数）* 片数
             zbCommodity.ZE_QTY = (singleZhe - pb1Zhe - pb2Zhe) * pianParam.NCP_VALUE;
             //幅数和用量区分定宽定高
-            if (orderDetail.FIX_TYPE == "01") {
+            if (orderDetail.CURTAIN_FIX_TYPE == "01") {
               //定宽
               //主布幅数 = 主布褶数 / 最大褶数
               zbCommodity.FU_QTY = this.dosageFilter(zbCommodity.ZE_QTY / maxzheParam.NCP_VALUE);
               //主布用量 = （帘身高 + 高度折边用量）* 主布幅数（进位取整）
               zbCommodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * Math.ceil(zbCommodity.FU_QTY));
             }
-            else if (orderDetail.FIX_TYPE == "02") {
+            else if (orderDetail.CURTAIN_FIX_TYPE == "02") {
               //定高
               //主布用量 = 主布褶数 * 完整褶用量 + 边用量（有配布*1，无配布*2） * 片数
               var pbCount = 2;
@@ -1330,14 +1356,14 @@ export default {
             //主布褶数 = 单片褶数 * 片数
             zbCommodity.ZE_QTY = singleZhe * pianParam.NCP_VALUE;
             //幅数和用量区分定宽定高
-            if (orderDetail.FIX_TYPE == "01") {
+            if (orderDetail.CURTAIN_FIX_TYPE == "01") {
               //定宽
               //主布幅数 = 主布褶数 / 最大褶数
               zbCommodity.FU_QTY = this.dosageFilter(zbCommodity.ZE_QTY / maxzheParam.NCP_VALUE);
               //主布用量 = （窗纱高 + 高度折边用量）* 0.8 * 主布幅数（进位取整）
               zbCommodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * 0.8 * Math.ceil(zbCommodity.FU_QTY));
             }
-            else if (orderDetail.FIX_TYPE == "02") {
+            else if (orderDetail.CURTAIN_FIX_TYPE == "02") {
               //定高
               //主布用量 = 主布褶数 * 完整褶用量 + 边用量 * 2 * 片数
               zbCommodity.DOSAGE = this.dosageFilter(zbCommodity.ZE_QTY * zheParam.NCP_VALUE + bianParam.NCP_VALUE * 2 * pianParam.NCP_VALUE);
@@ -1357,14 +1383,14 @@ export default {
             //配布褶数 = 主布褶数
             pbCommodity.ZE_QTY = zbCommodity.ZE_QTY;
             //幅数和用量区分定宽定高
-            if (orderDetail.FIX_TYPE == "01") {
+            if (orderDetail.CURTAIN_FIX_TYPE == "01") {
               //定宽
               //配布幅数 = 主布幅数
               pbCommodity.FU_QTY = zbCommodity.FU_QTY;
               //配布用量 = 窗纱高 / 5 * 配布幅数（进位取整）
               pbCommodity.DOSAGE = this.dosageFilter(height / 5 * Math.ceil(pbCommodity.FU_QTY));
             }
-            else if (orderDetail.FIX_TYPE == "02") {
+            else if (orderDetail.CURTAIN_FIX_TYPE == "02") {
               //定高
               //配布用量 = 主布用量 / 2
               pbCommodity.DOSAGE = this.dosageFilter(zbCommodity.DOSAGE / 2);
@@ -1404,7 +1430,7 @@ export default {
             //下脚配布褶数 = 主布褶数
             xjCommodity.ZE_QTY = zbCommodity.ZE_QTY;
             //幅数和用量区分定宽定高
-            if (orderDetail.FIX_TYPE == "01") {
+            if (orderDetail.CURTAIN_FIX_TYPE == "01") {
               //定宽
               //下脚配布幅数 = 主布幅数
               xjCommodity.FU_QTY = zbCommodity.FU_QTY;
@@ -1413,7 +1439,7 @@ export default {
               //有下脚时，主布用量 = （窗纱高 - 下脚高）* 主布幅数（进位取整）
               zbCommodity.DOSAGE = this.dosageFilter((height - this.curtainParamsList.xiajiaoHeightParam.NCP_VALUE) * Math.ceil(zbCommodity.FU_QTY));
             }
-            else if (orderDetail.FIX_TYPE == "02") {
+            else if (orderDetail.CURTAIN_FIX_TYPE == "02") {
               //定高
               //下脚配布用量 = 主布用量 / 片数
               xjCommodity.DOSAGE = this.dosageFilter(zbCommodity.DOSAGE / pianParam.NCP_VALUE);
@@ -1427,7 +1453,7 @@ export default {
 
         //窗纱没有配布也没有下脚时
         if (!pbCommodity.ID && !xjCommodity.ID) {
-          if (orderDetail.FIX_TYPE == "01" && zbCommodity.ITEM_NO) {
+          if (orderDetail.CURTAIN_FIX_TYPE == "01" && zbCommodity.ITEM_NO) {
             //主布用量 = (窗纱高 + 高度折边用量) * 主布幅数(进位取整)
             zbCommodity.DOSAGE = this.dosageFilter((height + HightBianParam.NCP_VALUE) * Math.ceil(zbCommodity.FU_QTY));
           }
@@ -2176,7 +2202,7 @@ export default {
           } else {
             oneCurtain.ILLUSTRATE = oneCurtain.ILLUSTRATE.replace('不足4平方米。按4平方米下单量收费;', '');
           }
-          if (orderDetail.FIX_TYPE == '02') {
+          if (orderDetail.CURTAIN_FIX_TYPE == '02') {
             var height = this.convertNumber(oneCurtain.HEIGHT);
             var childrenCurtain = allCurtains.filter(item =>
               item.NCM_PID == oneCurtain.NC_MODEL_ID

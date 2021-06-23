@@ -261,7 +261,7 @@
                 <span v-else>-</span>
               </template>
             </el-table-column>
-            <el-table-column label="库存" width="60" align="center" prop="curtain_store"></el-table-column>
+            <el-table-column label="库存" width="70" align="center" prop="curtain_store"></el-table-column>
             <el-table-column label="单价" width="60" align="center" prop="PRICE" v-if="isManager != '0'">
               <template slot-scope="scope">
                 <!-- 只有部件算钱 -->
@@ -356,7 +356,7 @@
                 </el-table-column>
                 <el-table-column label="名称" width="80" header-align="center" prop="NOTE">
                 </el-table-column>
-                <el-table-column label="库存" width="60" align="center" prop="curtain_store"></el-table-column>
+                <el-table-column label="库存" width="70" align="center" prop="curtain_store"></el-table-column>
                 <el-table-column label="单价" width="60" align="center" prop="PRICE" v-if="isManager != '0'">
                   <template slot-scope="scope">
                     <!-- 只有部件算钱 -->

@@ -198,7 +198,7 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="库存" width="60" align="center" prop="curtain_store"></el-table-column>
+        <el-table-column label="库存" width="70" align="center" prop="curtain_store"></el-table-column>
         <el-table-column v-if="isManager != '0' ||  (isManager == '0' && check_CURTAIN_STATUS_ID == -1)" label="总价" align="center"
           width="60">
           <template slot-scope="scope">
@@ -322,6 +322,11 @@
         <el-button class="ml10" type="danger" @click="dialogTableVisible = false" plain>取消</el-button>
       </footer>
     </el-dialog>
+
+    <!-- 面料提示信息 -->
+    <el-dialog width="800px" title="提示" :visible.sync="mlTipVisible" :close-on-click-modal="false">
+      <div v-html="mlTipTxt"></div>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -427,6 +432,8 @@ export default {
       suggestionLJ: "", //兰居人员总体审核意见
       check_CURTAIN_STATUS_ID: Cookies.get("CURTAIN_STATUS_ID"),
       previewUrlList: [],
+      mlTipVisible: false,
+      mlTipTxt: "",
     };
   },
   props: [
@@ -821,17 +828,19 @@ export default {
       this.data[this.chooseIndex].specification = data.fixGrade / 1000;
       this.data[this.chooseIndex].price = price;
       this.data[this.chooseIndex].note = "";
-      let theFixType;
+
+      this.data[this.chooseIndex].item.itemNo = this.itemNo;
+      this.judgeTip(this.data[this.chooseIndex], this.chooseIndex);
+      //库存
+      this.data = this.getStoreData(this.data);
+      //面料提示
+      this.getMLTip([this.data[this.chooseIndex]]);
+
       if (this.data[this.chooseIndex].itemType === "lspb") {
-        this.data[this.chooseIndex].certainHeightWidth = null;
-        this.data[this.chooseIndex].item.itemNo = this.itemNo;
-        this.judgeTip(this.data[this.chooseIndex], this.chooseIndex);
-        //库存
-        this.data = this.getStoreData(this.data);
-        //面料提示
-        this.getMLTip();
         return;
       }
+
+      let theFixType;
       if (data.fixType === "01") {
         theFixType = 1;
       } else if (data.fixType === "02") {
@@ -862,46 +871,33 @@ export default {
           itemType: this.data[index].itemType,
           fixType: _fixType,
         };
-        GetDosageByNo(obj)
-          .then((res) => {
-            if (res.data.length == 0) {
-              this.$alert("用量获取失败", "提示", {
-                confirmButtonText: "好的",
-                type: "warning",
-              });
-              return;
-            }
-            let _data = this.data[this.chooseIndex];
-            let keys;
-            // if (_data.itemType == "lt")
-            //   keys = Math.round(res.data[0].dosage * 100) / 100;
-            // else keys = Math.round(res.data[0].dosage * 10) / 10;
-            keys = Math.round(res.data[0].dosage * 100) / 100;
-            //绣花边只需要修改自身，无需修改面料
-            if (_data.productType === "XHB") {
-              this.data[this.chooseIndex].dosage = keys;
-            }
-            //面料除了修改自身，还需修改所有其他的，除了LCB、XHB之外的所有，工艺继续做进一步判断
-            else if (_data.productType === "ML") {
-              this.updateDosage(_data.itemType, keys);
-            }
-            this.data[this.chooseIndex].item.itemNo = this.itemNo;
-            this.judgeTip(this.data[this.chooseIndex], this.chooseIndex);
-            //库存
-            this.data = this.getStoreData(this.data);
-            //面料提示
-            this.getMLTip();
-          })
+        GetDosageByNo(obj).then((res) => {
+          if (res.data.length == 0) {
+            this.$alert("用量获取失败", "提示", {
+              confirmButtonText: "好的",
+              type: "warning",
+            });
+            return;
+          }
+          let _data = this.data[this.chooseIndex];
+          let keys;
+          // if (_data.itemType == "lt")
+          //   keys = Math.round(res.data[0].dosage * 100) / 100;
+          // else keys = Math.round(res.data[0].dosage * 10) / 10;
+          keys = Math.round(res.data[0].dosage * 100) / 100;
+          //绣花边只需要修改自身，无需修改面料
+          if (_data.productType === "XHB") {
+            this.data[this.chooseIndex].dosage = keys;
+          }
+          //面料除了修改自身，还需修改所有其他的，除了LCB、XHB之外的所有，工艺继续做进一步判断
+          else if (_data.productType === "ML") {
+            this.updateDosage(_data.itemType, keys);
+          }
+        })
           .catch((err) => {
             console.log(err);
           });
       } else if (status1) {
-        this.data[this.chooseIndex].item.itemNo = this.itemNo;
-        this.judgeTip(this.data[this.chooseIndex], this.chooseIndex);
-        //库存
-        this.data = this.getStoreData(this.data);
-        //面料提示
-        this.getMLTip();
         if (this.data[this.chooseIndex].item.itemNo === "GY-003") {
           this.data[this.chooseIndex].dosage = this.curtainData[this.chooseIndex].dosage;
         } else {
@@ -1249,7 +1245,7 @@ export default {
           _manufacturingInstructions === "特殊见备注" ||
           _manufacturingInstructions === "特殊开备注"
         ) {
-          if (this.isNull(_curtainData[i].note)) {
+          if (!_curtainData[i].note) {
             this.$alert("特殊开的备注不能为空", "提示", {
               confirmButtonText: "好的",
               type: "warning",
@@ -1391,13 +1387,6 @@ export default {
     },
     ...mapMutations("navTabs", ["addTab"]),
     ...mapActions("navTabs", ["closeTab", "closeToTab"]),
-    //判空
-    isNull(str) {
-      if (str === "" || str === undefined || str === null) return true;
-      var regu = "^[ ]+$";
-      var re = new RegExp(regu);
-      return re.test(str);
-    },
     //获取原对比数据
     async getOldData(data) {
       if (this.tableStatus === 3) return;
@@ -1482,7 +1471,7 @@ export default {
       });
     },
     //大类二类的勾选联动，是否出现×号
-    bigToSmall: function (data) {
+    bigToSmall(data) {
       let index = -1;
       switch (data.itemType) {
         case "lt":
@@ -1582,41 +1571,35 @@ export default {
       this.previewUrlList[index].show = false;
     },
     //获取面料的提示
-    getMLTip() {
+    getMLTip(originData) {
       //根据curtainData的数据，获取所有提示，统一提示
       var itemNoList = [];
-      for (var i = 0; i < this.data.length; i++) {
-        var oneCurtain = this.data[i];
-        //if(oneCurtain.itemType == 'ls')
-        var remark = oneCurtain.note;
-        var remainRemark = remark.match(/提示:(\S*).;/);
-        if (remainRemark == null)
+      for (var i = 0; i < originData.length; i++) {
+        var oneCurtain = originData[i];
+        if (itemNoList.indexOf(oneCurtain.item.itemNo) == -1)
           itemNoList.push(oneCurtain.item.itemNo);
       }
       if (itemNoList.length) {
         GetMLTipByList({ itemNoList: itemNoList }).then(res => {
           if (res.data.length) {
-            var msgTip = "";
+            this.mlTipTxt = "";
             for (var i = 0; i < res.data.length; i++) {
-              if (res.data[i].NOTE) {
-                msgTip += res.data[i].ITEM_NO + ":" + res.data[i].NOTE + ";";
-                var data = this.data.filter((item) => item.item.itemNo == res.data[i].ITEM_NO);
-                if (data.length) {
-                  for (var j = 0; j < data.length; j++) {
-                    var remark = data[j].note;
-                    var remainRemark = remark.match(/提示:(\S*)./);
-                    if (remainRemark && remainRemark.length) remainRemark = remainRemark[1];
-                    data[j].note = data[j].note.replace('提示:' + remainRemark + '.', "");
-                    data[j].note += '提示:' + res.data[i].NOTE + '.';
+              var data = this.data.filter(item => item.item.itemNo == res.data[i].ITEM_NO);
+              if (data.length) {
+                for (var j = 0; j < data.length; j++) {
+                  if (data[j].note.indexOf(res.data[i].NOTE_NOTE) == -1) {
+                    if (res.data[i].NOTE_NOTE) {
+                      data[j].note += res.data[i].NOTE_NOTE;
+                    }
+                    if (res.data[i].NOTE) {
+                      this.mlTipTxt += this.getTypeName(data[j].itemType) + ":" + res.data[i].ITEM_NO + ":" + res.data[i].NOTE + "<br /><br />";
+                    }
                   }
                 }
               }
             }
-            if (msgTip) {
-              this.$alert(msgTip, "提示", {
-                confirmButtonText: "确定",
-                type: "warning",
-              });
+            if (this.mlTipTxt) {
+              this.mlTipVisible = true;
             }
           }
         })
@@ -1642,7 +1625,7 @@ export default {
     //库存
     this.data = this.getStoreData(this.data);
     //面料提示
-    this.getMLTip();
+    this.getMLTip(this.data);
   },
 };
 </script>

@@ -1208,7 +1208,7 @@ export default {
     },
     //获取备注文字
     getRemark(data, rowIndex) {
-      if (data.certainHeightWidth === 0 && data.productType == 'ML') {
+      if (data.certainHeightWidth === 0 && data.productType == 'ML' && data.itemType != 'lspb') {
         if (data.specification < this.ruleForm.ORDERBODY[rowIndex].CURTAIN_HEIGHT && data.specification > 0) {
           return "超高帘，用量待审核!!";
         }

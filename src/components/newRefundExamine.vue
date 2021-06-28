@@ -15,50 +15,54 @@
           <el-option v-for="item in statusArray" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
         </el-select>
-        <el-button type="success" @click.native="clickSearch" style="margin-right:6px;">查 询</el-button>
-        <el-button type="warning" @click.native="resetSearch" style="margin-right:6px;">重 置</el-button>
+        <el-button type="success" @click="clickSearch" style="margin-right:6px;">查 询</el-button>
+        <el-button type="warning" @click="resetSearch" style="margin-right:6px;">重 置</el-button>
       </div>
       <div class="tbarStyle">
         <span style="margin-right:24px">型号：</span>
-        <el-input clearable v-model="selectItemNo" style="width:14%;margin-right:10px;" placeholder="产品型号">
+        <el-input clearable v-model="selectItemNo" style="width:14%;margin-right:10px;" placeholder="产品型号"
+          @keyup.enter.native="clickSearch">
         </el-input>
         <span style="margin-right:5px">客户名：</span>
-        <el-input clearable v-model="selectCNAME" style="width:14%;margin-right:10px;" placeholder="客户名">
+        <el-input clearable v-model="selectCNAME" style="width:14%;margin-right:10px;" placeholder="客户名"
+          @keyup.enter.native="clickSearch">
         </el-input>
         <span style="margin-right:5px">处理人：</span>
-        <el-input clearable style="width:14%;margin-right:10px;" v-model="selectDealor" placeholder="处理人">
+        <el-input clearable style="width:14%;margin-right:10px;" v-model="selectDealor" placeholder="处理人"
+          @keyup.enter.native="clickSearch">
         </el-input>
-        <el-button @click.native="checkNoPrint" style="margin-right:6px;width:168px">查看未打印
+        <el-button @click="checkNoPrint" style="margin-right:6px;width:168px">查看未打印
         </el-button>
       </div>
+
       <el-table border :row-class-name="tableRowClassName" :data="tableData" style="width: 100%">
-        <el-table-column width="130" label="编号" prop="ID" align="center">
+        <el-table-column width="120" label="编号" prop="ID" align="center">
         </el-table-column>
-        <el-table-column width="145" label="创建时间" align="center">
+        <el-table-column width="130" label="创建时间" align="center">
           <template slot-scope="scope">
             {{ scope.row.CREATE_TS | datatrans }}
           </template>
         </el-table-column>
         <el-table-column label="客户名称" prop="CNAME" align="center">
         </el-table-column>
-        <el-table-column width="90" label="联系人" prop="CONTACT_MAN" align="center">
+        <el-table-column width="100" label="联系人" prop="CONTACT_MAN" align="center">
         </el-table-column>
-        <el-table-column width="120" label="联系电话" prop="CONTACT_PHONE" align="center">
+        <el-table-column width="110" label="联系电话" prop="CONTACT_PHONE" align="center">
         </el-table-column>
-        <el-table-column width="70" label="货品数" prop="ITEM_COUNT" align="center">
+        <el-table-column width="60" label="货品数" prop="ITEM_COUNT" align="center">
         </el-table-column>
         <el-table-column width="120" label="状态" align="center">
           <template slot-scope="scope">
             {{ scope.row.STATE | transStatus }}
           </template>
         </el-table-column>
-        <el-table-column label="处理人" prop="DEALMAN_NAME" align="center">
+        <el-table-column width="120" label="物流信息备注" prop="RETURN_TRANSINFO" align="center">
+        </el-table-column>
+        <el-table-column width="70" label="处理人" prop="DEALMAN_NAME" align="center">
           <template slot-scope="scope">
             {{  DealManTrans(scope.row) }}
           </template>
         </el-table-column>
-
-        <!-- 未做 -->
         <el-table-column width="100" label="操作" align="center">
           <template slot-scope="scope">
             <el-button circle style="padding: 7px;" type="warning" icon="el-icon-search" size="mini"
@@ -68,13 +72,14 @@
                   scope.row.STATE == 'SUBMITTED' ||
                     scope.row.STATE == 'RECEIVE' ||
                     scope.row.STATE == 'CUSTOMERAFFIRM' ||
-                    scope.row.STATE == 'SENDBACK'
+                    scope.row.STATE == 'SENDBACK' ||
+                    scope.row.STATE == 'WRITEEDTRANS'
                 " circle style="padding: 7px;" @click="_CheckDetail(scope.row, 2)" type="primary" icon="el-icon-edit"
               size="mini">
             </el-button>
           </template>
         </el-table-column>
-        <el-table-column width="100" label="打印标记" prop="PRINTED" align="center">
+        <el-table-column width="80" label="打印标记" prop="PRINTED" align="center">
           <template slot-scope="scope">
             <el-checkbox v-if="scope.row.STATE === 'APPROVED'" @change="changePrinted(scope.row, scope.$index)"
               v-model="scope.row.PRINTED">
@@ -88,7 +93,7 @@
       </el-pagination>
     </el-card>
 
-    <el-dialog :visible.sync="RefundDetail" :close-on-click-modal="false" width="1000px" append-to-body>
+    <el-dialog :visible.sync="RefundDetail" :close-on-click-modal="false" width="1100px" append-to-body>
       <!-- 查看区 -->
       <div v-if="isCheck" id="printTable">
         <div style="margin-bottom:5px;">
@@ -176,149 +181,126 @@
                 </ul>
               </td>
             </tr>
-            <tr v-if="submit.STATE != 'SUBMITTED'">
-              <td class="grayTD" style="font-size:20px;height:30px" colspan="8">
-                玉兰处理意见
-              </td>
-            </tr>
-            <tr v-if="submit.STATE == 'SENDBACK'">
-              <td class="grayTD">
-                初审意见或退回原因<span style="color:red;">*</span>
-              </td>
-              <td colspan="7">{{ submit.FIRST_AUDITION }}</td>
-            </tr>
-            <tr v-if="submit.STATE != 'SUBMITTED' && submit.STATE != 'SENDBACK'">
-              <td class="grayTD">
-                初审意见<span style="color:red;">*</span>
-              </td>
-              <td colspan="2">{{ submit.RETURN_TYPE }}</td>
-              <td colspan="5">{{ submit.FIRST_AUDITION }}</td>
-            </tr>
-            <tr v-if="
-                  submit.STATE != 'SUBMITTED' &&
-                    submit.STATE != 'SENDBACK' &&
-                    submit.RETURN_TYPE != '无需退货'
-                ">
-              <td class="grayTD">备注信息</td>
-              <td colspan="7" v-if="submit.RETURN_TYPE == '玉兰取货'">
-                我公司已安排物流公司上门取货，请保持电话畅通
-              </td>
-              <td colspan="7" v-if="submit.RETURN_TYPE == '客户邮寄'">
-                请您在快递单上备注提货单号
-              </td>
-              <td colspan="7" v-else></td>
-            </tr>
-            <tr v-if="
-                  submit.STATE != 'SUBMITTED' &&
-                    submit.STATE != 'SENDBACK' &&
-                    submit.RETURN_TYPE == '客户邮寄'
-                ">
-              <td class="grayTD">退货或寄样信息</td>
-              <td colspan="7">
-                {{ submit.RETURN_ADDRESS }}
-              </td>
-            </tr>
-            <tr v-if="
-                  submit.STATE != 'SUBMITTED' &&
-                    submit.STATE != 'SENDBACK' &&
-                    submit.RETURN_TYPE == '客户邮寄'
-                ">
-              <td class="grayTD">邮寄备注信息</td>
-              <td colspan="7">
-                您的提货单号为{{ submit.SALE_NO }}
-              </td>
-            </tr>
-            <tr v-if="
-                  submit.STATE != 'SUBMITTED' &&
-                    submit.STATE != 'SENDBACK' &&
-                    submit.RETURN_TYPE == '客户邮寄'
-                ">
-              <td class="grayTD">物流备注信息</td>
-              <td style=";color:red;" colspan="7" v-if="!submit.RETURN_TRANSINFO && submit.STATE == 'RECEIVE'">
-                {{ submit.RETURN_TRANSINFO | transInfoTip }}
-              </td>
-              <td colspan="7" v-if="!submit.RETURN_TRANSINFO && submit.STATE != 'RECEIVE'">
-                {{ submit.RETURN_TRANSINFO | transInfoTip }}
-              </td>
-              <td colspan="7" v-if="submit.RETURN_TRANSINFO !== ''">
-                {{ submit.RETURN_TRANSINFO }}
-              </td>
-            </tr>
-            <!-- 初审意见附件下载 -->
-            <tr v-if="submit.STATE != 'SUBMITTED'&&submit.STATE != 'SENDBACK'">
-              <td class="grayTD">附件</td>
-              <td colspan="7">
-                <ul class="el-upload-list el-upload-list--text">
-                  <li v-for="(file, index) in fileListForAudition" :key="index" class="el-upload-list__item is-success"
-                    tabindex="0">
-                    <a class="el-upload-list__item-name">
-                      <el-link type="primary" size="mini" @click="showImage(file.url)"
-                        @mouseenter.native="showMiniImage($event, file.url)" @mouseout.native="MiniPic = false">
-                        {{ file.name }}
-                      </el-link>
-                    </a>
-                    <label style="display:block;position:absolute;top:1px;right:10px;">
-                      <a @click="downLoad(file.url)">下载</a>
-                    </label>
-                  </li>
-                </ul>
-              </td>
-            </tr>
-            <tr v-if="
-                  submit.STATE == 'CUSTOMERAFFIRM' || submit.STATE == 'APPROVED'
-                ">
-              <td class="grayTD" style="font-size:20px;height:30px" colspan="8">
-                玉兰处理结果
-              </td>
-            </tr>
-            <tr v-if="
-                  submit.STATE == 'CUSTOMERAFFIRM' || submit.STATE == 'APPROVED'
-                ">
-              <td class="grayTD" style="width:12%;">产品/项目</td>
-              <td class="grayTD" style="width:14%;">型号</td>
-              <td class="grayTD" style="width:10%;">单位</td>
-              <td class="grayTD" style="width:8%;">数量</td>
-              <td class="grayTD" style="width:8%;">金额</td>
-              <td class="grayTD" style="width:13%;">质量问题</td>
-              <td class="grayTD" style="width:15%;">处理意见</td>
-              <td class="grayTD" style="width:20%;">附件</td>
-            </tr>
-            <tr v-if="submit.STATE == 'CUSTOMERAFFIRM' || submit.STATE == 'APPROVED' " v-for="(item, index) of processDetail"
-              :key="index">
-              <td>{{ submit.PRODUCTION_VERSION }}</td>
-              <td>{{ submit.ITEM_NO }}</td>
-              <td>{{ submit.UNIT }}</td>
-              <td>{{ processDetail[index].P_QTY }}</td>
-              <td>{{ processDetail[index].P_MONEY }}</td>
-              <td>{{ processDetail[index].P_NOTES }}</td>
-              <td>{{ processDetail[index].P_RESULT }}</td>
-              <td>
-                <ul class="el-upload-list el-upload-list--text" v-if="processDetail[index].fileListForProcess.length">
-                  <li v-for="(file, index) in processDetail[index]
+            <!-- 已提交不能查看下面这些 -->
+            <template v-if="submit.STATE != 'SUBMITTED'">
+              <!-- 初审意见 -->
+              <tr>
+                <td class="grayTD" style="font-size:20px;height:30px" colspan="8">
+                  玉兰处理意见
+                </td>
+              </tr>
+              <tr v-if="submit.STATE != 'SENDBACK'">
+                <td class="grayTD">初审意见</td>
+                <td colspan="2">{{ submit.RETURN_TYPE }}</td>
+                <td colspan="5">{{ submit.FIRST_AUDITION }}</td>
+              </tr>
+              <tr v-else>
+                <td class="grayTD">初审意见或退回原因</td>
+                <td colspan="7">{{ submit.FIRST_AUDITION }}</td>
+              </tr>
+              <!-- 无需退货 -->
+              <tr v-if="submit.STATE != 'SENDBACK' && submit.RETURN_TYPE != '无需退货'">
+                <td class="grayTD">备注信息</td>
+                <td colspan="7" v-if="submit.RETURN_TYPE == '玉兰取货'">
+                  我公司已安排物流公司上门取货，请保持电话畅通
+                </td>
+                <td colspan="7" v-if="submit.RETURN_TYPE == '客户邮寄'">
+                  请您在快递单上备注提货单号
+                </td>
+                <td colspan="7" v-else></td>
+              </tr>
+              <!-- 客户邮寄 -->
+              <template v-if="submit.RETURN_TYPE == '客户邮寄'">
+                <tr>
+                  <td class="grayTD">退货或寄样信息</td>
+                  <td colspan="7">{{ submit.RETURN_ADDRESS }}</td>
+                </tr>
+                <tr>
+                  <td class="grayTD">邮寄备注信息</td>
+                  <td colspan="7">
+                    您的提货单号为{{ submit.SALE_NO }}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="grayTD">物流备注信息</td>
+                  <td colspan="7">
+                    <span v-if="submit.RETURN_TRANSINFO">{{ submit.RETURN_TRANSINFO }}</span>
+                    <span style="color:red;" v-else>客户尚未填写该内容</span>
+                  </td>
+                </tr>
+              </template>
+              <!-- 初审意见附件下载 -->
+              <tr v-if="submit.STATE != 'SUBMITTED'&&submit.STATE != 'SENDBACK'">
+                <td class="grayTD">附件</td>
+                <td colspan="7">
+                  <ul class="el-upload-list el-upload-list--text">
+                    <li v-for="(file, index) in fileListForAudition" :key="index" class="el-upload-list__item is-success"
+                      tabindex="0">
+                      <a class="el-upload-list__item-name">
+                        <el-link type="primary" size="mini" @click="showImage(file.url)"
+                          @mouseenter.native="showMiniImage($event, file.url)" @mouseout.native="MiniPic = false">
+                          {{ file.name }}
+                        </el-link>
+                      </a>
+                      <label style="display:block;position:absolute;top:1px;right:10px;">
+                        <a @click="downLoad(file.url)">下载</a>
+                      </label>
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+              <!-- 玉兰处理结果 -->
+              <template v-if="submit.STATE == 'CUSTOMERAFFIRM' || submit.STATE == 'APPROVED'">
+                <tr>
+                  <td class="grayTD" style="font-size:20px;height:30px" colspan="8">
+                    玉兰处理结果
+                  </td>
+                </tr>
+                <tr>
+                  <td class="grayTD" style="width:12%;">产品/项目</td>
+                  <td class="grayTD" style="width:14%;">型号</td>
+                  <td class="grayTD" style="width:10%;">单位</td>
+                  <td class="grayTD" style="width:8%;">数量</td>
+                  <td class="grayTD" style="width:10%;">金额</td>
+                  <td class="grayTD" style="width:13%;">质量问题</td>
+                  <td class="grayTD" style="width:13%;">处理意见</td>
+                  <td class="grayTD" style="width:20%;">附件</td>
+                </tr>
+                <tr v-for="(item, index) of processDetail" :key="index">
+                  <td>{{ submit.PRODUCTION_VERSION }}</td>
+                  <td>{{ submit.ITEM_NO }}</td>
+                  <td>{{ submit.UNIT }}</td>
+                  <td>{{ processDetail[index].P_QTY }}</td>
+                  <td>{{ processDetail[index].P_MONEY }}</td>
+                  <td>{{ processDetail[index].P_NOTES }}</td>
+                  <td>{{ processDetail[index].P_RESULT }}</td>
+                  <td>
+                    <ul class="el-upload-list el-upload-list--text" v-if="processDetail[index].fileListForProcess.length">
+                      <li v-for="(file, index) in processDetail[index]
                         .fileListForProcess" :key="index" class="el-upload-list__item is-success" tabindex="0">
-                    <a class="el-upload-list__item-name">
-                      <el-link type="primary" size="mini" @click="showImage(file.url)"
-                        @mouseenter.native="showMiniImage($event, file.url)" @mouseout.native="MiniPic = false">
-                        {{ file.name }}
-                      </el-link>
-                    </a>
-                    <label style="display:block;position:absolute;top:1px;right:10px;">
-                      <a @click="downLoad(file.url)">下载</a>
-                    </label>
-                  </li>
-                </ul>
-                <span v-else>无</span>
-              </td>
-            </tr>
-            <tr v-if="
-                  submit.STATE == 'CUSTOMERAFFIRM' || submit.STATE == 'APPROVED'
-                ">
-              <td class="grayTD">金额小写</td>
-              <td colspan="3">{{ submit.TOTALMONEY }}</td>
-              <td class="grayTD">金额大写</td>
-              <td colspan="3">{{ totalMoneyUpper }}</td>
-            </tr>
-
+                        <a class="el-upload-list__item-name">
+                          <el-link type="primary" size="mini" @click="showImage(file.url)"
+                            @mouseenter.native="showMiniImage($event, file.url)" @mouseout.native="MiniPic = false">
+                            {{ file.name }}
+                          </el-link>
+                        </a>
+                        <label style="display:block;position:absolute;top:1px;right:10px;">
+                          <a @click="downLoad(file.url)">下载</a>
+                        </label>
+                      </li>
+                    </ul>
+                    <span v-else>无</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="grayTD">金额小写</td>
+                  <td colspan="3">{{ submit.TOTALMONEY }}</td>
+                  <td class="grayTD">金额大写</td>
+                  <td colspan="3">{{ totalMoneyUpper }}</td>
+                </tr>
+              </template>
+            </template>
+            <!-- 底部 -->
             <tr style="height:90px">
               <td colspan="8" border="0px" style="font-size:13px;color:gray;text-align:left;">
                 <div style="margin:4px 0px 4px 4px">
@@ -336,36 +318,29 @@
                 <div style="margin:4px 0px 4px 4px" v-if="submit.STATE != 'SUBMITTED'&&submit.STATE != 'APPROVED'">
                   广东玉兰集团股份有限公司<br />
                   市场部<br />
-                  {{ new Date(submit.DEAL_TS).getFullYear() }}年
-                  {{
-                      addZeroIfNeed(new Date(submit.DEAL_TS).getMonth() + 1)
-                    }}月
-                  {{ addZeroIfNeed(new Date(submit.DEAL_TS).getDate()) }}日
-                </div>
-                <div style="margin:4px 0px 4px 4px" v-if="submit.STATE == 'APPROVED'">
-                  广东玉兰集团股份有限公司<br />
-                  市场部<br />
-                  {{ new Date(submit.REASSURE_TS).getFullYear() }}年
-                  {{
-                      addZeroIfNeed(new Date(submit.REASSURE_TS).getMonth() + 1)
-                    }}月
-                  {{ addZeroIfNeed(new Date(submit.REASSURE_TS).getDate()) }}日
-                </div>
-                <div style="margin:4px 0px 4px 4px" v-if="submit.STATE == 'SUBMITTED'">
-                  广东玉兰集团股份有限公司<br />
-                  市场部<br />
-                  <span> 年 月 日</span>
+                  <span v-if="submit.STATE == 'APPROVED'">
+                    {{ new Date(submit.REASSURE_TS).getFullYear() }}年
+                    {{ addZeroIfNeed(new Date(submit.REASSURE_TS).getMonth() + 1) }}月
+                    {{ addZeroIfNeed(new Date(submit.REASSURE_TS).getDate()) }}日
+                  </span>
+                  <span v-else-if="submit.STATE == 'SUBMITTED'"> 年 月 日</span>
+                  <span v-else>
+                    {{ new Date(submit.DEAL_TS).getFullYear() }}年
+                    {{ addZeroIfNeed(new Date(submit.DEAL_TS).getMonth() + 1) }}月
+                    {{ addZeroIfNeed(new Date(submit.DEAL_TS).getDate()) }}日
+                  </span>
                 </div>
               </td>
               <td colspan="4" border="0px" style="font-size:13px;color:gray;text-align:center;">
                 <div>
                   经销商
-                  <span v-if="submit.STATE == 'APPROVED'">:{{ submit.CNAME }}</span><br />
+                  <span v-if="submit.STATE == 'APPROVED'">:{{ submit.CNAME }}</span>
+                  <br />
                   <span v-if="submit.STATE != 'APPROVED'"> 年 月 日</span>
                   <span v-else>
                     {{ new Date(submit.REASSURE_TS).getFullYear() }}年
-                    {{addZeroIfNeed(new Date(submit.REASSURE_TS).getMonth() + 1)}}月
-                    {{addZeroIfNeed(new Date(submit.REASSURE_TS).getDate())}}日
+                    {{ addZeroIfNeed(new Date(submit.REASSURE_TS).getMonth() + 1) }}月
+                    {{ addZeroIfNeed(new Date(submit.REASSURE_TS).getDate()) }}日
                   </span>
                 </div>
               </td>
@@ -441,6 +416,7 @@
                 </ul>
               </td>
             </tr>
+            <!-- 初审意见 -->
             <tr>
               <td class="grayTD" style="font-size:20px;height:30px" colspan="8">
                 玉兰处理意见
@@ -455,30 +431,25 @@
                 </el-input>
               </td>
             </tr>
-            <tr v-if="submit.STATE != 'SENDBACK'">
+            <tr v-else>
               <td class="grayTD">初审意见</td>
-              <td colspan="2" v-if="
-                    submit.STATE == 'SUBMITTED' || submit.STATE == 'RECEIVE'
-                  ">
-                <el-select style="height:16px;width:100%;padding:0px 0px 0px 0px;" v-model="submit.RETURN_TYPE" filterable
+              <td colspan="2">
+                <el-select v-if="submit.STATE == 'SUBMITTED' || submit.STATE == 'RECEIVE'"
+                  style="height:16px;width:100%;padding:0px 0px 0px 0px;" v-model="submit.RETURN_TYPE" filterable
                   placeholder="退货方式">
                   <el-option v-for="item in returnArray" :key="item.value" :label="item.label" :value="item.value">
                   </el-option>
                 </el-select>
+                <span v-else>{{ submit.RETURN_TYPE }}</span>
               </td>
-              <td colspan="2" v-else>
-                {{ submit.RETURN_TYPE }}
-              </td>
-              <td colspan="5" v-if="
-                    submit.STATE == 'SUBMITTED' || submit.STATE == 'RECEIVE'
-                  ">
-                <el-input v-model="submit.FIRST_AUDITION" placeholder="请填写处理意见或退回原因" clearable class="inputStyle">
+              <td colspan="5">
+                <el-input v-if="submit.STATE == 'SUBMITTED' || submit.STATE == 'RECEIVE'" v-model="submit.FIRST_AUDITION"
+                  placeholder="请填写处理意见或退回原因" clearable class="inputStyle">
                 </el-input>
-              </td>
-              <td colspan="5" v-else>
-                {{ submit.FIRST_AUDITION }}
+                <span v-else>{{ submit.FIRST_AUDITION }}</span>
               </td>
             </tr>
+            <!-- 无需退货 -->
             <tr v-if="submit.STATE != 'SENDBACK' && submit.RETURN_TYPE != '无需退货'">
               <td class="grayTD">备注信息</td>
               <td colspan="7" v-if="submit.RETURN_TYPE == '玉兰取货'">
@@ -489,32 +460,30 @@
               </td>
               <td colspan="7" v-else></td>
             </tr>
-            <tr v-if="submit.STATE != 'SENDBACK' && submit.RETURN_TYPE == '客户邮寄'">
-              <td class="grayTD">退货或寄样信息</td>
-              <td colspan="7" v-if="submit.STATE == 'SUBMITTED' || submit.STATE == 'RECEIVE'">
-                <el-select style="width:99%;" v-model="submit.RETURN_ADDRESS" filterable placeholder="请选择地址和收件人">
-                  <el-option v-for="item in returnInfo" :key="item.value" :label="item.label" :value="item.value">
-                  </el-option>
-                </el-select>
-              </td>
-              <td colspan="7" v-else>{{ submit.RETURN_ADDRESS }}</td>
-            </tr>
-            <tr v-if="submit.STATE != 'SENDBACK' && submit.RETURN_TYPE == '客户邮寄'">
-              <td class="grayTD">邮寄备注信息</td>
-              <td colspan="7">您的提货单号： {{ submit.SALE_NO }}</td>
-            </tr>
-            <tr v-if="submit.STATE != 'SUBMITTED' && submit.STATE != 'SENDBACK' && submit.RETURN_TYPE == '客户邮寄'">
-              <td class="grayTD">物流备注信息</td>
-              <td style="color:red;" colspan="7" v-if="!submit.RETURN_TRANSINFO && submit.STATE == 'RECEIVE'">
-                {{ submit.RETURN_TRANSINFO | transInfoTip }}
-              </td>
-              <td colspan="7" v-if="!submit.RETURN_TRANSINFO && submit.STATE != 'RECEIVE'">
-                {{ submit.RETURN_TRANSINFO | transInfoTip }}
-              </td>
-              <td colspan="7" v-if="submit.RETURN_TRANSINFO !== ''">
-                {{ submit.RETURN_TRANSINFO }}
-              </td>
-            </tr>
+            <!-- 客户邮寄 -->
+            <template v-if="submit.RETURN_TYPE == '客户邮寄'">
+              <tr>
+                <td class="grayTD">退货或寄样信息</td>
+                <td colspan="7" v-if="submit.STATE == 'SUBMITTED' || submit.STATE == 'CUSTOMERWRITETRANS'">
+                  <el-select style="width:99%;" v-model="submit.RETURN_ADDRESS" filterable placeholder="请选择地址和收件人">
+                    <el-option v-for="item in returnInfo" :key="item.value" :label="item.label" :value="item.value">
+                    </el-option>
+                  </el-select>
+                </td>
+                <td colspan="7" v-else>{{ submit.RETURN_ADDRESS }}</td>
+              </tr>
+              <tr>
+                <td class="grayTD">邮寄备注信息</td>
+                <td colspan="7">您的提货单号： {{ submit.SALE_NO }}</td>
+              </tr>
+              <tr v-if="submit.STATE != 'SUBMITTED'">
+                <td class="grayTD">物流备注信息</td>
+                <td colspan="7">
+                  <span v-if="submit.RETURN_TRANSINFO">{{ submit.RETURN_TRANSINFO }}</span>
+                  <span style="color:red;" v-else>客户尚未填写该内容</span>
+                </td>
+              </tr>
+            </template>
             <!-- 初审意见附件上传 -->
             <!-- fileList是否需要改成fileListForAudition -->
             <tr v-if="submit.STATE == 'SUBMITTED'||submit.STATE == 'RECEIVE'">
@@ -554,72 +523,73 @@
                 </ul>
               </td>
             </tr>
-            <tr v-if="submit.STATE != 'SUBMITTED' && submit.STATE != 'SENDBACK'">
-              <td class="grayTD" style="font-size:20px;height:30px" colspan="8">
-                玉兰处理结果
-              </td>
-            </tr>
-            <tr v-if="submit.STATE != 'SUBMITTED' && submit.STATE != 'SENDBACK'">
-              <td class="grayTD" style="width:120px;">
-                <el-button type="primary" size="mini" icon="el-icon-plus" @click="_rowPlus()" circle style="border-radius:50%;">
-                </el-button>
-                产品/项目
-              </td>
-              <td class="grayTD" style="width:125px;">型号</td>
-              <td class="grayTD" style="width:80px;">单位</td>
-              <td class="grayTD" style="width:80px;">
-                数量<span style="color:red;">*</span>
-              </td>
-              <td class="grayTD" style="width:80px;">
-                金额<span style="color:red;">*</span>
-              </td>
-              <td class="grayTD" style="width:130px;">
-                质量问题<span style="color:red;">*</span>
-              </td>
-              <td class="grayTD" style="width:150px;">
-                处理意见<span style="color:red;">*</span>
-              </td>
-              <td class="grayTD">附件</td>
-            </tr>
-            <tr v-if="submit.STATE != 'SUBMITTED' && submit.STATE != 'SENDBACK'" v-for="(item, index) of processDetail"
-              :key="index">
-              <td>
-                <el-button type="danger" size="mini" icon="el-icon-minus" @click="_rowSubtract(index)" v-if="index != 0" circle>
-                </el-button>
-                {{ submit.PRODUCTION_VERSION }}
-              </td>
-              <td>{{ submit.ITEM_NO }}
-              </td>
-              <td>{{ submit.UNIT }}</td>
-              <td>
-                <el-input v-model="processDetail[index].P_QTY" placeholder="" clearable class="inputStyle" oninput="value=value.replace(/[^\d.]/g,'')
+            <!-- 玉兰处理结果 -->
+            <template v-if="submit.STATE == 'RECEIVE' || submit.STATE == 'CUSTOMERAFFIRM' || submit.STATE == 'APPROVED'">
+              <tr>
+                <td class="grayTD" style="font-size:20px;height:30px" colspan="8">
+                  玉兰处理结果
+                </td>
+              </tr>
+              <tr>
+                <td class="grayTD" style="width:120px;">
+                  <el-button type="primary" size="mini" icon="el-icon-plus" @click="_rowPlus()" circle style="border-radius:50%;">
+                  </el-button>
+                  产品/项目
+                </td>
+                <td class="grayTD" style="width:125px;">型号</td>
+                <td class="grayTD" style="width:80px;">单位</td>
+                <td class="grayTD" style="width:80px;">
+                  数量<span style="color:red;">*</span>
+                </td>
+                <td class="grayTD" style="width:100px;">
+                  金额<span style="color:red;">*</span>
+                </td>
+                <td class="grayTD" style="width:130px;">
+                  质量问题<span style="color:red;">*</span>
+                </td>
+                <td class="grayTD" style="width:150px;">
+                  处理意见<span style="color:red;">*</span>
+                </td>
+                <td class="grayTD">附件</td>
+              </tr>
+              <tr v-for="(item, index) of processDetail" :key="index">
+                <td>
+                  <el-button type="danger" size="mini" icon="el-icon-minus" @click="_rowSubtract(index)" v-if="index != 0" circle>
+                  </el-button>
+                  {{ submit.PRODUCTION_VERSION }}
+                </td>
+                <td>{{ submit.ITEM_NO }}
+                </td>
+                <td>{{ submit.UNIT }}</td>
+                <td>
+                  <el-input v-model="processDetail[index].P_QTY" placeholder="" clearable class="inputStyle" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
                            .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)">
-                </el-input>
-              </td>
-              <td>
-                <el-input v-model="processDetail[index].P_MONEY" placeholder="" clearable class="inputStyle" oninput="value=value.replace(/[^\d.]/g,'')
+                  </el-input>
+                </td>
+                <td>
+                  <el-input v-model="processDetail[index].P_MONEY" placeholder="" clearable class="inputStyle" oninput="value=value.replace(/[^\d.]/g,'')
                            .replace(/^\./g, '').replace(/\.{2,}/g, '.')
                            .replace('.', '$#$').replace(/\./g, '')
                            .replace('$#$', '.')
                            .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)">
-                </el-input>
-              </td>
-              <td>
-                <el-input v-model="processDetail[index].P_NOTES" placeholder="" clearable class="inputStyle"></el-input>
-              </td>
-              <td>
-                <el-select style="width:99%;" v-model="processDetail[index].P_RESULT" filterable placeholder="">
-                  <el-option v-for="item in processArray" :key="item.value" :label="item.label" :value="item.value">
-                  </el-option>
-                </el-select>
-              </td>
-              <!--注意ref，两处上传的ref应该不同-->
-              <td>
-                <div>
-                  <el-upload class="upload-de2" :action="
+                  </el-input>
+                </td>
+                <td>
+                  <el-input v-model="processDetail[index].P_NOTES" placeholder="" clearable class="inputStyle"></el-input>
+                </td>
+                <td>
+                  <el-select style="width:99%;" v-model="processDetail[index].P_RESULT" filterable placeholder="">
+                    <el-option v-for="item in processArray" :key="item.value" :label="item.label" :value="item.value">
+                    </el-option>
+                  </el-select>
+                </td>
+                <!--注意ref，两处上传的ref应该不同-->
+                <td>
+                  <div>
+                    <el-upload class="upload-de2" :action="
                         Global.baseUrl +
                           '/RETURNCOMPENSATIONBILL/UploadFilesForProcesss'
                       " drag multiple :on-change="function(file, fileList) {
@@ -642,13 +612,15 @@
                         dateString: dateString,
                         fileNameList: fileNameListForProcess
                       }">
-                    <i class="el-icon-upload2" style="margin-top:5px;">
-                      <span style="">上传附件</span>
-                    </i>
-                  </el-upload>
-                </div>
-              </td>
-            </tr>
+                      <i class="el-icon-upload2" style="margin-top:5px;">
+                        <span style="">上传附件</span>
+                      </i>
+                    </el-upload>
+                  </div>
+                </td>
+              </tr>
+            </template>
+            <!-- 底部 -->
             <tr style="height:90px">
               <td colspan="8" border="0px" style="font-size:13px;color:gray;text-align:left;">
                 <div style="margin:4px 0px 4px 4px">
@@ -666,16 +638,12 @@
                 <div style="margin:4px 0px 4px 4px" v-if="submit.STATE != 'SUBMITTED'&&submit.STATE != 'APPROVED'">
                   广东玉兰集团股份有限公司<br />
                   市场部<br />
-                  {{ new Date(submit.DEAL_TS).getFullYear() }}年
-                  {{
-                      addZeroIfNeed(new Date(submit.DEAL_TS).getMonth() + 1)
-                    }}月
-                  {{ addZeroIfNeed(new Date(submit.DEAL_TS).getDate()) }}日
-                </div>
-                <div style="margin:4px 0px 4px 4px" v-if="submit.STATE == 'SUBMITTED'">
-                  广东玉兰集团股份有限公司<br />
-                  市场部<br />
-                  <span> 年 月 日</span>
+                  <span v-if="submit.STATE != 'SUBMITTED' && submit.STATE != 'APPROVED'">
+                    {{ new Date(submit.DEAL_TS).getFullYear() }}年
+                    {{ addZeroIfNeed(new Date(submit.DEAL_TS).getMonth() + 1) }}月
+                    {{ addZeroIfNeed(new Date(submit.DEAL_TS).getDate()) }}日
+                  </span>
+                  <span v-if="submit.STATE == 'SUBMITTED'"> 年 月 日</span>
                 </div>
               </td>
               <td colspan="4" border="0px" style="font-size:13px;color:gray;text-align:center;">
@@ -685,8 +653,8 @@
                   <span v-if="submit.STATE != 'APPROVED'"> 年 月 日</span>
                   <span v-else>
                     {{ new Date(submit.REASSURE_TS).getFullYear() }}年
-                    {{addZeroIfNeed(new Date(submit.REASSURE_TS).getMonth() + 1)}}月
-                    {{addZeroIfNeed(new Date(submit.REASSURE_TS).getDate())}}日
+                    {{ addZeroIfNeed(new Date(submit.REASSURE_TS).getMonth() + 1) }}月
+                    {{ addZeroIfNeed(new Date(submit.REASSURE_TS).getDate()) }}日
                   </span>
                 </div>
               </td>
@@ -694,15 +662,17 @@
           </table>
 
           <div style="text-align:center;margin-top:5px" v-if="isEdit">
-            <el-button type="primary" v-if="submit.STATE == 'SENDBACK'" @click="_EditDetail(submit.STATE, 5)">保存退回意见
+            <el-button type="primary" v-if="submit.STATE == 'SENDBACK'" @click="_EditDetail(5)">保存退回意见
             </el-button>
-            <el-button type="primary" v-if="submit.STATE == 'SUBMITTED'" @click="_EditDetail(submit.STATE, 1)">保存初审意见
+            <el-button type="primary" v-if="submit.STATE == 'SUBMITTED'" @click="_EditDetail(1)">保存初审意见
             </el-button>
-            <el-button type="success" v-if="submit.STATE == 'RECEIVE'" @click="_EditDetail(submit.STATE, 4)">修改初审意见
+            <el-button type="primary" v-if="submit.STATE == 'WRITEEDTRANS'" @click="_EditDetail(6)">接收
+            </el-button>
+            <el-button type="success" v-if="submit.STATE == 'RECEIVE'" @click="_EditDetail(4)">修改初审意见
             </el-button>
             <el-button type="primary" v-if="submit.STATE == 'RECEIVE' || submit.STATE == 'CUSTOMERAFFIRM'"
-              @click="_EditDetail(submit.STATE, 3)">保存处理结果</el-button>
-            <el-button type="danger" v-if="submit.STATE == 'SUBMITTED'" @click="_EditDetail(submit.STATE, 2)">退回修改
+              @click="_EditDetail(3)">保存处理结果</el-button>
+            <el-button type="danger" v-if="submit.STATE == 'SUBMITTED'" @click="_EditDetail(2)">退回修改
             </el-button>
             <el-button type="info" @click="isEdit = false;RefundDetail = false;">返回</el-button>
           </div>
@@ -780,7 +750,6 @@ export default {
       selectItemNo: "", //搜索栏产品型号
       selectCNAME: "", //搜索栏姓名
       selectDealor: "", //搜索栏处理人名
-      zongshuliang: "",
       daifashuliang: "",
       kuaidi100: "",
       kuaididanhao: "",
@@ -799,6 +768,8 @@ export default {
         { value: "NEEDPROCESSING", label: "待处理" },
         { value: "SUBMITTED", label: "已提交" },
         { value: "SENDBACK", label: "退回修改" },
+        { value: "CUSTOMERWRITETRANS", label: "待填写物流信息" },
+        { value: "WRITEEDTRANS", label: "已填写物流信息" },
         { value: "RECEIVE", label: "已接收" },
         { value: "CUSTOMERAFFIRM", label: "客户确认中" },
         { value: "APPROVED", label: "客户同意" },
@@ -875,6 +846,12 @@ export default {
         case "SENDBACK":
           return "退回修改";
           break;
+        case "CUSTOMERWRITETRANS":
+          return "待填写物流信息";
+          break;
+        case "WRITEEDTRANS":
+          return "已填写物流信息";
+          break;
         case "RECEIVE":
           return "已接收";
           break;
@@ -884,14 +861,6 @@ export default {
         case "APPROVED":
           return "客户同意";
           break;
-      }
-    },
-    //物流备注信息未填写的提示
-    transInfoTip(val) {
-      if (val == null || val == "") {
-        return "客户尚未填写该内容";
-      } else {
-        return val;
       }
     },
   },
@@ -1093,7 +1062,7 @@ export default {
       });
     },
     //保存修改
-    _EditDetail(val, type) {
+    _EditDetail(type) {
       this.kind = type;
       if (type == 3) {
         //编辑处理结果
@@ -1190,72 +1159,72 @@ export default {
         if (this.doActionByupload != true) {
           this.submitEDITANSYCCForProcess();
         }
-      } else {
+      } else if (type == 2 || type == 5) {
         //编辑初审意见
         //先判断填写的信息是否完整
-        if (type == 2 || type == 5) {
-          if (!this.submit.FIRST_AUDITION) {
-            this.$alert("请填写初审意见或退回原因", "提示", {
+        if (!this.submit.FIRST_AUDITION) {
+          this.$alert("请填写初审意见或退回原因", "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return;
+        }
+        this.submitAudition(type);
+      } else if (type == 1 || type == 4) {
+        //判断信息是否填写完整
+        if (!this.submit.FIRST_AUDITION) {
+          this.$alert("请填写初审意见或退回原因", "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return;
+        }
+        if (!this.submit.RETURN_TYPE) {
+          this.$alert("请选择退货方式", "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return;
+        } else {
+          if (
+            this.submit.RETURN_TYPE == "客户邮寄" &&
+            !this.submit.RETURN_ADDRESS
+          ) {
+            this.$alert("请选择地址和收件人", "提示", {
               confirmButtonText: "确定",
               type: "warning",
             });
             return;
-          }
-          this.submitAudition(type);
-        } else if (type == 1 || type == 4) {
-          //判断信息是否填写完整
-          if (!this.submit.FIRST_AUDITION) {
-            this.$alert("请填写初审意见或退回原因", "提示", {
-              confirmButtonText: "确定",
-              type: "warning",
-            });
-            return;
-          }
-          if (!this.submit.RETURN_TYPE) {
-            this.$alert("请选择退货方式", "提示", {
-              confirmButtonText: "确定",
-              type: "warning",
-            });
-            return;
-          } else {
-            if (
-              this.submit.RETURN_TYPE == "客户邮寄" &&
-              !this.submit.RETURN_ADDRESS
-            ) {
-              this.$alert("请选择地址和收件人", "提示", {
-                confirmButtonText: "确定",
-                type: "warning",
-              });
-              return;
-            }
-          }
-          //判断上传附件的形式为图片或视频
-          if (this.fileListForAudition.length != 0 && this.FormRight == false) {
-            this.$alert("提交失败，附件仅能上传图片或视频", "提示", {
-              confirmButtonText: "确定",
-              type: "warning",
-            });
-            return;
-          }
-          //第一次添加
-          if (this.firstAddAudition && this.fileChangeForAudition) {
-            this.$refs.upload.submit();
-          } else if (!this.firstAddAudition && this.fileChangeForAudition) {
-            //修改
-            this.$refs.upload.submit();
-          } else {
-            if (this.deleteFileForAudition.length > 0) {
-              for (let i = 0; i < this.deleteFileForAudition.length; i++) {
-                this.submit.FIRST_AUDITION_FILE = "";
-                for (var j = 0; j < this.fileListForAudition.length; j++) {
-                  this.submit.FIRST_AUDITION_FILE +=
-                    this.fileListForAudition[j].url + ";";
-                }
-              }
-            }
-            this.submitAudition(this.kind);
           }
         }
+        //判断上传附件的形式为图片或视频
+        if (this.fileListForAudition.length != 0 && this.FormRight == false) {
+          this.$alert("提交失败，附件仅能上传图片或视频", "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
+          });
+          return;
+        }
+        //第一次添加
+        if (this.firstAddAudition && this.fileChangeForAudition) {
+          this.$refs.upload.submit();
+        } else if (!this.firstAddAudition && this.fileChangeForAudition) {
+          //修改
+          this.$refs.upload.submit();
+        } else {
+          if (this.deleteFileForAudition.length > 0) {
+            for (let i = 0; i < this.deleteFileForAudition.length; i++) {
+              this.submit.FIRST_AUDITION_FILE = "";
+              for (var j = 0; j < this.fileListForAudition.length; j++) {
+                this.submit.FIRST_AUDITION_FILE +=
+                  this.fileListForAudition[j].url + ";";
+              }
+            }
+          }
+          this.submitAudition(this.kind);
+        }
+      } else if (type == 6) {
+        this.submitAudition(this.kind);
       }
     },
     //显示图片
@@ -1376,19 +1345,17 @@ export default {
     //获得退货或寄样信息
     _getReturnInfo() {
       getReturnInfo2().then((res) => {
-        if (res.code == 0) {
-          for (var i = 0; i < res.data.length; i++) {
-            //这一部分应该在编辑里使用（可以进行初审的时候使用）
-            this.returnInfo[i] = new Object();
-            this.returnInfo[i].label =
-              "地址:" +
-              res.data[i].ADDRESS +
-              "   收件人:" +
-              res.data[i].ADDRESSEE +
-              "   电话:" +
-              res.data[i].TEL;
-            this.returnInfo[i].value = this.returnInfo[i].label;
-          }
+        for (var i = 0; i < res.data.length; i++) {
+          //这一部分应该在编辑里使用（可以进行初审的时候使用）
+          this.returnInfo[i] = new Object();
+          this.returnInfo[i].label =
+            "地址:" +
+            res.data[i].ADDRESS +
+            "   收件人:" +
+            res.data[i].ADDRESSEE +
+            "   电话:" +
+            res.data[i].TEL;
+          this.returnInfo[i].value = this.returnInfo[i].label;
         }
       });
     },
@@ -1521,11 +1488,8 @@ export default {
     },
     //提交初审意见（最终）
     submitAudition(type) {
+      this.submit.DEALMAN_CODE = this.CID;
       if (type == 2 || type == 5) {
-        if (type == 2) {
-          this.submit.STATE = "SENDBACK";
-        }
-        this.submit.DEALMAN_CODE = this.CID;
         UpdateFirstAudition({
           head: this.submit,
           type: type,
@@ -1533,35 +1497,23 @@ export default {
           deleteFile: this.deleteFileForAudition,
           firstAddFile: this.firstAddAudition,
         }).then((res) => {
-          if (res.code == 0) {
-            if (type == 2) {
-              this.$alert("退回成功", "提示", {
-                confirmButtonText: "确定",
-                type: "success",
-              });
-            } else if (type == 5) {
-              this.$alert("成功修改退回意见", "提示", {
-                confirmButtonText: "确定",
-                type: "success",
-              });
-            }
-            this.releaseBadge("newRefund2"); //刷新角标
-            this.refresh();
-            this.RefundDetail = false;
-            return;
-          } else {
-            this.$alert("退回失败，请稍后重试", "提示", {
+          if (type == 2) {
+            this.$alert("退回成功", "提示", {
               confirmButtonText: "确定",
-              type: "warning",
+              type: "success",
             });
-            return;
+          } else if (type == 5) {
+            this.$alert("成功修改退回意见", "提示", {
+              confirmButtonText: "确定",
+              type: "success",
+            });
           }
+          this.releaseBadge("newRefund2"); //刷新角标
+          this.refresh();
+          this.RefundDetail = false;
+          return;
         });
       } else if (type == 1 || type == 4) {
-        if (type == 1) {
-          this.submit.STATE = "RECEIVE";
-        }
-        this.submit.DEALMAN_CODE = this.CID;
         UpdateFirstAudition({
           head: this.submit,
           type: type,
@@ -1569,29 +1521,38 @@ export default {
           deleteFile: this.deleteFileForAudition,
           firstAddFile: this.firstAddAudition,
         }).then((res) => {
-          if (res.code == 0) {
-            if (type == 1) {
-              this.$alert("成功提交初审意见", "提示", {
-                confirmButtonText: "确定",
-                type: "success",
-              });
-            } else if (type == 4) {
-              this.$alert("成功修改初审意见", "提示", {
-                confirmButtonText: "确定",
-                type: "success",
-              });
-            }
-            this.releaseBadge("newRefund2"); //刷新角标
-            this.refresh();
-            this.RefundDetail = false;
-            return;
-          } else {
-            this.$alert("提交失败，请稍后重试", "提示", {
+          if (type == 1) {
+            this.$alert("成功提交初审意见", "提示", {
               confirmButtonText: "确定",
-              type: "warning",
+              type: "success",
             });
-            return;
+          } else if (type == 4) {
+            this.$alert("成功修改初审意见", "提示", {
+              confirmButtonText: "确定",
+              type: "success",
+            });
           }
+          this.releaseBadge("newRefund2"); //刷新角标
+          this.refresh();
+          this.RefundDetail = false;
+          return;
+        });
+      } else if (type == 6) {
+        UpdateFirstAudition({
+          head: this.submit,
+          type: type,
+          attchmentChange: this.fileChangeForAudition,
+          deleteFile: this.deleteFileForAudition,
+          firstAddFile: this.firstAddAudition,
+        }).then((res) => {
+          this.$alert("接收成功", "提示", {
+            confirmButtonText: "确定",
+            type: "success",
+          });
+          this.releaseBadge("newRefund2"); //刷新角标
+          this.refresh();
+          this.RefundDetail = false;
+          return;
         });
       }
     },
@@ -1715,22 +1676,13 @@ export default {
         attchmentChange: this.fileChangeForProcess,
         deleteFiles: this.deleteFileForProcess,
       }).then((res) => {
-        if (res.code == 0) {
-          this.$alert("处理成功", "提示", {
-            confirmButtonText: "确定",
-            type: "success",
-          });
-          this.releaseBadge("newRefund2"); //刷新角标
-          this.refresh();
-          this.RefundDetail = false;
-          return;
-        } else {
-          this.$alert("处理失败，请稍后重试", "提示", {
-            confirmButtonText: "确定",
-            type: "warning",
-          });
-          return;
-        }
+        this.$alert("处理成功", "提示", {
+          confirmButtonText: "确定",
+          type: "success",
+        });
+        this.releaseBadge("newRefund2"); //刷新角标
+        this.refresh();
+        this.RefundDetail = false;
       });
     },
     //获取当前年月日

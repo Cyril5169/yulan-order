@@ -648,6 +648,7 @@ export default {
           AUDIT_TYPE: auditType,
           SALE_NO: data.SALE_NO, //提货单号
           ORDER_NO: this.orderDetail.ORDER_NO, //B2B订单号
+          TRANS_ID: data.TRANS_ID
         };
         this.submit = {
           RTCB_ID: "", //退货单ID
@@ -661,7 +662,6 @@ export default {
           SALE_NO: data.SALE_NO, //提货单号
           ORDER_NO: this.orderDetail.ORDER_NO, //B2B订单号
           ITEM_NO: this.orderDetail.ITEM_NO, //产品型号
-          C_TRANSBILL: data.TRANS_ID, //物流单号
           NOTE: "", //类型
           fileList: [], //附件列表
           ATTACHMENT_FILE: "", //附件
@@ -774,7 +774,7 @@ export default {
         this.RefundDetail = false;
         this.ljAfterSaleVisiable = false;
       }).catch((err) => {
-        this.$alert("添加失败", "提示", {
+        this.$alert("提交失败", "提示", {
           type: "warning",
           confirmButtonText: "好的",
         }).catch(() => { });

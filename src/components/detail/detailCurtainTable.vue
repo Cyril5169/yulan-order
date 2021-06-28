@@ -283,7 +283,7 @@
 
       <!-- 只可查看 -->
       <div v-if="tableStatus === 3" style="text-align: center;" class="mt20">
-        <el-input style="margin-bottom: 10px" resize="none" type="textarea" :rows="3" disabled placeholder="请输入订单审核意见"
+        <el-input style="margin-bottom: 10px" resize="none" type="textarea" :rows="3" disabled placeholder="订单审核意见"
           v-model="suggestionLJ">
         </el-input>
         <el-button type="danger" class="mr20" width="130px" @click.native="resolveModify">
@@ -324,7 +324,7 @@
     </el-dialog>
 
     <!-- 面料提示信息 -->
-    <el-dialog width="800px" title="提示" :visible.sync="mlTipVisible" :close-on-click-modal="false">
+    <el-dialog width="800px" title="提示" :visible.sync="mlTipVisible" :close-on-click-modal="false" append-to-body>
       <div v-html="mlTipTxt"></div>
     </el-dialog>
   </el-card>
@@ -1029,7 +1029,7 @@ export default {
     },
     //获取备注文字
     getRemark(data) {
-      if (data.certainHeightWidth === 0 && data.productType == 'ML') {
+      if (data.certainHeightWidth === 0 && data.productType == 'ML' && data.itemType != 'lspb') {
         if (
           data.specification < this.headerData.height &&
           data.specification > 0
@@ -1572,6 +1572,7 @@ export default {
     },
     //获取面料的提示
     getMLTip(originData) {
+      if (this.tableStatus === 3) return;
       //根据curtainData的数据，获取所有提示，统一提示
       var itemNoList = [];
       for (var i = 0; i < originData.length; i++) {

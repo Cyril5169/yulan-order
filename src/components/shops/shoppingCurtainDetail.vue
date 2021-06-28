@@ -981,7 +981,7 @@ export default {
     },
     //获取备注文字
     getRemark(data) {
-      if (data.fixType === "02") {
+      if (data.fixType === "02" && data.productType == 'ML' && data.itemType != 'lspb') {
         let _fixType = data.fixGrade / 1000;
         if (_fixType < this.message.height) {
           return "超高帘，用量待审核!!";

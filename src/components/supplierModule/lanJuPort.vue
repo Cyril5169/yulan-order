@@ -1935,7 +1935,7 @@ export default {
                   }
                   //记录发出去回返回来的值
                   await SaveHistoryLJPostData({
-                    dirName: oneplace[0].ORDER_NO + '-' + dateStamp,
+                    dirName: oneplace[0].ORDER_NO + '-' + pruData[i].PUR_NO + '-' + dateStamp,
                     fileName: oneplace[0].ORDER_NO + '-' + detail.CL_PLACE_ID,
                     content: JSON.stringify(postdata),
                     resBLJ: JSON.stringify(resB)
@@ -2100,7 +2100,7 @@ export default {
                   }
                   //记录发出去回返回来的值
                   await SaveHistoryLJPostData({
-                    dirName: oneOrderDetail.ORDER_NO + '-' + dateStamp,
+                    dirName: oneOrderDetail.ORDER_NO + '-' + pruData[i].PUR_NO + '-' + dateStamp,
                     fileName: oneOrderDetail.ORDER_NO + '-' + oneOrderDetail.LINE_NO,
                     content: JSON.stringify(postdata),
                     resBLJ: JSON.stringify(resB)
@@ -2186,7 +2186,7 @@ export default {
                   }
                   //记录发出去回返回来的值
                   await SaveHistoryLJPostData({
-                    dirName: onedata[0].ORDER_NO + '-' + dateStamp,
+                    dirName: onedata[0].ORDER_NO + '-' + pruData[i].PUR_NO + '-' + dateStamp,
                     fileName: onedata[0].ORDER_NO + '-' + detail.CL_PLACE_ID,
                     content: JSON.stringify(postdata),
                     resBLJ: JSON.stringify(resB)

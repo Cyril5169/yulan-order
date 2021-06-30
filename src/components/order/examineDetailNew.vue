@@ -1602,7 +1602,7 @@ export default {
               var dinghuoshu = res.data.data.dinghuoshu ? res.data.data.dinghuoshu : 0;
               var xiaxian = res.data.data.xiaxian ? res.data.data.xiaxian : 0;
               var ddz = 0;
-              if (res2.length) ddz = res2[0].DOSAGE;
+              if (res2.data.length) ddz = res2.data[0].DOSAGE;
               var store_num = kucun - dinghuoshu - ddz;
               if (store_num >= xiaxian) {
                 store_charge = "充足";

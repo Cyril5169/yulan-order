@@ -315,7 +315,7 @@
             </tr>
             <tr style="height:40px">
               <td colspan="4" border="0px" style="font-size:13px;color:gray;text-align:center;">
-                <div style="margin:4px 0px 4px 4px" v-if="submit.STATE != 'SUBMITTED'&&submit.STATE != 'APPROVED'">
+                <div style="margin:4px 0px 4px 4px">
                   广东玉兰集团股份有限公司<br />
                   市场部<br />
                   <span v-if="submit.STATE == 'APPROVED'">
@@ -464,7 +464,7 @@
             <template v-if="submit.RETURN_TYPE == '客户邮寄'">
               <tr>
                 <td class="grayTD">退货或寄样信息</td>
-                <td colspan="7" v-if="submit.STATE == 'SUBMITTED' || submit.STATE == 'CUSTOMERWRITETRANS'">
+                <td colspan="7" v-if="submit.STATE == 'SUBMITTED' || submit.STATE == 'RECEIVE' || submit.STATE == 'CUSTOMERWRITETRANS'">
                   <el-select style="width:99%;" v-model="submit.RETURN_ADDRESS" filterable placeholder="请选择地址和收件人">
                     <el-option v-for="item in returnInfo" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
@@ -635,7 +635,7 @@
             </tr>
             <tr style="height:40px">
               <td colspan="4" border="0px" style="font-size:13px;color:gray;text-align:center;">
-                <div style="margin:4px 0px 4px 4px" v-if="submit.STATE != 'SUBMITTED'&&submit.STATE != 'APPROVED'">
+                <div style="margin:4px 0px 4px 4px">
                   广东玉兰集团股份有限公司<br />
                   市场部<br />
                   <span v-if="submit.STATE != 'SUBMITTED' && submit.STATE != 'APPROVED'">

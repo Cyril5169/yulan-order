@@ -20,7 +20,7 @@
           <el-table-column label="型号" prop="ITEM_NO" width="100" align="center"></el-table-column>
           <el-table-column label="版本号" prop="PRODUCTVERSION_NAME" width="80" align="center"></el-table-column>
           <el-table-column label="预警库存量" prop="QTY_ARM" width="100" align="center"></el-table-column>
-          <el-table-column label="可用库存" prop="AVAILABEL_STOCK" width="100" align="center"></el-table-column>
+          <el-table-column label="可用库存(已入库)" prop="AVAILABEL_STOCK" width="120" align="center"></el-table-column>
           <el-table-column label="计划单在途数" prop="ONWAY_NUMBER" width="100" align="center"></el-table-column>
           <el-table-column label="可用库存(含在途)" prop="ALL_AVAILABEL_STOCK" width="120" align="center">
             <template slot-scope="scope">

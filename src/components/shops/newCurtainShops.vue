@@ -22,6 +22,7 @@
         <!-- 帘款 -->
         <div class="curtain-parent-item">
           <span>帘款：{{curtainHeadData.ITEM_NO}}</span>
+          <span v-if="!this.isStandard">(非标定)</span>
         </div>
         <!-- 帘款参数 -->
         <div class="curtain-params">
@@ -1066,18 +1067,20 @@ export default {
           var lbtItem = this.curtainDataChange.filter(item => item.NCM_PID == oneCurtain.NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
           if (lbtItem.length) {
             lbtItem = lbtItem[0]; //只取第一个拉边条（按理应该只有一个）
-            this.curtainData.push({ ...lbtItem });
             //找到需要显示拉边条的面料
             var lbtmlItem = this.getLBTMLItem();
-            //强制改成对应的ITEM_NO
-            this.curtainData[this.curtainData.length - 1].ITEM_NO = lbtmlItem.MATERIAL_NO ? lbtmlItem.MATERIAL_NO : '';
-            //排序
-            this.curtainData.sort((a, b) => {
-              if (a.NCT_SORTNO == b.NCT_SORTNO) {
-                return a.NCM_SORTNO > b.NCM_SORTNO ? 1 : -1;
-              }
-              return a.NCT_SORTNO > b.NCT_SORTNO ? 1 : -1;
-            });
+            if (lbtmlItem.ITEM_NO) {
+              this.curtainData.push({ ...lbtItem });
+              //强制改成对应的ITEM_NO
+              this.curtainData[this.curtainData.length - 1].ITEM_NO = lbtmlItem.MATERIAL_NO ? lbtmlItem.MATERIAL_NO : '';
+              //排序
+              this.curtainData.sort((a, b) => {
+                if (a.NCT_SORTNO == b.NCT_SORTNO) {
+                  return a.NCM_SORTNO > b.NCM_SORTNO ? 1 : -1;
+                }
+                return a.NCT_SORTNO > b.NCT_SORTNO ? 1 : -1;
+              });
+            }
           }
         } else if (common == "3B" && oneCurtain.NCM_BIAN == "4B") {
           //去掉拉边条

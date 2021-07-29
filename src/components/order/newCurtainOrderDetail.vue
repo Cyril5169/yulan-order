@@ -985,18 +985,20 @@ export default {
           if (lbtItem.length) {
             lbtItem = lbtItem[0]; //只取第一个拉边条（按理应该只有一个）
             lbtItem = this.dealInsertData(lbtItem);
-            this.orderDetail.curtains.push({ ...lbtItem });
             //找到需要显示拉边条的面料
             var lbtmlItem = this.getLBTMLItem();
-            //强制改成对应的ITEM_NO
-            this.orderDetail.curtains[this.orderDetail.curtains.length - 1].ITEM_NO = lbtmlItem.MATERIAL_NO ? lbtmlItem.MATERIAL_NO : '';
-            //排序
-            this.orderDetail.curtains.sort((a, b) => {
-              if (a.NCT_SORTNO == b.NCT_SORTNO) {
-                return a.NCM_SORTNO > b.NCM_SORTNO ? 1 : -1;
-              }
-              return a.NCT_SORTNO > b.NCT_SORTNO ? 1 : -1;
-            });
+            if (lbtmlItem.ITEM_NO) {
+              this.orderDetail.curtains.push({ ...lbtItem });
+              //强制改成对应的ITEM_NO
+              this.orderDetail.curtains[this.orderDetail.curtains.length - 1].ITEM_NO = lbtmlItem.MATERIAL_NO ? lbtmlItem.MATERIAL_NO : '';
+              //排序
+              this.orderDetail.curtains.sort((a, b) => {
+                if (a.NCT_SORTNO == b.NCT_SORTNO) {
+                  return a.NCM_SORTNO > b.NCM_SORTNO ? 1 : -1;
+                }
+                return a.NCT_SORTNO > b.NCT_SORTNO ? 1 : -1;
+              });
+            }
           }
         } else if (common == "3B" && oneCurtain.BIAN == "4B") {
           //去掉拉边条
@@ -1529,7 +1531,7 @@ export default {
           } else {
             oneCurtain.ILLUSTRATE = oneCurtain.ILLUSTRATE.replace('不足4平方米。按4平方米下单量收费;', '');
           }
-          
+
           //判断是否超高
           var height = this.convertNumber(oneCurtain.HEIGHT);
           var childrenCurtain = allCurtains.filter(item =>

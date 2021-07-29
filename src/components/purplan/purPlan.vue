@@ -29,27 +29,36 @@
       </div>
       <hr style="width:100%;" />
       <div style="flex:1;position:relative;">
-        <el-table :data="planData" height="100%" style="position:absolute;" @selection-change="handleSelectionChange"
-          :row-class-name="tableRowClassName">
+        <el-table :data="planData" height="100%" style="position:absolute;" ref="planDataTable"
+          @selection-change="handleSelectionChange" :row-class-name="tableRowClassName" show-summary
+          :summary-method="getSummaries">
           <el-table-column type="selection" width="55" align="center"></el-table-column>
           <el-table-column type="index" width="50" align="center"></el-table-column>
           <el-table-column label="供应商" prop="SUPPLY_NAME" width="180" align="center"></el-table-column>
           <el-table-column label="型号" prop="ITEM_NO" width="100" align="center"></el-table-column>
+          <el-table-column label="版本名称" prop="PRODUCTVERSION_NAME" width="100" align="center"></el-table-column>
           <el-table-column label="需求计划量" prop="PLAN_QUANTITY" width="100" align="center"></el-table-column>
           <el-table-column label="需求日期" prop="REQ_DATE" width="100" align="center">
             <template slot-scope="scope">
               <span>{{scope.row.REQ_DATE | dateFilter}}</span>
             </template>
           </el-table-column>
-          <el-table-column label="距交货天数" width="100" align="center">
+          <el-table-column label="距交货天数" width="100" align="center"
+            :filters="[{text: '已超期', value: '已超期'},{text: '未超期', value: '未超期'}]" :filter-method="filterHandler">
             <template slot-scope="scope">
               <span>{{ getSpanDate(scope.row) }}</span>
             </template>
           </el-table-column>
           <el-table-column label="已到货数量" prop="ARRIVAL_QUANTITY" width="100" align="center"></el-table-column>
-          <el-table-column label="未到货数量" width="100" align="center">
-            <template slot-scope="scope">
-              <span>{{scope.row.PLAN_QUANTITY - scope.row.ARRIVAL_QUANTITY}}</span>
+          <el-table-column label="未到货数量" prop="UNARRIVAL_QUANTITY" width="180" align="center"
+            :filters="[{text: '小于', value: '小于'}]" :filter-method="filterHandler2">
+            <template slot="header" slot-scope="scope">
+              <span>未到货数量</span>
+              <input v-model="unArrivalNum" class="inputCls" oninput="value=value.replace(/[^\d.]/g,'')
+                           .replace(/^\./g, '').replace(/\.{2,}/g, '.')
+                           .replace('.', '$#$').replace(/\./g, '')
+                           .replace('$#$', '.')
+                           .slice(0,value.indexOf('.') === -1? value.length: value.indexOf('.') + 3)" />
             </template>
           </el-table-column>
           <el-table-column label="已入库数量" prop="STOCK_QUANTITY" width="100" align="center"></el-table-column>
@@ -189,7 +198,8 @@ export default {
       dialogVisible: false,
       itemSearch: '',
       searchItemVisible: false,
-      selectPlan: []
+      selectPlan: [],
+      unArrivalNum: 0
     }
   },
   filters: {
@@ -243,6 +253,9 @@ export default {
       this.planData = [];
       GetPurPlanListByCondition(data).then(res => {
         this.planData = res.data;
+        this.$nextTick(() => {
+          this.$refs.planDataTable.doLayout();
+        })
       })
     },
     handleSelectionChange(val) {
@@ -416,6 +429,49 @@ export default {
           })
         }).catch(() => { });
       }
+    },
+    filterHandler(value, row, column) {
+      if (value == '已超期')
+        return this.getSpanDate(row) < 0
+      else if (value == '未超期')
+        return this.getSpanDate(row) > 0
+    },
+    filterHandler2(value, row, column) {
+      if (value == '小于')
+        return row.UNARRIVAL_QUANTITY < this.unArrivalNum && row.UNARRIVAL_QUANTITY > 0
+    },
+    getSummaries(param) {
+      const { columns, data } = param;
+      const sums = [];
+      if (data && data.length > 0) {
+        columns.forEach((column, index) => {
+          if (index === 1) {
+            sums[index] = "合计";
+            return;
+          } else if (column.property == 'PLAN_QUANTITY'
+            || column.property == 'ARRIVAL_QUANTITY'
+            || column.property == 'UNARRIVAL_QUANTITY'
+            || column.property == 'STOCK_QUANTITY') {
+            var values = data.map(item => Number(item[column.property]));
+            if (!values.every(value => isNaN(value))) {
+              sums[index] = values.reduce((prev, curr) => {
+                const value = Number(curr);
+                if (!isNaN(value)) {
+                  return prev + curr;
+                } else {
+                  return prev;
+                }
+              }, 0);
+              sums[index] = sums[index].toFixed(2);
+            } else {
+              sums[index] = "";
+            }
+          } else {
+            sums[index] = "";
+          }
+        });
+      }
+      return sums;
     }
   },
   mounted() {
@@ -440,6 +496,21 @@ export default {
   flex: 1;
   display: flex;
   flex-direction: column;
+}
+.inputCls {
+  background-color: #fff;
+  background-image: none;
+  border-radius: 4px;
+  border: 1px solid #dcdfe6;
+  box-sizing: border-box;
+  color: #606266;
+  display: inline-block;
+  width: 50px;
+  padding: 0 5px;
+}
+.inputCls:focus {
+  border-color: #409eff;
+  outline: 0;
 }
 </style>
 <style>

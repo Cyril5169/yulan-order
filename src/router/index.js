@@ -153,7 +153,10 @@ const router = new Router({
         {
           path: '/downloadSpace',
           name: 'downloadSpace',
-          component: DownloadSpace
+          component: DownloadSpace,
+          meta: {
+            isFlex: true
+          }
         },
         {
           path: '/marketInfo',

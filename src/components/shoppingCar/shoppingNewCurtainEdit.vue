@@ -612,7 +612,7 @@ export default {
           item.NC_PART_TYPECODE != "LBT" &&
           item.curtain_choose
         );
-        //按照2褶，1褶，主布的顺序找
+        //按照2褶，1褶，上横拼配布，下横拼配布，主布的顺序找
         lbtmlItem = mlList.filter(item => item.NC_PART_TYPECODE == 'PB2');
         if (lbtmlItem.length) {
           lbtmlItem = lbtmlItem[0];
@@ -621,9 +621,19 @@ export default {
           if (lbtmlItem.length) {
             lbtmlItem = lbtmlItem[0];
           } else {
-            lbtmlItem = mlList.filter(item => item.NC_PART_TYPECODE == 'ZB');
+            lbtmlItem = mlList.filter(item => item.NC_PART_TYPECODE == 'SHPPB');
             if (lbtmlItem.length) {
               lbtmlItem = lbtmlItem[0];
+            } else {
+              lbtmlItem = mlList.filter(item => item.NC_PART_TYPECODE == 'XHPPB');
+              if (lbtmlItem.length) {
+                lbtmlItem = lbtmlItem[0];
+              } else {
+                lbtmlItem = mlList.filter(item => item.NC_PART_TYPECODE == 'ZB');
+                if (lbtmlItem.length) {
+                  lbtmlItem = lbtmlItem[0];
+                }
+              }
             }
           }
         }
@@ -903,12 +913,14 @@ export default {
       var curtain_height = this.convertNumber(oneCurtain.HEIGHT);
       var LEFT_FILLET = this.convertNumber(oneCurtain.LEFT_FILLET);
       var RIGHT_FILLET = this.convertNumber(oneCurtain.RIGHT_FILLET);
-      if (oneCurtain.NC_PART_TYPECODE == "LT") {
-        //计算帘头用量 帘头用量=（帘头宽+左转角+右转角）*帘头高
-        oneCurtain.DOSAGE = this.dosageFilter((curtain_width + LEFT_FILLET + RIGHT_FILLET) * curtain_height);
-      } else {
-        oneCurtain.DOSAGE = this.dosageFilter(curtain_width * curtain_height);
-      }
+      // if (oneCurtain.NC_PART_TYPECODE == "LT") {
+      //   //计算帘头用量 帘头用量=（帘头宽+左转角+右转角）*帘头高
+      //   oneCurtain.DOSAGE = this.dosageFilter((curtain_width + LEFT_FILLET + RIGHT_FILLET) * curtain_height);
+      // } else {
+      //   oneCurtain.DOSAGE = this.dosageFilter(curtain_width * curtain_height);
+      // }
+      //2021.8.12修改，不需要+左转角+右转角了
+      oneCurtain.DOSAGE = this.dosageFilter(curtain_width * curtain_height);
       //帘身改变同时改变里衬布的
       if (oneCurtain.NC_PART_TYPECODE == "LS") {
         //改变里衬布的

@@ -108,7 +108,8 @@
             </el-table-column>
             <el-table-column width="100" label="同步标记" prop="IMPORT_FLAG" align="center">
               <template slot-scope="scope">
-                <span v-if="scope.row.ORDER_NO.substring(0, 1) != 'X' && scope.row.ORDER_NO.substring(0, 1) != 'N' && scope.row.ORDER_NO.substring(0, 1) != 'Y'"></span>
+                <span
+                  v-if="scope.row.ORDER_NO.substring(0, 1) != 'X' && scope.row.ORDER_NO.substring(0, 1) != 'N' && scope.row.ORDER_NO.substring(0, 1) != 'Y'"></span>
                 <span v-else-if="scope.row.IMPORT_FLAG == 'Y'">已同步</span>
                 <button v-else class="btn-style" @click="onClickAsync(scope.row)">同步订单</button>
               </template>
@@ -2046,9 +2047,9 @@ export default {
                   cpPlaceId: oneOrderDetail.LINE_NO,
                   custmorname: oneOrderDetail.CUSTOMER_NAME,
                   sortname: oneOrderDetail.CUSTOMER_CODE,
-                  tempCustmorjc: oneOrderDetail.LINKPERSON,
-                  tempPhone: oneOrderDetail.TELEPHONE,
-                  tempAddress: oneOrderDetail.POST_ADDRESS,
+                  tempCustmorjc: onedata[0].LINKMAN,
+                  tempPhone: onedata[0].LINKTEL,
+                  tempAddress: onedata[0].POST_ADDRESS,
                   tempProvince: onedata[0].RECIVER_AREA1,
                   tempCity: onedata[0].RECIVER_AREA2,
                   tempArea: onedata[0].RECIVER_AREA3,
@@ -2284,7 +2285,7 @@ export default {
         downLoadFile(this.Global.baseUrl + `PUR_HEAD/CreateExcel?PUR_NO=${PUR_NO}`);
       } else if (this.orderNoPreFix == "N") {
         downLoadFile(this.Global.baseUrl + `PUR_HEAD/CreateExcelN?PUR_NO=${PUR_NO}`);
-      }else {
+      } else {
         downLoadFile(this.Global.baseUrl + `PUR_HEAD/CreateExcelY?PUR_NO=${PUR_NO}`);
       }
     },

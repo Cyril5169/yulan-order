@@ -834,7 +834,7 @@ export default {
           item.NC_PART_TYPECODE != "LBT" &&
           item.curtain_choose
         );
-        //按照2褶，1褶，主布的顺序找
+        //按照2褶，1褶，上横拼配布，下横拼配布，主布的顺序找
         lbtmlItem = mlList.filter(item => item.NC_PART_TYPECODE == 'PB2');
         if (lbtmlItem.length) {
           lbtmlItem = lbtmlItem[0];
@@ -843,9 +843,19 @@ export default {
           if (lbtmlItem.length) {
             lbtmlItem = lbtmlItem[0];
           } else {
-            lbtmlItem = mlList.filter(item => item.NC_PART_TYPECODE == 'ZB');
+            lbtmlItem = mlList.filter(item => item.NC_PART_TYPECODE == 'SHPPB');
             if (lbtmlItem.length) {
               lbtmlItem = lbtmlItem[0];
+            } else {
+              lbtmlItem = mlList.filter(item => item.NC_PART_TYPECODE == 'XHPPB');
+              if (lbtmlItem.length) {
+                lbtmlItem = lbtmlItem[0];
+              } else {
+                lbtmlItem = mlList.filter(item => item.NC_PART_TYPECODE == 'ZB');
+                if (lbtmlItem.length) {
+                  lbtmlItem = lbtmlItem[0];
+                }
+              }
             }
           }
         }
@@ -1094,12 +1104,14 @@ export default {
       var height = this.convertNumber(oneCurtain.HEIGHT);
       var left_fillet = this.convertNumber(oneCurtain.LEFT_FILLET);
       var right_fillet = this.convertNumber(oneCurtain.RIGHT_FILLET);
-      if (oneCurtain.NC_PART_TYPECODE == "LT") {
-        //计算帘头用量 帘头用量=（帘头宽+左转角+右转角）*帘头高
-        oneCurtain.DOSAGE = this.dosageFilter((width + left_fillet + right_fillet) * height);
-      } else {
-        oneCurtain.DOSAGE = this.dosageFilter(width * height);
-      }
+      // if (oneCurtain.NC_PART_TYPECODE == "LT") {
+      //   //计算帘头用量 帘头用量=（帘头宽+左转角+右转角）*帘头高
+      //   oneCurtain.DOSAGE = this.dosageFilter((width + left_fillet + right_fillet) * height);
+      // } else {
+      //   oneCurtain.DOSAGE = this.dosageFilter(width * height);
+      // }
+      //2021.8.12修改，不需要+左转角+右转角了
+      oneCurtain.DOSAGE = this.dosageFilter(curtain_width * curtain_height);
       if (oneCurtain.NC_PART_TYPECODE == "LS") {
         //改变里衬布的
         var LCBITEM = this.ruleForm.ORDERBODY[this.currentIndex].curtains.filter(item => item.NC_PART_TYPECODE == "LCB");

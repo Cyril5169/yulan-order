@@ -1100,15 +1100,15 @@ export default {
     changeOneWidthOrHeight(val, index1, index) {
       this.currentIndex = index;
       var oneCurtain = this.ruleForm.ORDERBODY[this.currentIndex].curtains[index1];
-      var width = this.convertNumber(oneCurtain.WIDTH);
-      var height = this.convertNumber(oneCurtain.HEIGHT);
+      var curtain_width = this.convertNumber(oneCurtain.WIDTH);
+      var curtain_height = this.convertNumber(oneCurtain.HEIGHT);
       var left_fillet = this.convertNumber(oneCurtain.LEFT_FILLET);
       var right_fillet = this.convertNumber(oneCurtain.RIGHT_FILLET);
       // if (oneCurtain.NC_PART_TYPECODE == "LT") {
       //   //计算帘头用量 帘头用量=（帘头宽+左转角+右转角）*帘头高
-      //   oneCurtain.DOSAGE = this.dosageFilter((width + left_fillet + right_fillet) * height);
+      //   oneCurtain.DOSAGE = this.dosageFilter((curtain_width + left_fillet + right_fillet) * curtain_height);
       // } else {
-      //   oneCurtain.DOSAGE = this.dosageFilter(width * height);
+      //   oneCurtain.DOSAGE = this.dosageFilter(curtain_width * curtain_height);
       // }
       //2021.8.12修改，不需要+左转角+右转角了
       oneCurtain.DOSAGE = this.dosageFilter(curtain_width * curtain_height);

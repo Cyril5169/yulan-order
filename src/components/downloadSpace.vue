@@ -18,13 +18,12 @@
       <el-table height="100%" style="position:absolute;" ref="fileTable" :data="fileData" @row-dblclick="handleDbclikc">
         <el-table-column label="文件名" header-align="center">
           <template slot-scope="scope">
-            <span style="margin-left:10px;">
+            <div class="file-name-ct">
               <div class="format" :class="formatClass(scope.row.FILE_NAME)"></div>
-              <div style="display:inline-block;">
-                <a :class="[scope.row.FILE_TYPE == 0 ? 'nolink' : 'link']" style="margin-left:5px;"
-                  @click="gotoNext(scope.row)">{{ scope.row.FILE_NAME }}</a>
-              </div>
-            </span>
+              <!-- <el-image v-else class="img-preview" :src="getPictureUrl(scope.row.FILE_PATH)" lazy /> -->
+              <a :class="[scope.row.FILE_TYPE == 0 ? 'nolink' : 'link']" style="margin-left:5px;"
+                @click="gotoNext(scope.row)">{{ scope.row.FILE_NAME }}</a>
+            </div>
           </template>
         </el-table-column>
         <el-table-column width="150">
@@ -47,8 +46,8 @@
       </el-table>
     </div>
 
-    <el-dialog title="图片预览(因图片过大，若显示上一张图片请耐心等待刷新)" :visible.sync="picShow" top="5vh">
-      <img width="100%" :src="imgUrl" />
+    <el-dialog title="图片预览(因图片过大，请耐心等待加载)" width="800px" :visible.sync="picShow" top="5vh">
+      <el-image :src="imgUrl" />
     </el-dialog>
   </div>
 </template>
@@ -255,6 +254,9 @@ export default {
       )
         return true;
     },
+    getPictureUrl(url) {
+      return this.Global.fileCenterUrl + url;
+    },
     previewPic(url) {
       this.imgUrl = "";
       this.imgUrl = this.Global.fileCenterUrl + url;
@@ -295,11 +297,19 @@ export default {
 .link:hover {
   color: #09aaff;
 }
+.file-name-ct {
+  margin-left: 10px;
+  line-height: 25px;
+  display: flex;
+  align-items: center;
+}
+.img-preview {
+  width: 25px;
+  height: 25px;
+}
 .format {
   width: 25px;
   height: 25px;
-  margin-bottom: -5px;
-  display: inline-block;
   background-size: cover;
 }
 .android-mini {

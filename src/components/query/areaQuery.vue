@@ -23,7 +23,7 @@
             </el-option>
           </el-select>
           <span style="margin-left:5px;">关键字筛选</span>
-          <el-input size="small" @keyup.enter.native="getCustomerDataList()" placeholder="客户名称，客户代码" clearable v-model="condition"
+          <el-input size="small" @keyup.enter.native="getCustomerDataList()" placeholder="客户名称,客户代码" clearable v-model="condition"
             style="width:250px;">
             <el-button @click="getCustomerDataList()" slot="append" icon="el-icon-search">搜索</el-button>
           </el-input>
@@ -46,7 +46,11 @@
               <el-date-picker format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="结束日期区间" v-model="finishTime"
                 style="width:150px;"></el-date-picker>
             </div>
-            <div style="margin-top:20px;">
+            <div style="margin-top:10px;">
+              <el-input size="small" style="width:390px;" v-model="orderCondition" placeholder="提货单号，合同号"
+                @keyup.enter.native="searchData"></el-input>
+            </div>
+            <div style="margin-top:10px;">
               <el-button icon="el-icon-search" class="greenBtn" @click="searchData">查询</el-button>
               <el-button icon="el-icon-s-grid" class="greenBtn" @click="resetData" style="margin-left:35px;">重置
               </el-button>
@@ -65,32 +69,35 @@
             <el-table-column prop="CUSTOMER_NAME" label="客户名称" align="center" width="180" show-overflow-tooltip>
             </el-table-column>
             <el-table-column label="提货单号" width="100" align="center">
-              <template slot-scope="scope1">
-                <el-button size="mini" @click="getOrderDetail(scope1.row)" type="text">{{ scope1.row.SALE_NO }}
-                </el-button>
+              <template slot-scope="scope">
+                <el-tooltip placement="top" effect="light">
+                  <span slot="content" style="color:red;">{{scope.row.POST_ADDRESS}}</span>
+                  <el-button size="small" @click="getOrderDetail(scope.row)" type="text">{{ scope.row.SALE_NO }}
+                  </el-button>
+                </el-tooltip>
               </template>
             </el-table-column>
             <el-table-column label="状态" align="center">
-              <template slot-scope="scope2">
-                {{ scope2.row.STATUS_ID | transStatus }}
+              <template slot-scope="scope">
+                {{ scope.row.STATUS_ID | transStatus }}
               </template>
             </el-table-column>
             <el-table-column prop="CONTRACT_NO" label="B2B订单号" align="center"></el-table-column>
             <el-table-column label="单据类型" align="center" prop="BILL_ID"
               :filters="[{text: '冲减单', value: '0'}, {text: '自动提货单', value: '1'},{text: '手工提货单', value: '2'},{text: '退货单', value: '3'}, ]"
               :filter-method="filterHandler">
-              <template slot-scope="scope3">
-                {{ scope3.row.BILL_ID | transType }}
+              <template slot-scope="scope">
+                {{ scope.row.BILL_ID | transType }}
               </template>
             </el-table-column>
             <el-table-column prop="BILL_DATE" label="开单日期" align="center">
-              <template slot-scope="scope5">
-                {{ scope5.row.BILL_DATE | datatrans }}
+              <template slot-scope="scope">
+                {{ scope.row.BILL_DATE | datatrans }}
               </template>
             </el-table-column>
             <el-table-column prop="DATE_OUT_STOCK" label="提货日期" align="center">
-              <template slot-scope="scope5">
-                {{ scope5.row.DATE_OUT_STOCK | datatrans }}
+              <template slot-scope="scope">
+                {{ scope.row.DATE_OUT_STOCK | datatrans }}
               </template>
             </el-table-column>
             <el-table-column prop="MONEY_SUM" label="金额" align="center"></el-table-column>
@@ -132,10 +139,13 @@
           <tr>
             <td class="td_1">客户</td>
             <td colspan="5">
-              <span style="margin-left:10px;">
-                {{ orderHead.CUSTOMER_NAME }}/联系人:{{
-                    orderHead.LINKMAN
-                  }}</span>
+              <span style="margin-left:10px;">{{orderHead.CUSTOMER_NAME}}/联系人:{{orderHead.LINKMAN}}</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="td_1">到货地址</td>
+            <td colspan="5">
+              <span style="margin-left:10px;">{{orderHead.POST_ADDRESS}}</span>
             </td>
           </tr>
           <tr>
@@ -154,9 +164,9 @@
           </el-table-column>
           <el-table-column prop="ITEM_NO" label="型号" width="110" align="center">
           </el-table-column>
-          <el-table-column prop="BATCH_NO" label="批次" width="180" align="center">
+          <el-table-column prop="BATCH_NO" label="批次" width="190" align="center">
           </el-table-column>
-          <el-table-column prop="PRODUCTVERSION_NAME" label="版本" width="150" align="center"></el-table-column>
+          <el-table-column prop="PRODUCTVERSION_NAME" label="版本" width="140" align="center"></el-table-column>
           <el-table-column prop="NOTE" label="仓库" align="center"></el-table-column>
           <el-table-column prop="QTY_DELIVER" label="发货数" width="80" align="center"></el-table-column>
           <el-table-column prop="TRANS_PRICE" label="物流单价" width="80" align="center"></el-table-column>
@@ -187,17 +197,15 @@ export default {
   data() {
     return {
       condition: "",
+      orderCondition: "",
       beginTime: "",
-      nowBeginTime: "",
       finishTime: "",
-      nowFinishTime: "",
       areaCodeList: [],
       selectAreaCode: "",
       areaDistinctList: [],
       selectAreaDistinct: "",
       customerData: [],
       selectCustomer: [],
-      nowCustomers: [],
       customerTypeData: [
         {
           value: "",
@@ -236,8 +244,6 @@ export default {
           label: "已月结"
         }
       ],
-      selectOrderType: "",
-      nowSelectOrderType: "",
       customerOrderTaskData: [],
       limit: 10,
       count: 0,
@@ -330,7 +336,6 @@ export default {
       this.areaCodeChange();
       this.beginTime = this.timeDefault_1;
       this.finishTime = this.timeDefault_2;
-      this.selectOrderType = "";
     },
     //获得能查看的市场
     getAreaCodeData() {
@@ -410,23 +415,22 @@ export default {
         CUSTOMER_CODEs: this.selectCustomer,
         beginTime: this.beginTime,
         finishTime: this.finishTime,
+        condition: this.orderCondition
       };
       data.finishTime = data.finishTime + " 23:59:59";
       getPackByCustomer(data).then(res => {
         this.customerOrderTaskData = res.data;
       });
-      this.nowBeginTime = this.beginTime;
-      this.nowFinishTime = this.finishTime;
-      this.nowCustomers = this.selectCustomer;
       this.currentPage = 1;
       this.getAllCustomerAllOrder();
     },
     getAllCustomerAllOrder() {
       this.customerOrderData = [];
       var data = {
-        CUSTOMER_CODEs: this.nowCustomers, //已选用户
-        beginTime: this.nowBeginTime, //起始时间
-        finishTime: this.nowFinishTime, //结束时间
+        CUSTOMER_CODEs: this.selectCustomer, //已选用户
+        beginTime: this.beginTime, //起始时间
+        finishTime: this.finishTime, //结束时间
+        condition: this.orderCondition,
         limit: this.limit, //限制数
         page: this.currentPage, //页数
       };
@@ -434,9 +438,6 @@ export default {
       getPackDetails(data).then(res => {
         this.count = res.count;
         this.customerOrderData = res.data;
-        this.nowBeginTime = this.beginTime;
-        this.nowFinishTime = this.finishTime;
-        this.nowSelectOrderType = this.selectOrderType;
       });
     },
     handleCurrentChange(val) {
@@ -444,6 +445,7 @@ export default {
       this.getAllCustomerAllOrder();
     },
     getOrderDetail(row) {
+      console.log(row)
       this.orderHead = row;
       var data_2 = {
         saleNo: row.SALE_NO //所选提货单

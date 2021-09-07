@@ -345,17 +345,17 @@
       </el-steps>
     </div>
     <!-- 替换列表 -->
-    <el-dialog width="65%" :visible.sync="dialogTableVisible" :close-on-click-modal="false">
+    <el-dialog width="65%" v-if="dialogTableVisible" :visible.sync="dialogTableVisible" :close-on-click-modal="false">
       <div slot="title">
         <b>{{ dialogTitle }}</b>
       </div>
-      <div v-if="items.length !== 0">
-        <el-input clearable size="small" v-if="allCurtaindata[chooseRowIndex][chooseIndex].productType !=='GY'"
-          placeholder="输入商品型号查找" style="width:250px;margin: 0 0 10px 10px;" v-model.trim="searchKey" @clear="initSearch"
-          @keyup.enter.native="initSearch">
-          <el-button @click="initSearch" slot="append" icon="el-icon-search">搜索</el-button>
-        </el-input>
-        <br />
+      <el-input clearable size="small" v-if="allCurtaindata[chooseRowIndex][chooseIndex].productType !=='GY'"
+        placeholder="输入商品型号查找" style="width:250px;margin: 0 0 10px 10px;" v-model.trim="searchKey" @clear="initSearch"
+        @keyup.enter.native="initSearch">
+        <el-button @click="initSearch" slot="append" icon="el-icon-search">搜索</el-button>
+      </el-input>
+      <br />
+      <template v-if="items.length !== 0">
         <el-radio border size="small" class="mt10 ml10" v-for="item in items" :value="item.itemNo" :key="item.itemNo"
           v-model="itemNo" :label="item.itemNo">
           <span v-if="chooseType === 'LCB' || chooseType === 'GY'">
@@ -367,8 +367,8 @@
           @current-change="getAllItemNoData" :current-page.sync="currentPage" :page-size="limit"
           layout="prev, pager, next, jumper" :total="totalNumber">
         </el-pagination>
-      </div>
-      <div v-else style="height: 200px;">
+      </template>
+      <div v-else style="height: 200px;margin: 0 0 10px 10px;">
         暂无数据
       </div>
       <footer class="mt20" style="text-align: center;">

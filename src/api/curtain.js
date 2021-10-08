@@ -2,7 +2,6 @@
  *存放除了查询窗帘之外的窗帘所有接口，因为实在是太多了
 */
 import { get, post, patch, put } from './http'
-import Axios from 'axios'
 //获取单个窗帘信息
 export function getCurtainDetailMsg(data, config = {}) {
     return post('/item/getCurtainInfo.do', data, config).then((res) => {

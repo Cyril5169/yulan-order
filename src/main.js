@@ -2,8 +2,9 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import App from './App'
-import router from './router'
 import 'babel-polyfill'
+import router from './router'
+import store from './store'
 import Axios from 'axios'
 import { get, post, patch, put } from './api/http'
 import qs from 'qs'
@@ -13,7 +14,6 @@ import AFTableColumn from 'af-table-column'
 import 'element-ui/lib/theme-chalk/index.css'
 import './assets/iconfont/iconfont.css'
 import './assets/css/base.css'
-import store from './store'
 import { showFullScreenLoading, tryHideFullScreenLoading } from './api/loading'
 import * as custom from './common/js/filter'
 
@@ -68,7 +68,7 @@ Axios.interceptors.response.use(res => {
 })
 Vue.config.productionTip = false
 
-
+//注册为全局filter的同时注册为全局方法
 Object.keys(custom).forEach(key => {
   Vue.filter(key, custom[key]);
   Vue.prototype[key] = custom[key];

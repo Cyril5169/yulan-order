@@ -326,3 +326,10 @@ export function GetPurByOrderNo(data, config = {}) {
         return Promise.reject(err);
     })
 }
+export function GetAreaList(data, config = {}) {
+    return post('/AREA_REGION/GetAreaList', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}

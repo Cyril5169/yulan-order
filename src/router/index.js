@@ -1,5 +1,4 @@
 import Vue from 'vue'
-import store from '../store/index';
 import Router from 'vue-router'
 import Login from '@/components/login'
 import Main from '@/components/main'
@@ -64,6 +63,7 @@ import safeStock from '@/components/purplan/safeStock'
 import basePlan from '@/components/purplan/basePlan'
 import purPlan from '@/components/purplan/purPlan'
 import supplyPurPlan from '@/components/purplan/supplyPurPlan'
+import buyUserInfo from '@/components/buyUser/buyUserInfo'
 
 Vue.use(Router)
 
@@ -459,6 +459,14 @@ const router = new Router({
           path: '/purplan/supplyPurPlan',
           name: 'supplyPurPlan',
           component: supplyPurPlan,
+          meta: {
+            isFlex: true //flex布局
+          }
+        },
+        {
+          path: '/buyUser/buyUserInfo',
+          name: 'buyUserInfo',
+          component: buyUserInfo,
           meta: {
             isFlex: true //flex布局
           }

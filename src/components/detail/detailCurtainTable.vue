@@ -420,11 +420,11 @@ export default {
       //帘身配布制造说明
       part3: [
         { value: "一个褶" },
-        { value: "一个半褶" },
+        //{ value: "一个半褶" },
         { value: "二个褶" },
-        { value: "二个半褶" },
+        //{ value: "二个半褶" },
         { value: "三个褶" },
-        { value: "三个半褶" },
+        //{ value: "三个半褶" },
       ],
       //配件编码
       part2: [],

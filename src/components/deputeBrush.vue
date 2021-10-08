@@ -85,8 +85,8 @@
     </el-card>
   </div>
 </template>
+
 <script>
-import Axios from "axios";
 import Cookies from "js-cookie";
 import dialogOrderDetail from "../components/order/dialogOrderDetail";
 import { GetTaskProgress, GetYearTaskProgress, getOrderDetails } from "@/api/orderListASP";

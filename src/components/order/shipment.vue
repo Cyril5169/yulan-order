@@ -340,7 +340,6 @@
 </template>
 
 <script>
-import Axios from "axios";
 import { addSubmit } from "@/api/complaintASP";
 import Cookies from "js-cookie";
 import {

@@ -25,7 +25,8 @@
           <div style="margin-top:10px;">
             <span style="position:relative;float:right;right:60px;" @click="rememberPassWord = !rememberPassWord">
               <input style="width:14px;height:14px;vertical-align:middle;" type="checkbox" value
-                v-model="rememberPassWord" /><span style="color:gray;vertical-align:middle;">自&nbsp;动&nbsp;登&nbsp;录</span>
+                v-model="rememberPassWord" /><span
+                style="color:gray;vertical-align:middle;user-select:none;">自&nbsp;动&nbsp;登&nbsp;录</span>
             </span>
           </div>
         </div>

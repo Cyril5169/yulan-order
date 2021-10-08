@@ -1,5 +1,4 @@
 import { get, post, patch, put } from './http'
-import Axios from 'axios'
 //用户登录
 export function userLogin(data) {
     return post('/web_user/login.do', data).then((res) => {

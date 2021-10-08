@@ -1,5 +1,4 @@
 import { get, post, patch, put} from './http'
-import Axios from 'axios'
 
 //获取银行列表 
 export function getBankList(url,data){

@@ -1,9 +1,8 @@
 import { get, post, patch, put} from './http'
-import Axios from 'axios'
 
 //添加入购物车
 export function addShoppingCar(data){
-    return Axios.post('/cart/addCartItem.do',data).then((res) =>{
+    return post('/cart/addCartItem.do',data).then((res) =>{
         return Promise.resolve(res);
     }).catch((err) =>{
         return Promise.reject(err);

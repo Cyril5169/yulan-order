@@ -1452,4 +1452,33 @@ export default {
 .el-drawer__header {
   margin-bottom: 15px;
 }
+/* 自己定义的全局样式 */
+.zj-tbar {
+  margin-bottom: 5px;
+  padding: 3px 5px;
+}
+.zj-table-ct {
+  flex: 1;
+  position: relative;
+}
+.zj-flex-table {
+  position: absolute;
+}
+.zj-flex-page {
+  padding: 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+.zj-flex-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.zj-flex-row {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+}
 </style>

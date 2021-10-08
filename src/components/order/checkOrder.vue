@@ -299,7 +299,7 @@
     </el-dialog>
     <!-- 维护购买人 -->
     <el-dialog v-if="buyUserVisible" :visible.sync="buyUserVisible" title="管理购买用户" :close-on-click-modal="false" width="1000px">
-      <buyUserInfo style="height: 500px;" @row-dblclick="handleRowDBClick" canCheck creFlag="订单创建"></buyUserInfo>
+      <buyUserInfo style="height: 500px;" @row-dblclick="handleRowDBClick" canCheck creFlag="order"></buyUserInfo>
     </el-dialog>
   </el-card>
 </template>

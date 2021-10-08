@@ -312,6 +312,7 @@ export function GetUnImportOrder(data, config = {}) {
         return Promise.reject(err);
     })
 }
+//获得未导入布精灵的订单
 export function GetUnImportOrderByItem(data, config = {}) {
     return post('/CTM_ORDER/GetUnImportOrderByItem', data, config).then((res) => {
         return Promise.resolve(res);
@@ -319,6 +320,7 @@ export function GetUnImportOrderByItem(data, config = {}) {
         return Promise.reject(err);
     })
 }
+//通过订单号获得采购单
 export function GetPurByOrderNo(data, config = {}) {
     return post('/PUR_HEAD/GetPurByOrderNo', data, config).then((res) => {
         return Promise.resolve(res);
@@ -326,8 +328,17 @@ export function GetPurByOrderNo(data, config = {}) {
         return Promise.reject(err);
     })
 }
+//获得省市区
 export function GetAreaList(data, config = {}) {
     return post('/AREA_REGION/GetAreaList', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+//消费者统计
+export function GetBuyUserStatistic(data, config = {}) {
+    return post('/BUYUSER_INFO/GetBuyUserStatistic', data, config).then((res) => {
         return Promise.resolve(res);
     }).catch((err) => {
         return Promise.reject(err);

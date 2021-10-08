@@ -18,15 +18,20 @@
       <el-table class="zj-flex-table" height="100%" :data="buyUserInfoData" :row-class-name="tableRowClassName"
         @selection-change="handleSelectionChange" @row-dblclick="handleRowDBClick">
         <el-table-column type="selection" width="55" align="center"></el-table-column>
-        <el-table-column width="120" prop="BUYUSER" label="用户姓名" align="center"></el-table-column>
-        <el-table-column width="150" prop="BUYUSER_PHONE" label="用户电话" align="center"></el-table-column>
+        <el-table-column width="120" prop="BUYUSER" label="消费者姓名" align="center"></el-table-column>
+        <el-table-column width="150" prop="BUYUSER_PHONE" label="联系电话" align="center"></el-table-column>
         <el-table-column label="地址" header-align="center">
           <template slot-scope="scope">
             {{splitAddress(scope.row)}}
           </template>
         </el-table-column>
         <el-table-column width="150" prop="NOTE" label="备注"></el-table-column>
-        <el-table-column width="100" prop="CRE_FLAG" label="来源" align="center"></el-table-column>
+        <el-table-column width="100" prop="CRE_FLAG" label="来源" align="center">
+          <template slot-scope="scope">
+            <span v-if="scope.row.CRE_FLAG == 'order'">订单创建</span>
+            <span v-if="scope.row.CRE_FLAG == 'user'">手工创建</span>
+          </template>
+        </el-table-column>
         <el-table-column width="100" prop="CRE_DATE" label="创建时间" align="center">
           <template slot-scope="scope">
             {{scope.row.CRE_DATE | dateFilter}}
@@ -72,18 +77,18 @@
           </el-select>
         </el-form-item>
         <el-form-item label="详细地址">
-          <el-input style="width:450px;" v-model="buyUserModel.POST_ADDRESS">
+          <el-input style="width:460px;" v-model="buyUserModel.POST_ADDRESS">
           </el-input>
         </el-form-item>
         <el-form-item label="备注">
-          <el-input style="width:450px;" v-model="buyUserModel.NOTE">
+          <el-input style="width:460px;" v-model="buyUserModel.NOTE">
           </el-input>
         </el-form-item>
-        <el-form-item style="text-align:center;margin-right:100px;">
+        <div style="text-align:center;margin-bottom:10px;">
           <el-button size="medium" @click="addBuyUserVisible = false">取&nbsp;&nbsp;消</el-button>
           <el-button type="primary" size="medium" @click="onSaveBuyUserClick" style="margin-left:30px;">保&nbsp;&nbsp;存
           </el-button>
-        </el-form-item>
+        </div>
       </el-form>
     </el-dialog>
   </div>
@@ -108,7 +113,7 @@ export default {
     },
     creFlag: {
       type: String,
-      default: "手工创建"
+      default: "user"
     }
   },
   data() {
@@ -156,8 +161,8 @@ export default {
       this.getBuyUser();
     },
     splitAddress(row) {
-      var address = `${row.PROVINCE ? row.PROVINCE : ""}${row.CITY ? row.CITY : ""
-        }${row.COUNTRY ? row.COUNTRY : ""}${row.POST_ADDRESS ? row.POST_ADDRESS : ""
+      var address = `${row.PROVINCE ? row.PROVINCE : ""} ${row.CITY ? row.CITY : ""
+        } ${row.COUNTRY ? row.COUNTRY : ""} ${row.POST_ADDRESS ? row.POST_ADDRESS : ""
         }`;
       return address;
     },
@@ -174,7 +179,8 @@ export default {
         CITY_ID: "",
         COUNTRY_ID: "",
         NOTE: "",
-        CRE_FLAG: this.creFlag
+        CRE_FLAG: this.creFlag,
+        OPERATOR: Cookies.get("cid")
       };
       this.areaData = [];
       this.cityData = [];

@@ -1,5 +1,13 @@
 import { get, post, patch, put } from './httpASP'
 
+
+export function UpdateModel(data, config = {}) {
+    return post('/CTM_ORDER/UpdateModel', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
 //根据订单号获得订单
 export function GetCtmOrder(data, config = {}) {
     return post('/CTM_ORDER/GetCtmOrder', data, config).then((res) => {
@@ -154,6 +162,14 @@ export function GetYearTaskProgress(data, config = {}) {
 //上传购买人图片
 export function UploadBuyUserFiles(data, config = {}) {
     return post('/CTM_ORDER/UploadBuyUserFiles', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+//上墙附件
+export function UploadUpWallFiles(data, config = {}) {
+    return post('/CTM_ORDER/UploadUpWallFiles', data, config).then((res) => {
         return Promise.resolve(res);
     }).catch((err) => {
         return Promise.reject(err);
@@ -371,6 +387,14 @@ export function GetCustomerOrderDetail(data, config = {}) {
 //所有消费者订单
 export function GetBuyUserAllOrder(data, config = {}) {
     return post('/BUYUSER_INFO/GetBuyUserAllOrder', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+//审核所有消费者订单
+export function GetAllBuyUserOrder(data, config = {}) {
+    return post('/BUYUSER_INFO/GetAllBuyUserOrder', data, config).then((res) => {
         return Promise.resolve(res);
     }).catch((err) => {
         return Promise.reject(err);

@@ -45,33 +45,49 @@
 
       <el-table v-else-if="selectType == 'all'" class="zj-flex-table" height="100%" :data="buyUserData" key="all">
         <el-table-column width="120" prop="BUYUSER" label="消费者姓名" align="center"></el-table-column>
-        <el-table-column width="150" prop="BUYUSER_PHONE" label="联系电话" align="center"></el-table-column>
+        <el-table-column width="120" prop="BUYUSER_PHONE" label="联系电话" align="center"></el-table-column>
         <el-table-column width="120" prop="ORDER_NO" label="订单号" align="center">
           <template slot-scope="scope">
             <el-button size="small" @click="getOrderDetail(scope.row.ORDER_NO)" type="text">{{ scope.row.ORDER_NO }}
             </el-button>
           </template>
         </el-table-column>
-        <el-table-column width="150" prop="ITEM_NO" label="型号" align="center"></el-table-column>
-        <el-table-column width="150" prop="PRODUCTVERSION_NAME" label="版本名称" align="center"></el-table-column>
+        <el-table-column width="100" prop="ITEM_NO" label="型号" align="center"></el-table-column>
+        <el-table-column width="100" prop="PRODUCTVERSION_NAME" label="版本名称" align="center"></el-table-column>
         <el-table-column prop="PROMOTION" label="活动" align="center"></el-table-column>
-        <el-table-column width="120" prop="PROMOTION_COST" label="折后金额" align="center">
+        <el-table-column width="100" prop="PROMOTION_COST" label="折后金额" align="center">
           <template slot-scope="scope">
             <span v-if="isManager === '0'">***</span>
             <span v-else>{{ scope.row.PROMOTION_COST }}</span>
           </template>
         </el-table-column>
-        <el-table-column width="120" prop="FINAL_COST" label="应付金额" align="center">
+        <el-table-column width="100" prop="FINAL_COST" label="应付金额" align="center">
           <template slot-scope="scope">
             <span v-if="isManager === '0'">***</span>
             <span v-else>{{ scope.row.FINAL_COST }}</span>
           </template>
         </el-table-column>
-        <el-table-column width="120" prop="WEB_TJ_TIME" label="下单日期" align="center"></el-table-column>
+        <el-table-column width="100" prop="WEB_TJ_TIME" label="下单日期" align="center"></el-table-column>
+        <el-table-column width="70" label="购买凭证" align="center">
+          <template slot-scope="scope">
+            <el-button size="small" type="text" v-if="scope.row.BUYUSER_PICTURE" @click="showPicture(scope.row.BUYUSER_PICTURE)">
+              查看
+            </el-button>
+            <span v-else>无</span>
+          </template>
+        </el-table-column>
+        <el-table-column width="70" label="上墙附件" align="center">
+          <template slot-scope="scope">
+            <el-button size="small" type="text" v-if="scope.row.BUYUSER_PICTURE1"
+              @click="showPicture(scope.row.BUYUSER_PICTURE1)">查看
+            </el-button>
+            <span v-else>无</span>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
 
-    <el-dialog width="800px" :title="'[' + selectCustomer.BUYUSER + ']订单列表'" v-if="customerOrderListVisible"
+    <el-dialog width="1000px" :title="'[' + selectCustomer.BUYUSER + ']订单列表'" v-if="customerOrderListVisible"
       :visible.sync="customerOrderListVisible">
       <div class="zj-tbar">
         <el-button icon="el-icon-refresh" size="mini" circle @click="refreshOrderDetailData">
@@ -101,6 +117,22 @@
           </template>
         </el-table-column>
         <el-table-column width="100" prop="WEB_TJ_TIME" label="下单日期" align="center"></el-table-column>
+        <el-table-column width="70" label="购买凭证" align="center">
+          <template slot-scope="scope">
+            <el-button size="small" type="text" v-if="scope.row.BUYUSER_PICTURE" @click="showPicture(scope.row.BUYUSER_PICTURE)">
+              查看
+            </el-button>
+            <span v-else>无</span>
+          </template>
+        </el-table-column>
+        <el-table-column width="70" label="上墙附件" align="center">
+          <template slot-scope="scope">
+            <el-button size="small" type="text" v-if="scope.row.BUYUSER_PICTURE1"
+              @click="showPicture(scope.row.BUYUSER_PICTURE1)">查看
+            </el-button>
+            <span v-else>无</span>
+          </template>
+        </el-table-column>
       </el-table>
     </el-dialog>
 
@@ -109,6 +141,13 @@
         <checkExamine v-if="orderDetailVisible" :isShowButton="false">
         </checkExamine>
       </keep-alive>
+    </el-dialog>
+
+    <el-dialog :visible.sync="pictureVisible" width="700px" append-to-body>
+      <div style="display: inline-block;margin:5px;cursor:pointer;" v-for="(file,index) in fileList" :key="index">
+        <el-image style="width: 200px; height: 200px" :src="file" fit="fill" @click="handleImgClick(index)"
+          :preview-src-list="fileList2"></el-image>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -131,22 +170,25 @@ export default {
       selectCustomer: {},
       customerOrderListData: [],
       orderDetailVisible: false,
-      selectType: 'group'
+      selectType: 'group',
+      pictureVisible: false,
+      fileList: [],
+      fileList2: []
     }
   },
   methods: {
     refreshBuyUserStatistic() {
       if (this.selectType == 'group') {
         GetBuyUserStatistic({
-          //cid: Cookies.get("cid"),
-          cid: 'C23036'
+          cid: Cookies.get("cid"),
+          //cid: 'C23036'
         }).then(res => {
           this.buyUserData = res.data;
         })
       } else if (this.selectType == 'all') {
         GetBuyUserAllOrder({
-          //cid: Cookies.get("cid"),
-          cid: 'C23036'
+          cid: Cookies.get("cid"),
+          //cid: 'C23036'
         }).then(res => {
           this.buyUserData = res.data;
         })
@@ -156,7 +198,7 @@ export default {
       if (this.selectType == 'group') {
         downLoadFile(this.Global.baseUrl + `BUYUSER_INFO/ExportStatisticExcel?cid=${Cookies.get("cid")}`);
       } else if (this.selectType == 'all') {
-        downLoadFile(this.Global.baseUrl + `BUYUSER_INFO/ExportAllBuyUserExcel?cid=${Cookies.get("cid")}`);
+        downLoadFile(this.Global.baseUrl + `BUYUSER_INFO/ExportBuyUserAllOrderExcel?cid=${Cookies.get("cid")}`);
       }
     },
     onShowOrderDetailClick(row) {
@@ -166,8 +208,8 @@ export default {
     },
     refreshOrderDetailData() {
       GetCustomerOrderDetail({
-        //cid: Cookies.get("cid"),
-        cid: 'C23036',
+        cid: Cookies.get("cid"),
+        //cid: 'C23036',
         buyuser: this.selectCustomer.BUYUSER,
         buyuser_phone: this.selectCustomer.BUYUSER_PHONE
       }).then(res => {
@@ -180,6 +222,28 @@ export default {
     getOrderDetail(order_no) {
       Cookies.set("ORDER_NO", order_no);
       this.orderDetailVisible = true;
+    },
+    showPicture(urls) {
+      this.fileList = [];
+      if (urls) {
+        var list = urls.split(";");
+        for (var i = 0; i < list.length - 1; i++) {
+          var index = list[i].lastIndexOf("/");
+          if (index == -1) index = list[i].lastIndexOf("\\");
+          var fileName = list[i].substr(index + 1);
+          this.fileList.push(this.Global.baseUrl + list[i]);
+        }
+        this.pictureVisible = true;
+      }
+    },
+    handleImgClick(index) {
+      let tempImgList = [...this.fileList];
+      let temp = [];
+      for (let i = 0; i < index; i++) {
+        temp.push(tempImgList.shift());
+      }
+      this.fileList2 = tempImgList.concat(temp);
+      this.showViewer = true;
     },
   },
   mounted() {

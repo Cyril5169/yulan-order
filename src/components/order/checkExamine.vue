@@ -8,7 +8,7 @@
         </detailCurtainTable>
       </keep-alive>
     </el-dialog>
-    <el-dialog title="查看购买凭证" width="700px" :visible.sync="buyUserPictureVisible">
+    <el-dialog title="查看购买凭证" width="700px" :visible.sync="buyUserPictureVisible" append-to-body>
       <div style="display: inline-block;margin:5px;cursor:pointer;" v-for="(file,index) in fileList" :key="index">
         <el-image style="width: 200px; height: 200px" :src="file" fit="fill" @click="handleImgClick(index)"
           :preview-src-list="fileList2"></el-image>
@@ -563,6 +563,8 @@ export default {
           this.showExportProduct = true;
         }
         this.nowDate = new Date(new Date().setDate(new Date().getDate() - 2)).getTime();
+
+        this.fileList = [];
         if (this.ruleForm.BUYUSER_PICTURE) {
           var list = this.ruleForm.BUYUSER_PICTURE.split(";");
           for (var i = 0; i < list.length - 1; i++) {

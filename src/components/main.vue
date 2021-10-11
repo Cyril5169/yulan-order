@@ -1452,6 +1452,9 @@ export default {
 .el-drawer__header {
   margin-bottom: 15px;
 }
+.el-image-viewer__close {
+  color: #ffffff;
+}
 /* 自己定义的全局样式 */
 .zj-tbar {
   margin-bottom: 5px;

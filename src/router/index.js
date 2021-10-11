@@ -65,6 +65,7 @@ import purPlan from '@/components/purplan/purPlan'
 import supplyPurPlan from '@/components/purplan/supplyPurPlan'
 import buyUserInfo from '@/components/buyUser/buyUserInfo'
 import buyUserStatistic from '@/components/buyUser/buyUserStatistic'
+import buyUserCheck from '@/components/buyUser/buyUserCheck'
 
 Vue.use(Router)
 
@@ -476,6 +477,14 @@ const router = new Router({
           path: '/buyUser/buyUserStatistic',
           name: 'buyUserStatistic',
           component: buyUserStatistic,
+          meta: {
+            isFlex: true //flex布局
+          }
+        },
+        {
+          path: '/buyUser/buyUserCheck',
+          name: 'buyUserCheck',
+          component: buyUserCheck,
           meta: {
             isFlex: true //flex布局
           }

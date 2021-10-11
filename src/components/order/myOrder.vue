@@ -30,7 +30,7 @@
         <el-button @click="search()" slot="append" icon="el-icon-search">搜索</el-button>
       </el-input>
     </div>
-    <div id="outDiv">
+    <div class="outDiv">
       <el-card style="position:relative;" v-for="(item, index) of orderList" :key="index">
         <div slot="header">
           <span class="zoomLeft">时间：</span>
@@ -67,7 +67,7 @@
             ">兰居尚品订单进度查询</a>
         </div>
 
-        <div class="outDiv" style="float:left;width:90%">
+        <div style="float:left;width:90%">
           <el-table border :data="orderList[index].ORDERBODY" style="width: 100%;margin-bottom:5px;"
             :row-class-name="tableRowClassName">
             <el-table-column prop="ITEM_NO" label="型号" align="center" width="150"></el-table-column>
@@ -145,10 +145,26 @@
         </el-pagination>
       </div>
     </div>
-    <el-dialog :show-close="true" :visible.sync="shipmentVisible" width="1200px" title="出货详情">
+    <!-- 出货详情 -->
+    <el-dialog :visible.sync="shipmentVisible" width="1200px" title="出货详情">
       <keep-alive>
         <shipment v-if="shipmentVisible" :orderDetail="selectOrderDetail"></shipment>
       </keep-alive>
+    </el-dialog>
+    <!-- 上墙附件 -->
+    <el-dialog :visible.sync="fileVisible" width="600px"
+      :title="'上墙附件' + (selectOrder.BUYUSER_PICTURE1_CHECK == 1? '-审核通过' : '')">
+      <div>
+        <el-upload class="upload-de" :class="{'hideUploadBtn': selectOrder.BUYUSER_PICTURE1_CHECK == 1 }" multiple action="#"
+          list-type="picture-card" :http-request="handleUpload" :on-change="handleChange" :on-preview="handlePictureCardPreview"
+          :before-remove="beforeRemove" :on-remove="handleRemove" :before-upload="beforeAvatarUpload" :file-list="fileList">
+          <i class="el-icon-plus"></i>
+        </el-upload>
+      </div>
+    </el-dialog>
+    <!-- 查看大图 -->
+    <el-dialog :visible.sync="dialogImageVisible">
+      <img width="100%" :src="dialogImageUrl" />
     </el-dialog>
   </el-card>
 </template>
@@ -162,7 +178,10 @@ import {
   copyCartItem,
   GetPromotionByType,
   GetPromotionByTypeAndId,
-  settlementAgain
+  settlementAgain,
+  DeleteFileByPath,
+  UploadUpWallFiles,
+  UpdateModel
 } from "@/api/orderListASP";
 import { mapMutations, mapActions, mapState } from "vuex";
 import Cookies from "js-cookie";
@@ -348,7 +367,13 @@ export default {
           value: "3",
         },
       ],
-      nowDate: 0
+      nowDate: 0,
+      selectOrder: {},
+      fileList: [],
+      fileVisible: false,
+      dialogImageVisible: false,
+      dialogImageUrl: '',
+      removeByAuto: false
     };
   },
   components: {
@@ -694,7 +719,112 @@ export default {
         });
     },
     toUploadPicture(item) {
+      this.selectOrder = item;
+      //this.selectOrder.BUYUSER_PICTURE1_CHECK = 1;
+      this.fileList = [];
+      if (item.BUYUSER_PICTURE1) {
+        var list = item.BUYUSER_PICTURE1.split(";");
+        for (var i = 0; i < list.length - 1; i++) {
+          var index = list[i].lastIndexOf("/");
+          if (index == -1) index = list[i].lastIndexOf("\\");
+          var fileName = list[i].substr(index + 1);
+          this.fileList.push({
+            name: fileName,
+            url: this.Global.baseUrl + list[i],
+          });
+        }
+      }
+      this.fileVisible = true;
+    },
+    beforeAvatarUpload(file) {
+      this.removeByAuto = false;
+      if (this.selectOrder.BUYUSER_PICTURE1_CHECK == 1) {
+        this.$alert("已审核通过！", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
+        this.removeByAuto = true;
+        return false;
+      }
+      let types = ["image/jpeg", "image/gif", "image/bmp", "image/png"];
+      const isJPG = types.includes(file.type);
+      if (!isJPG) {
+        this.$message.error("上传头像图片只能是图片格式!");
+      }
+      return isJPG;
+    },
+    handleUpload(param) {
+      const formData = new FormData();
+      formData.append("file", param.file);
+      UploadUpWallFiles(formData, {
+        params: {
+          cid: Cookies.get("cid")
+        }
+      }).then(res => {
+        this.fileList.push({
+          name: res.data,
+          url: this.Global.baseUrl + "/Files/UpWall/" + Cookies.get("cid") + "/" + res.data
+        })
+        //上传成功更新order
+        if (!this.selectOrder.BUYUSER_PICTURE) this.selectOrder.BUYUSER_PICTURE = "";
 
+        var row = JSON.parse(JSON.stringify(this.selectOrder));
+        row += "/Files/UpWall/" + Cookies.get("cid") + "/" + res.data + ";";
+        row.UpdateColumns = ["BUYUSER_PICTURE1"];
+        UpdateModel(row).then(res => {
+          this.$message({
+            message: "上传成功!",
+            type: "success",
+            duration: 1000
+          });
+          this.selectOrder.BUYUSER_PICTURE1 += "/Files/UpWall/" + Cookies.get("cid") + "/" + res.data + ";";
+        })
+      })
+    },
+    handleChange(file, fileList) {
+      //this.fileList = fileList;
+    },
+    beforeRemove(file, fileList) {
+      if(this.removeByAuto) return true;
+      if (this.selectOrder.BUYUSER_PICTURE1_CHECK == 1) {
+        this.$alert("已审核通过！", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
+        return false;
+      }
+      return this.$confirm("确定删除吗", "提示", {
+        confirmButtonText: "是",
+        cancelButtonText: "否",
+        type: "warning",
+      })
+    },
+    handleRemove(file, fileList) {
+      DeleteFileByPath({
+        path: "/Files/UpWall/" + Cookies.get("cid") + "/" + file.name
+      }).then(res => {
+        this.fileList = fileList;
+        //删除成功更新order
+        var temPath
+        for (var i = 0; i < this.fileList.length; i++) {
+          temPath += "/Files/UpWall/" + Cookies.get("cid") + "/" + this.fileList[i].name + ";";
+        }
+        var row = JSON.parse(JSON.stringify(this.selectOrder));
+        row.BUYUSER_PICTURE1 = temPath;
+        row.UpdateColumns = ["BUYUSER_PICTURE1"];
+        UpdateModel(row).then(res => {
+          this.$message({
+            message: "删除成功!",
+            type: "success",
+            duration: 1000
+          });
+          this.selectOrder.BUYUSER_PICTURE1 = temPath;
+        })
+      })
+    },
+    handlePictureCardPreview(file) {
+      this.dialogImageUrl = file.url;
+      this.dialogImageVisible = true;
     },
     //隔行变色
     tableRowClassName({ row, rowIndex }) {
@@ -729,10 +859,6 @@ p {
   float: right;
   margin-right: 15px;
   width: 8%;
-  /* position: absolute;
-  top: 50%;
-  left: 90%;
-  width: 8%; */
 }
 .zoomRight {
   font-weight: 400;
@@ -750,15 +876,32 @@ p {
   color: tomato;
   text-decoration: line-through;
 }
-#outDiv .el-card__header {
+.outDiv .el-card__header {
   padding: 12px 20px;
   background-color: rgb(245, 245, 245);
 }
-#outDiv .el-card__body {
+.outDiv .el-card__body {
   padding: 5px 10px;
 }
-#outDiv .el-card {
+.outDiv .el-card {
   margin-top: 5px;
   border: 1px solid rgb(140, 214, 198);
+}
+.upload-de .el-upload--picture-card {
+  width: 70px;
+  height: 70px;
+  line-height: 80px;
+}
+.upload-de .el-upload-list--picture-card .el-upload-list__item {
+  width: 70px;
+  height: 70px;
+  line-height: 70px;
+  margin-right: 8px;
+}
+.upload-de .el-upload-list__item {
+  transition: none !important;
+}
+.hideUploadBtn .el-upload--picture-card {
+  display: none;
 }
 </style>

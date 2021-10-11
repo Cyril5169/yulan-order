@@ -153,9 +153,9 @@
     </el-dialog>
     <!-- 上墙附件 -->
     <el-dialog :visible.sync="fileVisible" width="600px"
-      :title="'上墙附件' + (selectOrder.BUYUSER_PICTURE1_CHECK == 1? '-审核通过' : '')">
+      :title="'上墙附件' + (selectOrder.YULAN_CONFIRM == '1'? '-审核通过' : '')">
       <div>
-        <el-upload class="upload-de" :class="{'hideUploadBtn': selectOrder.BUYUSER_PICTURE1_CHECK == 1 }" multiple action="#"
+        <el-upload class="upload-de" :class="{'hideUploadBtn': selectOrder.YULAN_CONFIRM == '1' }" multiple action="#"
           list-type="picture-card" :http-request="handleUpload" :on-change="handleChange" :on-preview="handlePictureCardPreview"
           :before-remove="beforeRemove" :on-remove="handleRemove" :before-upload="beforeAvatarUpload" :file-list="fileList">
           <i class="el-icon-plus"></i>
@@ -720,7 +720,6 @@ export default {
     },
     toUploadPicture(item) {
       this.selectOrder = item;
-      //this.selectOrder.BUYUSER_PICTURE1_CHECK = 1;
       this.fileList = [];
       if (item.BUYUSER_PICTURE1) {
         var list = item.BUYUSER_PICTURE1.split(";");
@@ -738,7 +737,7 @@ export default {
     },
     beforeAvatarUpload(file) {
       this.removeByAuto = false;
-      if (this.selectOrder.BUYUSER_PICTURE1_CHECK == 1) {
+      if (this.selectOrder.YULAN_CONFIRM == '1') {
         this.$alert("已审核通过！", "提示", {
           confirmButtonText: "确定",
           type: "warning",
@@ -786,7 +785,7 @@ export default {
     },
     beforeRemove(file, fileList) {
       if(this.removeByAuto) return true;
-      if (this.selectOrder.BUYUSER_PICTURE1_CHECK == 1) {
+      if (this.selectOrder.YULAN_CONFIRM == '1') {
         this.$alert("已审核通过！", "提示", {
           confirmButtonText: "确定",
           type: "warning",

@@ -9,6 +9,7 @@
       <span>至</span>
       <el-date-picker style="width:130px;" @change="refreshBuyUserData" v-model=" finishTime" placeholder="日期区间" size="small">
       </el-date-picker>
+      <el-checkbox v-model="checked" @change="refreshBuyUserData">只看未审核</el-checkbox>
       <el-button style="margin-left:10px;" type="primary" size="small" @click="exportAllBuyUserExcel">导出Excel</el-button>
     </div>
     <div class="zj-table-ct">
@@ -49,11 +50,11 @@
         </el-table-column>
         <el-table-column width="100" label="操作" align="center" fixed="right">
           <template slot-scope="scope">
-            <el-button size="mini" type="success" v-if="scope.row.BUYUSER_PICTURE1_CHECK == 1" @click="updateCheck(scope.row, 1)">
-              审核通过
-            </el-button>
-            <el-button size="mini" type="danger" v-else @click="updateCheck(scope.row, 0)">
+            <el-button size="mini" type="danger" v-if="scope.row.YULAN_CONFIRM == '1'" @click="updateCheck(scope.row, '0')">
               撤销审核
+            </el-button>
+            <el-button size="mini" type="success" v-else="scope.row.YULAN_CONFIRM == '0'" @click="updateCheck(scope.row, '1')">
+              审核通过
             </el-button>
           </template>
         </el-table-column>
@@ -82,14 +83,16 @@ export default {
       buyUserData: [],
       pictureVisible: false,
       fileList: [],
-      fileList2: []
+      fileList2: [],
+      checked: true
     }
   },
   methods: {
     refreshBuyUserData() {
       var data = {
         beginTime: this.beginTime,
-        finishTime: this.finishTime
+        finishTime: this.finishTime,
+        isCheck: this.checked
       }
       if (!data.beginTime) {
         data.beginTime = "0001/1/1";
@@ -106,7 +109,8 @@ export default {
     exportAllBuyUserExcel() {
       var data = {
         beginTime: this.beginTime,
-        finishTime: this.finishTime
+        finishTime: this.finishTime,
+        isCheck: this.checked
       }
       if (!data.beginTime) {
         data.beginTime = "0001/1/1";
@@ -116,7 +120,7 @@ export default {
       } else {
         data.finishTime = new Date(new Date(data.finishTime.getTime()).setHours(23, 59, 59, 999));
       }
-      downLoadFile(this.Global.baseUrl + `BUYUSER_INFO/ExportAllBuyUserExcel?beginTime=${this.dateFilter(data.beginTime, 'yyyy-MM-dd HH:mm:ss')}&finishTime=${this.dateFilter(data.finishTime, 'yyyy-MM-dd HH:mm:ss')}`);
+      downLoadFile(this.Global.baseUrl + `BUYUSER_INFO/ExportAllBuyUserExcel?beginTime=${this.dateFilter(data.beginTime, 'yyyy-MM-dd HH:mm:ss')}&finishTime=${this.dateFilter(data.finishTime, 'yyyy-MM-dd HH:mm:ss')}&isCheck=${data.isCheck}`);
     },
     showPicture(urls) {
       this.fileList = [];
@@ -147,15 +151,15 @@ export default {
         type: "warning",
       }).then(() => {
         var temp = JSON.parse(JSON.stringify(row));
-        temp.BUYUSER_PICTURE1_CHECK = type;
-        temp.UpdateColumns = ["BUYUSER_PICTURE1_CHECK"];
-        UpdateModel(row).then(res => {
+        temp.YULAN_CONFIRM = type;
+        temp.UpdateColumns = ["YULAN_CONFIRM"];
+        UpdateModel(temp).then(res => {
           this.$message({
             message: "操作成功!",
             type: "success",
             duration: 1000
           });
-          row.BUYUSER_PICTURE1_CHECK = type;
+          row.YULAN_CONFIRM = type;
         })
       }).catch(() => { });
     }

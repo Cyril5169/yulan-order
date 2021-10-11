@@ -114,9 +114,6 @@
           </el-table>
         </div>
         <div class="buttonDiv">
-          <p style="width:100px; font-size:18px; color:tomato; text-align:center;">
-            {{ item.status }}
-          </p>
           <p v-if="
                   (item.CURTAIN_STATUS_ID == 0 ||
                     item.CURTAIN_STATUS_ID == 4) &&
@@ -133,10 +130,12 @@
             <el-button size="medium" type="danger" plain>提交订单</el-button>
           </p>
           <p>
-            <el-button @click="toCheckExamine(
-                    item.ORDER_NO,
-                    item.CURTAIN_STATUS_ID,
-                    item.STATUS_ID)" size="medium" type="success">订单详情</el-button>
+            <el-button @click="toCheckExamine(item.ORDER_NO, item.CURTAIN_STATUS_ID)" size="medium" type="success">订单详情
+            </el-button>
+          </p>
+          <p>
+            <el-button v-if="item.STATUS_ID == 7" @click="toUploadPicture(item)" size="medium" type="primary">上墙附件
+            </el-button>
           </p>
         </div>
       </el-card>
@@ -157,6 +156,7 @@
 <script>
 import {
   getAllOrders,
+  GetOrderDetailCurtains,
   InsertOperationRecord,
   cancelOrderNew,
   copyCartItem,
@@ -408,7 +408,7 @@ export default {
     },
     priceFilter(value) {
       //四舍五入过滤大法
-      let realVal = parseFloat(value).toFixed(2);
+      var realVal = parseFloat(value).toFixed(2);
       //防止出现-0.00；
       if (realVal <= 0) {
         realVal = 0.0;
@@ -437,62 +437,72 @@ export default {
     },
     //窗帘提交订单
     summitCurtain(item) {
-      let orderBody = item.ORDERBODY;
-      let transCookies = [];
-      for (let i = 0; i < orderBody.length; i++) {
-        transCookies[i] = new Object();
-        transCookies[i].width = orderBody[i].CURTAIN_WIDTH;
-        transCookies[i].height = orderBody[i].CURTAIN_HEIGHT;
-        transCookies[i].orderNumber = item.ORDER_NO;
-        transCookies[i].lineNo = orderBody[i].LINE_NO;
-        transCookies[i].activityId = orderBody[i].P_ID;
-        transCookies[i].quantity = orderBody[i].QTY_REQUIRED;
-        var price = 0;
-        //获取原价
-        for (let j = 0; j < orderBody[i].curtains.length; j++) {
-          price += orderBody[i].curtains[j].price.mul(
-            orderBody[i].curtains[j].dosage
-          );
+      var orderBody = item.ORDERBODY;
+      var transCookies = [];
+      //查询窗帘原价
+      GetOrderDetailCurtains({
+        orderNo: item.ORDER_NO,
+        lineNo: 0
+      }).then(res => {
+        for (var i = 0; i < orderBody.length; i++) {
+          transCookies[i] = new Object();
+          transCookies[i].width = orderBody[i].CURTAIN_WIDTH;
+          transCookies[i].height = orderBody[i].CURTAIN_HEIGHT;
+          transCookies[i].orderNumber = item.ORDER_NO;
+          transCookies[i].lineNo = orderBody[i].LINE_NO;
+          transCookies[i].activityId = orderBody[i].P_ID;
+          transCookies[i].quantity = orderBody[i].QTY_REQUIRED;
+          var price = 0;
+          //获取原价
+          for (var j = 0; j < res.data[i].curtains.length; j++) {
+            price += res.data[i].curtains[j].PRICE.mul(res.data[i].curtains[j].DOSAGE);
+          }
+          transCookies[i].price = price;
+          transCookies[i].splitShipment = orderBody[i].PART_SEND_ID;
+          transCookies[i].activityName = orderBody[i].PROMOTION;
+          transCookies[i].unit = orderBody[i].UNIT;
+          transCookies[i].item = orderBody[i].item;
         }
-        transCookies[i].price = price;
-        transCookies[i].splitShipment = orderBody[i].PART_SEND_ID;
-        transCookies[i].activityName = orderBody[i].PROMOTION;
-        transCookies[i].unit = orderBody[i].UNIT;
-        transCookies[i].item = orderBody[i].item;
-      }
-      sessionStorage.setItem("shopping", JSON.stringify(transCookies));
-      sessionStorage.setItem("shoppingHead", JSON.stringify(item));
-      Cookies.set("cur_status", 3);
-      Cookies.set("new_cur_status", 0);
-      this.addTab("order/checkOrder");
+        sessionStorage.setItem("shopping", JSON.stringify(transCookies));
+        sessionStorage.setItem("shoppingHead", JSON.stringify(item));
+        Cookies.set("cur_status", 3);
+        Cookies.set("new_cur_status", 0);
+        this.addTab("order/checkOrder");
+      })
     },
     summitNewCurtain(item) {
-      let orderBody = item.ORDERBODY;
-      let transCookies = [];
-      for (let i = 0; i < orderBody.length; i++) {
-        transCookies[i] = new Object();
-        transCookies[i].width = orderBody[i].CURTAIN_WIDTH;
-        transCookies[i].height = orderBody[i].CURTAIN_HEIGHT;
-        transCookies[i].orderNumber = item.ORDER_NO;
-        transCookies[i].lineNo = orderBody[i].LINE_NO;
-        transCookies[i].activityId = orderBody[i].P_ID;
-        transCookies[i].quantity = orderBody[i].QTY_REQUIRED;
-        var price = 0;
-        //获取原价
-        for (let j = 0; j < orderBody[i].curtains.length; j++) {
-          price += this.oneTotal(orderBody[i].curtains[j]);
+      var orderBody = item.ORDERBODY;
+      var transCookies = [];
+      //查询窗帘原价
+      GetOrderDetailCurtains({
+        orderNo: item.ORDER_NO,
+        lineNo: 0
+      }).then(res => {
+        for (var i = 0; i < orderBody.length; i++) {
+          transCookies[i] = new Object();
+          transCookies[i].width = orderBody[i].CURTAIN_WIDTH;
+          transCookies[i].height = orderBody[i].CURTAIN_HEIGHT;
+          transCookies[i].orderNumber = item.ORDER_NO;
+          transCookies[i].lineNo = orderBody[i].LINE_NO;
+          transCookies[i].activityId = orderBody[i].P_ID;
+          transCookies[i].quantity = orderBody[i].QTY_REQUIRED;
+          var price = 0;
+          //获取原价
+          for (var j = 0; j < res.data[i].curtains.length; j++) {
+            price += this.oneTotal(res.data[i].curtains[j]);
+          }
+          transCookies[i].price = price;
+          transCookies[i].splitShipment = orderBody[i].PART_SEND_ID;
+          transCookies[i].activityName = orderBody[i].PROMOTION;
+          transCookies[i].unit = orderBody[i].UNIT;
+          transCookies[i].item = orderBody[i].item;
         }
-        transCookies[i].price = price;
-        transCookies[i].splitShipment = orderBody[i].PART_SEND_ID;
-        transCookies[i].activityName = orderBody[i].PROMOTION;
-        transCookies[i].unit = orderBody[i].UNIT;
-        transCookies[i].item = orderBody[i].item;
-      }
-      sessionStorage.setItem("shopping", JSON.stringify(transCookies));
-      sessionStorage.setItem("shoppingHead", JSON.stringify(item));
-      Cookies.set("cur_status", 3);
-      Cookies.set("new_cur_status", 1);
-      this.addTab("order/checkOrder");
+        sessionStorage.setItem("shopping", JSON.stringify(transCookies));
+        sessionStorage.setItem("shoppingHead", JSON.stringify(item));
+        Cookies.set("cur_status", 3);
+        Cookies.set("new_cur_status", 1);
+        this.addTab("order/checkOrder");
+      })
     },
     //一个子件的总价
     oneTotal(row) {
@@ -508,10 +518,9 @@ export default {
       return price;
     },
     //查看审核
-    toCheckExamine(value, ID, status) {
+    toCheckExamine(value, ID) {
       Cookies.set("ORDER_NO", value);
       Cookies.set("CURTAIN_STATUS_ID", ID);
-      Cookies.set("status_ID", status);
       Cookies.set("isExamine", "false");
       this.addTab("order/checkExamine");
     },
@@ -683,6 +692,9 @@ export default {
             type: "warning",
           });
         });
+    },
+    toUploadPicture(item) {
+
     },
     //隔行变色
     tableRowClassName({ row, rowIndex }) {

@@ -128,16 +128,15 @@
             <div v-else>{{ getTypeName(scope.row.itemType) }}</div>
           </template>
         </el-table-column>
-        <el-table-column v-if="isManager != '0' ||  (isManager == '0' && check_CURTAIN_STATUS_ID == -1)" label="单价" align="center"
-          width="50">
+        <el-table-column v-if="isManager != '0' ||  (isManager == '0' && isExamine)" label="单价" align="center" width="50">
           <template slot-scope="scope">
             <span>
               {{ scope.row.price }}
             </span>
           </template>
         </el-table-column>
-        <el-table-column v-if="(isManager != '0' ||  (isManager == '0' && check_CURTAIN_STATUS_ID == -1)) && salPromotion.P_ID"
-          label="折后" align="center" width="55">
+        <el-table-column v-if="(isManager != '0' ||  (isManager == '0' && isExamine)) && salPromotion.P_ID" label="折后"
+          align="center" width="55">
           <template slot-scope="scope">
             <span>
               {{ calculatePromotionPrice(scope.row) }}
@@ -199,8 +198,7 @@
           </template>
         </el-table-column>
         <el-table-column label="库存" width="70" align="center" prop="curtain_store"></el-table-column>
-        <el-table-column v-if="isManager != '0' ||  (isManager == '0' && check_CURTAIN_STATUS_ID == -1)" label="总价" align="center"
-          width="60">
+        <el-table-column v-if="isManager != '0' ||  (isManager == '0' && isExamine)" label="总价" align="center" width="60">
           <template slot-scope="scope">
             <span>
               {{ oneTotal(scope.row) }}
@@ -255,8 +253,9 @@
           </template>
         </el-table-column>
       </el-table>
-      <div v-if="isManager != '0' ||  (isManager == '0' && check_CURTAIN_STATUS_ID == -1)"
-        style="font-size:16px;margin-top:10px;">总计：<span style="color:red;">￥{{allTotal | dosageFilter}}</span></div>
+      <div v-if="isManager != '0' ||  (isManager == '0' && isExamine)" style="font-size:16px;margin-top:10px;">
+        总计：<span style="color:red;">￥{{allTotal | dosageFilter}}</span>
+      </div>
 
       <!-- 购物车修改窗帘详情 -->
       <div v-if="tableStatus === 0" style="text-align: center;" class="mt20">
@@ -292,7 +291,8 @@
       </div>
     </div>
     <!-- 替换列表 -->
-    <el-dialog width="65%" v-if="dialogTableVisible" :visible.sync="dialogTableVisible" append-to-body :close-on-click-modal="false">
+    <el-dialog width="65%" v-if="dialogTableVisible" :visible.sync="dialogTableVisible" append-to-body
+      :close-on-click-modal="false">
       <div slot="title">
         <b>{{ dialogTitle }}</b>
       </div>
@@ -357,6 +357,7 @@ export default {
       cid: Cookies.get("cid"), //假定给的用户id
       customerType: Cookies.get("customerType"), //客户类型
       isManager: Cookies.get("isManager"), //是否为管理员
+      isExamine: Cookies.get("isExamine") == "true",
       //获取真实数据
       message: {
         itemNo: "T330029",
@@ -429,7 +430,6 @@ export default {
       //配件编码
       part2: [],
       suggestionLJ: "", //兰居人员总体审核意见
-      check_CURTAIN_STATUS_ID: Cookies.get("CURTAIN_STATUS_ID"),
       previewUrlList: [],
       mlTipVisible: false,
       mlTipTxt: "",

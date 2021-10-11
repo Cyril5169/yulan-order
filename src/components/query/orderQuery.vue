@@ -152,7 +152,7 @@
     <!-- 订单详情 -->
     <el-dialog :show-close="true" :visible.sync="orderVisible" width="1100px" top="5vh" append-to-body>
       <keep-alive>
-        <checkExamine v-if="orderVisible" :isShowButton="false" :ruleForm="ruleForm">
+        <checkExamine v-if="orderVisible" :isShowButton="false">
         </checkExamine>
       </keep-alive>
     </el-dialog>
@@ -293,7 +293,6 @@ export default {
       getMoney: 0,
       orderVisible: false,
       order_no: "",
-      ruleForm: {},
       customerDetailVisible: false,
       customerInfo: {},
       couponData: [],
@@ -527,8 +526,7 @@ export default {
     },
     getOrderDetail(order_no) {
       Cookies.set("ORDER_NO", order_no);
-      Cookies.set("CURTAIN_STATUS_ID", -2);
-      Cookies.set("status_ID", -2);
+      Cookies.set("isExamine", "true");
       this.orderVisible = true;
     },
     async getCustomerInfoClick(val) {

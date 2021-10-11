@@ -77,10 +77,9 @@
           <div style="margin:auto;">上传购买凭证：</div>
           <span style="font-size:13px;color:grey;vertical-align:middle;">(消费者在门店的订货单)</span>
         </div>
-        <el-upload class="upload-de" style="display:inline-block;vertical-align:middle;margin-top:10px;"
-          :action="Global.baseUrl + '/CTM_ORDER/UploadBuyUserFiles'" list-type="picture-card" :on-change="handleChange"
-          :on-preview="handlePictureCardPreview" :on-remove="handleRemove" :before-upload="beforeAvatarUpload"
-          :file-list="fileList" :data="{ cid: cid }">
+        <el-upload class="upload-de" style="display:inline-block;vertical-align:middle;margin-top:10px;" multiple action="#"
+          list-type="picture-card" :http-request="handleUpload" :on-change="handleChange" :on-preview="handlePictureCardPreview"
+          :on-remove="handleRemove" :before-upload="beforeAvatarUpload" :file-list="fileList">
           <i class="el-icon-plus"></i>
         </el-upload>
       </fieldset>
@@ -317,6 +316,8 @@ import {
   GetPromotionsById,
   GetBuyUserInfo,
   GetPromotionByTypeAndId,
+  UploadBuyUserFiles,
+  DeleteFileByPath
 } from "@/api/orderListASP";
 import Axios from "axios";
 import { mapMutations, mapActions } from "vuex";
@@ -1231,7 +1232,7 @@ export default {
           "/Files/BuyUser/" + this.cid + "/" + this.fileList[i].name + ";";
       }
       if (this.showWriteBuyUser) {
-        //要填写购买人信息
+        //要填写购买人信息(有些地方可能没有第三级)
         if (
           !this.ctm_order.buyUser ||
           !this.ctm_order.buyUserPhone ||
@@ -1466,10 +1467,27 @@ export default {
       }
       return this.dosageFilter(price);
     },
+    handleUpload(param) {
+      const formData = new FormData();
+      formData.append("file", param.file);
+      UploadBuyUserFiles(formData, {
+        params: {
+          cid: this.cid
+        }
+      }).then(res => {
+        this.fileList.push({
+          name: res.data,
+          url: this.Global.baseUrl + "/Files/BuyUser/" + this.cid + "/" + res.data
+        })
+      })
+    },
     handleChange(file, fileList) {
-      this.fileList = fileList;
+      //this.fileList = fileList;
     },
     handleRemove(file, fileList) {
+      DeleteFileByPath({
+        path: "/Files/BuyUser/" + this.cid + "/" + file.name
+      })
       this.fileList = fileList;
     },
     handlePictureCardPreview(file) {
@@ -1671,5 +1689,14 @@ export default {
   width: 70px;
   height: 70px;
   line-height: 80px;
+}
+.upload-de .el-upload-list--picture-card .el-upload-list__item {
+  width: 70px;
+  height: 70px;
+  line-height: 70px;
+  margin-right: 8px;
+}
+.upload-de .el-upload-list__item {
+  transition: none !important;
 }
 </style>

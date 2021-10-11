@@ -22,10 +22,12 @@
 
     <div slot="header">
       <span class="headSpan">订单详情</span>
-      <el-button @click="exportProductExcel" v-if="check_CURTAIN_STATUS_ID == -1 && showExportProduct" size="mini" plain>
+      <!-- 审核人员对测试账号的订单专用 -->
+      <el-button @click="exportProductExcel" v-if="isExamine && showExportProduct && button_1" size="mini" plain>
         导出生产模板
       </el-button>
-      <countdown style="color:red;" v-if="check_STATUS_ID != 3 && (check_CURTAIN_STATUS_ID == 1 || check_CURTAIN_STATUS_ID == 2)"
+      <countdown style="color:red;"
+        v-if="!isExamine && ruleForm.STATUS_ID != 3 && (ruleForm.CURTAIN_STATUS_ID == 1 || ruleForm.CURTAIN_STATUS_ID == 2)"
         :time="new Date(ruleForm.DATE_UPDATE).getTime() - nowDate" format="DD 天 HH 时 mm 分 ss 秒后自动作废" @finish="backTowhere" />
       <el-button @click="backTowhere()" style="float:right;" size="small" type="success" plain v-if="button_1">返回
       </el-button>
@@ -79,7 +81,7 @@
           <br />
           <span class="zoomLeft">
             交货日期：
-            <span class="zoomRight">{{ ruleForm.JIAOHUO_DATE | datatrans }}</span>
+            <span class="zoomRight">{{ ruleForm.JIAOHUO_DATE | dateFilter('yyyy-MM-dd HH:mm:ss') }}</span>
           </span>
           <span class="zoomLeft">
             兰居处理说明：
@@ -93,7 +95,7 @@
         <el-table-column align="center" prop="ITEM_NO" label="型号" width="140"></el-table-column>
         <el-table-column align="center" label="经销单价" width="80">
           <template slot-scope="scope1">
-            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID > -1">***</span>
+            <span v-if="isManager === '0' && !isExamine">***</span>
             <span v-else>{{ scope1.row.UNIT_PRICE | priceFilter }}</span>
           </template>
         </el-table-column>
@@ -103,25 +105,25 @@
         </el-table-column>
         <el-table-column prop="PROMOTION_COST" align="center" label="折后金额" width="90">
           <template slot-scope="scope1">
-            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID > -1">***</span>
+            <span v-if="isManager === '0' && !isExamine">***</span>
             <span v-else>{{ scope1.row.PROMOTION_COST }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="BACK_Y" align="center" label="年返利使用金额" width="90">
           <template slot-scope="scope1">
-            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID >-1">***</span>
+            <span v-if="isManager === '0' && !isExamine">***</span>
             <span v-else>{{ scope1.row.BACK_Y }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="BACK_M" align="center" label="月返利使用金额" width="90">
           <template slot-scope="scope1">
-            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID > -1">***</span>
+            <span v-if="isManager === '0' && !isExamine">***</span>
             <span v-else>{{ scope1.row.BACK_M }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="FINAL_COST" align="center" label="应付金额" width="90">
           <template slot-scope="scope1">
-            <span v-if="isManager === '0' && check_CURTAIN_STATUS_ID != -1">***</span>
+            <span v-if="isManager === '0' && !isExamine">***</span>
             <span v-else>{{ scope1.row.FINAL_COST }}</span>
           </template>
         </el-table-column>
@@ -137,47 +139,48 @@
             <el-button @click="openNewCurtain(scope.row, scope.$index)" type="primary" size="mini">查看详情</el-button>
           </template>
         </el-table-column>
-        <el-table-column v-if="check_CURTAIN_STATUS_ID == 1 && (isX || isN)" align="center" prop="checkStatus" label="是否修改"
+        <el-table-column v-if="ruleForm.CURTAIN_STATUS_ID == 1 && (isX || isN)" align="center" prop="checkStatus" label="是否修改"
           width="80">
         </el-table-column>
       </el-table>
 
-      <div style="float:right;margin-top:20px;margin-right:10px;height:80px;">
-        <el-button v-if="check_CURTAIN_STATUS_ID == 2" @click="_defeat()" size="medium" type="warning">退回兰居修改
+      <div style="float:right;margin-top:20px;margin-right:10px;height:80px;" v-if="!isExamine">
+        <el-button v-if="ruleForm.CURTAIN_STATUS_ID == 2" @click="_defeat()" size="medium" type="warning">退回兰居修改
         </el-button>
-        <el-button v-if="check_CURTAIN_STATUS_ID == 2" @click="_pass()" size="medium" type="success">确认兰居修改</el-button>
-        <el-button :disabled="!modifyBtnVisible" v-if="check_CURTAIN_STATUS_ID == 1 && isX" @click="LjExamine()" size="medium"
+        <el-button v-if="ruleForm.CURTAIN_STATUS_ID == 2" @click="_pass()" size="medium" type="success">确认兰居修改</el-button>
+        <el-button :disabled="!modifyBtnVisible" v-if="ruleForm.CURTAIN_STATUS_ID == 1 && isX" @click="LjExamine()" size="medium"
           type="success">确认修改</el-button>
-        <el-button :disabled="!modifyBtnVisible" v-if="check_CURTAIN_STATUS_ID == 1 && isN" @click="customerChange" size="medium"
-          type="success">确认修改</el-button>
-        <el-button v-if="(check_CURTAIN_STATUS_ID == 0 || check_CURTAIN_STATUS_ID == 4) && check_STATUS_ID == 0 && isX"
+        <el-button :disabled="!modifyBtnVisible" v-if="ruleForm.CURTAIN_STATUS_ID == 1 && isN" @click="customerChange"
+          size="medium" type="success">确认修改</el-button>
+        <el-button v-if="(ruleForm.CURTAIN_STATUS_ID == 0 || ruleForm.CURTAIN_STATUS_ID == 4) && ruleForm.STATUS_ID == 0 && isX"
           @click="summitCurtain" size="medium" type="primary">提交订单</el-button>
-        <el-button v-if="(check_CURTAIN_STATUS_ID == 0 || check_CURTAIN_STATUS_ID == 4) && check_STATUS_ID == 0 && isN"
+        <el-button v-if="(ruleForm.CURTAIN_STATUS_ID == 0 || ruleForm.CURTAIN_STATUS_ID == 4) && ruleForm.STATUS_ID == 0 && isN"
           @click="summitNewCurtain" size="medium" type="primary">提交订单</el-button>
-        <el-button v-if="check_STATUS_ID == 5 || check_STATUS_ID == 6" @click="refreshPay()" size="medium" type="danger" plain>
+        <el-button v-if="ruleForm.STATUS_ID == 5 || ruleForm.STATUS_ID == 6" @click="refreshPay()" size="medium" type="danger"
+          plain>
           提交订单</el-button>
       </div>
       <div style="padding:10px;">
         <span class="timeLeft">
           创建：
-          <span class="timeRight">{{ ruleForm.DATE_CRE | datatrans}}</span>
+          <span class="timeRight">{{ ruleForm.DATE_CRE | dateFilter('yyyy-MM-dd HH:mm:ss')}}</span>
         </span>
         <span v-if="ruleForm.WEB_TJ_TIME && ruleForm.WEB_TJ_TIME != '9999/12/31 00:00:00'" class="timeLeft">
           提交：
-          <span class="timeRight">{{ ruleForm.WEB_TJ_TIME | datatrans}}</span>
+          <span class="timeRight">{{ ruleForm.WEB_TJ_TIME | dateFilter('yyyy-MM-dd HH:mm:ss')}}</span>
         </span>
         <span class="timeLeft">
           更新：
-          <span class="timeRight">{{ ruleForm.DATE_UPDATE | datatrans}}</span>
+          <span class="timeRight">{{ ruleForm.DATE_UPDATE | dateFilter('yyyy-MM-dd HH:mm:ss')}}</span>
         </span>
         <br />
         <span v-if="ruleForm.DATE_ACCEPT && ruleForm.DATE_ACCEPT != '9999/12/31 00:00:00'" class="timeLeft">
           接收：
-          <span class="timeRight">{{ ruleForm.DATE_ACCEPT | datatrans}}</span>
+          <span class="timeRight">{{ ruleForm.DATE_ACCEPT | dateFilter('yyyy-MM-dd HH:mm:ss')}}</span>
         </span>
         <span v-if="ruleForm.DATE_DEAL && ruleForm.DATE_DEAL != '9999/12/31 00:00:00'" class="timeLeft">
           处理：
-          <span class="timeRight">{{ ruleForm.DATE_DEAL | datatrans }}</span>
+          <span class="timeRight">{{ ruleForm.DATE_DEAL | dateFilter('yyyy-MM-dd HH:mm:ss') }}</span>
         </span>
         <span v-if="ruleForm.USER_NO" class="timeLeft">
           处理人：
@@ -240,8 +243,8 @@ export default {
       renderArray: [],
       tableIndex: "",
       isManager: Cookies.get("isManager"),
+      isExamine: Cookies.get("isExamine") == "true",
       check_CURTAIN_STATUS_ID: "",
-      check_STATUS_ID: "",
       orderNum: "",
       detailVisible: false,
       newCurtainDetailVisible: false,
@@ -282,25 +285,6 @@ export default {
       }
 
       return realVal;
-    },
-    datatrans(value) {
-      if (!value || value == "9999/12/31 00:00:00") {
-        return "";
-      }
-      //时间戳转化大法
-      let date = new Date(value);
-      let y = date.getFullYear();
-      let MM = date.getMonth() + 1;
-      MM = MM < 10 ? "0" + MM : MM;
-      let d = date.getDate();
-      d = d < 10 ? "0" + d : d;
-      let h = date.getHours();
-      h = h < 10 ? "0" + h : h;
-      let m = date.getMinutes();
-      m = m < 10 ? "0" + m : m;
-      let s = date.getSeconds();
-      s = s < 10 ? "0" + s : s;
-      return y + "-" + MM + "-" + d + " " + h + ":" + m + ":" + s;
     },
   },
   computed: {
@@ -451,7 +435,6 @@ export default {
             confirmButtonText: "确定",
             type: "success",
           });
-          this.check_CURTAIN_STATUS_ID = "0";
           this.getDetail();
         })
         .catch((res) => {
@@ -477,15 +460,14 @@ export default {
             confirmButtonText: "确定",
             type: "success",
           }).then(() => {
-            this.check_CURTAIN_STATUS_ID = "4";
+            this.ruleForm.CURTAIN_STATUS_ID = '4'
           });
-        })
-          .catch((res) => {
-            this.$alert("操作失败，请稍后重试", "提示", {
-              confirmButtonText: "确定",
-              type: "warning",
-            });
+        }).catch((res) => {
+          this.$alert("操作失败，请稍后重试", "提示", {
+            confirmButtonText: "确定",
+            type: "warning",
           });
+        });
       });
     },
     //退回兰居修改
@@ -723,7 +705,6 @@ export default {
           confirmButtonText: "确定",
           type: "success",
         });
-        this.check_CURTAIN_STATUS_ID = "0";
         this.getDetail();
       }).catch((res) => {
         this.$alert("操作失败:" + res.msg, "提示", {
@@ -753,7 +734,7 @@ export default {
               }
             }, 0);
             sums[index] = sums[index].toFixed(2);
-            if (this.isManager == "0" && this.check_CURTAIN_STATUS_ID != -1)
+            if (this.isManager == "0" && !this.isExamine)
               sums[index] = "***";
           } else {
             sums[index] = "";
@@ -782,7 +763,6 @@ export default {
     this.isX = this.orderNum.slice(0, 1) == "X";
     this.isN = this.orderNum.slice(0, 1) == "N";
     this.check_CURTAIN_STATUS_ID = Cookies.get("CURTAIN_STATUS_ID");
-    this.check_STATUS_ID = Cookies.get("status_ID");
     this.getDetail();
     if (this.isShowButton != undefined) {
       this.button_1 = this.isShowButton;
@@ -794,7 +774,6 @@ export default {
       this.isX = this.orderNum.slice(0, 1) == "X";
       this.isN = this.orderNum.slice(0, 1) == "N";
       this.check_CURTAIN_STATUS_ID = Cookies.get("CURTAIN_STATUS_ID");
-      this.check_STATUS_ID = Cookies.get("status_ID");
       this.getDetail();
     }
   },

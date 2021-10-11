@@ -24,6 +24,15 @@ export function getAllOrders(data, config = {}) {
         return Promise.reject(err);
     })
 }
+//明细的窗帘
+export function GetOrderDetailCurtains(data, config = {}) {
+    return post('/CTM_ORDER/GetOrderDetailCurtains', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+//订单详情
 export function getOrderDetails(data, config = {}) {
     return post('/CTM_ORDER/getOrderDetails', data, config).then((res) => {
         return Promise.resolve(res);
@@ -145,6 +154,13 @@ export function GetYearTaskProgress(data, config = {}) {
 //上传购买人图片
 export function UploadBuyUserFiles(data, config = {}) {
     return post('/CTM_ORDER/UploadBuyUserFiles', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+export function DeleteFileByPath(data, config = {}) {
+    return post('/CTM_ORDER/DeleteFileByPath', data, config).then((res) => {
         return Promise.resolve(res);
     }).catch((err) => {
         return Promise.reject(err);
@@ -339,6 +355,22 @@ export function GetAreaList(data, config = {}) {
 //消费者统计
 export function GetBuyUserStatistic(data, config = {}) {
     return post('/BUYUSER_INFO/GetBuyUserStatistic', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+//单个消费者订单列表
+export function GetCustomerOrderDetail(data, config = {}) {
+    return post('/BUYUSER_INFO/GetCustomerOrderDetail', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+//所有消费者订单
+export function GetBuyUserAllOrder(data, config = {}) {
+    return post('/BUYUSER_INFO/GetBuyUserAllOrder', data, config).then((res) => {
         return Promise.resolve(res);
     }).catch((err) => {
         return Promise.reject(err);

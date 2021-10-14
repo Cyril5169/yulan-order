@@ -7,12 +7,12 @@
         style="width:350px;">
         <el-button @click="searchBuyUser()" slot="append" icon="el-icon-search">搜索</el-button>
       </el-input>
-      <el-button style="margin-left:20px;" size="medium" @click="addBuyUserShow()" type="primary">新增购买用户信息
+      <el-button style="margin-left:20px;" size="medium" @click="addBuyUserShow()" type="primary">新增消费者信息
       </el-button>
       <el-button type="danger" size="medium" :disabled="userSelect.length==0" @click="deleteBuyUserList">
-        删除选中用户({{userSelect.length}})
+        删除选中消费者({{userSelect.length}})
       </el-button>
-      <div v-if="canCheck" style="color:darkgrey;">*双击填充到购买人信息</div>
+      <div v-if="canCheck" style="color:darkgrey;">*双击填充到消费者信息</div>
     </div>
     <div class="zj-table-ct">
       <el-table class="zj-flex-table" height="100%" :data="buyUserInfoData" :row-class-name="tableRowClassName"
@@ -49,15 +49,15 @@
     </div>
 
     <!-- 新增/编辑购买人 -->
-    <el-dialog width="650px" @close="clearData" :title="addOrNot?'新增购买用户':'编辑购买用户'" v-if="addBuyUserVisible"
+    <el-dialog width="650px" @close="clearData" :title="addOrNot?'新增消费者':'编辑消费者'" v-if="addBuyUserVisible"
       :visible.sync="addBuyUserVisible" append-to-body>
       <el-form size="small" :model="buyUserModel" label-width="100px" ref="buyUserForm" :rules="add_rules">
         <el-form-item label="用户姓名" prop="BUYUSER">
-          <el-input style="width:250px;" v-model="buyUserModel.BUYUSER">
+          <el-input style="width:250px;" v-model="buyUserModel.BUYUSER" :disabled="!addOrNot">
           </el-input>
         </el-form-item>
         <el-form-item label="联系电话" prop="BUYUSER_PHONE">
-          <el-input style="width:250px;" v-model="buyUserModel.BUYUSER_PHONE">
+          <el-input style="width:250px;" v-model="buyUserModel.BUYUSER_PHONE" :disabled="!addOrNot">
           </el-input>
         </el-form-item>
         <el-form-item label="所在地区">

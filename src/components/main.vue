@@ -1465,7 +1465,7 @@ export default {
   position: relative;
 }
 .zj-flex-table {
-  position: absolute;
+  position: absolute !important;
 }
 .zj-flex-page {
   padding: 10px;

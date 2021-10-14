@@ -51,7 +51,7 @@
         <span style="display:inline-block;margin-left:50px;">用户电话：</span>
         <el-input style="width:300px;" v-model="ctm_order.buyUserPhone" placeholder="请输入用户电话"></el-input>
         <span @click.prevent="buyUserShow" class="charge" style="float:right;margin-right:20px;font-weight:bold;">
-          管理购买用户信息
+          管理消费者信息
         </span>
         <br />
         <br />

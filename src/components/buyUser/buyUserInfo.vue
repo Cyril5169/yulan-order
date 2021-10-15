@@ -50,7 +50,7 @@
 
     <!-- 新增/编辑购买人 -->
     <el-dialog width="650px" @close="clearData" :title="addOrNot?'新增消费者':'编辑消费者'" v-if="addBuyUserVisible"
-      :visible.sync="addBuyUserVisible" append-to-body>
+      :visible.sync="addBuyUserVisible" :close-on-click-modal="false" append-to-body>
       <el-form size="small" :model="buyUserModel" label-width="100px" ref="buyUserForm" :rules="add_rules">
         <el-form-item label="用户姓名" prop="BUYUSER">
           <el-input style="width:250px;" v-model="buyUserModel.BUYUSER" :disabled="!addOrNot">

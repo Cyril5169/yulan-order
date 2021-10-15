@@ -152,8 +152,7 @@
       </keep-alive>
     </el-dialog>
     <!-- 上墙附件 -->
-    <el-dialog :visible.sync="fileVisible" width="600px"
-      :title="'上墙附件' + (selectOrder.YULAN_CONFIRM == '1'? '-审核通过' : '')">
+    <el-dialog :visible.sync="fileVisible" width="600px" :title="'上墙附件' + (selectOrder.YULAN_CONFIRM == '1'? '-审核通过' : '')">
       <div>
         <el-upload class="upload-de" :class="{'hideUploadBtn': selectOrder.YULAN_CONFIRM == '1' }" multiple action="#"
           list-type="picture-card" :http-request="handleUpload" :on-change="handleChange" :on-preview="handlePictureCardPreview"
@@ -572,7 +571,7 @@ export default {
       } else {
         data.finishTime = data.finishTime + " 23:59:59";
       }
-      getAllOrders(data).then((res) => {
+      getAllOrders(data).then(res => {
         this.count = res.count;
         this.orderList = res.data;
         if (this.activeName == "pending")
@@ -752,39 +751,40 @@ export default {
       }
       return isJPG;
     },
-    handleUpload(param) {
+    async handleUpload(param) {
       const formData = new FormData();
       formData.append("file", param.file);
-      UploadUpWallFiles(formData, {
+      var res = await UploadUpWallFiles(formData, {
         params: {
           cid: Cookies.get("cid")
         }
-      }).then(res => {
-        this.fileList.push({
-          name: res.data,
-          url: this.Global.baseUrl + "/Files/UpWall/" + Cookies.get("cid") + "/" + res.data
-        })
-        //上传成功更新order
-        if (!this.selectOrder.BUYUSER_PICTURE) this.selectOrder.BUYUSER_PICTURE = "";
-
-        var row = JSON.parse(JSON.stringify(this.selectOrder));
-        row += "/Files/UpWall/" + Cookies.get("cid") + "/" + res.data + ";";
-        row.UpdateColumns = ["BUYUSER_PICTURE1"];
-        UpdateModel(row).then(res => {
-          this.$message({
-            message: "上传成功!",
-            type: "success",
-            duration: 1000
-          });
-          this.selectOrder.BUYUSER_PICTURE1 += "/Files/UpWall/" + Cookies.get("cid") + "/" + res.data + ";";
-        })
       })
+      var url = "/Files/UpWall/" + Cookies.get("cid") + "/" + res.data;
+      this.fileList.push({
+        name: res.data,
+        url: this.Global.baseUrl + url
+      })
+      //上传成功更新order
+      if (!this.selectOrder.BUYUSER_PICTURE1) this.selectOrder.BUYUSER_PICTURE1 = "";
+      this.selectOrder.BUYUSER_PICTURE1 += url + ";";
+      var row = JSON.parse(JSON.stringify(this.selectOrder));
+      row.UpdateColumns = ["BUYUSER_PICTURE1"];
+      var res2 = await UpdateModel(row);
+      if (res2.code == 0) {
+        this.$message({
+          message: "上传成功!",
+          type: "success",
+          duration: 1000
+        });
+      } else {
+
+      }
     },
     handleChange(file, fileList) {
       //this.fileList = fileList;
     },
     beforeRemove(file, fileList) {
-      if(this.removeByAuto) return true;
+      if (this.removeByAuto) return true;
       if (this.selectOrder.YULAN_CONFIRM == '1') {
         this.$alert("已审核通过！", "提示", {
           confirmButtonText: "确定",
@@ -804,7 +804,7 @@ export default {
       }).then(res => {
         this.fileList = fileList;
         //删除成功更新order
-        var temPath
+        var temPath = "";
         for (var i = 0; i < this.fileList.length; i++) {
           temPath += "/Files/UpWall/" + Cookies.get("cid") + "/" + this.fileList[i].name + ";";
         }

@@ -16,23 +16,19 @@
       <el-table class="zj-flex-table" height="100%" :data="buyUserData" key="all">
         <el-table-column width="100" prop="CUSTOMER_MAIN_ID1" label="客户代码" align="center"></el-table-column>
         <el-table-column width="120" prop="CUSTOMER_NAME" label="客户名称" align="center"></el-table-column>
+        <el-table-column width="100" prop="LINKPERSON" label="客户联系人" align="center"></el-table-column>
+        <el-table-column width="100" prop="TELEPHONE" label="客户联系电话" align="center"></el-table-column>
+        <el-table-column width="100" prop="ALL_SPEND" label="订单总金额" align="center"></el-table-column>
         <el-table-column width="120" prop="BUYUSER" label="消费者姓名" align="center"></el-table-column>
         <el-table-column width="100" prop="BUYUSER_PHONE" label="联系电话" align="center"></el-table-column>
-        <el-table-column width="120" prop="ORDER_NO" label="订单号" align="center">
+        <el-table-column prop="ORDER_NO" label="订单号" align="center">
           <!-- <template slot-scope="scope">
             <el-button size="small" @click="getOrderDetail(scope.row.ORDER_NO)" type="text">{{ scope.row.ORDER_NO }}
             </el-button>
           </template> -->
         </el-table-column>
-        <el-table-column width="100" prop="ITEM_NO" label="型号" align="center"></el-table-column>
-        <el-table-column width="100" prop="PRODUCTVERSION_NAME" label="版本名称" align="center"></el-table-column>
-        <el-table-column width="120" prop="PROMOTION" label="活动" align="center"></el-table-column>
-        <el-table-column width="100" prop="PROMOTION_COST" label="折后金额" align="center">
-        </el-table-column>
-        <el-table-column width="100" prop="FINAL_COST" label="应付金额" align="center">
-        </el-table-column>
         <el-table-column width="100" prop="WEB_TJ_TIME" label="下单日期" align="center"></el-table-column>
-        <el-table-column width="70" label="购买凭证" align="center" fixed="right">
+        <el-table-column width="70" label="购买凭证" align="center">
           <template slot-scope="scope">
             <el-button size="small" type="text" v-if="scope.row.BUYUSER_PICTURE" @click="showPicture(scope.row.BUYUSER_PICTURE)">
               查看
@@ -40,7 +36,7 @@
             <span v-else>无</span>
           </template>
         </el-table-column>
-        <el-table-column width="70" label="上墙附件" align="center" fixed="right">
+        <el-table-column width="70" label="上墙附件" align="center">
           <template slot-scope="scope">
             <el-button size="small" type="text" v-if="scope.row.BUYUSER_PICTURE1"
               @click="showPicture(scope.row.BUYUSER_PICTURE1)">查看
@@ -48,7 +44,7 @@
             <span v-else>无</span>
           </template>
         </el-table-column>
-        <el-table-column width="100" label="操作" align="center" fixed="right">
+        <el-table-column width="100" label="操作" align="center">
           <template slot-scope="scope">
             <el-button size="mini" type="danger" v-if="scope.row.YULAN_CONFIRM == '1'" @click="updateCheck(scope.row, '0')">
               撤销审核

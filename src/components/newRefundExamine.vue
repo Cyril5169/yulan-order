@@ -464,7 +464,8 @@
             <template v-if="submit.RETURN_TYPE == '客户邮寄'">
               <tr>
                 <td class="grayTD">退货或寄样信息</td>
-                <td colspan="7" v-if="submit.STATE == 'SUBMITTED' || submit.STATE == 'RECEIVE' || submit.STATE == 'CUSTOMERWRITETRANS'">
+                <td colspan="7"
+                  v-if="submit.STATE == 'SUBMITTED' || submit.STATE == 'RECEIVE' || submit.STATE == 'CUSTOMERWRITETRANS'">
                   <el-select style="width:99%;" v-model="submit.RETURN_ADDRESS" filterable placeholder="请选择地址和收件人">
                     <el-option v-for="item in returnInfo" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
@@ -1712,24 +1713,21 @@ export default {
         },
       })
         .then((res) => {
-          if (res.code == 0) {
-            var model = {
-              origin: param.file.name,
-              now: res.data,
-            };
-            this.filesSubmit.push(model);
-            //上传成功的文件数=上传的文件数
-            if (
-              this.filesSubmit.length ==
-              this.fileListForAudition.length -
-              this.iniAuditionFileNum +
-              this.deleteFileForAudition.length
-            ) {
-              this.submitAuditionFile(this.kind);
-            }
+          var model = {
+            origin: param.file.name,
+            now: res.data,
+          };
+          this.filesSubmit.push(model);
+          //上传成功的文件数=上传的文件数
+          if (
+            this.filesSubmit.length ==
+            this.fileListForAudition.length -
+            this.iniAuditionFileNum +
+            this.deleteFileForAudition.length
+          ) {
+            this.submitAuditionFile(this.kind);
           }
         })
-        .then(() => { })
         .catch(() => { });
     },
     ...mapMutations("badge", ["addBadge", "releaseBadge"]),

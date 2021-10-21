@@ -342,18 +342,11 @@ export default {
           };
           updateCurtainOrder(data)
             .then((res) => {
-              if (res.code == 0) {
-                this.$alert("操作成功,已将该订单退回给客户", "提示", {
-                  confirmButtonText: "确定",
-                  type: "success",
-                });
-                this.getorderList();
-              } else {
-                this.$alert("操作失败，请稍后重试", "提示", {
-                  confirmButtonText: "确定",
-                  type: "warning",
-                });
-              }
+              this.$alert("操作成功,已将该订单退回给客户", "提示", {
+                confirmButtonText: "确定",
+                type: "success",
+              });
+              this.getorderList();
             })
             .catch((res) => {
               this.$alert("操作失败:" + res.msg, "提示", {

@@ -579,19 +579,12 @@ export default {
         }
       }
       addSubmit({ model: data1, detailModels: data2 }).then(res => {
-        if (res.code == 0) {
-          this.$alert("提交成功", "提示", {
-            confirmButtonText: "确定",
-            type: "success"
-          });
-          this.currentPage = 1;
-          this.refresh();
-        } else {
-          this.$alert("提交失败，请稍后重试", "提示", {
-            confirmButtonText: "确定",
-            type: "warning"
-          });
-        }
+        this.$alert("提交成功", "提示", {
+          confirmButtonText: "确定",
+          type: "success"
+        });
+        this.currentPage = 1;
+        this.refresh();
       });
       this.initRowspan = 5;
       this.lanjuDetail = false;
@@ -694,20 +687,13 @@ export default {
         model: this.submitForm,
         detailModels: this.submitDetailForm
       }).then(res => {
-        if (res.code == 0) {
-          this.$alert("修改成功", "提示", {
-            confirmButtonText: "确定",
-            type: "success"
-          });
-          this.currentPage = 1;
-          this.releaseBadge("lanju2"); //刷新角标
-          this.refresh();
-        } else {
-          this.$alert("修改失败，请稍后重试", "提示", {
-            confirmButtonText: "确定",
-            type: "warning"
-          });
-        }
+        this.$alert("修改成功", "提示", {
+          confirmButtonText: "确定",
+          type: "success"
+        });
+        this.currentPage = 1;
+        this.releaseBadge("lanju2"); //刷新角标
+        this.refresh();
       });
       this.lanjuDetail = false;
     },

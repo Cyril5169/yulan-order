@@ -145,7 +145,8 @@
             <tr>
               <td class="grayTD">售后订单号<span style="color:red;">*</span></td>
               <td colspan="5">
-                <a target="_blank" :href="'http://www.luxlano.com/ddkc/DD_bjl.asp?b2b=' + processDetail.SH_ORDER_NO">{{processDetail.SH_ORDER_NO}}</a>
+                <a target="_blank"
+                  :href="'http://www.luxlano.com/ddkc/DD_bjl.asp?b2b=' + processDetail.SH_ORDER_NO">{{processDetail.SH_ORDER_NO}}</a>
               </td>
             </tr>
             <tr>
@@ -198,7 +199,8 @@
                 1.兰居提交处理意见后，请您在15日内确认、提出异议，否则本《售后申请表》作废；<br />
                 2.请您仔细阅读本《售后申请表》相关信息，一旦确认，视为同意我司的处理意见；<br />
                 3.如果产生售后费用，请扫下方收款二维码进行支付，并将截图上传作为付款凭证；<br />
-                <el-image style="width: 100px;cursor:pointer;" :src="require('../../assets/img/ljshouhou.jpg')" :preview-src-list="[require('../../assets/img/ljshouhou.jpg')]"></el-image><br />
+                <el-image style="width: 100px;cursor:pointer;" :src="require('../../assets/img/ljshouhou.jpg')"
+                  :preview-src-list="[require('../../assets/img/ljshouhou.jpg')]"></el-image><br />
                 售后电话：020-89202878<br />
                 公司名称：广东兰居尚品创意家具有限公司&emsp;&emsp;地址：广州市番禺区东环街市广路易兴工业村（方氏物业）A栋3层<br />
               </div>
@@ -500,20 +502,11 @@ export default {
         type: "warning",
       }).then(() => {
         DeleteCompensation({ id: val }).then((res) => {
-          if (res.code == 0) {
-            this.$alert("删除成功", "提示", {
-              confirmButtonText: "确定",
-              type: "success",
-            });
-            this.refresh();
-            return;
-          } else {
-            this.$alert("删除失败，请稍后重试", "提示", {
-              confirmButtonText: "确定",
-              type: "warning",
-            });
-            return;
-          }
+          this.$alert("删除成功", "提示", {
+            confirmButtonText: "确定",
+            type: "success",
+          });
+          this.refresh();
         });
       });
     },

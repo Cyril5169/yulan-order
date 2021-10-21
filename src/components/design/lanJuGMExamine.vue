@@ -654,22 +654,15 @@ export default {
         model: this.submitForm,
         detailModels: this.submitDetailForm
       }).then(res => {
-        if (res.code == 0) {
-          this.$alert("修改成功", "提示", {
-            confirmButtonText: "确定",
-            type: "success"
-          });
-          this.currentPage = 1;
-          if (this.submitForm.STATUS == 4) {
-            this.releaseBadge("lanju3"); //刷新角标
-          }
-          this.refresh();
-        } else {
-          this.$alert("修改失败，请稍后重试", "提示", {
-            confirmButtonText: "确定",
-            type: "warning"
-          });
+        this.$alert("修改成功", "提示", {
+          confirmButtonText: "确定",
+          type: "success"
+        });
+        this.currentPage = 1;
+        if (this.submitForm.STATUS == 4) {
+          this.releaseBadge("lanju3"); //刷新角标
         }
+        this.refresh();
       });
       this.lanjuDetail = false;
     },
@@ -710,20 +703,13 @@ export default {
         model: this.submitForm,
         detailModels: this.submitDetailForm
       }).then(res => {
-        if (res.code == 0) {
-          this.$alert("修改成功", "提示", {
-            confirmButtonText: "确定",
-            type: "success"
-          });
-          this.currentPage = 1;
-          this.releaseBadge("lanju3"); //刷新角标
-          this.refresh();
-        } else {
-          this.$alert("修改失败，请稍后重试", "提示", {
-            confirmButtonText: "确定",
-            type: "warning"
-          });
-        }
+        this.$alert("修改成功", "提示", {
+          confirmButtonText: "确定",
+          type: "success"
+        });
+        this.currentPage = 1;
+        this.releaseBadge("lanju3"); //刷新角标
+        this.refresh();
       });
       this.lanjuDetail = false;
     },
@@ -748,19 +734,12 @@ export default {
         model: this.submitForm,
         detailModels: this.submitDetailForm
       }).then(res => {
-        if (res.code == 0) {
-          this.$alert("提交成功", "提示", {
-            confirmButtonText: "确定",
-            type: "success"
-          });
-          this.currentPage = 1;
-          this.refresh();
-        } else {
-          this.$alert("提交失败，请稍后重试", "提示", {
-            confirmButtonText: "确定",
-            type: "warning"
-          });
-        }
+        this.$alert("提交成功", "提示", {
+          confirmButtonText: "确定",
+          type: "success"
+        });
+        this.currentPage = 1;
+        this.refresh();
       });
       this.usedRowspan = 5;
       this.currentPage = 1;

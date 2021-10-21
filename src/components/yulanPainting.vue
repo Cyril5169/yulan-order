@@ -2,91 +2,32 @@
   <div>
     <el-card shadow="hover">
       <div style="margin-bottom:10px;">
-        <el-date-picker
-          type="date"
-          format="yyyy-MM-dd"
-          value-format="yyyy-MM-dd"
-          placeholder="日期区间"
-          v-model="startDate"
-          style="width:14%;"
-        ></el-date-picker
-        >--
-        <el-date-picker
-          type="date"
-          format="yyyy-MM-dd"
-          value-format="yyyy-MM-dd"
-          placeholder="日期区间"
-          v-model="endDate"
-          style="width:14%;"
-        ></el-date-picker>
+        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="日期区间" v-model="startDate"
+          style="width:14%;"></el-date-picker>--
+        <el-date-picker type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="日期区间" v-model="endDate"
+          style="width:14%;"></el-date-picker>
         <el-select v-model="status" placeholder="客户确认中">
-          <el-option
-            v-for="item in options"
-            :key="item.label"
-            :label="item.label"
-            :value="item.value"
-          ></el-option>
+          <el-option v-for="item in options" :key="item.label" :label="item.label" :value="item.value"></el-option>
         </el-select>
-        <el-input
-          @keyup.enter.native="search()"
-          placeholder="请输入客户信息"
-          v-model="cid"
-          style="width:250px;"
-        >
-          <el-button @click="search()" slot="append" icon="el-icon-search"
-            >查询</el-button
-          >
+        <el-input @keyup.enter.native="search()" placeholder="请输入客户信息" v-model="cid" style="width:250px;">
+          <el-button @click="search()" slot="append" icon="el-icon-search">查询</el-button>
         </el-input>
-        <el-button
-          @click="
+        <el-button @click="
             checkDialog = true;
             checkID = '';
-          "
-          style="float:right;margin-right:20px;"
-          size="medium"
-          type="primary"
-          >新建</el-button
-        >
+          " style="float:right;margin-right:20px;" size="medium" type="primary">新建</el-button>
       </div>
-      <el-table
-        border
-        :data="bankData"
-        style="width: 100%"
-        :row-class-name="tableRowClassName"
-      >
-        <el-table-column
-          prop="id"
-          label="编号"
-          align="center"
-        ></el-table-column>
+      <el-table border :data="bankData" style="width: 100%" :row-class-name="tableRowClassName">
+        <el-table-column prop="id" label="编号" align="center"></el-table-column>
         <el-table-column label="创建时间" width="160" align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.createTs | datatrans }}</span>
           </template>
         </el-table-column>
-        <el-table-column
-          prop="cname"
-          width="220"
-          label="客户名称"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          prop="customerAgent"
-          label="联系人"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          prop="officeTel"
-          width="220"
-          label="联系电话"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          prop="imageCount"
-          label="图片数"
-          width="80"
-          align="center"
-        ></el-table-column>
+        <el-table-column prop="cname" width="220" label="客户名称" align="center"></el-table-column>
+        <el-table-column prop="customerAgent" label="联系人" align="center"></el-table-column>
+        <el-table-column prop="officeTel" width="220" label="联系电话" align="center"></el-table-column>
+        <el-table-column prop="imageCount" label="图片数" width="80" align="center"></el-table-column>
         <el-table-column label="状态" align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.state | transStatus }}</span>
@@ -94,51 +35,22 @@
         </el-table-column>
         <el-table-column align="center" width="180" label="操作">
           <template slot-scope="scope">
-            <el-button
-              @click="lookIt(scope.row)"
-              type="warning"
-              icon="el-icon-search"
-              circle
-              size="mini"
-            ></el-button>
-            <el-button
-              v-if="scope.row.state == 'ONCREATE'"
-              @click="editIt(scope.row)"
-              type="primary"
-              icon="el-icon-edit"
-              circle
-              size="mini"
-            ></el-button>
-            <el-button
-              v-if="scope.row.state == 'ONCREATE'"
-              @click="deleteIt(scope.row.id)"
-              type="danger"
-              icon="el-icon-delete"
-              circle
-              size="mini"
-            ></el-button>
+            <el-button @click="lookIt(scope.row)" type="warning" icon="el-icon-search" circle size="mini"></el-button>
+            <el-button v-if="scope.row.state == 'ONCREATE'" @click="editIt(scope.row)" type="primary" icon="el-icon-edit" circle
+              size="mini"></el-button>
+            <el-button v-if="scope.row.state == 'ONCREATE'" @click="deleteIt(scope.row.id)" type="danger" icon="el-icon-delete"
+              circle size="mini"></el-button>
           </template>
         </el-table-column>
       </el-table>
       <div style="margin:0 35%;" class="block">
-        <el-pagination
-          @current-change="handleCurrentChange"
-          :current-page.sync="currentPage"
-          :page-size="limit"
-          layout="total, prev, pager, next, jumper"
-          :total="count"
-        ></el-pagination>
+        <el-pagination @current-change="handleCurrentChange" :current-page.sync="currentPage" :page-size="limit"
+          layout="total, prev, pager, next, jumper" :total="count"></el-pagination>
       </div>
     </el-card>
 
     <!-- 【新建】 -->
-    <el-dialog
-      @close="_getList"
-      title="委托喷绘确认表"
-      :visible.sync="PaintingDia"
-      :close-on-click-modal="false"
-      width="70%"
-    >
+    <el-dialog @close="_getList" title="委托喷绘确认表" :visible.sync="PaintingDia" :close-on-click-modal="false" width="70%">
       <div class="table-c">
         <table width="100%" border="0" cellspacing="0" cellpadding="0">
           <tr style="height:55px;">
@@ -175,18 +87,8 @@
           <tr class="tableCol">
             <td colspan="5">委托人来图定制要求</td>
             <td colspan="1">
-              <el-tooltip
-                style="cursor: pointer;"
-                class="item"
-                effect="dark"
-                content="点击添加"
-                placement="top"
-              >
-                <i
-                  @click="addPIC = true"
-                  style="font-size:30px;"
-                  class="el-icon-circle-plus"
-                ></i>
+              <el-tooltip style="cursor: pointer;" class="item" effect="dark" content="点击添加" placement="top">
+                <i @click="addPIC = true" style="font-size:30px;" class="el-icon-circle-plus"></i>
               </el-tooltip>
             </td>
           </tr>
@@ -199,17 +101,8 @@
           <tr v-for="item of abdrImage" :key="item.index">
             <td colspan="1">{{ item.imageIndex }}</td>
             <td colspan="2">
-              <el-tooltip
-                class="item"
-                effect="dark"
-                content="点击放大图片"
-                placement="top"
-              >
-                <img
-                  @click="showBIG(item.imagePath)"
-                  class="IMG"
-                  :src="item.imagePath"
-                />
+              <el-tooltip class="item" effect="dark" content="点击放大图片" placement="top">
+                <img @click="showBIG(item.imagePath)" class="IMG" :src="item.imagePath" />
               </el-tooltip>
             </td>
             <td colspan="1">{{ item.specifications }}</td>
@@ -239,23 +132,13 @@
 
         <div style="width:180px;margin:0 auto;">
           <br />
-          <el-button type="danger" @click="deleteIt(sumbit.abdrId)"
-            >删 除</el-button
-          >
-          <el-button type="success" @click="_changeStatus(sumbit.abdrId)"
-            >提 交</el-button
-          >
+          <el-button type="danger" @click="deleteIt(sumbit.abdrId)">删 除</el-button>
+          <el-button type="success" @click="_changeStatus(sumbit.abdrId)">提 交</el-button>
         </div>
       </div>
     </el-dialog>
     <!-- 【查看和编辑】 -->
-    <el-dialog
-      @close="_getList"
-      title="委托喷绘确认表"
-      :visible.sync="lookDia"
-      :close-on-click-modal="false"
-      width="70%"
-    >
+    <el-dialog @close="_getList" title="委托喷绘确认表" :visible.sync="lookDia" :close-on-click-modal="false" width="70%">
       <div class="table-c">
         <table width="100%" border="0" cellspacing="0" cellpadding="0">
           <tr style="height:55px;">
@@ -295,18 +178,8 @@
           <tr v-else class="tableCol">
             <td colspan="5">委托人来图定制要求</td>
             <td colspan="1">
-              <el-tooltip
-                style="cursor: pointer;"
-                class="item"
-                effect="dark"
-                content="点击添加"
-                placement="top"
-              >
-                <i
-                  @click="addPIC = true"
-                  style="font-size:30px;"
-                  class="el-icon-circle-plus"
-                ></i>
+              <el-tooltip style="cursor: pointer;" class="item" effect="dark" content="点击添加" placement="top">
+                <i @click="addPIC = true" style="font-size:30px;" class="el-icon-circle-plus"></i>
               </el-tooltip>
             </td>
           </tr>
@@ -319,17 +192,8 @@
           <tr v-for="item of abdrImage" :key="item.index">
             <td colspan="1">{{ item.imageIndex }}</td>
             <td colspan="2">
-              <el-tooltip
-                class="item"
-                effect="dark"
-                content="点击放大图片"
-                placement="top"
-              >
-                <img
-                  @click="showBIG(item.imagePath)"
-                  class="IMG"
-                  :src="item.imagePath"
-                />
+              <el-tooltip class="item" effect="dark" content="点击放大图片" placement="top">
+                <img @click="showBIG(item.imagePath)" class="IMG" :src="item.imagePath" />
               </el-tooltip>
             </td>
             <td colspan="1">{{ item.specifications }}</td>
@@ -365,53 +229,31 @@
 
         <div v-show="isCHULI" style="width:180px;margin:0 auto;">
           <br />
-          <el-button type="danger" @click="deleteIt(tableData.id)"
-            >删 除</el-button
-          >
-          <el-button type="success" @click="_changeStatus(tableData.id)"
-            >提 交</el-button
-          >
+          <el-button type="danger" @click="deleteIt(tableData.id)">删 除</el-button>
+          <el-button type="success" @click="_changeStatus(tableData.id)">提 交</el-button>
         </div>
       </div>
     </el-dialog>
 
     <!-- 图片表 -->
-    <el-dialog
-      title="上传喷绘样图"
-      :visible.sync="addPIC"
-      :close-on-click-modal="false"
-      width="40%"
-    >
+    <el-dialog title="上传喷绘样图" :visible.sync="addPIC" :close-on-click-modal="false" width="40%">
       <div>
         <span>
           规格参数：
-          <el-input
-            v-model="sumbit.specifications"
-            placeholder="请输入规格参数"
-            style="width:450px;"
-          ></el-input>
+          <el-input v-model="sumbit.specifications" placeholder="请输入规格参数" style="width:450px;"></el-input>
         </span>
         <br />
         <br />
         <span>
           定制要求：
-          <el-input
-            v-model="sumbit.memo"
-            placeholder="请输入定制要求"
-            style="width:450px;"
-          ></el-input>
+          <el-input v-model="sumbit.memo" placeholder="请输入定制要求" style="width:450px;"></el-input>
         </span>
         <br />
         <br />
         <div style="width:300px;margin:0 auto;">
-          <el-upload
-            class="avatar-uploader"
-            accept="image/png, image/jpg, image/jpeg"
-            action="http://14.29.223.114:10250/yulan-capital/AbdrImage/upload.do"
-            :show-file-list="false"
-            :on-success="handleAvatarSuccess"
-            :before-upload="beforeAvatarUpload"
-          >
+          <el-upload class="avatar-uploader" accept="image/png, image/jpg, image/jpeg"
+            action="http://14.29.223.114:10250/yulan-capital/AbdrImage/upload.do" :show-file-list="false"
+            :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
             <img v-if="imgUrl" :src="imgUrl" class="avatar" />
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
@@ -426,12 +268,7 @@
     <el-dialog title="客户信息" :visible.sync="checkDialog" width="40%">
       <span>
         客户编号：
-        <el-input
-          v-model="checkID"
-          placeholder="请输入客户编号"
-          style="width:400px;"
-          @keyup.enter.native="_getWaterNumber()"
-        ></el-input>
+        <el-input v-model="checkID" placeholder="请输入客户编号" style="width:400px;" @keyup.enter.native="_getWaterNumber()"></el-input>
       </span>
       <span slot="footer" class="dialog-footer">
         <el-button @click="checkDialog = false">取 消</el-button>
@@ -523,7 +360,7 @@ export default {
       isCHULI: false
     };
   },
-  created: function() {
+  created: function () {
     this._getList();
   },
   filters: {
@@ -613,19 +450,12 @@ export default {
         id: id
       };
       DeletePainting(url, data).then(res => {
-        if (res.code == 0) {
-          this.$alert("删除成功", "提示", {
-            confirmButtonText: "确定",
-            type: "success"
-          });
-          this.PaintingDia = false;
-          this.lookDia = false;
-        } else {
-          this.$alert("删除失败，请稍后重试", "提示", {
-            confirmButtonText: "确定",
-            type: "danger"
-          });
-        }
+        this.$alert("删除成功", "提示", {
+          confirmButtonText: "确定",
+          type: "success"
+        });
+        this.PaintingDia = false;
+        this.lookDia = false;
         this._getList();
       });
     },
@@ -677,24 +507,6 @@ export default {
 
           this.PaintingDia = true; //大表格
           this.checkDialog = false;
-          // if (res.code == 0) {
-          //   this.sumbit.abdrId = res.AirbrushDesignerAssure.id;
-          //   this.sumbit.createTs = res.AirbrushDesignerAssure.createTs;
-          //   this.sumbit.erpCreator = res.AirbrushDesignerAssure.realName;
-
-          //   this.checkData.customerCode = res.customerInfo.customerCode;
-          //   this.checkData.shortName = res.customerInfo.shortName;
-          //   this.checkData.officeTel = res.customerInfo.officeTel;
-          //   this.checkData.customerAgent = res.customerInfo.customerAgent;
-
-          //   this.PaintingDia = true; //大表格
-          //   this.checkDialog = false;
-          // } else {
-          //   this.$alert("查询失败，请稍后重试", "提示", {
-          //     confirmButtonText: "确定",
-          //     type: "warning"
-          //   });
-          // }
         })
         .catch(err => {
           this.$alert(err.msg, "提示", {

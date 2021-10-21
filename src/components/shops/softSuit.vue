@@ -504,45 +504,29 @@ export default {
         splitShipment: storeMessage,
         softType: _type,
       }).then((res) => {
+        this.$alert("此型号已添加成功，请前往购物车查看", "添加成功", {
+          confirmButtonText: "确定",
+          type: "success",
+        });
+        this.$root.$emit("refreshBadgeIcon", "softCount");
         this.numberList[index].value = "";
         this.numberList[index].value1 = "";
         this.expands = [];
         this.clearMsg();
-        if (res.code === 0) {
-          this.$alert("此型号已添加成功，请前往购物车查看", "添加成功", {
-            confirmButtonText: "确定",
-            type: "success",
-          });
-          this.$root.$emit("refreshBadgeIcon", "softCount");
-        } else {
-          var msg = res.data.msg;
-          if (msg == "该产品正在上架，暂时不能加入购物车") {
-            msg =
-              "没有维护" +
-              this.getPriceTip() +
-              "价格，暂时不能加入购物车，请联系玉兰订单部";
-          }
-          this.$alert(msg, "添加失败", {
-            confirmButtonText: "确定",
-            type: "warning",
-          });
+      }).catch(res => {
+        var msg = res.msg ? res.msg : "";
+        if (msg == "该产品正在上架，暂时不能加入购物车") {
+          msg = "没有维护" + this.getPriceTip() + "价格，暂时不能加入购物车，请联系玉兰订单部";
         }
-      })
-        .catch((err) => {
-          this.numberList[index].value = "";
-          this.numberList[index].value1 = "";
-          this.expands = [];
-          this.clearMsg();
-          this.$alert(
-            "添加失败，请查看信息填写是否正确或者检查网络是否通畅",
-            "提示",
-            {
-              confirmButtonText: "确定",
-              type: "warning",
-            }
-          );
-          console.log(err);
+        this.$alert(msg, "添加失败", {
+          confirmButtonText: "确定",
+          type: "warning",
         });
+        this.numberList[index].value = "";
+        this.numberList[index].value1 = "";
+        this.expands = [];
+        this.clearMsg();
+      });
     },
     getPriceTip() {
       switch (this.customerType) {

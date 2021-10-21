@@ -2,11 +2,11 @@
   <div>
     <el-card shadow="hover">
       <!-- 非X开头确认采购单界面兰 ==================================================================================-->
-      <el-dialog :show-close="true" :visible.sync="checkY_Visible" :close-on-click-modal="false" disabled="true"
-        width="1180px" top="8vh">
+      <el-dialog :show-close="true" :visible.sync="checkY_Visible" :close-on-click-modal="false" disabled="true" width="1180px"
+        top="8vh">
         <div id="checkYPrint" style="margin-bottom:10px">
-          <div align="center" class="th-font18"> <span>广东玉兰集团股份有限公司采购单（<span
-                class="th-font18color">{{ pur_headForm.PUR_NO }} </span>）</span></div>
+          <div align="center" class="th-font18"> <span>广东玉兰集团股份有限公司采购单（<span class="th-font18color">{{ pur_headForm.PUR_NO }}
+              </span>）</span></div>
         </div>
         <div>
           <h4 style="font-weight:normal">收货人：{{ pur_headForm.LINKMAN }}
@@ -112,8 +112,8 @@
         </div>
       </el-dialog>
       <!-- 非X开头（窗帘）订单 已确认采购单详情界面   ==========================================================================-->
-      <el-dialog id="checkedX" title="" :visible.sync="checkedY_Visible" :show-close="true"
-        :close-on-click-modal="false" width="1170px" top="8vh">
+      <el-dialog id="checkedX" title="" :visible.sync="checkedY_Visible" :show-close="true" :close-on-click-modal="false"
+        width="1170px" top="8vh">
         <div class="fixedDiv">
           <div style="margin:20px">
             <el-button @click="returnMain" type="primary" size="small">返 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 回
@@ -350,8 +350,7 @@
                     <el-table-column property="SUPPLY_CHECK_NOTES" label="说明" header-align="center" min-width="60">
                     </el-table-column>
                   </el-table>
-                  <el-table :data="sumMoneyCol" :show-header="false" class="font14-bold" cellpadding="0"
-                    style="width:100%">
+                  <el-table :data="sumMoneyCol" :show-header="false" class="font14-bold" cellpadding="0" style="width:100%">
                     <el-table-column width="38" property="ITEM_NO" label=" ">
                     </el-table-column>
 
@@ -416,8 +415,8 @@
 
             </div>
 
-            <el-table @selection-change="handleSelectionChange" size="small" border :data="pur_headData"
-              style="width: 100%" highlight-current-row>
+            <el-table @selection-change="handleSelectionChange" size="small" border :data="pur_headData" style="width: 100%"
+              highlight-current-row>
               <el-table-column v-if="false" type="selection" width="55">
               </el-table-column>
               <el-table-column type="index" label=" " :index="indexMethod">
@@ -473,8 +472,7 @@
               <el-button @click="checkNoPrint()" size="small" style="margin-left:8px" class="button_1">查看全部未打印
               </el-button>
             </div>
-            <el-table border :data="pur_headData" size="small" style="width: 100%" cellpadding="0"
-              highlight-current-row>
+            <el-table border :data="pur_headData" size="small" style="width: 100%" cellpadding="0" highlight-current-row>
               <el-table-column label=" " type="index" :index="indexMethod">
               </el-table-column>
               <el-table-column prop="PUR_NO" width="100" label="单号" align="center"></el-table-column>
@@ -585,8 +583,7 @@
               <el-button @click="checkNoPrint()" size="small" style="margin-left:8px" class="button_1">查看全部未打印
               </el-button>
             </div>
-            <el-table border :data="pur_headData" size="small" style="width: 100%" cellpadding="0"
-              highlight-current-row>
+            <el-table border :data="pur_headData" size="small" style="width: 100%" cellpadding="0" highlight-current-row>
               <el-table-column label=" " type="index" :index="indexMethod">
               </el-table-column>
               <el-table-column prop="PUR_NO" width="100" label="单号" align="center"></el-table-column>
@@ -627,9 +624,9 @@
             </el-table>
           </el-tab-pane>
           <div style="margin:0 25%;" class="block">
-            <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-              :current-page.sync="currentPage" :page-sizes="[5, 10, 15, 20]" :page-size="limit"
-              layout="total,sizes, prev, pager, next, jumper" :total="count"></el-pagination>
+            <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="currentPage"
+              :page-sizes="[5, 10, 15, 20]" :page-size="limit" layout="total,sizes, prev, pager, next, jumper" :total="count">
+            </el-pagination>
           </div>
         </el-tabs>
 
@@ -760,18 +757,11 @@ export default {
         arr_pur: arr_pur,
       };
       UpdateCheckFlagBatch(data).then((res) => {
-        if (res.code == 0) {
-          this.$alert("批量确认成功", "提示", {
-            confirmButtonText: "确定",
-            type: "success",
-          });
-          this.autoSearch();
-        } else {
-          this.$alert("批量确认失败，请稍后重试", "提示", {
-            confirmButtonText: "确定",
-            type: "warning",
-          });
-        }
+        this.$alert("批量确认成功", "提示", {
+          confirmButtonText: "确定",
+          type: "success",
+        });
+        this.autoSearch();
       });
     },
 
@@ -993,20 +983,13 @@ export default {
         NOTE: this.supply_check_notes,
       };
       SaveHeadNotes(data).then((res) => {
-        if (res.code == 0) {
-          this.$alert("保存说明成功", "提示", {
-            confirmButtonText: "确定",
-            type: "success",
-          });
-          this.autoSearch();
-          this.checkX_Visible = false;
-          this.checkY_Visible = false;
-        } else {
-          this.$alert("保存失败，请稍后重试", "提示", {
-            confirmButtonText: "确定",
-            type: "warning",
-          });
-        }
+        this.$alert("保存说明成功", "提示", {
+          confirmButtonText: "确定",
+          type: "success",
+        });
+        this.autoSearch();
+        this.checkX_Visible = false;
+        this.checkY_Visible = false;
       });
     },
     returnMain() {
@@ -1036,20 +1019,9 @@ export default {
       };
 
       Submit(data).then((res) => {
-        if (res.code == 0) {
-          // this.$alert("确认成功", "提示", {
-          //   confirmButtonText: "确定",
-          //   type: "success"
-          // });
-          this.autoSearch();
-          this.checkY_Visible = false;
-          this.checkedY_Visible = true;
-        } else {
-          this.$alert("确认失败，请稍后重试", "提示", {
-            confirmButtonText: "确定",
-            type: "warning",
-          });
-        }
+        this.autoSearch();
+        this.checkY_Visible = false;
+        this.checkedY_Visible = true;
       });
     },
     autoSearch() {
@@ -1106,7 +1078,7 @@ export default {
 
       downLoadFile(
         this.Global.baseUrl +
-          `PUR_HEAD/SalExcel_1?current_id=${current_id}&customer=${customer}&po_type=${po_type}&check_flag=${check_flag}&beginTime=${beginTime}&finishTime=${finishTime}&po=${po}`
+        `PUR_HEAD/SalExcel_1?current_id=${current_id}&customer=${customer}&po_type=${po_type}&check_flag=${check_flag}&beginTime=${beginTime}&finishTime=${finishTime}&po=${po}`
       );
     },
     downLoadX() {
@@ -1132,7 +1104,7 @@ export default {
       var bill_type = this.bill_type;
       downLoadFile(
         this.Global.baseUrl +
-          `PUR_HEAD/HeadAndDetailExcel?cid=${cid}&po=${po}&beginTime=${beginTime}&finishTime=${finishTime}&po_type=${po_type}&bill_type=${bill_type}`
+        `PUR_HEAD/HeadAndDetailExcel?cid=${cid}&po=${po}&beginTime=${beginTime}&finishTime=${finishTime}&po_type=${po_type}&bill_type=${bill_type}`
       );
     },
     autoSearchDetail(PUR_NO) {

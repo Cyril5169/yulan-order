@@ -502,8 +502,9 @@ export default {
       if (storeMessage === undefined) return;
       if (this.seletedActivity === null || this.seletedActivity === undefined)
         this.seletedActivity = "";
+      var data = {};
       if (row.unit !== "平方米") {
-        var data = {
+        data = {
           customer_type: this.customerType,
           CID: this.cid,
           itemNO: row.type,
@@ -516,7 +517,7 @@ export default {
           splitShipment: storeMessage,
         };
       } else {
-        var data = {
+        data = {
           customer_type: this.customerType,
           CID: this.cid,
           itemNO: row.type,
@@ -530,48 +531,29 @@ export default {
         };
       }
       addShoppingCar(data).then((res) => {
-        if (res.code === 0) {
-          this.$alert("此型号已添加成功，请前往购物车查看", "添加成功", {
-            confirmButtonText: "确定",
-            type: "success",
-          });
-          this.searchKey = "";
-          this.tableData = [];
-          this.expands = [];
-          this.clearMsg();
-          this.$root.$emit("refreshBadgeIcon", "wallCount");
-        } else {
-          var msg = res.data.msg;
-          if (msg == "该产品正在上架，暂时不能加入购物车") {
-            msg =
-              "没有维护" +
-              this.getPriceTip() +
-              "价格，暂时不能加入购物车，请联系玉兰订单部";
-          }
-          this.$alert(msg, "添加失败", {
-            confirmButtonText: "确定",
-            type: "warning",
-          });
-          this.searchKey = "";
-          this.tableData = [];
-          this.expands = [];
-          this.clearMsg();
-        }
-      })
-        .catch((err) => {
-          this.$alert(
-            "请查看信息填写是否正确或者检查网络是否通畅",
-            "添加失败",
-            {
-              confirmButtonText: "确定",
-              type: "warning",
-            }
-          );
-          this.searchKey = "";
-          this.tableData = [];
-          this.expands = [];
-          this.clearMsg();
+        this.$alert("此型号已添加成功，请前往购物车查看", "添加成功", {
+          confirmButtonText: "确定",
+          type: "success",
         });
+        this.searchKey = "";
+        this.tableData = [];
+        this.expands = [];
+        this.clearMsg();
+        this.$root.$emit("refreshBadgeIcon", "wallCount");
+      }).catch((res) => {
+        var msg = res.msg ? res.msg : "";
+        if (msg == "该产品正在上架，暂时不能加入购物车") {
+          msg = "没有维护" + this.getPriceTip() + "价格，暂时不能加入购物车，请联系玉兰订单部";
+        }
+        this.$alert(msg, "添加失败", {
+          confirmButtonText: "确定",
+          type: "warning",
+        });
+        this.searchKey = "";
+        this.tableData = [];
+        this.expands = [];
+        this.clearMsg();
+      });
     },
     //查看该商品的库存
     seeStore(scope) {

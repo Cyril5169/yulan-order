@@ -305,6 +305,7 @@ export function DeleteBuyUserList(data, config = {}) {
         return Promise.reject(err);
     })
 }
+//按月查
 export function GetOrderAndTaskByCustomer(data, config = {}) {
     return post('/CTM_ORDER/GetOrderAndTaskByCustomer', data, config).then((res) => {
         return Promise.resolve(res);
@@ -312,7 +313,29 @@ export function GetOrderAndTaskByCustomer(data, config = {}) {
         return Promise.reject(err);
     })
 }
-
+//按年查
+export function GetYearOrderAndTaskByCustomer(data, config = {}) {
+    return post('/CTM_ORDER/GetYearOrderAndTaskByCustomer', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+//根据用户ID查找用户订单
+export function getOrderByAreaCustomer(data, config = {}) {
+    return post('/CTM_ORDER/getOrderByAreaCustomer', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+export function GetYearOrderByAreaCustomer(data, config = {}) {
+    return post('/CTM_ORDER/GetYearOrderByAreaCustomer', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
 export function ljExportProductExcel(data, config = {}) {
     return post('/CTM_ORDER/ljExportProductExcel', data, config).then((res) => {
         return Promise.resolve(res);

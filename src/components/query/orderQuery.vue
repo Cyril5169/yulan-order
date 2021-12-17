@@ -40,13 +40,24 @@
           </div>
           <div style="display:inline-block;vertical-align:top;margin-left:20px;">
             <div>
-              <span>归属月份</span>
-              <el-date-picker value-format="yyyy-MM-dd" placeholder="开始日期区间" :picker-options="pickerOptions1" v-model="beginTime"
-                style="width:150px" type="month">
-              </el-date-picker>
-              &nbsp;--
-              <el-date-picker value-format="yyyy-MM-dd" placeholder="结束日期区间" :picker-options="pickerOptions2" v-model="finishTime"
-                style="width:150px;" type="month"></el-date-picker>
+              <el-select v-model="selectTimeType" style="width:120px">
+                <el-option label="按活动月份" value="month">
+                </el-option>
+                <el-option label="按年任务" value="year">
+                </el-option>
+              </el-select>
+              <span>：</span>
+              <template v-if="selectTimeType == 'month'">
+                <el-date-picker value-format="yyyy-MM-dd" placeholder="开始日期区间" :picker-options="pickerOptions1"
+                  v-model="beginTime" style="width:150px" type="month">
+                </el-date-picker>
+                &nbsp;--
+                <el-date-picker value-format="yyyy-MM-dd" placeholder="结束日期区间" :picker-options="pickerOptions2"
+                  v-model="finishTime" style="width:150px;" type="month"></el-date-picker>
+              </template>
+              <el-select v-else v-model="selectYear" style="width:85px;">
+                <el-option v-for="item in 85" :key="item+2015" :value="item+2015" :label="item+2015"></el-option>
+              </el-select>
             </div>
             <!-- <div style="margin-top:20px;">
               <span>订单状态</span>
@@ -68,7 +79,7 @@
             任务金额汇总：{{ sumOrderMoney }}元
           </div>
           <el-table :data="customerOrderTaskData" border class="orderDataTable">
-            <el-table-column type="index">
+            <el-table-column type="index" align="center">
             </el-table-column>
             <el-table-column label="客户代码" align="center" width="120px">
               <template slot-scope="scope">
@@ -82,14 +93,14 @@
                 </el-button>
               </template>
             </el-table-column>
+            <el-table-column prop="ALL_SPEND" label="订单总额" align="center">
+            </el-table-column>
+            <el-table-column prop="ALL_SPEND_CALCULATE" label="任务总额" align="center">
+            </el-table-column>
             <el-table-column prop="ASSIGNMENTS_TARGET" label="目标任务" align="center">
               <template slot-scope="scope">
                 <span> {{scope.row.ASSIGNMENTS_TARGET >0 ? scope.row.ASSIGNMENTS_TARGET:"无任务"}}</span>
               </template>
-            </el-table-column>
-            <el-table-column prop="ALL_SPEND" label="订单总额" align="center">
-            </el-table-column>
-            <el-table-column prop="ALL_SPEND_CALCULATE" label="任务总额" align="center">
             </el-table-column>
             <el-table-column label="任务差额" align="center">
               <template slot-scope="scope">
@@ -206,13 +217,23 @@ import {
   getDistrictByAreaCode,
   getCustomerDataForOrder
 } from "@/api/areaInfoASP";
-import { getOrderByAreaCustomer } from "@/api/orderInfoASP";
-import { GetOrderAndTaskByCustomer, getCustomerInfo, getResideMonery } from "@/api/orderListASP";
+import {
+  getOrderByAreaCustomer,
+  GetYearOrderByAreaCustomer,
+  GetOrderAndTaskByCustomer,
+  GetYearOrderAndTaskByCustomer,
+  getCustomerInfo,
+  getResideMonery
+} from "@/api/orderListASP";
 
 export default {
   data() {
     return {
       condition: "",
+      selectTimeType: "month",
+      nowselectTimeType: "",
+      nowselectYear: new Date().getFullYear(),
+      selectYear: new Date().getFullYear(),
       beginTime: "",
       nowBeginTime: "",
       finishTime: "",
@@ -467,27 +488,45 @@ export default {
         });
         return;
       }
-      if (!this.beginTime || !this.finishTime) {
-        this.$alert("请选择时间", "提示", {
-          confirmButtonText: "确定",
-          type: "success"
+      if (this.selectTimeType == 'month') {
+        if (!this.beginTime || !this.finishTime) {
+          this.$alert("请选择时间", "提示", {
+            confirmButtonText: "确定",
+            type: "success"
+          });
+          return;
+        }
+        this.customerOrderTaskData = [];
+        var data = {
+          CUSTOMER_CODEs: this.selectCustomer,
+          beginTime: this.beginTime,
+          finishTime: this.finishTime,
+          status: this.selectOrderType
+        };
+        data.finishTime = data.finishTime + " 23:59:59";
+        GetOrderAndTaskByCustomer(data).then(res => {
+          this.customerOrderTaskData = res.data;
+          this.nowBeginTime = this.beginTime;
+          this.nowFinishTime = this.finishTime;
+          this.nowSelectOrderType = this.selectOrderType;
+          this.nowselectYear = this.selectYear;
         });
-        return;
+      } else {
+        //按年查
+        this.customerOrderTaskData = [];
+        var data = {
+          CUSTOMER_CODEs: this.selectCustomer,
+          year: this.selectYear
+        };
+        GetYearOrderAndTaskByCustomer(data).then(res => {
+          this.customerOrderTaskData = res.data;
+          this.nowBeginTime = this.beginTime;
+          this.nowFinishTime = this.finishTime;
+          this.nowSelectOrderType = this.selectOrderType;
+          this.nowselectTimeType = this.selectTimeType;
+          this.nowselectYear = this.selectYear;
+        });
       }
-      this.customerOrderTaskData = [];
-      var data = {
-        CUSTOMER_CODEs: this.selectCustomer,
-        beginTime: this.beginTime,
-        finishTime: this.finishTime,
-        status: this.selectOrderType
-      };
-      data.finishTime = data.finishTime + " 23:59:59";
-      GetOrderAndTaskByCustomer(data).then(res => {
-        this.customerOrderTaskData = res.data;
-        this.nowBeginTime = this.beginTime;
-        this.nowFinishTime = this.finishTime;
-        this.nowSelectOrderType = this.selectOrderType;
-      });
     },
     filterHandler(value, row, column) {
       if (value == "完成")
@@ -504,21 +543,36 @@ export default {
       this.getOrderAll();
     },
     getOrderAll() {
-      this.customerOrderData = [];
-      var data = {
-        customerCode: this.selectOneCustomer.CUSTOMER_CODE, //已选用户
-        beginTime: this.nowBeginTime, //起始时间
-        finishTime: this.nowFinishTime, //结束时间
-        limit: this.limit, //限制数
-        page: this.currentPage, //页数
-        status: this.nowSelectOrderType //状态
-      };
-      data.finishTime = data.finishTime + " 23:59:59";
-      getOrderByAreaCustomer(data).then(res => {
-        this.count = res.count;
-        this.customerOrderData = res.data;
-        this.allOrderVisible = true;
-      });
+      if (this.nowselectTimeType == "month") {
+        this.customerOrderData = [];
+        var data = {
+          customerCode: this.selectOneCustomer.CUSTOMER_CODE, //已选用户
+          beginTime: this.nowBeginTime, //起始时间
+          finishTime: this.nowFinishTime, //结束时间
+          limit: this.limit, //限制数
+          page: this.currentPage, //页数
+          status: this.nowSelectOrderType //状态
+        };
+        data.finishTime = data.finishTime + " 23:59:59";
+        getOrderByAreaCustomer(data).then(res => {
+          this.count = res.count;
+          this.customerOrderData = res.data;
+          this.allOrderVisible = true;
+        });
+      } else {
+        this.customerOrderData = [];
+        var data = {
+          customerCode: this.selectOneCustomer.CUSTOMER_CODE, //已选用户
+          year: this.nowselectYear,
+          limit: this.limit, //限制数
+          page: this.currentPage, //页数
+        };
+        GetYearOrderByAreaCustomer(data).then(res => {
+          this.count = res.count;
+          this.customerOrderData = res.data;
+          this.allOrderVisible = true;
+        });
+      }
     },
     handleCurrentChange(val) {
       this.currentPage = val;

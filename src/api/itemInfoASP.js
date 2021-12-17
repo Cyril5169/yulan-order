@@ -182,3 +182,19 @@ export function GetMLTipByList(data, config = {}) {
         return Promise.reject(err);
     })
 }
+//墙板运费预估，获取全部省份
+export function GetProvinceDataList(data, config = {}) {
+    return post('/WL_MONEY/GetProvinceDataList', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+//墙板运费预估，获取计算的数据
+export function GetFeeEstimateByProvince(data, config = {}) {
+    return post('/WL_MONEY/GetFeeEstimateByProvince', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}

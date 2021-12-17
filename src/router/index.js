@@ -66,6 +66,7 @@ import supplyPurPlan from '@/components/purplan/supplyPurPlan'
 import buyUserInfo from '@/components/buyUser/buyUserInfo'
 import buyUserStatistic from '@/components/buyUser/buyUserStatistic'
 import buyUserCheck from '@/components/buyUser/buyUserCheck'
+import wallFeeEstimate from '@/components/query/wallFeeEstimate'
 
 Vue.use(Router)
 
@@ -488,6 +489,11 @@ const router = new Router({
           meta: {
             isFlex: true //flex布局
           }
+        },
+        {
+          path: '/query/wallFeeEstimate',
+          name: 'wallFeeEstimate',
+          component: wallFeeEstimate,
         },
       ]
     }

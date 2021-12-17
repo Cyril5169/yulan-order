@@ -73,6 +73,10 @@
         <el-input style="width:770px;margin-top:10px;" v-model="ctm_order.buyUserPostAddress" placeholder="请输入用户地址">
         </el-input>
         <br />
+        <span>天猫订单号：</span>
+        <el-input style="width:200px;margin-top:10px;" v-model="ctm_order.tmallOrderNo" placeholder="请输入天猫订单号">
+        </el-input>
+        <br />
         <div style="display:inline-block;vertical-align:middle;margin:10px 10px 0 0;">
           <div style="margin:auto;">上传购买凭证：</div>
           <span style="font-size:13px;color:grey;vertical-align:middle;">(消费者在门店的订货单)</span>
@@ -386,6 +390,7 @@ export default {
         reciverArea1: "",
         reciverArea2: "",
         reciverArea3: "",
+        tmallOrderNo: "",
       },
       options: [
         {
@@ -1239,7 +1244,8 @@ export default {
           !this.ctm_order.buyUserArea1 ||
           !this.ctm_order.buyUserArea2 ||
           //!this.ctm_order.buyUserArea3 ||
-          !this.ctm_order.buyUserPostAddress
+          !this.ctm_order.buyUserPostAddress ||
+          !this.ctm_order.tmallOrderNo
         ) {
           this.$alert("请填写完整的购买用户信息", "提示", {
             confirmButtonText: "确定",
@@ -1295,6 +1301,7 @@ export default {
         this.ctm_order.buyUserArea2 = orderItem.BUYUSER_AREA2.trim();
         this.ctm_order.buyUserArea3 = orderItem.BUYUSER_AREA3.trim();
         this.ctm_order.buyUserPostAddress = orderItem.BUYUSER_POST_ADDRESS.trim();
+        this.ctm_order.tmallOrderNo = orderItem.TMALL_ORDER_NO.trim();
 
         if (this.ctm_order.buyUserPicture) {
           var list = this.ctm_order.buyUserPicture.split(";");

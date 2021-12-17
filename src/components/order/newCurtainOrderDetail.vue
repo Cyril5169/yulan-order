@@ -1502,6 +1502,23 @@ export default {
           return false;
         }
       }
+
+      //拉边条的判断
+      var lsItem = this.chooseCurtainData.filter(item => item.BIAN_ENABLE > 0 && item.BIAN == "4B");
+      if(lsItem.length) {
+        for (var i = 0; i < lsItem.length; i++) {
+          //判断有没有拉边条
+          var lbtItem = this.chooseCurtainData.filter(item => item.NCM_PID == lsItem[i].NC_MODEL_ID && item.NC_PART_TYPECODE == "LBT");
+          if(!lbtItem.length) {
+            this.$alert(`${this.transPartTypeCode(lsItem[i].NC_PART_TYPECODE)}选择了4S边，但没有拉边条，保存失败`, "提示", {
+              confirmButtonText: "确定",
+              type: "warning",
+            });
+            return false;
+          }
+        }
+      }
+
       return true;
     },
     resolveModify() {

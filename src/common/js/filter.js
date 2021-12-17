@@ -7,7 +7,7 @@ let dosageFilter = data =>{
     return Math.round(data.mul(100)) / 100;
 }
 function dateFilter(value, format) {
-    if (!value || value == "9999-12-31") return "";
+    if (!value || value == "9999-12-31" || value == "9999/12/31" || value == "9999/12/31 00:00:00") return "";
     if (typeof value == "string" && value.indexOf('T') == -1) {
         var reg = new RegExp('-', "g")
         value = value.replace(reg, '/')

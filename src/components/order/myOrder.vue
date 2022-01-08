@@ -182,6 +182,7 @@ import {
   UploadUpWallFiles,
   UpdateModel
 } from "@/api/orderListASP";
+import { GetNewCurtainParams } from "@/api/newCurtainASP";
 import { mapMutations, mapActions, mapState } from "vuex";
 import Cookies from "js-cookie";
 import shipment from "./shipment";
@@ -530,16 +531,34 @@ export default {
     },
     //一个子件的总价
     oneTotal(row) {
-      var price = row.PRICE;
-      //最小下单量 帘头1.帘身里衬，窗纱4
-      var DOSAGE = row.DOSAGE;
-      if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < 1 && DOSAGE > 0) {
-        DOSAGE = 1;
-      } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'LCB' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4 && DOSAGE > 0) {
-        DOSAGE = 4;
-      }
-      price = price.mul(DOSAGE)
-      return price;
+      GetNewCurtainParams().then(res => {
+        var param1 = res.data.filter(item => item.NCP_TYPE == 'MINIMUMQUANTITY' && item.NCP_CODE == 'LT');
+        if (param1.length) this.minimumQty_lt = param1[0].NCP_VALUE;
+        var param2 = res.data.filter(item => item.NCP_TYPE == 'MINIMUMQUANTITY' && item.NCP_CODE == 'LS');
+        if (param2.length) this.minimumQty_ls = param2[0].NCP_VALUE;
+
+        var price = row.PRICE;
+        //最小下单量 帘头1.帘身里衬，窗纱3
+        var DOSAGE = row.DOSAGE;
+        if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < this.minimumQty_lt && DOSAGE > 0) {
+          DOSAGE = this.minimumQty_lt;
+        } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'LCB' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < this.minimumQty_ls && DOSAGE > 0) {
+          DOSAGE = this.minimumQty_ls;
+        }
+        price = price.mul(DOSAGE)
+        return price;
+      }).catch(res => {
+        var price = row.PRICE;
+        //最小下单量 帘头1.帘身里衬，窗纱3
+        var DOSAGE = row.DOSAGE;
+        if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < this.minimumQty_lt && DOSAGE > 0) {
+          DOSAGE = this.minimumQty_lt;
+        } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'LCB' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < this.minimumQty_ls && DOSAGE > 0) {
+          DOSAGE = this.minimumQty_ls;
+        }
+        price = price.mul(DOSAGE)
+        return price;
+      })
     },
     //查看审核
     toCheckExamine(value, ID) {

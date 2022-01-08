@@ -559,6 +559,8 @@ export default {
           label: "定高",
         },
       ],
+      minimumQty_lt: 1,
+      minimumQty_ls: 4,
     }
   },
   computed: {
@@ -819,6 +821,12 @@ export default {
           DQMaxZheParam: DQMaxZheParam,
           xiajiaoHeightParam: xiajiaoHeightParam
         }
+
+        //最小下单量参数
+        var param1 = res.data.filter(item => item.NCP_TYPE == 'MINIMUMQUANTITY' && item.NCP_CODE == 'LT');
+        if (param1.length) this.minimumQty_lt = param1[0].NCP_VALUE;
+        var param2 = res.data.filter(item => item.NCP_TYPE == 'MINIMUMQUANTITY' && item.NCP_CODE == 'LS');
+        if (param2.length) this.minimumQty_ls = param2[0].NCP_VALUE;
       });
     },
     //找到需要加载拉边条的面料
@@ -1492,12 +1500,12 @@ export default {
     //一个子件的总价
     oneTotal(row) {
       var price = row.PRICE;
-      //最小下单量 帘头1.帘身里衬，窗纱4
+      //最小下单量。帘头1.帘身里衬，窗纱3
       var DOSAGE = row.DOSAGE ? this.convertNumber(row.DOSAGE) : 0;
-      if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < 1 && DOSAGE > 0) {
-        DOSAGE = 1;
-      } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'LCB' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < 4 && DOSAGE > 0) {
-        DOSAGE = 4;
+      if (row.NC_PART_TYPECODE == 'LT' && DOSAGE < this.minimumQty_lt && DOSAGE > 0) {
+        DOSAGE = this.minimumQty_lt;
+      } else if ((row.NC_PART_TYPECODE == 'LS' || row.NC_PART_TYPECODE == 'LCB' || row.NC_PART_TYPECODE == 'CS') && DOSAGE < this.minimumQty_ls && DOSAGE > 0) {
+        DOSAGE = this.minimumQty_ls;
       }
       price = price.mul(DOSAGE)
       return price;
@@ -2200,22 +2208,24 @@ export default {
       for (var i = 0; i < curtains.length; i++) {
         var oneCurtain = curtains[i];
         if (!oneCurtain.ITEM_NO) continue;
-        //最小下单量。帘头1.帘身里衬，窗纱4
+        //最小下单量。帘头1.帘身里衬，窗纱3
         if (oneCurtain.NC_PART_TYPECODE == 'LT') {
-          if (oneCurtain.DOSAGE < 1 && oneCurtain.DOSAGE > 0) {
-            if (oneCurtain.ILLUSTRATE.indexOf('不足1平方米。按1平方米下单量收费;') == -1) {
-              oneCurtain.ILLUSTRATE += '不足1平方米。按1平方米下单量收费;';
+          var replaceStr = `不足${this.minimumQty_lt}平方米。按${this.minimumQty_lt}平方米下单量收费;`
+          if (oneCurtain.DOSAGE < this.minimumQty_lt && oneCurtain.DOSAGE > 0) {
+            if (oneCurtain.ILLUSTRATE.indexOf(replaceStr) == -1) {
+              oneCurtain.ILLUSTRATE += replaceStr;
             }
           } else {
-            oneCurtain.ILLUSTRATE = oneCurtain.ILLUSTRATE.replace('不足1平方米。按1平方米下单量收费;', '');
+            oneCurtain.ILLUSTRATE = oneCurtain.ILLUSTRATE.replace(replaceStr, '');
           }
         } else if (oneCurtain.NC_PART_TYPECODE == 'LS' || oneCurtain.NC_PART_TYPECODE == 'LCB' || oneCurtain.NC_PART_TYPECODE == 'CS') {
-          if (oneCurtain.DOSAGE < 4 && oneCurtain.DOSAGE > 0) {
-            if (oneCurtain.ILLUSTRATE.indexOf('不足4平方米。按4平方米下单量收费;') == -1) {
-              oneCurtain.ILLUSTRATE += '不足4平方米。按4平方米下单量收费;';
+          var replaceStr = `不足${this.minimumQty_ls}平方米。按${this.minimumQty_ls}平方米下单量收费;`
+          if (oneCurtain.DOSAGE < this.minimumQty_ls && oneCurtain.DOSAGE > 0) {
+            if (oneCurtain.ILLUSTRATE.indexOf(replaceStr) == -1) {
+              oneCurtain.ILLUSTRATE += replaceStr;
             }
           } else {
-            oneCurtain.ILLUSTRATE = oneCurtain.ILLUSTRATE.replace('不足4平方米。按4平方米下单量收费;', '');
+            oneCurtain.ILLUSTRATE = oneCurtain.ILLUSTRATE.replace(replaceStr, '');
           }
 
           //判断是否超高
@@ -2289,8 +2299,8 @@ export default {
   },
   mounted() {
     this.orderNumber = Cookies.get("NEW_ORDER_NO");
-    this.getPartTypeData();
     this.getCurtainParams();
+    this.getPartTypeData();
     this.getDetail();
 
     window.addEventListener("scroll", this.handleScroll, true);

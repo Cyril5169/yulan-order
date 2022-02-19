@@ -13,7 +13,7 @@
       <fieldset>
         <legend>发货信息</legend>
         <div :class="overflow">
-          <p v-for="(item, index) of data" :key="index">
+          <p v-for="(item, index) of addressData" :key="index">
             <el-radio @change="showAddress" v-model="radio" :label="index" border>{{ item.wlContacts }}
               ({{ item.wlTel }}) {{ item.province
                 }}{{ item.city }}{{ item.country
@@ -237,7 +237,7 @@
     <!-- 地址管理信息 -->
     <el-dialog width="70%" @close="dialogClose" title="管理收货信息" :visible.sync="dialogFormVisible">
       <el-button @click="clickNew()" type="success">添加地址</el-button>
-      <el-table border :data="data" style="width: 100%" :row-class-name="tableRowClassName">
+      <el-table border :data="addressData" style="width: 100%" :row-class-name="tableRowClassName">
         <el-table-column prop="wlContacts" label="收货人" align="center"></el-table-column>
         <el-table-column prop="wlTel" label="联系电话" align="center"></el-table-column>
         <el-table-column label="收货地址">
@@ -353,7 +353,7 @@ export default {
       product_group_tpye: "", //类型
       //获取地址
       transferData: [],
-      data: [
+      addressData: [
         {
           wlContacts: "",
           wlTel: "",
@@ -830,9 +830,6 @@ export default {
               confirmButtonText: "确定",
               type: "success",
             });
-            //预留一下
-            //this.allAddress();
-            //this.data=this.transferData;
           });
         })
         .catch(() => {
@@ -936,13 +933,13 @@ export default {
     //弹窗打开事件
     dialogOpen() {
       this.dialogFormVisible = true;
-      this.data = this.transferData;
+      this.addressData = this.transferData;
       this.overflow = "overflow";
     },
     //弹窗关闭事件
     dialogClose() {
-      this.data = [];
-      this.data[0] = this.transferData[0];
+      this.addressData = [];
+      this.addressData[0] = this.transferData[0];
       this.overflow = "";
     },
     //新增地址按钮
@@ -1009,7 +1006,7 @@ export default {
         .then((res) => {
           this.transferData = res.data.data;
           this.sortAddress();
-          this.data = [];
+          this.addressData = [];
           if (this.ctm_order.wlTel && this.ctm_order.wlContacts) {
             //如果是窗帘重新提交进来有默认值
             var addIndex = 0;
@@ -1048,14 +1045,14 @@ export default {
             this.addressIt = true;
             this.showAddress();
           } else {
-            this.data[0] = this.transferData[0];
+            this.addressData[0] = this.transferData[0];
 
-            this.ctm_order.wlTel = this.data[0].wlTel;
-            this.ctm_order.wlContacts = this.data[0].wlContacts;
-            this.ctm_order.postAddress = this.data[0].postAddress;
-            this.ctm_order.reciverArea1 = this.data[0].province;
-            this.ctm_order.reciverArea2 = this.data[0].city;
-            this.ctm_order.reciverArea3 = this.data[0].country;
+            this.ctm_order.wlTel = this.addressData[0].wlTel;
+            this.ctm_order.wlContacts = this.addressData[0].wlContacts;
+            this.ctm_order.postAddress = this.addressData[0].postAddress;
+            this.ctm_order.reciverArea1 = this.addressData[0].province;
+            this.ctm_order.reciverArea2 = this.addressData[0].city;
+            this.ctm_order.reciverArea3 = this.addressData[0].country;
             this.ctm_order.allAddress = `${this.ctm_order.reciverArea1 ? this.ctm_order.reciverArea1 : ""
               }${this.ctm_order.reciverArea2 ? this.ctm_order.reciverArea2 : ""}${this.ctm_order.reciverArea3 ? this.ctm_order.reciverArea3 : ""
               }${this.ctm_order.postAddress}`;
@@ -1078,7 +1075,7 @@ export default {
       if (this.addressIt == false) {
         this.overflow = "overflow";
         this.addressAppear = "收起↑";
-        this.data = this.transferData;
+        this.addressData = this.transferData;
         this.addressIt = true;
       } else {
         this.addressIt = false;
@@ -1087,23 +1084,23 @@ export default {
         var cutPoint = this.radio;
         var abc = this.transferData.splice(cutPoint, 1);
         this.transferData.unshift(abc[0]);
-        //this.data=this.transferData;
-        this.data = [];
-        this.data[0] = this.transferData[0];
+        //this.addressData=this.transferData;
+        this.addressData = [];
+        this.addressData[0] = this.transferData[0];
         this.radio = 0;
 
-        this.ctm_order.wlTel = this.data[0].wlTel;
-        this.ctm_order.wlContacts = this.data[0].wlContacts;
-        this.ctm_order.postAddress = this.data[0].postAddress;
-        this.ctm_order.reciverArea1 = this.data[0].province;
-        this.ctm_order.reciverArea2 = this.data[0].city;
-        this.ctm_order.reciverArea3 = this.data[0].country;
+        this.ctm_order.wlTel = this.addressData[0].wlTel;
+        this.ctm_order.wlContacts = this.addressData[0].wlContacts;
+        this.ctm_order.postAddress = this.addressData[0].postAddress;
+        this.ctm_order.reciverArea1 = this.addressData[0].province;
+        this.ctm_order.reciverArea2 = this.addressData[0].city;
+        this.ctm_order.reciverArea3 = this.addressData[0].country;
         this.ctm_order.allAddress = `${this.ctm_order.reciverArea1 ? this.ctm_order.reciverArea1 : ""
           }${this.ctm_order.reciverArea2 ? this.ctm_order.reciverArea2 : ""}${this.ctm_order.reciverArea3 ? this.ctm_order.reciverArea3 : ""
           }${this.ctm_order.postAddress}`;
-        if (this.data[0].addressId == 0) {
+        if (this.addressData[0].addressId == 0) {
           this.ctm_order.postAddressModified = "0";
-          this.ctm_order.allAddress = this.data[0].postAddress;
+          this.ctm_order.allAddress = this.addressData[0].postAddress;
         } else {
           this.ctm_order.postAddressModified = "1";
         }

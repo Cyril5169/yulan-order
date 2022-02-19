@@ -81,8 +81,7 @@
         </el-table-column>
         <el-table-column width="80" label="打印标记" prop="PRINTED" align="center">
           <template slot-scope="scope">
-            <el-checkbox v-if="scope.row.STATE === 'APPROVED'" @change="changePrinted(scope.row, scope.$index)"
-              v-model="scope.row.PRINTED">
+            <el-checkbox @change="changePrinted(scope.row, scope.$index)" v-model="scope.row.PRINTED">
               {{ scope.row.PRINTED === false ? "未打印" : "已打印" }}
             </el-checkbox>
           </template>

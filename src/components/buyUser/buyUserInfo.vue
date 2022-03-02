@@ -3,7 +3,7 @@
     <div class="zj-tbar">
       <el-button icon="el-icon-refresh" size="mini" circle @click="searchBuyUser">
       </el-button>
-      <el-input @keyup.enter.native="searchBuyUser()" size="medium" placeholder="输入用户姓名/地址" v-model="condition" clearable
+      <el-input @keyup.enter.native="searchBuyUser()" size="medium" placeholder="输入用户姓名/电话/地址" v-model="condition" clearable
         style="width:350px;">
         <el-button @click="searchBuyUser()" slot="append" icon="el-icon-search">搜索</el-button>
       </el-input>
@@ -110,10 +110,6 @@ export default {
     canCheck: {
       type: Boolean,
       default: false
-    },
-    creFlag: {
-      type: String,
-      default: "user"
     }
   },
   data() {
@@ -179,7 +175,7 @@ export default {
         CITY_ID: "",
         COUNTRY_ID: "",
         NOTE: "",
-        CRE_FLAG: this.creFlag,
+        CRE_FLAG: "user",
         OPERATOR: Cookies.get("cid")
       };
       this.areaData = [];

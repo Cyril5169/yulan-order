@@ -270,6 +270,7 @@ export function GetPackExpressState(data, config = {}) {
         return Promise.reject(err);
     })
 }
+//消费者管理
 export function GetBuyUserInfo(data, config = {}) {
     return post('/BUYUSER_INFO/GetBuyUserInfo', data, config).then((res) => {
         return Promise.resolve(res);
@@ -418,6 +419,14 @@ export function GetBuyUserAllOrder(data, config = {}) {
 //审核所有消费者订单
 export function GetAllBuyUserOrder(data, config = {}) {
     return post('/BUYUSER_INFO/GetAllBuyUserOrder', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+//地址管理
+export function GetCustomerAddressList(data, config = {}) {
+    return post('/POST_ADDRESS/GetCustomerAddressList', data, config).then((res) => {
         return Promise.resolve(res);
     }).catch((err) => {
         return Promise.reject(err);

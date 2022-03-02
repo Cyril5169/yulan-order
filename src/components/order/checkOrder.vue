@@ -12,30 +12,26 @@
     <div class="grayDiv">
       <fieldset>
         <legend>发货信息</legend>
-        <div :class="overflow">
-          <p v-for="(item, index) of addressData" :key="index">
-            <el-radio @change="showAddress" v-model="radio" :label="index" border>{{ item.wlContacts }}
-              ({{ item.wlTel }}) {{ item.province
-                }}{{ item.city }}{{ item.country
-                }}{{ item.postAddress }}</el-radio>
-            <span v-if="item.addressId === 0" style="color:tomato; font-weight:bold;">默认地址</span>
-          </p>
-        </div>
-        <p style="font-weight:bold;">
-          <span class="charge" @click.prevent="showAddress">
-            <div style="width:250px;display:inline-block;">
-              {{ addressAppear }}
+        <div>
+          <div :class="overflowCls" style="position: relative;">
+            <div v-for="(item, index) of addressData" :key="index">
+              <el-radio @change="showAddress" v-model="radio" :label="index" border size="medium" style="margin-top:5px;">
+                {{ item.wlContacts }}({{ item.wlTel }})
+                {{ item.province }}{{ item.city }}{{ item.country}}{{ item.postAddress }}
+              </el-radio>
+              <span v-if="item.addressId === 0" style="color:tomato; font-weight:bold;">默认地址</span>
             </div>
-          </span>
-          <span @click.prevent="dialogOpen" class="charge" style="float:right;margin-right:20px;">
-            管理收货地址
-          </span>
-        </p>
-
+            <span @click.prevent="dialogOpen" class="charge" style="position:absolute;top:0;right:20px;">
+              管理收货地址
+            </span>
+          </div>
+          <div style="width:250px;margin-top:10px;" class="charge" @click.prevent="showAddress">
+            {{ addressIt? '收起↑':'更多地址⇣' }}
+          </div>
+        </div>
         <!-- 配送信息 -->
         <span>选择配送方式：</span>
-        <el-select @change="changePeiSong" style="width:300px; display:inline-block;" v-model="ctm_order.deliveryType"
-          placeholder="请选择">
+        <el-select @change="changePeiSong" style="width:300px;" v-model="ctm_order.deliveryType" placeholder="请选择">
           <el-option v-for="item in options" :key="item.deliveryType" :label="item.label" :value="item.deliveryType"
             :disabled="item.disabled"></el-option>
         </el-select>
@@ -48,9 +44,9 @@
         <legend>购买用户信息</legend>
         <span>用户姓名：</span>
         <el-input style="width:330px;" v-model="ctm_order.buyUser" placeholder="请输入用户姓名"></el-input>
-        <span style="display:inline-block;margin-left:50px;">用户电话：</span>
+        <span style="margin-left:50px;">用户电话：</span>
         <el-input style="width:300px;" v-model="ctm_order.buyUserPhone" placeholder="请输入用户电话"></el-input>
-        <span @click.prevent="buyUserShow" class="charge" style="float:right;margin-right:20px;font-weight:bold;">
+        <span @click.prevent="buyUserShow" class="charge" style="float:right;margin-right:20px;">
           管理消费者信息
         </span>
         <br />
@@ -108,7 +104,6 @@
           </el-radio-group>
         </div>
         <br /> -->
-
       <fieldset>
         <legend>工程报备单号</legend>
         <el-input style="width:400px" v-model="ctm_order.projectNo" placeholder="请输入工程报备单号"></el-input>
@@ -210,17 +205,17 @@
     <div v-else style="margin:5px 0 0 5px">无可用优惠券</div>
 
     <div class="rightDiv">
-      <div>
+      <div class="right-money">
         折后总金额：
         <span v-if="isManager === '0'">***</span>
         <span v-else>{{ totalPrice | priceFilter }}</span>
       </div>
-      <div>
+      <div class="right-money">
         总返利：
         <span v-if="isManager === '0'">***</span>
         <span v-else>{{ backPrice | priceFilter }}</span>
       </div>
-      <div>
+      <div class="right-money">
         应付总金额：
         <span v-if="isManager === '0'">***</span>
         <span v-else>{{ allSpend | priceFilter }}</span>
@@ -234,6 +229,7 @@
     <el-dialog :visible.sync="dialogImageVisible">
       <img width="100%" :src="dialogImageUrl" />
     </el-dialog>
+
     <!-- 地址管理信息 -->
     <el-dialog width="70%" @close="dialogClose" title="管理收货信息" :visible.sync="dialogFormVisible">
       <el-button @click="clickNew()" type="success">添加地址</el-button>
@@ -288,20 +284,23 @@
         </div>
       </el-dialog>
     </el-dialog>
+
     <!-- 查看使用记录 -->
     <el-dialog :title="'优惠券使用记录[券号:' + couponId + ']'" :visible.sync="dialogUse" width="1000px" top="5vh">
       <keep-alive>
         <useRecordDetail v-if="dialogUse" :couponId="couponId"></useRecordDetail>
       </keep-alive>
     </el-dialog>
+
     <!-- 查看返利记录 -->
     <el-dialog :title="'优惠券返利记录[券号:' + couponId + ']'" :visible.sync="dialogBack" width="60%" top="5vh">
       <keep-alive>
         <couponRecordDetail v-if="dialogBack" :couponId="couponId"></couponRecordDetail>
       </keep-alive>
     </el-dialog>
-    <!-- 维护购买人 -->
-    <el-dialog v-if="buyUserVisible" :visible.sync="buyUserVisible" title="管理购买用户" :close-on-click-modal="false" width="1000px">
+
+    <!-- 消费者管理 -->
+    <el-dialog v-if="buyUserVisible" :visible.sync="buyUserVisible" title="管理购买用户" :close-on-click-modal="false" width="65vw">
       <buyUserInfo style="height: 500px;" @row-dblclick="handleRowDBClick" canCheck></buyUserInfo>
     </el-dialog>
   </el-card>
@@ -321,7 +320,8 @@ import {
   GetBuyUserInfo,
   GetPromotionByTypeAndId,
   UploadBuyUserFiles,
-  DeleteFileByPath
+  DeleteFileByPath,
+  GetCustomerAddressList
 } from "@/api/orderListASP";
 import Axios from "axios";
 import { mapMutations, mapActions } from "vuex";
@@ -362,8 +362,7 @@ export default {
         },
       ],
       packingShow: false,
-      addressAppear: "更多地址⇣",
-      overflow: "",
+      overflowCls: "",
       addressIt: false,
       radio: 0,
       backPrice: 0.0,
@@ -532,6 +531,7 @@ export default {
       this.transferData.reverse();
       var morendizhi = this.transferData.pop();
       this.transferData.unshift(morendizhi);
+      console.log(this.transferData)
     },
     //表格过滤  --是否允许分批
     formatRole(row, column) {
@@ -934,13 +934,13 @@ export default {
     dialogOpen() {
       this.dialogFormVisible = true;
       this.addressData = this.transferData;
-      this.overflow = "overflow";
+      this.overflowCls = "overflow-cls";
     },
     //弹窗关闭事件
     dialogClose() {
       this.addressData = [];
       this.addressData[0] = this.transferData[0];
-      this.overflow = "";
+      this.overflowCls = "";
     },
     //新增地址按钮
     clickNew() {
@@ -1004,6 +1004,7 @@ export default {
         cid: Cookies.get("cid"),
       })
         .then((res) => {
+          console.log(res)
           this.transferData = res.data.data;
           this.sortAddress();
           this.addressData = [];
@@ -1062,25 +1063,15 @@ export default {
           console.log(error);
         });
     },
-    //隔行变色
-    tableRowClassName({ row, rowIndex }) {
-      if (rowIndex % 2 == 0) {
-        return "success-row";
-      }
-      return "";
-    },
     //获取更多地址
     showAddress() {
-      //this.addressIt=!this.addressIt;
       if (this.addressIt == false) {
-        this.overflow = "overflow";
-        this.addressAppear = "收起↑";
-        this.addressData = this.transferData;
         this.addressIt = true;
+        this.overflowCls = "overflow-cls";
+        this.addressData = this.transferData;
       } else {
         this.addressIt = false;
-        this.overflow = "";
-        this.addressAppear = "更多地址⇣";
+        this.overflowCls = "";
         var cutPoint = this.radio;
         var abc = this.transferData.splice(cutPoint, 1);
         this.transferData.unshift(abc[0]);
@@ -1526,6 +1517,13 @@ export default {
       this.refreshCountry(row.CITY_ID, row.CITY);
       this.buyUserVisible = false;
     },
+    //隔行变色
+    tableRowClassName({ row, rowIndex }) {
+      if (rowIndex % 2 == 0) {
+        return "success-row";
+      }
+      return "";
+    },
   },
   created() {
     this.curtainStatus = Cookies.get("cur_status");
@@ -1536,18 +1534,25 @@ export default {
     this.allAddress(); //获取地址
     this._getTickets(); //获取优惠券
     this.chargeQuery(); //经办人
+    GetCustomerAddressList({
+      cid: Cookies.get("cid"),
+      condition: "",
+    }).then(res => {
+      console.log(res)
+    })
   },
 };
 </script>
 
 <style scoped>
-.overflow {
-  height: 160px;
+.overflow-cls {
+  max-height: 150px;
   overflow: auto;
 }
 .charge {
   color: #8bc34a;
   cursor: pointer;
+  font-weight: bold;
 }
 .centerCard {
   margin: 0 auto;
@@ -1558,13 +1563,13 @@ export default {
 }
 .zoomRight {
   font-weight: 400;
-  font-size: 15px;
+  font-size: 16px;
   line-height: 30px;
   display: inline-block;
   margin-right: 30px;
 }
 .zoomLeft {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: bold;
 }
 .headSpan {
@@ -1586,7 +1591,9 @@ export default {
   color: tomato;
   font-size: 18px;
 }
-
+.right-money {
+  margin-bottom: 5px;
+}
 .couponHead {
   height: 58px;
 }

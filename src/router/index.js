@@ -67,6 +67,7 @@ import buyUserInfo from '@/components/buyUser/buyUserInfo'
 import buyUserStatistic from '@/components/buyUser/buyUserStatistic'
 import buyUserCheck from '@/components/buyUser/buyUserCheck'
 import wallFeeEstimate from '@/components/query/wallFeeEstimate'
+import addressList from '@/components/addressManagment/addressList'
 
 Vue.use(Router)
 
@@ -494,6 +495,14 @@ const router = new Router({
           path: '/query/wallFeeEstimate',
           name: 'wallFeeEstimate',
           component: wallFeeEstimate,
+        },
+        {
+          path: '/addressManagment/addressList',
+          name: 'addressList',
+          component: addressList,
+          meta: {
+            isFlex: true //flex布局
+          }
         },
       ]
     }

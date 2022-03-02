@@ -13,20 +13,20 @@
       <fieldset>
         <legend>发货信息</legend>
         <div>
-          <div :class="overflowCls" style="position: relative;">
-            <div v-for="(item, index) of addressData" :key="index">
-              <el-radio @change="showAddress" v-model="radio" :label="index" border size="medium" style="margin-top:5px;">
-                {{ item.wlContacts }}({{ item.wlTel }})
-                {{ item.province }}{{ item.city }}{{ item.country}}{{ item.postAddress }}
+          <div :class="{'overflow-cls': moreAddressVisible}" style="position: relative;">
+            <div v-for="(item, index) of addressShowData" :key="index">
+              <el-radio @change="selectAddress" v-model="radio" :label="index" border size="medium" style="margin-top:5px;">
+                {{ item.WL_CONTACTS }}({{ item.WL_TEL }})
+                {{ item.PROVINCE }}{{ item.CITY }}{{ item.COUNTRY}}{{ item.POST_ADDRESS }}
               </el-radio>
-              <span v-if="item.addressId === 0" style="color:tomato; font-weight:bold;">默认地址</span>
+              <span v-if="item.ADDRESS_ID == 0" style="color:tomato; font-weight:bold;">默认地址</span>
             </div>
             <span @click.prevent="dialogOpen" class="charge" style="position:absolute;top:0;right:20px;">
               管理收货地址
             </span>
           </div>
-          <div style="width:250px;margin-top:10px;" class="charge" @click.prevent="showAddress">
-            {{ addressIt? '收起↑':'更多地址⇣' }}
+          <div style="width:250px;margin-top:10px;" class="charge" @click.prevent="moreAddressVisible=!moreAddressVisible">
+            {{ moreAddressVisible? '收起↑':'更多地址⇣' }}
           </div>
         </div>
         <!-- 配送信息 -->
@@ -52,16 +52,16 @@
         <br />
         <br />
         <span>选择地区：</span>
-        <el-select @change="getCity3" style="width:253px;" v-model="ctm_order.buyUserArea1" placeholder="请选择省份">
-          <el-option v-for="(item, index) in provinceData" :key="index" :label="item.regionName" :value="item.regionName">
+        <el-select @change="getCity" style="width:253px;" v-model="ctm_order.buyUserArea1" placeholder="请选择省份">
+          <el-option v-for="(item, index) in provinceData" :key="index" :label="item.REGION_NAME" :value="item.REGION_NAME">
           </el-option>
         </el-select>
-        <el-select @change="getCountry3" style="width:253px;" v-model="ctm_order.buyUserArea2" placeholder="请选择城市">
-          <el-option v-for="(item, index) in cityData" :key="index" :label="item.regionName" :value="item.regionName">
+        <el-select @change="getArea" style="width:253px;" v-model="ctm_order.buyUserArea2" placeholder="请选择城市">
+          <el-option v-for="(item, index) in cityData" :key="index" :label="item.REGION_NAME" :value="item.REGION_NAME">
           </el-option>
         </el-select>
         <el-select style="width:254px;" v-model="ctm_order.buyUserArea3" placeholder="请选择县区">
-          <el-option v-for="(item, index) in countryData" :key="index" :label="item.regionName" :value="item.regionName">
+          <el-option v-for="(item, index) in areaData" :key="index" :label="item.REGION_NAME" :value="item.REGION_NAME">
           </el-option>
         </el-select>
         <br />
@@ -231,58 +231,8 @@
     </el-dialog>
 
     <!-- 地址管理信息 -->
-    <el-dialog width="70%" @close="dialogClose" title="管理收货信息" :visible.sync="dialogFormVisible">
-      <el-button @click="clickNew()" type="success">添加地址</el-button>
-      <el-table border :data="addressData" style="width: 100%" :row-class-name="tableRowClassName">
-        <el-table-column prop="wlContacts" label="收货人" align="center"></el-table-column>
-        <el-table-column prop="wlTel" label="联系电话" align="center"></el-table-column>
-        <el-table-column label="收货地址">
-          <template slot-scope="scope">
-            <span>{{ scope.row.province }}</span>
-            <span>{{ scope.row.city }}</span>
-            <span>{{ scope.row.country }}</span>
-            <span>{{ scope.row.postAddress }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column align="center" label="操作">
-          <template slot-scope="scope">
-            <el-button v-show="scope.row.addressId != 0" @click="editIt(scope.row)" type="warning" size="small">编辑
-            </el-button>
-            <el-button v-show="scope.row.addressId != 0" @click="deleteIt(scope.row)" type="danger" size="small">删除
-            </el-button>
-            <span v-show="scope.row.addressId === 0">默认地址不可操作</span>
-          </template>
-        </el-table-column>
-      </el-table>
-      <el-dialog width="60%" title="地址管理" @close="clearRule('form')" :visible.sync="innerVisible" append-to-body>
-        <el-select @change="getCity()" style="width:30%;" v-model="value" placeholder="请选择省份">
-          <el-option v-for="(item, index) in province" :key="index" :label="item.regionName" :value="index">
-          </el-option>
-        </el-select>
-        <el-select @change="getCountry()" style="width:30%;" v-model="value2" placeholder="请选择城市">
-          <el-option v-for="(item, index) in city" :key="index" :label="item.regionName" :value="index"></el-option>
-        </el-select>
-        <el-select @change="printfCountry()" style="width:30%;" v-model="value3" placeholder="请选择县区">
-          <el-option v-for="(item, index) in country" :key="index" :label="item.regionName" :value="index">
-          </el-option>
-        </el-select>
-        <div>
-          <el-form :model="form" ref="form" class="demo-ruleForm" :rules="formRules" label-width="80px">
-            <el-form-item label="详细地址" prop="address">
-              <el-input style="width:90%;" v-model="form.address" autocomplete="off" placeholder="请输入详细地址"></el-input>
-            </el-form-item>
-            <el-form-item label="收货人" prop="name">
-              <el-input style="width:90%;" v-model="form.name" autocomplete="off" placeholder="请输入收货人姓名"></el-input>
-            </el-form-item>
-            <el-form-item label="联系电话" prop="telephone">
-              <el-input style="width:90%;" v-model="form.telephone" autocomplete="off" placeholder="请输入联系电话">
-              </el-input>
-            </el-form-item>
-          </el-form>
-          <el-button v-if="chageOrAdd" type="danger" @click="changeAddress('form')">确认修改</el-button>
-          <el-button v-else type="success" @click="NewAddress('form')">确认添加</el-button>
-        </div>
-      </el-dialog>
+    <el-dialog @close="getAllAddress()" title="管理收货地址" :visible.sync="dialogFormVisible" width="65vw">
+      <addressList style="height: 500px;" />
     </el-dialog>
 
     <!-- 查看使用记录 -->
@@ -300,7 +250,7 @@
     </el-dialog>
 
     <!-- 消费者管理 -->
-    <el-dialog v-if="buyUserVisible" :visible.sync="buyUserVisible" title="管理购买用户" :close-on-click-modal="false" width="65vw">
+    <el-dialog v-if="buyUserVisible" :visible.sync="buyUserVisible" title="管理消费者信息" :close-on-click-modal="false" width="65vw">
       <buyUserInfo style="height: 500px;" @row-dblclick="handleRowDBClick" canCheck></buyUserInfo>
     </el-dialog>
   </el-card>
@@ -308,11 +258,9 @@
 
 <script>
 import Cookies from "js-cookie";
-import { addAddress } from "@/api/orderList";
-import { deleteAddress } from "@/api/orderList";
-import { editAddress } from "@/api/orderList";
 import { GetCanUseCoupon } from "@/api/couponASP";
 import {
+  GetAreaList,
   orderSettlement,
   normalOrderSettlement,
   getCustomerInfo,
@@ -328,13 +276,15 @@ import { mapMutations, mapActions } from "vuex";
 import useRecordDetail from "../center/useRecordDetail";
 import couponRecordDetail from "../center/couponRecordDetail";
 import buyUserInfo from "../buyUser/buyUserInfo"
+import addressList from "../addressManagment/addressList"
 
 export default {
   name: "checkOrder",
   components: {
     useRecordDetail,
     couponRecordDetail,
-    buyUserInfo
+    buyUserInfo,
+    addressList
   },
   data() {
     return {
@@ -349,21 +299,12 @@ export default {
       newCurtainStatus: "",
       buyUserVisible: false,
       couponId: "",
-      backTable: [],
       product_group_tpye: "", //类型
       //获取地址
-      transferData: [],
-      addressData: [
-        {
-          wlContacts: "",
-          wlTel: "",
-          postAddress: "",
-          addressId: 1,
-        },
-      ],
+      addressListData: [],
       packingShow: false,
       overflowCls: "",
-      addressIt: false,
+      moreAddressVisible: false,
       radio: 0,
       backPrice: 0.0,
       ctm_order: {
@@ -402,33 +343,12 @@ export default {
         },
       ],
       province: [],
-      city: [],
-      country: [],
       provinceData: [],
       cityData: [],
-      countryData: [],
-      value: "",
-      value2: "",
-      value3: "",
-      chageOrAdd: true,
-      notes: "",
+      areaData: [],
       //地址
       dialogFormVisible: false,
-      innerVisible: false,
-      form: {
-        name: "",
-        telephone: "",
-        address: "",
-        theSheng: "",
-        shengID: "",
-        theshi: "",
-        shiID: "",
-        thequ: "",
-        quID: "",
-        addressId: "",
-      },
       order_details: [],
-      array: [],
       activeNames: ["1"],
       couponData: [],
       couponDataGroup: [],
@@ -438,16 +358,6 @@ export default {
       chargeData: {
         CUSTOMER_AGENT: "",
         OFFICE_TEL: "",
-      },
-      formRules: {
-        telephone: [
-          {
-            min: 11,
-            max: 11,
-            message: "请填写正确的手机号码",
-            trigger: "blur",
-          },
-        ],
       },
       dialogImageUrl: "",
       dialogImageVisible: false,
@@ -496,9 +406,19 @@ export default {
       return allcost;
     },
     //计算总价
-    allSpend: function () {
+    allSpend() {
       return this.totalPrice - this.backPrice;
     },
+    addressShowData() {
+      if (this.moreAddressVisible) {
+        return this.addressListData;
+      } else {
+        if (this.addressListData.length)
+          return [this.addressListData[0]];
+        else
+          return [];
+      }
+    }
   },
   methods: {
     ...mapActions("navTabs", ["closeToTab"]),
@@ -515,23 +435,6 @@ export default {
       if (this.ctm_order.deliveryType == 1) {
         this.ctm_order.deliveryNotes = "";
       }
-    },
-    //将地址按照顺序渲染
-    sortAddress() {
-      var compare = function (a, b) {
-        if (a.addressId < b.addressId) {
-          return -1;
-        } else if (a.addressId > b.addressId) {
-          return 1;
-        } else {
-          return 0;
-        }
-      };
-      this.transferData.sort(compare);
-      this.transferData.reverse();
-      var morendizhi = this.transferData.pop();
-      this.transferData.unshift(morendizhi);
-      console.log(this.transferData)
     },
     //表格过滤  --是否允许分批
     formatRole(row, column) {
@@ -717,384 +620,108 @@ export default {
       this.couponId = itemId;
       this.dialogBack = true;
     },
-    //确定修改地址
-    changeAddress(formName) {
-      var url = "/postAddress/updatePostAddress.do";
-      var data = {
-        cid: Cookies.get("cid"),
-        addressId: this.form.addressId /* 33, */,
-        postAddress: this.form.address /* "其实我不是渣渣曹" */,
-        wlContacts: this.form.name /* "渣渣陈" */,
-        wlTel: this.form.telephone /* "11011011010", */,
-        province: this.form.theSheng /* "广东省" */,
-        city: this.form.theshi /* "汕头市" */,
-        country: this.form.thequ /* "升平区", */,
-        provinceID: this.form.shengID /* "P19" */,
-        cityID: this.form.shiID /* "S200" */,
-        countryID: this.form.quID /* "D1994" */,
-      };
-      if (data.country == "" || data.country == undefined) {
-        data.countryID = "";
-      }
-      this.$refs[formName].validate((valid) => {
-        if (
-          valid &&
-          data.province != undefined &&
-          data.city != undefined &&
-          this.form.address != undefined &&
-          this.form.name != undefined &&
-          data.province != "" &&
-          data.city != "" &&
-          this.form.address != "" &&
-          this.form.name != "" &&
-          this.form.telephone != "" &&
-          this.form.telephone != undefined
-        ) {
-          editAddress(url, data).then((res) => {
-            this.dialogFormVisible = false;
-            this.innerVisible = false;
-            this.allAddress();
-            this.$alert("修改地址成功", "提示", {
-              confirmButtonText: "确定",
-              type: "success",
-            });
-          });
-        } else {
-          this.$alert("请填写正确信息", "提示", {
-            confirmButtonText: "确定",
-            type: "warning",
-          });
-          return false;
-        }
+    //获取省份
+    getProvince() {
+      GetAreaList({
+        region_level: 1
+      }, { loading: false }).then((res) => {
+        this.provinceData = res.data;
+      }).catch((error) => {
+        console.log(error);
       });
     },
-    //编辑地址弹窗初始化
-    editIt(row) {
-      //输入框初始化
-      this.chageOrAdd = true;
-      this.innerVisible = true;
-      this.value = row.province;
-      this.value2 = row.city;
-      this.value3 = row.country;
-      //表单初始化
-      this.form.theSheng = row.province;
-      this.form.shengID = row.provinceID;
-      this.form.theshi = row.city;
-      this.form.shiID = row.cityID;
-      this.form.quID = row.countryID;
-      this.form.thequ = row.country;
-      this.form.address = row.postAddress;
-      this.form.name = row.wlContacts;
-      this.form.telephone = row.wlTel;
-      this.form.addressId = row.addressId;
-      //接口
-      Axios.post("/areaRegion/getCity.do", {
-        regionId: row.provinceID,
-        regionName: row.provinceID,
-      })
-        .then((res) => {
-          this.city = res.data.city;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      Axios.post("/areaRegion/getCountry.do", {
-        regionId: row.cityID,
-        regionName: row.city,
-      })
-        .then((res) => {
-          this.country = res.data.country;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    //删除地址
-    deleteIt(row) {
-      this.$confirm("确定删除该地址吗？", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(() => {
-          var url = "/postAddress/deletePostAddress.do";
-          var data = {
-            cid: Cookies.get("cid"),
-            addressId: row.addressId,
-          };
-          deleteAddress(url, data).then((res) => {
-            this.dialogFormVisible = false;
-            this.innerVisible = false;
-            this.allAddress();
-            this.$alert("删除成功！", "提示", {
-              confirmButtonText: "确定",
-              type: "success",
-            });
-          });
-        })
-        .catch(() => {
-          console.log("地址没有删除！！！");
-        });
-    },
-    //输出区县
-    printfCountry() {
-      var country = this.value3;
-      this.form.thequ = this.country[country].regionName;
-      this.form.quID = this.country[country].regionId;
-    },
-    refreshCountry(regionId, regionName) {
-      Axios.post(
-        "/areaRegion/getCountry.do",
-        {
-          regionId: regionId,
-          regionName: regionName,
-        },
-        { loading: false }
-      )
-        .then((res) => {
-          this.country = res.data.country;
-          this.countryData = res.data.country;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    //获取区县
-    getCountry() {
-      this.value3 = "";
-      this.form.thequ = "";
-      this.country = [];
-      var city = this.value2;
-      this.form.theshi = this.city[city].regionName;
-      this.form.shiID = this.city[city].regionId;
-      this.refreshCountry(this.city[city].regionId, this.city[city].regionName);
-    },
-    getCountry3(value) {
-      this.ctm_order.buyUserArea3 = "";
-      this.countryData = [];
-      var city = this.city.filter((item) => item.regionName == value)[0];
-      this.refreshCountry(city.regionId, city.regionName);
-    },
-    refreshCity(regionId, regionName) {
-      Axios.post(
-        "/areaRegion/getCity.do",
-        {
-          regionId: regionId,
-          regionName: regionName,
-        },
-        { loading: false }
-      )
-        .then((res) => {
-          this.city = res.data.city;
-          this.cityData = res.data.city;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    //获取城市
-    getCity() {
-      //新增
-      this.form.theshi = "";
-      this.form.thequ = "";
-
-      this.value2 = "";
-      this.value3 = "";
-      var shengfen = this.value;
-      this.form.theSheng = this.province[shengfen].regionName;
-      this.form.shengID = this.province[shengfen].regionId;
-      this.refreshCity(
-        this.province[shengfen].regionId,
-        this.province[shengfen].regionName
-      );
-    },
-    getCity3(value) {
+    getCity(value) {
       //新增
       this.ctm_order.buyUserArea2 = "";
       this.ctm_order.buyUserArea3 = "";
       this.cityData = [];
-      this.countryData = [];
-      var shengfen = this.provinceData.filter(
-        (item) => item.regionName == value
-      )[0];
-      this.refreshCity(shengfen.regionId, shengfen.regionName);
+      this.areaData = [];
+      var selectProvince = this.provinceData.filter((item) => item.REGION_NAME == value)[0];
+      this.refreshCity(selectProvince.REGION_ID);
     },
-    //获取省份
-    getProvince() {
-      Axios.post("/areaRegion/getProvince.do", {})
-        .then((res) => {
-          this.province = res.data.province;
-          this.provinceData = res.data.province;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+    refreshCity(id) {
+      GetAreaList({
+        region_level: 2,
+        parent_code: id
+      }, { loading: false }).then((res) => {
+        this.cityData = res.data;
+      }).catch((error) => {
+        console.log(error);
+      });
+    },
+    getArea(value) {
+      this.ctm_order.buyUserArea3 = "";
+      this.areaData = [];
+      var selectCity = this.cityData.filter((item) => item.REGION_NAME == value)[0];
+      this.refreshArea(selectCity.REGION_ID);
+    },
+    refreshArea(id) {
+      GetAreaList({
+        region_level: 3,
+        parent_code: id
+      }, { loading: false }).then((res) => {
+        this.areaData = res.data;
+      }).catch((error) => {
+        console.log(error);
+      });
     },
     //弹窗打开事件
     dialogOpen() {
       this.dialogFormVisible = true;
-      this.addressData = this.transferData;
-      this.overflowCls = "overflow-cls";
-    },
-    //弹窗关闭事件
-    dialogClose() {
-      this.addressData = [];
-      this.addressData[0] = this.transferData[0];
-      this.overflowCls = "";
-    },
-    //新增地址按钮
-    clickNew() {
-      this.chageOrAdd = false;
-      this.innerVisible = true;
-      this.form = {};
-      this.value = "";
-      this.value2 = "";
-      this.value3 = "";
-    },
-    //新增地址
-    NewAddress(formName) {
-      var url = "/postAddress/addPostAddress.do";
-      var data = {
-        cid: Cookies.get("cid"),
-        postAddress: this.form.address,
-        wlContacts: this.form.name,
-        wlTel: this.form.telephone,
-        province: this.form.theSheng,
-        city: this.form.theshi,
-        country: this.form.thequ,
-        provinceID: this.form.shengID,
-        cityID: this.form.shiID,
-        countryID: this.form.quID,
-      };
-      this.$refs[formName].validate((valid) => {
-        if (
-          valid &&
-          data.province != undefined &&
-          data.city != undefined &&
-          this.form.address != undefined &&
-          this.form.name != undefined &&
-          data.province != "" &&
-          data.city != "" &&
-          this.form.address != "" &&
-          this.form.name != "" &&
-          this.form.telephone != "" &&
-          this.form.telephone != undefined
-        ) {
-          addAddress(url, data).then((res) => {
-            this.dialogFormVisible = false;
-            this.innerVisible = false;
-            this.allAddress();
-            this.$alert("地址添加成功", "提示", {
-              confirmButtonText: "确定",
-              type: "success",
-            });
-          });
-        } else {
-          this.$alert("请完善并填写正确信息", "提示", {
-            confirmButtonText: "确定",
-            type: "warning",
-          });
-          return false;
-        }
-      });
     },
     //获取收货地址
-    allAddress() {
-      Axios.post("/postAddress/getPostAddress.do", {
+    getAllAddress() {
+      GetCustomerAddressList({
         cid: Cookies.get("cid"),
-      })
-        .then((res) => {
-          console.log(res)
-          this.transferData = res.data.data;
-          this.sortAddress();
-          this.addressData = [];
-          if (this.ctm_order.wlTel && this.ctm_order.wlContacts) {
-            //如果是窗帘重新提交进来有默认值
-            var addIndex = 0;
-            for (var i = 0; i < this.transferData.length; i++) {
-              var addArr = {
-                //跟字段对应上，直接判断
-                cid: this.transferData[i].cid,
-                postAddress: this.ctm_order.postAddress,
-                wlContacts: this.ctm_order.wlContacts,
-                wlTel: this.ctm_order.wlTel,
-                addressId: this.transferData[i].addressId,
-                province:
-                  this.ctm_order.reciverArea1 == ""
-                    ? null
-                    : this.ctm_order.reciverArea1,
-                city:
-                  this.ctm_order.reciverArea2 == ""
-                    ? null
-                    : this.ctm_order.reciverArea2,
-                country:
-                  this.ctm_order.reciverArea3 == ""
-                    ? null
-                    : this.ctm_order.reciverArea3,
-                provinceID: this.transferData[i].provinceID,
-                cityID: this.transferData[i].cityID,
-                countryID: this.transferData[i].countryID,
-              };
-              if (
-                JSON.stringify(addArr) == JSON.stringify(this.transferData[i])
-              ) {
-                addIndex = i;
-                break;
-              }
+        condition: "",
+      }, { loading: false }).then((res) => {
+        this.addressListData = res.data;
+        if (this.ctm_order.wlTel && this.ctm_order.wlContacts) {
+          var addIndex = 0;
+          //如果是窗帘重新提交进来有默认值
+          var temp = this.addressListData.filter(item => item.WL_CONTACTS == this.ctm_order.wlContacts && item.WL_TEL == this.ctm_order.wlTel
+            && item.POST_ADDRESS == this.ctm_order.postAddress && item.PROVINCE == this.ctm_order.reciverArea1
+            && item.CITY == this.ctm_order.reciverArea2 && item.COUNTRY == this.ctm_order.reciverArea3);
+          if (temp.length) {
+            temp = temp[0];
+            var index = this.addressListData.indexOf(temp);
+            if (index > -1) {
+              this.radio = index;
             }
-            this.radio = addIndex;
-            this.addressIt = true;
-            this.showAddress();
-          } else {
-            this.addressData[0] = this.transferData[0];
-
-            this.ctm_order.wlTel = this.addressData[0].wlTel;
-            this.ctm_order.wlContacts = this.addressData[0].wlContacts;
-            this.ctm_order.postAddress = this.addressData[0].postAddress;
-            this.ctm_order.reciverArea1 = this.addressData[0].province;
-            this.ctm_order.reciverArea2 = this.addressData[0].city;
-            this.ctm_order.reciverArea3 = this.addressData[0].country;
-            this.ctm_order.allAddress = `${this.ctm_order.reciverArea1 ? this.ctm_order.reciverArea1 : ""
-              }${this.ctm_order.reciverArea2 ? this.ctm_order.reciverArea2 : ""}${this.ctm_order.reciverArea3 ? this.ctm_order.reciverArea3 : ""
-              }${this.ctm_order.postAddress}`;
           }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    //获取更多地址
-    showAddress() {
-      if (this.addressIt == false) {
-        this.addressIt = true;
-        this.overflowCls = "overflow-cls";
-        this.addressData = this.transferData;
-      } else {
-        this.addressIt = false;
-        this.overflowCls = "";
-        var cutPoint = this.radio;
-        var abc = this.transferData.splice(cutPoint, 1);
-        this.transferData.unshift(abc[0]);
-        //this.addressData=this.transferData;
-        this.addressData = [];
-        this.addressData[0] = this.transferData[0];
-        this.radio = 0;
-
-        this.ctm_order.wlTel = this.addressData[0].wlTel;
-        this.ctm_order.wlContacts = this.addressData[0].wlContacts;
-        this.ctm_order.postAddress = this.addressData[0].postAddress;
-        this.ctm_order.reciverArea1 = this.addressData[0].province;
-        this.ctm_order.reciverArea2 = this.addressData[0].city;
-        this.ctm_order.reciverArea3 = this.addressData[0].country;
-        this.ctm_order.allAddress = `${this.ctm_order.reciverArea1 ? this.ctm_order.reciverArea1 : ""
-          }${this.ctm_order.reciverArea2 ? this.ctm_order.reciverArea2 : ""}${this.ctm_order.reciverArea3 ? this.ctm_order.reciverArea3 : ""
-          }${this.ctm_order.postAddress}`;
-        if (this.addressData[0].addressId == 0) {
-          this.ctm_order.postAddressModified = "0";
-          this.ctm_order.allAddress = this.addressData[0].postAddress;
-        } else {
-          this.ctm_order.postAddressModified = "1";
         }
+        this.selectAddress();
+      }).catch((error) => {
+        console.log(error);
+      });
+    },
+    //选中地址
+    selectAddress() {
+      this.moreAddressVisible = false;
+
+      //把选中的放到最前面
+      if (this.addressListData.length > 1) {
+        var cutPoint = this.radio;
+        var temp = this.addressListData.splice(cutPoint, 1);
+        this.addressListData.unshift(temp[0]);
+        this.radio = 0;
+      }
+
+      //赋值
+      this.ctm_order.wlTel = this.addressListData[0].WL_TEL;
+      this.ctm_order.wlContacts = this.addressListData[0].WL_CONTACTS;
+      this.ctm_order.postAddress = this.addressListData[0].POST_ADDRESS;
+      this.ctm_order.reciverArea1 = this.addressListData[0].PROVINCE;
+      this.ctm_order.reciverArea2 = this.addressListData[0].CITY;
+      this.ctm_order.reciverArea3 = this.addressListData[0].COUNTRY;
+      this.ctm_order.allAddress = `${this.ctm_order.reciverArea1 ? this.ctm_order.reciverArea1 : ""
+        }${this.ctm_order.reciverArea2 ? this.ctm_order.reciverArea2 : ""}${this.ctm_order.reciverArea3 ? this.ctm_order.reciverArea3 : ""
+        }${this.ctm_order.postAddress}`;
+      if (this.addressListData[0].ADDRESS_ID == 0) {
+        this.ctm_order.postAddressModified = "0";
+        this.ctm_order.allAddress = this.addressListData[0].POST_ADDRESS;
+      } else {
+        this.ctm_order.postAddressModified = "1";
       }
     },
     //窗帘
@@ -1513,8 +1140,8 @@ export default {
       this.ctm_order.buyUserArea2 = row.CITY;
       this.ctm_order.buyUserArea3 = row.COUNTRY;
       this.ctm_order.buyUserPostAddress = row.POST_ADDRESS;
-      this.refreshCity(row.PROVINCE_ID, row.PROVINCE);
-      this.refreshCountry(row.CITY_ID, row.CITY);
+      this.refreshCity(row.PROVINCE_ID);
+      this.refreshArea(row.CITY_ID);
       this.buyUserVisible = false;
     },
     //隔行变色
@@ -1531,15 +1158,9 @@ export default {
     this.getOrderInfo(); //获得订单相关信息
     this.getActivity(); //获取活动价
     this.getProvince(); //三级联动
-    this.allAddress(); //获取地址
+    this.getAllAddress(); //获取地址
     this._getTickets(); //获取优惠券
     this.chargeQuery(); //经办人
-    GetCustomerAddressList({
-      cid: Cookies.get("cid"),
-      condition: "",
-    }).then(res => {
-      console.log(res)
-    })
   },
 };
 </script>
@@ -1689,6 +1310,7 @@ export default {
   color: orange;
 }
 </style>
+
 <style>
 .el-table .success-row {
   background: #f0f9eb;

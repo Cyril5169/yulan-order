@@ -432,3 +432,24 @@ export function GetCustomerAddressList(data, config = {}) {
         return Promise.reject(err);
     })
 }
+export function InsertAddress(data, config = {}) {
+    return post('/POST_ADDRESS/InsertAddress', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+export function UpdateAddress(data, config = {}) {
+    return post('/POST_ADDRESS/UpdateAddress', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}
+export function DeleteAddress(data, config = {}) {
+    return post('/POST_ADDRESS/DeleteAddress', data, config).then((res) => {
+        return Promise.resolve(res);
+    }).catch((err) => {
+        return Promise.reject(err);
+    })
+}

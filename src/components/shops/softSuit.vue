@@ -181,8 +181,12 @@ export default {
           label: "床品",
         },
         {
-          name: "OTHER",
-          label: "其它",
+          name: "DKPL",
+          label: "吊卡片帘",
+        },
+        {
+          name: "DT",
+          label: "地毯",
         },
       ],
       currentPage: 1, //当前的页数
@@ -467,7 +471,7 @@ export default {
       //判断数字合理性
       //面料、花边保留一位小数
       //其余都是整数
-      let _type = Cookies.get("activeNameSoftSuit");
+      let _type = this.activeName;
       let re = /^[1-9]\d*$/;
       if (_type === "ML" || _type === "XHB") {
         re = /^[0-9]+(.[0-9]{1})?$/;

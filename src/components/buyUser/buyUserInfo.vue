@@ -1,10 +1,10 @@
 <template>
   <div class="zj-flex-page">
     <div class="zj-tbar">
-      <el-button icon="el-icon-refresh" size="mini" circle @click="searchBuyUser">
+      <el-button icon="el-icon-refresh" size="mini" circle @click="searchBuyUser()">
       </el-button>
       <el-input @keyup.enter.native="searchBuyUser()" size="medium" placeholder="输入用户姓名/电话/地址" v-model="condition" clearable
-        style="width:350px;">
+        @clear="searchClick()" style="width:350px;">
         <el-button @click="searchBuyUser()" slot="append" icon="el-icon-search">搜索</el-button>
       </el-input>
       <el-button style="margin-left:20px;" size="medium" @click="addBuyUserShow()" type="primary">新增消费者信息
@@ -163,6 +163,7 @@ export default {
       return address;
     },
     addBuyUserShow() {
+      this.getProvince();
       this.buyUserModel = {
         CUSTOMER_CODE: Cookies.get("companyId"),
         BUYUSER: "",
@@ -184,6 +185,7 @@ export default {
       this.addBuyUserVisible = true;
     },
     editBuyUserShow(row) {
+      this.getProvince();
       this.buyUserModel = JSON.parse(JSON.stringify(row));
       this.areaData = [];
       this.cityData = [];
@@ -238,44 +240,48 @@ export default {
       this.buyUserModel.COUNTRY = selectArea.REGION_NAME;
     },
     onSaveBuyUserClick() {
-      if (!this.buyUserModel.PROVINCE_ID || !this.buyUserModel.CITY_ID) {
-        this.$alert("请填写省市", "提示", {
-          confirmButtonText: "确定",
-          type: "warning",
-        });
-        return;
-      }
-      if (this.addOrNot) {
-        InsertBuyUser(this.buyUserModel).then((res) => {
-          this.$message({
-            message: "新增成功!",
-            type: "success",
-            duration: 1000,
-          });
-          this.searchBuyUser();
-          this.addBuyUserVisible = false;
-        }).catch((res) => {
-          this.$alert("新增失败", "提示", {
-            confirmButtonText: "确定",
-            type: "warning",
-          });
-        });
-      } else {
-        UpdateBuyUser(this.buyUserModel).then((res) => {
-          this.$message({
-            message: "编辑成功!",
-            type: "success",
-            duration: 1000,
-          });
-          this.searchBuyUser();
-          this.addBuyUserVisible = false;
-        }).catch((res) => {
-          this.$alert("编辑失败", "提示", {
-            confirmButtonText: "确定",
-            type: "warning",
-          });
-        });
-      }
+      this.$refs.buyUserForm.validate((valid) => {
+        if (valid) {
+          if (!this.buyUserModel.PROVINCE_ID || !this.buyUserModel.CITY_ID) {
+            this.$alert("请填写省市", "提示", {
+              confirmButtonText: "确定",
+              type: "warning",
+            });
+            return;
+          }
+          if (this.addOrNot) {
+            InsertBuyUser(this.buyUserModel).then((res) => {
+              this.$message({
+                message: "新增成功!",
+                type: "success",
+                duration: 1000,
+              });
+              this.searchBuyUser();
+              this.addBuyUserVisible = false;
+            }).catch((res) => {
+              this.$alert("新增失败", "提示", {
+                confirmButtonText: "确定",
+                type: "warning",
+              });
+            });
+          } else {
+            UpdateBuyUser(this.buyUserModel).then((res) => {
+              this.$message({
+                message: "编辑成功!",
+                type: "success",
+                duration: 1000,
+              });
+              this.searchBuyUser();
+              this.addBuyUserVisible = false;
+            }).catch((res) => {
+              this.$alert("编辑失败", "提示", {
+                confirmButtonText: "确定",
+                type: "warning",
+              });
+            });
+          }
+        }
+      });
     },
     deleteBuyUser(row) {
       this.$confirm("删除的数据无法恢复，是否删除？", "提示", {

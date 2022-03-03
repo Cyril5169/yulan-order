@@ -42,9 +42,9 @@
                         'http://14.29.221.4:10250/pc/#/?cid=' + cid + '&password=' + userInfo.password">网络协议签订</a>
                     <el-badge v-if="wangqian > 0" style="margin-top:5px;" :value="wangqian"></el-badge>
                   </el-dropdown-item>
-                  <el-dropdown-item v-if="isContainAttr('myZone/myCoupon')" @click.native="addTab('myZone/myCoupon')">我的优惠券</el-dropdown-item>
                   <el-dropdown-item v-if="isContainAttr('addressManagment/addressList')" @click.native="addTab('addressManagment/addressList')">收货地址管理</el-dropdown-item>
                   <el-dropdown-item v-if="isContainAttr('buyUser/buyUserInfo')" @click.native="addTab('buyUser/buyUserInfo')">消费者管理</el-dropdown-item>
+                  <el-dropdown-item v-if="isContainAttr('myZone/myCoupon')" @click.native="addTab('myZone/myCoupon')">我的优惠券</el-dropdown-item>
                   <el-dropdown-item @click.native="changePasswordVisible = true">修改密码</el-dropdown-item>
                   <el-dropdown-item divided @click.native="logout">退出登录</el-dropdown-item>
                 </el-dropdown-menu>

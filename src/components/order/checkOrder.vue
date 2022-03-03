@@ -677,7 +677,6 @@ export default {
       }, { loading: false }).then((res) => {
         this.addressListData = res.data;
         if (this.ctm_order.wlTel && this.ctm_order.wlContacts) {
-          var addIndex = 0;
           //如果是窗帘重新提交进来有默认值
           var temp = this.addressListData.filter(item => item.WL_CONTACTS == this.ctm_order.wlContacts && item.WL_TEL == this.ctm_order.wlTel
             && item.POST_ADDRESS == this.ctm_order.postAddress && item.PROVINCE == this.ctm_order.reciverArea1
@@ -714,12 +713,9 @@ export default {
       this.ctm_order.reciverArea1 = this.addressListData[0].PROVINCE;
       this.ctm_order.reciverArea2 = this.addressListData[0].CITY;
       this.ctm_order.reciverArea3 = this.addressListData[0].COUNTRY;
-      this.ctm_order.allAddress = `${this.ctm_order.reciverArea1 ? this.ctm_order.reciverArea1 : ""
-        }${this.ctm_order.reciverArea2 ? this.ctm_order.reciverArea2 : ""}${this.ctm_order.reciverArea3 ? this.ctm_order.reciverArea3 : ""
-        }${this.ctm_order.postAddress}`;
+
       if (this.addressListData[0].ADDRESS_ID == 0) {
         this.ctm_order.postAddressModified = "0";
-        this.ctm_order.allAddress = this.addressListData[0].POST_ADDRESS;
       } else {
         this.ctm_order.postAddressModified = "1";
       }
@@ -733,7 +729,7 @@ export default {
         deleteArray[i] = getPush3[i].cartItemId;
       }
       this.ctm_order.allSpend = this.totalPrice;
-      var data2 = {
+      var data = {
         product_group_tpye: this.newCurtainStatus == "1" ? "EE" : this.product_group_tpye, //产品类别
         promotion_cost: this.totalPrice, //活动价格【】
         cid: Cookies.get("cid"), //登录用户账号
@@ -745,7 +741,7 @@ export default {
         ctm_orders: this.order_details,
         cartItemIDs: deleteArray,
       };
-      orderSettlement(data2).then((res) => {
+      orderSettlement(data).then((res) => {
         this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
         if (this.newCurtainStatus == "1")
           this.$root.$emit("refreshBadgeIcon", "newCurtainCount");
@@ -767,13 +763,12 @@ export default {
           oldUrl: "order/checkOrder",
           newUrl: "order/myOrder",
         });
-      })
-        .catch((res) => {
-          this.$alert("提交失败:" + res.msg, "提示", {
-            confirmButtonText: "确定",
-            type: "warning",
-          });
+      }).catch((res) => {
+        this.$alert("提交失败:" + res.msg, "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
         });
+      });
     },
     //提交结算
     payIt() {
@@ -785,7 +780,7 @@ export default {
         deleteArray[i] = getPush3[i].id;
       }
       this.ctm_order.allSpend = this.totalPrice;
-      var data2 = {
+      var data = {
         product_group_tpye: this.product_group_tpye, //产品类别，从购物车出获取
         promotion_cost: this.totalPrice, //活动价格【】
         cid: Cookies.get("cid"), //登录用户账号
@@ -797,7 +792,7 @@ export default {
         ctm_orders: this.order_details,
         cartItemIDs: deleteArray,
       };
-      normalOrderSettlement(data2).then((res) => {
+      normalOrderSettlement(data).then((res) => {
         this.$root.$emit("refreshMoneyEvent"); //触发主页面刷新余额
         this.$root.$emit("refreshBadgeIcon", "wallCount");
         this.$root.$emit("refreshBadgeIcon", "softCount");
@@ -817,19 +812,16 @@ export default {
           oldUrl: "order/checkOrder",
           newUrl: "order/myOrder",
         });
-      })
-        .catch((res) => {
-          this.$alert("提交失败:" + res.msg, "提示", {
-            confirmButtonText: "确定",
-            type: "warning",
-          });
+      }).catch((res) => {
+        this.$alert("提交失败:" + res.msg, "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
         });
+      });
     },
     checkPay() {
-      if (
-        this.ctm_order.deliveryNotes == "" &&
-        this.ctm_order.deliveryType == 3
-      ) {
+      if (this.ctm_order.deliveryNotes == "" &&
+        this.ctm_order.deliveryType == 3) {
         this.$alert("请填写指定的物流公司", "提示", {
           confirmButtonText: "确定",
           type: "warning",
@@ -843,8 +835,14 @@ export default {
       //   });
       //   return;
       // }
-      //购买人地址
-      this.ctm_order.buyUserAddress = this.rsplitAddress(this.ctm_order);
+
+      //地址拼接
+      this.ctm_order.allAddress = `${this.ctm_order.reciverArea1 ? this.ctm_order.reciverArea1 : ""
+        }${this.ctm_order.reciverArea2 ? this.ctm_order.reciverArea2 : ""}${this.ctm_order.reciverArea3 ? this.ctm_order.reciverArea3 : ""
+        }${this.ctm_order.postAddress}`;
+      this.ctm_order.buyUserAddress = `${this.ctm_order.buyUserArea1 ? this.ctm_order.buyUserArea1 : ""
+        }${this.ctm_order.buyUserArea2 ? this.ctm_order.buyUserArea2 : ""}${this.ctm_order.buyUserArea3 ? this.ctm_order.buyUserArea3 : ""
+        }${this.ctm_order.buyUserPostAddress ? this.ctm_order.buyUserPostAddress : ""}`;
       //附件拼接
       this.ctm_order.buyUserPicture = "";
       for (var i = 0; i < this.fileList.length; i++) {
@@ -1126,12 +1124,6 @@ export default {
     },
     buyUserShow() {
       this.buyUserVisible = true;
-    },
-    rsplitAddress(row) {
-      var address = `${row.buyUserArea1 ? row.buyUserArea1 : ""}${row.buyUserArea2 ? row.buyUserArea2 : ""
-        }${row.buyUserArea3 ? row.buyUserArea3 : ""}${row.buyUserPostAddress ? row.buyUserPostAddress : ""
-        }`;
-      return address;
     },
     handleRowDBClick(row, column) {
       this.ctm_order.buyUser = row.BUYUSER;
